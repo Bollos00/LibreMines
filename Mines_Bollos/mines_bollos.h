@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include <QVector>
-#include <QRandomGenerator>
+#include <QtCore/QRandomGenerator>
 #include <QLabel>
 #include <QObject>
 #include <QDebug>
