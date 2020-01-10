@@ -789,9 +789,11 @@ void Mines_Bollos::vGameLost(int _X, int _Y){
     for(int j=0; j<i_Y; j++){
         for (int i=0; i<i_X; i++){
             if(Principal_Matrix[i][j].bHiddenState == true){
-                if(Principal_Matrix[i][j].S_Cell == MINE)
+
+                if(Principal_Matrix[i][j].S_Cell == MINE && Principal_Matrix[i][j].bFlag == false)
                     Principal_Matrix[i][j].QPB_a->hide();
-                else if (Principal_Matrix[i][j].bFlag == true){
+
+                else if (Principal_Matrix[i][j].S_Cell != MINE && Principal_Matrix[i][j].bFlag == true){
                     Principal_Matrix[i][j].QPB_a->hide();
                     Principal_Matrix[i][j].QL->setPixmap(QPixmap::fromImage(*QI_WrongFlag).scaled(fm, fm, Qt::KeepAspectRatio));
                 }
@@ -1052,9 +1054,6 @@ void Mines_Bollos::vConfigureInterface(){
 
     QL_Customized_nMines = new QLabel(this);
     QL_Customized_nMines->setText("Percent of Mines_Bollos: ");
-
-//    QL_FirstCellClean = new QLabel(this);
-//    QL_FirstCellClean->setText("First Cell Clean: ");
 
     QCB_FirstCellClean = new QCheckBox(this);
     QCB_FirstCellClean->setText("First Cell Clean");
