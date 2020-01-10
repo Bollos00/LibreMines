@@ -51,13 +51,22 @@ Mines_Bollos::~Mines_Bollos()
 }
 
 void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i_Y_Clean){
+
+    QPB_QuitInGame->setEnabled(false);
+    QPB_RestartInGame->setEnabled(false);
+
     i_X =_X;
     i_Y =_Y;
     i_nMines = i_nMines_;
     i_MinesLeft = i_nMines_;
     i_HiddenCells = 0;
 
-    Principal_Matrix= std::vector<std::vector<Cell>> (i_X, std::vector<Cell>(i_Y));
+    bool bRemakingGame = false;
+    if( i_X_Clean != -1 && i_Y_Clean != -1)
+        bRemakingGame = true;
+
+    if(!bRemakingGame)
+        Principal_Matrix= std::vector<std::vector<Cell>> (i_X, std::vector<Cell>(i_Y));
 
     if(i_limit_width/i_X < i_limit_height/i_Y)
         fm = i_limit_width/i_X;
@@ -76,34 +85,47 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
             QPM_NoFlag = QPixmap::fromImage(*QI_NoFlag).scaled(fm, fm, Qt::KeepAspectRatio),
             QPM_Mine = QPixmap::fromImage(*QI_Mine).scaled(fm, fm, Qt::KeepAspectRatio);
 
-
-    for(int j=0; j<i_Y; j++){
-        for (int i=0; i<i_X; i++){
-            Principal_Matrix[i][j].QL = new QLabel(this);
-            Principal_Matrix[i][j].QPB_a = new QPushButton_adapted(this);
-
-            Principal_Matrix[i][j].QL->setGeometry(i*fm,j*fm,fm,fm);
-            Principal_Matrix[i][j].QL->show();
-
-            Principal_Matrix[i][j].QPB_a->setGeometry(i*fm,j*fm,fm,fm);
-            Principal_Matrix[i][j].QPB_a->setIcon(QIcon(QPM_NoFlag));
-            Principal_Matrix[i][j].QPB_a->setIconSize(QSize(fm, fm));
-            Principal_Matrix[i][j].QPB_a->show();
-
-            Principal_Matrix[i][j].S_Cell = ZERO;
-            Principal_Matrix[i][j].bHiddenState = true;
-            Principal_Matrix[i][j].bFlag = false;
-
-            connect(Principal_Matrix[i][j].QPB_a, SIGNAL(SIGNAL_Clicked(QMouseEvent*)),this,SLOT(SLOT_OnQPushButton_adapteded_Clicked(QMouseEvent*)));
+    if(bRemakingGame){
+        for(int j=0; j<i_Y; j++){
+            for (int i=0; i<i_X; i++){
+                Principal_Matrix[i][j].S_Cell = ZERO;
+            }
         }
     }
+    else {
+        for(int j=0; j<i_Y; j++){
+            for (int i=0; i<i_X; i++){
+                Principal_Matrix[i][j].QL = new QLabel(this);
+                Principal_Matrix[i][j].QPB_a = new QPushButton_adapted(this);
+
+                Principal_Matrix[i][j].QL->setGeometry(i*fm,j*fm,fm,fm);
+                Principal_Matrix[i][j].QL->show();
+
+                Principal_Matrix[i][j].QPB_a->setGeometry(i*fm,j*fm,fm,fm);
+                Principal_Matrix[i][j].QPB_a->setIcon(QIcon(QPM_NoFlag));
+                Principal_Matrix[i][j].QPB_a->setIconSize(QSize(fm, fm));
+                Principal_Matrix[i][j].QPB_a->show();
+                Principal_Matrix[i][j].QPB_a->setEnabled(false);
+
+                Principal_Matrix[i][j].S_Cell = ZERO;
+                Principal_Matrix[i][j].bHiddenState = true;
+                Principal_Matrix[i][j].bFlag = false;
+
+                connect(Principal_Matrix[i][j].QPB_a, SIGNAL(SIGNAL_Clicked(QMouseEvent*)),this,SLOT(SLOT_OnQPushButton_adapteded_Clicked(QMouseEvent*)));
+                qApp->processEvents();
+            }
+        }
+    }
+
 
     QVector<QVector2D> vt_vt2d_CleanPoints;
     vt_vt2d_CleanPoints.clear();
 
-    for (int i=-1; i<=1; i++){
-        for (int j=-1; j<=1; j++){
-            vt_vt2d_CleanPoints.append(QVector2D(i_X_Clean + i, i_Y_Clean + j));
+    if(bRemakingGame){
+        for (int i=-1; i<=1; i++){
+            for (int j=-1; j<=1; j++){
+                vt_vt2d_CleanPoints.append(QVector2D(i_X_Clean + i, i_Y_Clean + j));
+            }
         }
     }
 
@@ -113,10 +135,12 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
 
         bool bPointClean = false;
 
-        for (auto n: vt_vt2d_CleanPoints){
-            if(n.x() == i && n.y() == j){
-                bPointClean = true;
-                break;
+        if(bRemakingGame){
+            for (auto n: vt_vt2d_CleanPoints){
+                if(static_cast<int>(n.x()) == i && static_cast<int>(n.y()) == j){
+                    bPointClean = true;
+                    break;
+                }
             }
         }
 
@@ -128,6 +152,7 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
     }
     for(int j=0; j<i_Y; j++){
         for (int i=0; i<i_X; i++){
+            Principal_Matrix[i][j].QPB_a->setEnabled(true);
             if(Principal_Matrix[i][j].S_Cell == ZERO){
                 i_HiddenCells++;
 
@@ -755,7 +780,8 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
     QL_TimerInGame->setNum(0);
     QL_YouWon_YouLost->setText(" ");
 
-
+    QPB_QuitInGame->setEnabled(true);
+    QPB_RestartInGame->setEnabled(true);
 }
 
 
@@ -1320,7 +1346,6 @@ void Mines_Bollos::SLOT_OnQPushButton_adapteded_Clicked(QMouseEvent *e){
     case Qt::LeftButton:
         if(bFirst){
             if(bFirstCellClean  &&  Principal_Matrix[_X][_Y].S_Cell != ZERO){
-                vResetPrincipal_Matrix();
                 vNewGame(i_X, i_Y, i_nMines, _X, _Y);
             }
             bFirst =false;
