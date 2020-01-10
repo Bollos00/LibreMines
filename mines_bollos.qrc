@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/Media_rsc">
+        <file>Media/Minesweeper_wrong_flag.png</file>
+        <file>Media/Minesweeper_no_flag.png</file>
+        <file>Media/Minesweeper_boom.png</file>
+        <file>Media/Minesweeper_mine.png</file>
+        <file>Media/Minesweeper_flag.png</file>
+        <file>Media/Minesweeper_eight.png</file>
+        <file>Media/Minesweeper_seven.png</file>
+        <file>Media/Minesweeper_six.png</file>
+        <file>Media/Minesweeper_five.png</file>
+        <file>Media/Minesweeper_four.png</file>
+        <file>Media/Minesweeper_three.png</file>
+        <file>Media/Minesweeper_two.png</file>
+        <file>Media/Minesweeper_one.png</file>
+        <file>Media/Minesweeper_zero.png</file>
+    </qresource>
+</RCC>
