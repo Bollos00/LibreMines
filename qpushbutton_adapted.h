@@ -6,17 +6,36 @@
 #include <QPushButton>
 #include <QMouseEvent>
 
+/**
+ * @brief
+ *
+ */
 class QPushButton_adapted : public QPushButton
 {
     Q_OBJECT
 
 public:
+    /**
+     * @brief
+     *
+     * @param parent
+     */
     explicit QPushButton_adapted(QWidget *parent = nullptr);
 
 private slots:
+    /**
+     * @brief
+     *
+     * @param e
+     */
     void mousePressEvent(QMouseEvent *e);
 
 signals:
+    /**
+     * @brief
+     *
+     * @param
+     */
     void SIGNAL_Clicked(QMouseEvent *);
 };
 

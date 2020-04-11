@@ -24,6 +24,10 @@
 
 #include <QMainWindow>
 
+/**
+ * @brief
+ *
+ */
 enum STATE{
     MINE = -1,
     ZERO = 0,
@@ -37,6 +41,10 @@ enum STATE{
     EIGHT = 8
 };
 
+/**
+ * @brief
+ *
+ */
 enum GAME_DIFFICULTY{
     NONE,
     EASY,
@@ -45,119 +53,240 @@ enum GAME_DIFFICULTY{
     CUSTOMIZED
 };
 
+/**
+ * @brief
+ *
+ */
 struct Cell{
-    STATE S_Cell;
-    QPushButton_adapted *QPB_a;
-    QLabel *QL;
-    bool bHiddenState;
-    bool bFlag;
+    STATE S_Cell; /**< TODO: describe */
+    QPushButton_adapted *QPB_a; /**< TODO: describe */
+    QLabel *QL; /**< TODO: describe */
+    bool bHiddenState; /**< TODO: describe */
+    bool bFlag; /**< TODO: describe */
 };
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Mines_Bollos; }
 QT_END_NAMESPACE
 
+/**
+ * @brief
+ *
+ */
 class Mines_Bollos : public QMainWindow
 {
     Q_OBJECT
 
 
 public:
+    /**
+     * @brief
+     *
+     * @param parent
+     */
     Mines_Bollos(QWidget *parent = nullptr);
+    /**
+     * @brief
+     *
+     */
     ~Mines_Bollos();
 
+    /**
+     * @brief
+     *
+     * @param _X
+     * @param _Y
+     * @param i_nMines_
+     * @param i_X_Clean
+     * @param i_Y_Clean
+     */
     void vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean = -2, int i_Y_Clean = -2);
+    /**
+     * @brief
+     *
+     */
     void vResetPrincipal_Matrix();
+    /**
+     * @brief
+     *
+     */
     void vConfigureInterface();
+    /**
+     * @brief
+     *
+     */
     void vHideInterface();
+    /**
+     * @brief
+     *
+     */
     void vShowInterface();
+    /**
+     * @brief
+     *
+     * @param _X
+     * @param _Y
+     */
     void vCasaLivre(int _X, int _Y);
+    /**
+     * @brief
+     *
+     */
     void vAjustInterfaceInGame();
+    /**
+     * @brief
+     *
+     */
     void vHideInterfaceInGame();
+    /**
+     * @brief
+     *
+     */
     void vShowInterfaceInGame();
+    /**
+     * @brief
+     *
+     * @param _X
+     * @param _Y
+     */
     void vAddOrRemoveFlag(int _X, int _Y);
+    /**
+     * @brief
+     *
+     * @param _X
+     * @param _Y
+     */
     void vGameLost(int _X, int _Y);
+    /**
+     * @brief
+     *
+     */
     void vGameWon();
+    /**
+     * @brief
+     *
+     */
     void vStartTimer();
+    /**
+     * @brief
+     *
+     */
     void vGenerateStatics();
 
 private slots:
+    /**
+     * @brief
+     *
+     */
     void SLOT_Easy();
+    /**
+     * @brief
+     *
+     */
     void SLOT_Medium();
+    /**
+     * @brief
+     *
+     */
     void SLOT_Hard();
+    /**
+     * @brief
+     *
+     */
     void SLOT_Customized();
 
+    /**
+     * @brief
+     *
+     */
     void SLOT_Quit();
+    /**
+     * @brief
+     *
+     */
     void SLOT_Restart();
 
+    /**
+     * @brief
+     *
+     */
     void SLOT_UpdateFirstCellClean();
 
+    /**
+     * @brief
+     *
+     */
     void SLOT_UpdateTime();
 
+    /**
+     * @brief
+     *
+     * @param e
+     */
     void SLOT_OnQPushButton_adapteded_Clicked(QMouseEvent *e);
 
 private:
-    Ui::Mines_Bollos *ui;
+    Ui::Mines_Bollos *ui; /**< TODO: describe */
 
-    std::vector<std::vector<Cell>> Principal_Matrix;
-    int i_limit_height;
-    int i_limit_width;
+    std::vector<std::vector<Cell>> Principal_Matrix; /**< TODO: describe */
+    int i_limit_height; /**< TODO: describe */
+    int i_limit_width; /**< TODO: describe */
 
-    int i_X;
-    int i_Y;
-    int i_nMines;
-    int i_TimeInSeconds;
-    int i_MinesLeft;
-    int i_HiddenCells;
-    int fm;
+    int i_X; /**< TODO: describe */
+    int i_Y; /**< TODO: describe */
+    int i_nMines; /**< TODO: describe */
+    int i_TimeInSeconds; /**< TODO: describe */
+    int i_MinesLeft; /**< TODO: describe */
+    int i_HiddenCells; /**< TODO: describe */
+    int fm; /**< TODO: describe */
 
-    int i_CellsToUnlock;
+    int i_CellsToUnlock; /**< TODO: describe */
 
-    bool bFirst;
-    bool bFirstCellClean;
+    bool bFirst; /**< TODO: describe */
+    bool bFirstCellClean; /**< TODO: describe */
 
-    GAME_DIFFICULTY GAME_STATE;
+    GAME_DIFFICULTY GAME_STATE; /**< TODO: describe */
 
-    QPushButton *QPB_Easy;
-    QPushButton *QPB_Medium;
-    QPushButton *QPB_Hard;
+    QPushButton *QPB_Easy; /**< TODO: describe */
+    QPushButton *QPB_Medium; /**< TODO: describe */
+    QPushButton *QPB_Hard; /**< TODO: describe */
 
-    QPushButton *QPB_CustomizedNewGame;
+    QPushButton *QPB_CustomizedNewGame; /**< TODO: describe */
 
-    QSpinBox *QSB_Customized_X;
-    QSpinBox *QSB_Customized_Y;
-    QSpinBox *QSB_Customized_nMines;
+    QSpinBox *QSB_Customized_X; /**< TODO: describe */
+    QSpinBox *QSB_Customized_Y; /**< TODO: describe */
+    QSpinBox *QSB_Customized_nMines; /**< TODO: describe */
 
-    QLabel *QL_Customized_X;
-    QLabel *QL_Customized_Y;
-    QLabel *QL_Customized_nMines;
+    QLabel *QL_Customized_X; /**< TODO: describe */
+    QLabel *QL_Customized_Y; /**< TODO: describe */
+    QLabel *QL_Customized_nMines; /**< TODO: describe */
 
-    QCheckBox *QCB_FirstCellClean;
+    QCheckBox *QCB_FirstCellClean; /**< TODO: describe */
 
-    QTimer *QTIMER_TimeInGame;
-    QLabel *QL_TimerInGame;
-    QLCDNumber *QLCDN_MinesLeft;
-    QPushButton *QPB_RestartInGame;
-    QPushButton *QPB_QuitInGame;
+    QTimer *QTIMER_TimeInGame; /**< TODO: describe */
+    QLabel *QL_TimerInGame; /**< TODO: describe */
+    QLCDNumber *QLCDN_MinesLeft; /**< TODO: describe */
+    QPushButton *QPB_RestartInGame; /**< TODO: describe */
+    QPushButton *QPB_QuitInGame; /**< TODO: describe */
 
-    QLabel *QL_Mines_Bollos;
-    QLabel *QL_YouWon_YouLost;
-    QLabel *QL_StatisLastMatch;
+    QLabel *QL_Mines_Bollos; /**< TODO: describe */
+    QLabel *QL_YouWon_YouLost; /**< TODO: describe */
+    QLabel *QL_StatisLastMatch; /**< TODO: describe */
 
-    QImage *QI_Zero;
-    QImage *QI_One;
-    QImage *QI_Two;
-    QImage *QI_Three;
-    QImage *QI_Four;
-    QImage *QI_Five;
-    QImage *QI_Six;
-    QImage *QI_Seven;
-    QImage *QI_Eight;
-    QImage *QI_Flag;
-    QImage *QI_NoFlag;
-    QImage *QI_Mine;
-    QImage *QI_Boom;
-    QImage *QI_WrongFlag;
+    QImage *QI_Zero; /**< TODO: describe */
+    QImage *QI_One; /**< TODO: describe */
+    QImage *QI_Two; /**< TODO: describe */
+    QImage *QI_Three; /**< TODO: describe */
+    QImage *QI_Four; /**< TODO: describe */
+    QImage *QI_Five; /**< TODO: describe */
+    QImage *QI_Six; /**< TODO: describe */
+    QImage *QI_Seven; /**< TODO: describe */
+    QImage *QI_Eight; /**< TODO: describe */
+    QImage *QI_Flag; /**< TODO: describe */
+    QImage *QI_NoFlag; /**< TODO: describe */
+    QImage *QI_Mine; /**< TODO: describe */
+    QImage *QI_Boom; /**< TODO: describe */
+    QImage *QI_WrongFlag; /**< TODO: describe */
 
 };
 #endif // MINES_BOLLOS_H

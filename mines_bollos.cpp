@@ -62,7 +62,7 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
     i_HiddenCells = 0;
 
     bool bRemakingGame = false;
-    if( i_X_Clean != -1 && i_Y_Clean != -1)
+    if( i_X_Clean != -2 && i_Y_Clean != -2)
         bRemakingGame = true;
 
     if(!bRemakingGame)
