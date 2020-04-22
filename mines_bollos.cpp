@@ -86,15 +86,19 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
             QPM_Mine = QPixmap::fromImage(*QI_Mine).scaled(fm, fm, Qt::KeepAspectRatio);
 
     if(bRemakingGame){
+
         for(int j=0; j<i_Y; j++){
             for (int i=0; i<i_X; i++){
+
                 Principal_Matrix[i][j].S_Cell = ZERO;
             }
         }
     }
     else {
+
         for(int j=0; j<i_Y; j++){
             for (int i=0; i<i_X; i++){
+
                 Principal_Matrix[i][j].QL = new QLabel(this);
                 Principal_Matrix[i][j].QPB_a = new QPushButton_adapted(this);
 
@@ -122,20 +126,24 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
     vt_vt2d_CleanPoints.clear();
 
     if(bRemakingGame){
+
         for (int i=-1; i<=1; i++){
             for (int j=-1; j<=1; j++){
+
                 vt_vt2d_CleanPoints.append(QVector2D(i_X_Clean + i, i_Y_Clean + j));
             }
         }
     }
 
     while(i_nMines_>0){
+
         int i = QRandomGenerator::global()->bounded(0,i_X);
         int j = QRandomGenerator::global()->bounded(0,i_Y);
 
         bool bPointClean = false;
 
         if(bRemakingGame){
+
             for (auto n: vt_vt2d_CleanPoints){
                 if(static_cast<int>(n.x()) == i && static_cast<int>(n.y()) == j){
                     bPointClean = true;
@@ -145,6 +153,7 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
         }
 
         if(Principal_Matrix[i][j].S_Cell == ZERO && bPointClean == false){
+
             i_nMines_--;
             Principal_Matrix[i][j].S_Cell = MINE;
             Principal_Matrix[i][j].QL->setPixmap(QPM_Mine);
@@ -152,8 +161,11 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
     }
     for(int j=0; j<i_Y; j++){
         for (int i=0; i<i_X; i++){
+
             Principal_Matrix[i][j].QPB_a->setEnabled(true);
+
             if(Principal_Matrix[i][j].S_Cell == ZERO){
+
                 i_HiddenCells++;
 
                 int auxiliar = 0;
@@ -166,60 +178,60 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
                 else if(i==0 && j==(i_Y-1)){
@@ -231,60 +243,60 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
                 else if(i==(i_X-1) && j==0){
@@ -296,60 +308,60 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
                 else if(i==(i_X-1) && j==(i_Y-1)){
@@ -361,60 +373,60 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
                 else if(i==0 && j>0 && j<(i_Y-1)){
@@ -430,63 +442,63 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
-                    else if(i==(i_X-1) && j>0 && j<(i_Y-1)){
+                else if(i==(i_X-1) && j>0 && j<(i_Y-1)){
                     if(Principal_Matrix[i-1][j].S_Cell == MINE)
                         auxiliar++;
                     if(Principal_Matrix[i][j+1].S_Cell == MINE)
@@ -499,60 +511,60 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
                 else if(i>0  && i<(i_X-1) && j==0){
@@ -568,60 +580,60 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
                 else if(i>0 && i<(i_X-1) && j==(i_Y-1)){
@@ -637,60 +649,60 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
                 else {
@@ -712,60 +724,60 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
                         auxiliar++;
 
                     switch (auxiliar) {
-                    case 0:
-                        Principal_Matrix[i][j].S_Cell = ZERO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
+                        case 0:
+                            Principal_Matrix[i][j].S_Cell = ZERO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Zero);
 
 
-                        break;
-                    case 1:
-                        Principal_Matrix[i][j].S_Cell = ONE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_One);
+                            break;
+                        case 1:
+                            Principal_Matrix[i][j].S_Cell = ONE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_One);
 
 
-                        break;
-                    case 2:
-                        Principal_Matrix[i][j].S_Cell = TWO;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
+                            break;
+                        case 2:
+                            Principal_Matrix[i][j].S_Cell = TWO;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Two);
 
 
-                        break;
-                    case 3:
-                        Principal_Matrix[i][j].S_Cell = THREE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
+                            break;
+                        case 3:
+                            Principal_Matrix[i][j].S_Cell = THREE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Three);
 
 
-                        break;
-                    case 4:
-                        Principal_Matrix[i][j].S_Cell = FOUR;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
+                            break;
+                        case 4:
+                            Principal_Matrix[i][j].S_Cell = FOUR;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Four);
 
 
-                        break;
-                    case 5:
-                        Principal_Matrix[i][j].S_Cell = FIVE;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
+                            break;
+                        case 5:
+                            Principal_Matrix[i][j].S_Cell = FIVE;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Five);
 
 
-                        break;
-                    case 6:
-                        Principal_Matrix[i][j].S_Cell = SIX;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
+                            break;
+                        case 6:
+                            Principal_Matrix[i][j].S_Cell = SIX;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Six);
 
 
-                        break;
-                    case 7:
-                        Principal_Matrix[i][j].S_Cell = SEVEN;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
+                            break;
+                        case 7:
+                            Principal_Matrix[i][j].S_Cell = SEVEN;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Seven);
 
 
-                        break;
-                    case 8:
-                        Principal_Matrix[i][j].S_Cell = EIGHT;
-                        Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
+                            break;
+                        case 8:
+                            Principal_Matrix[i][j].S_Cell = EIGHT;
+                            Principal_Matrix[i][j].QL->setPixmap(QPM_Eight);
 
 
-                        break;
+                            break;
                     }
                 }
             }
@@ -787,24 +799,25 @@ void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i
 
 
 void Mines_Bollos::vGameLost(int _X, int _Y){
+
     qDebug()<<"You Lost";
 
     QTIMER_TimeInGame->stop();
 
     switch (GAME_STATE) {
-    case NONE:
-        break;
-    case EASY:
-        QL_YouWon_YouLost->setText("You Lost\nDifficulty: EASY");
-        break;
-    case MEDIUM:
-        QL_YouWon_YouLost->setText("You Lost\nDifficulty: MEDIUM");
-        break;
-    case HARD:
-        QL_YouWon_YouLost->setText("You Lost\nDifficulty: HARD");
-        break;
-    case CUSTOMIZED:
-        QL_YouWon_YouLost->setText("You Lost\nDifficulty: CUSTOM\n" + QString::number(i_X) + "x" + QString::number(i_Y) + " : " + QString::number(i_nMines) + " Mines");
+        case NONE:
+            break;
+        case EASY:
+            QL_YouWon_YouLost->setText("You Lost\nDifficulty: EASY");
+            break;
+        case MEDIUM:
+            QL_YouWon_YouLost->setText("You Lost\nDifficulty: MEDIUM");
+            break;
+        case HARD:
+            QL_YouWon_YouLost->setText("You Lost\nDifficulty: HARD");
+            break;
+        case CUSTOMIZED:
+            QL_YouWon_YouLost->setText("You Lost\nDifficulty: CUSTOM\n" + QString::number(i_X) + "x" + QString::number(i_Y) + " : " + QString::number(i_nMines) + " Mines");
     }
 
 
@@ -832,24 +845,25 @@ void Mines_Bollos::vGameLost(int _X, int _Y){
 }
 
 void Mines_Bollos::vGameWon(){
+
     qDebug()<<"You won: "<<i_TimeInSeconds<<" Seconds";
 
     QTIMER_TimeInGame->stop();
 
     switch (GAME_STATE) {
-    case NONE:
-        break;
-    case EASY:
-        QL_YouWon_YouLost->setText("You Won\nDifficulty: EASY");
-        break;
-    case MEDIUM:
-        QL_YouWon_YouLost->setText("You Won\nDifficulty: MEDIUM");
-        break;
-    case HARD:
-        QL_YouWon_YouLost->setText("You Won\nDifficulty: HARD");
-        break;
-    case CUSTOMIZED:
-        QL_YouWon_YouLost->setText("You Won\nDifficulty: CUSTOM\n" + QString::number(i_X) + "x" + QString::number(i_Y) + " : " + QString::number(i_nMines) + " Mines");
+        case NONE:
+            break;
+        case EASY:
+            QL_YouWon_YouLost->setText("You Won\nDifficulty: EASY");
+            break;
+        case MEDIUM:
+            QL_YouWon_YouLost->setText("You Won\nDifficulty: MEDIUM");
+            break;
+        case HARD:
+            QL_YouWon_YouLost->setText("You Won\nDifficulty: HARD");
+            break;
+        case CUSTOMIZED:
+            QL_YouWon_YouLost->setText("You Won\nDifficulty: CUSTOM\n" + QString::number(i_X) + "x" + QString::number(i_Y) + " : " + QString::number(i_nMines) + " Mines");
     }
 
     vGenerateStatics();
@@ -863,6 +877,7 @@ void Mines_Bollos::vGameWon(){
 }
 
 void Mines_Bollos::vCasaLivre(int _X, int _Y){
+
     if(Principal_Matrix[_X][_Y] .bHiddenState == true && Principal_Matrix[_X][_Y].bFlag == false){
         Principal_Matrix[_X][_Y].bHiddenState = false;
         Principal_Matrix[_X][_Y].QPB_a->hide();
@@ -1089,13 +1104,13 @@ void Mines_Bollos::vConfigureInterface(){
                           width/2 - 2*width/20, 4*(height/2 - 2*height/20)/5 );
 
     QPB_Medium->setGeometry(QPB_Easy->x() + QPB_Easy->width() + width/20, height/20,
-                           width/2 - 2*width/20, 4*(height/2 - 2*height/20)/5 );
+                            width/2 - 2*width/20, 4*(height/2 - 2*height/20)/5 );
 
     QPB_Hard->setGeometry(width/20, QPB_Easy->y() + QPB_Easy->height() + height/20,
                           width/2 - 2*width/20,  4*(height/2 - 2*height/20)/5 );
 
     QCB_FirstCellClean->setGeometry(width/20, QPB_Hard->y() + QPB_Hard->height() + height/20,
-                                   width/2 - 2*width/20,  (height/2 - 2*height/20)/5 );
+                                    width/2 - 2*width/20,  (height/2 - 2*height/20)/5 );
 
     QPB_CustomizedNewGame->setGeometry(QPB_Easy->x() + QPB_Easy->width() + width/20, QPB_Easy->y() + QPB_Easy->height() + height/20,
                                        width/2 - 2*width/20, 2*(height/2 - 2*height/20)/5 );
@@ -1137,6 +1152,7 @@ void Mines_Bollos::vConfigureInterface(){
 }
 
 void Mines_Bollos::vHideInterface(){
+
     QPB_Easy->hide();
     QPB_Medium->hide();
     QPB_Hard->hide();
@@ -1155,6 +1171,7 @@ void Mines_Bollos::vHideInterface(){
 }
 
 void Mines_Bollos::vShowInterface(){
+
     QPB_Easy->show();
     QPB_Medium->show();
     QPB_Hard->show();
@@ -1229,6 +1246,7 @@ void Mines_Bollos::SLOT_Customized(){
 }
 
 void Mines_Bollos::vAjustInterfaceInGame(){
+
     int width = this->width();
     int height = this->height();
 
@@ -1243,6 +1261,7 @@ void Mines_Bollos::vAjustInterfaceInGame(){
 
 
 void Mines_Bollos::vHideInterfaceInGame(){
+
     QL_TimerInGame->hide();
     QLCDN_MinesLeft->hide();
     QPB_RestartInGame->hide();
@@ -1253,6 +1272,7 @@ void Mines_Bollos::vHideInterfaceInGame(){
 }
 
 void Mines_Bollos::vShowInterfaceInGame(){
+
     QL_TimerInGame->show();
     QLCDN_MinesLeft->show();
     QPB_RestartInGame->show();
@@ -1263,7 +1283,8 @@ void Mines_Bollos::vShowInterfaceInGame(){
 }
 
 void Mines_Bollos::SLOT_Restart(){
-    if(QTIMER_TimeInGame->isActive())
+    if(QTIMER_TimeInGame->isActive()
+       )
         QTIMER_TimeInGame->stop();
 
     delete QTIMER_TimeInGame;
@@ -1280,6 +1301,7 @@ void Mines_Bollos::SLOT_Restart(){
 }
 
 void Mines_Bollos::SLOT_Quit(){
+
     if (QTIMER_TimeInGame->isActive())
         QTIMER_TimeInGame->stop();
 
@@ -1295,6 +1317,7 @@ void Mines_Bollos::SLOT_Quit(){
 }
 
 void Mines_Bollos::SLOT_UpdateTime(){
+
     i_TimeInSeconds++;
     QL_TimerInGame->setNum(i_TimeInSeconds);
 }
@@ -1302,26 +1325,29 @@ void Mines_Bollos::SLOT_UpdateTime(){
 
 
 void Mines_Bollos::vAddOrRemoveFlag(int _X, int _Y){
+
     switch (Principal_Matrix[_X][_Y].bFlag){
-    case false:
-        Principal_Matrix[_X][_Y].QPB_a->setIcon(QIcon(QPixmap::fromImage(*QI_Flag).scaled(fm, fm, Qt::KeepAspectRatio)));
-        Principal_Matrix[_X][_Y].QPB_a->setIconSize(QSize(fm, fm));
-        Principal_Matrix[_X][_Y].bFlag = true;
-        i_MinesLeft--;
-        QLCDN_MinesLeft->display(i_MinesLeft);
-        break;
-    case true:
-        Principal_Matrix[_X][_Y].QPB_a->setIcon(QIcon(QPixmap::fromImage(*QI_NoFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
-        Principal_Matrix[_X][_Y].QPB_a->setIconSize(QSize(fm, fm));
-        Principal_Matrix[_X][_Y].bFlag = false;
-        i_MinesLeft++;
-        QLCDN_MinesLeft->display(i_MinesLeft);
-        break;
+        case false:
+            Principal_Matrix[_X][_Y].QPB_a->setIcon(QIcon(QPixmap::fromImage(*QI_Flag).scaled(fm, fm, Qt::KeepAspectRatio)));
+            Principal_Matrix[_X][_Y].QPB_a->setIconSize(QSize(fm, fm));
+            Principal_Matrix[_X][_Y].bFlag = true;
+            i_MinesLeft--;
+            QLCDN_MinesLeft->display(i_MinesLeft);
+            break;
+
+        case true:
+            Principal_Matrix[_X][_Y].QPB_a->setIcon(QIcon(QPixmap::fromImage(*QI_NoFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
+            Principal_Matrix[_X][_Y].QPB_a->setIconSize(QSize(fm, fm));
+            Principal_Matrix[_X][_Y].bFlag = false;
+            i_MinesLeft++;
+            QLCDN_MinesLeft->display(i_MinesLeft);
+            break;
 
     }
 }
 
 void Mines_Bollos::SLOT_OnQPushButton_adapteded_Clicked(QMouseEvent *e){
+
     QPushButton_adapted *_QPB = (QPushButton_adapted *) sender();
     bool bEncontrouPai = false;
     int _X, _Y;
@@ -1340,31 +1366,37 @@ void Mines_Bollos::SLOT_OnQPushButton_adapteded_Clicked(QMouseEvent *e){
             break;
     }
     switch (e->button()) {
-    case Qt::RightButton:
-        vAddOrRemoveFlag(_X, _Y);
-        break;
-    case Qt::LeftButton:
-        if(bFirst){
-            if(bFirstCellClean  &&  Principal_Matrix[_X][_Y].S_Cell != ZERO){
-                vNewGame(i_X, i_Y, i_nMines, _X, _Y);
+        case Qt::RightButton:
+
+            vAddOrRemoveFlag(_X, _Y);
+            break;
+
+        case Qt::LeftButton:
+            if(bFirst){
+                if(bFirstCellClean  &&  Principal_Matrix[_X][_Y].S_Cell != ZERO){
+                    vNewGame(i_X, i_Y, i_nMines, _X, _Y);
+                }
+                bFirst =false;
+                vStartTimer();
             }
-            bFirst =false;
-            vStartTimer();
-        }
 
-        if(Principal_Matrix[_X][_Y].S_Cell == MINE){
-            if(Principal_Matrix[_X][_Y].bFlag == false)
-                vGameLost(_X, _Y);
-        }
-        else
+            if(Principal_Matrix[_X][_Y].S_Cell == MINE){
+                if(Principal_Matrix[_X][_Y].bFlag == false)
+                    vGameLost(_X, _Y);
+            }
+            else
 
-            vCasaLivre(_X, _Y);
-        break;
+                vCasaLivre(_X, _Y);
+            break;
+
+        default:
+            break;
 
     }
 }
 
 void Mines_Bollos::vStartTimer(){
+
     i_TimeInSeconds = 0;
     QTIMER_TimeInGame->start(1e3);
 
@@ -1373,6 +1405,7 @@ void Mines_Bollos::vStartTimer(){
 }
 
 void Mines_Bollos::SLOT_UpdateFirstCellClean(){
+
     if(QCB_FirstCellClean->isChecked())
         bFirstCellClean = false;
     else
@@ -1380,9 +1413,10 @@ void Mines_Bollos::SLOT_UpdateFirstCellClean(){
 }
 
 void Mines_Bollos::vGenerateStatics(){
+
     int iCorrectFlags = 0,
-        iWrongFlags = 0,
-        iUnlockedCells = i_CellsToUnlock - i_HiddenCells;
+            iWrongFlags = 0,
+            iUnlockedCells = i_CellsToUnlock - i_HiddenCells;
 
     for (int i=0; i<(i_X-1); i++){
         for (int j=0; j<=(i_Y-1); j++){
@@ -1398,17 +1432,17 @@ void Mines_Bollos::vGenerateStatics(){
         i_TimeInSeconds = 1;
 
     double dFlagsPerSecond = (double)iCorrectFlags/i_TimeInSeconds,
-           dCellsPerSecond = (double)iUnlockedCells/i_TimeInSeconds,
-           dPercentageGameComplete = (double)100*iUnlockedCells/i_CellsToUnlock;
+            dCellsPerSecond = (double)iUnlockedCells/i_TimeInSeconds,
+            dPercentageGameComplete = (double)100*iUnlockedCells/i_CellsToUnlock;
 
     QString QS_Statics = "Correct Flags: " + QString::number(iCorrectFlags)
-                         +"\nWrongFlags: " + QString::number(iWrongFlags)
-                         +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
-                         +"\n"
-                         +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
-                         +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
-                         +"\n"
-                         +"\nGame Complete: " + QString::number(dPercentageGameComplete, 'f', 2) + " %";
+            +"\nWrongFlags: " + QString::number(iWrongFlags)
+            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
+            +"\n"
+            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
+            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
+            +"\n"
+            +"\nGame Complete: " + QString::number(dPercentageGameComplete, 'f', 2) + " %";
 
     QL_StatisLastMatch->setText(QS_Statics);
 }
