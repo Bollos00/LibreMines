@@ -1,12 +1,8 @@
 #include "mines_bollos.h"
-#include "ui_mines_bollos.h"
 
 Mines_Bollos::Mines_Bollos(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::Mines_Bollos)
 {
-    ui->setupUi(this);
-
     QI_Zero = new QImage;
     QI_One = new QImage;
     QI_Two = new QImage;
@@ -37,8 +33,9 @@ Mines_Bollos::Mines_Bollos(QWidget *parent)
     QI_Boom->load(":/Media_rsc/Media/Minesweeper_boom.png");
     QI_WrongFlag->load(":/Media_rsc/Media/Minesweeper_wrong_flag.png");
 
-
     vConfigureInterface();
+
+    vConfigureDarkMode(true);
 
     bFirst = false;
     bFirstCellClean = false;
@@ -47,7 +44,7 @@ Mines_Bollos::Mines_Bollos(QWidget *parent)
 
 Mines_Bollos::~Mines_Bollos()
 {
-    delete ui;
+
 }
 
 void Mines_Bollos::vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean, int i_Y_Clean){
@@ -1100,6 +1097,10 @@ void Mines_Bollos::vConfigureInterface(){
     QCB_FirstCellClean->setText("First Cell Clean");
     QCB_FirstCellClean->setChecked(false);
 
+    QCB_DarkModeEnabled = new QCheckBox(this);
+    QCB_DarkModeEnabled->setText("Disable Dark Mode");
+    QCB_DarkModeEnabled->setChecked(true);
+
     QPB_Easy->setGeometry(width/20, height/20,
                           width/2 - 2*width/20, 4*(height/2 - 2*height/20)/5 );
 
@@ -1110,7 +1111,10 @@ void Mines_Bollos::vConfigureInterface(){
                           width/2 - 2*width/20,  4*(height/2 - 2*height/20)/5 );
 
     QCB_FirstCellClean->setGeometry(width/20, QPB_Hard->y() + QPB_Hard->height() + height/20,
-                                    width/2 - 2*width/20,  (height/2 - 2*height/20)/5 );
+                                    width/2 - 2*width/20,  (height/2 - 2*height/20)/10 );
+
+    QCB_DarkModeEnabled->setGeometry(width/20, QCB_FirstCellClean->y() + QCB_FirstCellClean->height(),
+                                     width/2 - 2*width/20,  (height/2 - 2*height/20)/10);
 
     QPB_CustomizedNewGame->setGeometry(QPB_Easy->x() + QPB_Easy->width() + width/20, QPB_Easy->y() + QPB_Easy->height() + height/20,
                                        width/2 - 2*width/20, 2*(height/2 - 2*height/20)/5 );
@@ -1134,13 +1138,29 @@ void Mines_Bollos::vConfigureInterface(){
                                   QL_Customized_Y->width(), QL_Customized_Y->height());
 
 
-    connect(QPB_Easy, &QPushButton::pressed, this, &Mines_Bollos::SLOT_Easy);
-    connect(QPB_Medium, &QPushButton::pressed, this, &Mines_Bollos::SLOT_Medium);
-    connect(QPB_Hard, &QPushButton::pressed, this, &Mines_Bollos::SLOT_Hard);
-    connect(QPB_CustomizedNewGame, &QPushButton::pressed, this, &Mines_Bollos::SLOT_Customized);
-    connect(QPB_RestartInGame, &QPushButton::pressed, this, &Mines_Bollos::SLOT_Restart);
-    connect(QPB_QuitInGame, &QPushButton::pressed, this, &Mines_Bollos::SLOT_Quit);
-    connect(QCB_FirstCellClean, &QPushButton::pressed, this, &Mines_Bollos::SLOT_UpdateFirstCellClean);
+    connect(QPB_Easy, &QPushButton::pressed,
+            this, &Mines_Bollos::SLOT_Easy);
+
+    connect(QPB_Medium, &QPushButton::pressed, this,
+            &Mines_Bollos::SLOT_Medium);
+
+    connect(QPB_Hard, &QPushButton::pressed,
+            this, &Mines_Bollos::SLOT_Hard);
+
+    connect(QPB_CustomizedNewGame, &QPushButton::pressed,
+            this, &Mines_Bollos::SLOT_Customized);
+
+    connect(QPB_RestartInGame, &QPushButton::pressed,
+            this, &Mines_Bollos::SLOT_Restart);
+
+    connect(QPB_QuitInGame, &QPushButton::pressed,
+            this, &Mines_Bollos::SLOT_Quit);
+
+    connect(QCB_FirstCellClean, &QPushButton::released,
+            this, &Mines_Bollos::SLOT_UpdateFirstCellClean);
+
+    connect(QCB_DarkModeEnabled, &QPushButton::released,
+            this, &Mines_Bollos::SLOT_DarkMode);
 
     QL_Mines_Bollos = new QLabel(this);
     QL_Mines_Bollos->setText("Mines\nBollos");
@@ -1406,10 +1426,19 @@ void Mines_Bollos::vStartTimer(){
 
 void Mines_Bollos::SLOT_UpdateFirstCellClean(){
 
-    if(QCB_FirstCellClean->isChecked())
-        bFirstCellClean = false;
+    bFirstCellClean = QCB_FirstCellClean->isChecked();
+}
+
+void Mines_Bollos::SLOT_DarkMode()
+{
+    vConfigureDarkMode(QCB_DarkModeEnabled->isChecked());
+
+    if(QCB_DarkModeEnabled->isChecked())
+        QCB_DarkModeEnabled->setText("Disable dark mode");
+
     else
-        bFirstCellClean = true;
+        QCB_DarkModeEnabled->setText("Enable dark mode");
+
 }
 
 void Mines_Bollos::vGenerateStatics(){
@@ -1445,4 +1474,66 @@ void Mines_Bollos::vGenerateStatics(){
             +"\nGame Complete: " + QString::number(dPercentageGameComplete, 'f', 2) + " %";
 
     QL_StatisLastMatch->setText(QS_Statics);
+}
+
+void Mines_Bollos::vConfigureDarkMode(const bool bDark)
+{
+    if(bDark){
+        qApp->setStyle (QStyleFactory::create ("Fusion"));
+        QPalette darkPalette;
+        darkPalette.setColor (QPalette::BrightText,      Qt::red);
+        darkPalette.setColor (QPalette::WindowText,      Qt::white);
+        darkPalette.setColor (QPalette::ToolTipBase,     Qt::white);
+        darkPalette.setColor (QPalette::ToolTipText,     Qt::white);
+        darkPalette.setColor (QPalette::Text,            Qt::white);
+        darkPalette.setColor (QPalette::ButtonText,      Qt::white);
+        darkPalette.setColor (QPalette::HighlightedText, Qt::black);
+        darkPalette.setColor (QPalette::Window,          QColor (53, 53, 53));
+        darkPalette.setColor (QPalette::Base,            QColor (25, 25, 25));
+        darkPalette.setColor (QPalette::AlternateBase,   QColor (53, 53, 53));
+        darkPalette.setColor (QPalette::Button,          QColor (53, 53, 53));
+        darkPalette.setColor (QPalette::Link,            QColor (42, 130, 218));
+        darkPalette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
+
+        qApp->setPalette (darkPalette);
+
+    }
+
+    else {
+
+        qApp->setStyle (QStyleFactory::create ("Fusion"));
+        QPalette lightPalette;
+        lightPalette.setColor (QPalette::BrightText,      Qt::cyan);
+        lightPalette.setColor (QPalette::WindowText,      Qt::black);
+        lightPalette.setColor (QPalette::ToolTipBase,     Qt::black);
+        lightPalette.setColor (QPalette::ToolTipText,     Qt::black);
+        lightPalette.setColor (QPalette::Text,            Qt::black);
+        lightPalette.setColor (QPalette::ButtonText,      Qt::black);
+        lightPalette.setColor (QPalette::HighlightedText, Qt::white);
+        lightPalette.setColor (QPalette::Window,          QColor (202, 202, 202));
+        lightPalette.setColor (QPalette::Base,            QColor (228, 228, 228));
+        lightPalette.setColor (QPalette::AlternateBase,   QColor (202, 202, 202));
+        lightPalette.setColor (QPalette::Button,          QColor (202, 202, 202));
+        lightPalette.setColor (QPalette::Link,            QColor (213, 125, 37));
+        lightPalette.setColor (QPalette::Highlight,       QColor (213, 225, 37));
+
+        qApp->setPalette (lightPalette);
+
+    }
+
+    QI_Zero->invertPixels();
+    QI_One->invertPixels();
+    QI_Two->invertPixels();
+    QI_Three->invertPixels();
+    QI_Four->invertPixels();
+    QI_Five->invertPixels();
+    QI_Six->invertPixels();
+    QI_Seven->invertPixels();
+    QI_Eight->invertPixels();
+    QI_Flag->invertPixels();
+    QI_NoFlag->invertPixels();
+    QI_Mine->invertPixels();
+    QI_Boom->invertPixels();
+    QI_WrongFlag->invertPixels();
+
 }

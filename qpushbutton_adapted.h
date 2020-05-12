@@ -36,7 +36,7 @@ signals:
      *
      * @param
      */
-    void SIGNAL_Clicked(QMouseEvent *);
+    void SIGNAL_Clicked(QMouseEvent *event);
 };
 
 #endif // QPUSHBUTTON_ADAPTED_H
