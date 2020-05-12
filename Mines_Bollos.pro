@@ -27,8 +27,7 @@ HEADERS += \
     mines_bollos.h \
     qpushbutton_adapted.h
 
-FORMS += \
-    mines_bollos.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

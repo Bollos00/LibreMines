@@ -19,6 +19,8 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QCheckBox>
+#include <QStyleFactory>
+#include <QApplication>
 
 #include "qpushbutton_adapted.h"
 
@@ -65,9 +67,6 @@ struct Cell{
     bool bFlag; /**< TODO: describe */
 };
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class Mines_Bollos; }
-QT_END_NAMESPACE
 
 /**
  * @brief
@@ -100,6 +99,8 @@ public:
      * @param i_X_Clean
      * @param i_Y_Clean
      */
+
+private:
     void vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean = -2, int i_Y_Clean = -2);
     /**
      * @brief
@@ -173,6 +174,8 @@ public:
      */
     void vGenerateStatics();
 
+    void vConfigureDarkMode(const bool bDark);
+
 private slots:
     /**
      * @brief
@@ -212,6 +215,11 @@ private slots:
      */
     void SLOT_UpdateFirstCellClean();
 
+    ///
+    /// \brief SLOT_DarkMode
+    ///
+    void SLOT_DarkMode();
+
     /**
      * @brief
      *
@@ -226,7 +234,6 @@ private slots:
     void SLOT_OnQPushButton_adapteded_Clicked(QMouseEvent *e);
 
 private:
-    Ui::Mines_Bollos *ui; /**< TODO: describe */
 
     std::vector<std::vector<Cell>> Principal_Matrix; /**< TODO: describe */
     int i_limit_height; /**< TODO: describe */
@@ -262,6 +269,7 @@ private:
     QLabel *QL_Customized_nMines; /**< TODO: describe */
 
     QCheckBox *QCB_FirstCellClean; /**< TODO: describe */
+    QCheckBox *QCB_DarkModeEnabled;
 
     QTimer *QTIMER_TimeInGame; /**< TODO: describe */
     QLabel *QL_TimerInGame; /**< TODO: describe */
