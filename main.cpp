@@ -9,8 +9,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    Mines_Bollos w;
+    MinesBollos* w = new MinesBollos();
 
-    w.show();
+    w->show();
     return a.exec();
 }

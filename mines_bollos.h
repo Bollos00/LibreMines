@@ -47,7 +47,7 @@ enum CELL_STATE: char{
  * @brief
  *
  */
-enum GAME_DIFFICULTY: uchar{
+enum GAME_DIFFICULTY: char{
     NONE,
     EASY,
     MEDIUM,
@@ -112,7 +112,7 @@ struct Vector2Dshort {
  * @brief
  *
  */
-class Mines_Bollos : public QMainWindow
+class MinesBollos : public QMainWindow
 {
     Q_OBJECT
 
@@ -123,12 +123,12 @@ public:
      *
      * @param parent
      */
-    Mines_Bollos(QWidget *parent = nullptr);
+    MinesBollos(QWidget *parent = nullptr);
     /**
      * @brief
      *
      */
-    ~Mines_Bollos();
+    ~MinesBollos();
 
     /**
      * @brief
@@ -151,7 +151,7 @@ private:
      *
      */
 
-    void vResetPrincipal_Matrix();
+    void vResetPrincipalMatrix();
     /**
      * @brief
      *
@@ -173,7 +173,7 @@ private:
      * @param _X
      * @param _Y
      */
-    void vCasaLivre(const uchar _X, const uchar _Y);
+    void vCellClean(const uchar _X, const uchar _Y);
     /**
      * @brief
      *
@@ -280,7 +280,7 @@ private slots:
 
 private:
 
-    std::vector< std::vector<Cell> > PrincipalMatrix; /**< TODO: describe */
+    std::vector< std::vector<Cell> > principalMatrix; /**< TODO: describe */
     int iLimitHeight; /**< TODO: describe */
     int iLimitWidth; /**< TODO: describe */
 
@@ -340,6 +340,5 @@ private:
     QImage *imgMine; /**< TODO: describe */
     QImage *imgBoom; /**< TODO: describe */
     QImage *imgWrongFlag; /**< TODO: describe */
-
 };
 #endif // MINES_BOLLOS_H

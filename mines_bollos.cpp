@@ -1,8 +1,8 @@
 #include "mines_bollos.h"
 
-Mines_Bollos::Mines_Bollos(QWidget *parent) :
+MinesBollos::MinesBollos(QWidget *parent) :
     QMainWindow(parent),
-    PrincipalMatrix( std::vector< std::vector<Cell> >(0) ),
+    principalMatrix( std::vector< std::vector<Cell> >(0) ),
     iLimitHeight( 0 ),
     iLimitWidth( 0 ),
     iX( 0 ),
@@ -36,12 +36,55 @@ Mines_Bollos::Mines_Bollos(QWidget *parent) :
     vConfigureDarkMode(true);
 }
 
-Mines_Bollos::~Mines_Bollos()
+MinesBollos::~MinesBollos()
 {
-    qApp->quit();
+    vResetPrincipalMatrix();
+
+    delete buttonEasy;
+    delete buttonMedium;
+    delete buttonHard;
+
+    delete buttonCustomizedNewGame;
+
+    delete sbCustomizedX;
+    delete sbCustomizedY;
+    delete sbCustomizednMines;
+
+    delete labelCustomizedX;
+    delete labelCustomizedY;
+    delete labelCustomized_nMines;
+
+    delete cbFirstCellClean;
+    delete cbDarkModeEnabled;
+
+    delete timerTimeInGame;
+    delete labelTimerInGame;
+    delete lcd_numberMinesLeft;
+    delete buttonRestartInGame;
+    delete buttonQuitInGame;
+
+    delete labelMinesBollos;
+    delete labelYouWonYouLost;
+    delete labelStatisLastMatch;
+
+    delete imgZero;
+    delete imgOne;
+    delete imgTwo;
+    delete imgThree;
+    delete imgFour;
+    delete imgFive;
+    delete imgSix;
+    delete imgSeven;
+    delete imgEight;
+    delete imgFlag;
+    delete imgNoFlag;
+    delete imgMine;
+    delete imgBoom;
+    delete imgWrongFlag;
+
 }
 
-void Mines_Bollos::vNewGame(const uchar _X,
+void MinesBollos::vNewGame(const uchar _X,
                             const uchar _Y,
                             ushort i_nMines_,
                             const uchar i_X_Clean,
@@ -59,7 +102,7 @@ void Mines_Bollos::vNewGame(const uchar _X,
     const bool bRemakingGame = (i_X_Clean != 255 && i_Y_Clean != 255);
 
     if(!bRemakingGame)
-        PrincipalMatrix = std::vector<std::vector<Cell>> (iX, std::vector<Cell>(iY));
+        principalMatrix = std::vector<std::vector<Cell>> (iX, std::vector<Cell>(iY));
 
     if(iLimitWidth/iX < iLimitHeight/iY)
         fm = iLimitWidth/iX;
@@ -81,7 +124,7 @@ void Mines_Bollos::vNewGame(const uchar _X,
 
     if(bRemakingGame){
 
-        for(std::vector<Cell>& i: PrincipalMatrix)
+        for(std::vector<Cell>& i: principalMatrix)
         {
             for(Cell& j: i)
             {
@@ -95,7 +138,7 @@ void Mines_Bollos::vNewGame(const uchar _X,
         {
             for (uchar i=0; i<iX; i++)
             {
-                Cell& cell = PrincipalMatrix[i][j];
+                Cell& cell = principalMatrix[i][j];
 
                 cell.label = new QLabel(this);
                 cell.button = new QPushButton_adapted(this);
@@ -114,7 +157,7 @@ void Mines_Bollos::vNewGame(const uchar _X,
                 cell.hasFlag = false;
 
                 connect(cell.button, &QPushButton_adapted::SIGNAL_Clicked,
-                        this, &Mines_Bollos::SLOT_OnButtonClicked);
+                        this, &MinesBollos::SLOT_OnButtonClicked);
 
                 qApp->processEvents();
             }
@@ -157,7 +200,7 @@ void Mines_Bollos::vNewGame(const uchar _X,
             }
         }
 
-        Cell& cell = PrincipalMatrix[i][j];
+        Cell& cell = principalMatrix[i][j];
 
         if(cell.state == ZERO &&
            !bPointClean)
@@ -172,7 +215,7 @@ void Mines_Bollos::vNewGame(const uchar _X,
     {
         for (uchar i=0; i<iX; i++)
         {
-            Cell& cell = PrincipalMatrix[i][j];
+            Cell& cell = principalMatrix[i][j];
 
             cell.button->setEnabled(true);
 
@@ -185,119 +228,119 @@ void Mines_Bollos::vNewGame(const uchar _X,
                 if(i == 0 &&
                    j == 0)
                 {
-                    if(PrincipalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j+1].state == MINE)
+                    if(principalMatrix[i+1][j+1].state == MINE)
                         minesNeighbors++;
                 }
                 else if(i == 0 &&
                         j == iY-1)
                 {
-                    if(PrincipalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j-1].state == MINE)
+                    if(principalMatrix[i+1][j-1].state == MINE)
                         minesNeighbors++;
                 }
                 else if(i == iX-1 &&
                         j==0)
                 {
-                    if(PrincipalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j+1].state == MINE)
+                    if(principalMatrix[i-1][j+1].state == MINE)
                         minesNeighbors++;
                 }
                 else if(i == iX-1 &&
                         j == iY-1)
                 {
-                    if(PrincipalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j-1].state == MINE)
+                    if(principalMatrix[i-1][j-1].state == MINE)
                         minesNeighbors++;
                 }
                 else if(i == 0 &&
                         j > 0 &&
                         j < iY-1)
                 {
-                    if(PrincipalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j+1].state == MINE)
+                    if(principalMatrix[i+1][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j-1].state == MINE)
+                    if(principalMatrix[i+1][j-1].state == MINE)
                         minesNeighbors++;
                 }
                 else if(i == iX-1 &&
                         j >0 &&
                         j < iY-1)
                 {
-                    if(PrincipalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j+1].state == MINE)
+                    if(principalMatrix[i-1][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j-1].state == MINE)
+                    if(principalMatrix[i-1][j-1].state == MINE)
                         minesNeighbors++;
                 }
                 else if(i > 0 &&
                         i < iX-1 &&
                         j == 0){
-                    if(PrincipalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j+1].state == MINE)
+                    if(principalMatrix[i-1][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j+1].state == MINE)
+                    if(principalMatrix[i+1][j+1].state == MINE)
                         minesNeighbors++;
                 }
                 else if(i > 0 &&
                         i < iX-1 &&
                         j == iY-1)
                 {
-                    if(PrincipalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j-1].state == MINE)
+                    if(principalMatrix[i-1][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j-1].state == MINE)
+                    if(principalMatrix[i+1][j-1].state == MINE)
                         minesNeighbors++;
                 }
                 else
                 {
-                    if(PrincipalMatrix[i-1][j-1].state == MINE)
+                    if(principalMatrix[i-1][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i-1][j+1].state == MINE)
+                    if(principalMatrix[i-1][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j-1].state == MINE)
+                    if(principalMatrix[i+1][j-1].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].state == MINE)
                         minesNeighbors++;
-                    if(PrincipalMatrix[i+1][j+1].state == MINE)
+                    if(principalMatrix[i+1][j+1].state == MINE)
                         minesNeighbors++;
                 }
 
@@ -365,7 +408,7 @@ void Mines_Bollos::vNewGame(const uchar _X,
 
 
 
-void Mines_Bollos::vGameLost(const uchar _X, const uchar _Y){
+void MinesBollos::vGameLost(const uchar _X, const uchar _Y){
 
     qDebug()<<"You Lost";
 
@@ -392,7 +435,7 @@ void Mines_Bollos::vGameLost(const uchar _X, const uchar _Y){
                                         QString::number(nMines) +
                                         " Mines");
     }
-    PrincipalMatrix[_X][_Y].label->setPixmap(QPixmap::fromImage(*imgBoom).scaled(fm, fm, Qt::KeepAspectRatio));
+    principalMatrix[_X][_Y].label->setPixmap(QPixmap::fromImage(*imgBoom).scaled(fm, fm, Qt::KeepAspectRatio));
 
     vGenerateStatics();
 
@@ -400,7 +443,7 @@ void Mines_Bollos::vGameLost(const uchar _X, const uchar _Y){
     {
         for (uchar i=0; i<iX; i++)
         {
-            Cell& cell = PrincipalMatrix[i][j];
+            Cell& cell = principalMatrix[i][j];
 
             if(cell.isHidden)
             {
@@ -424,7 +467,7 @@ void Mines_Bollos::vGameLost(const uchar _X, const uchar _Y){
     }
 }
 
-void Mines_Bollos::vGameWon(){
+void MinesBollos::vGameWon(){
 
     qDebug()<<"You won: "<<iTimeInSeconds<<" Seconds";
 
@@ -451,166 +494,166 @@ void Mines_Bollos::vGameWon(){
     {
         for (uchar i=0; i<iX; i++)
         {
-            PrincipalMatrix[i][j].button->setEnabled(!PrincipalMatrix[i][j].isHidden);
+            principalMatrix[i][j].button->setEnabled(!principalMatrix[i][j].isHidden);
         }
     }
 
 }
 
-void Mines_Bollos::vCasaLivre(const uchar _X, const uchar _Y)
+void MinesBollos::vCellClean(const uchar _X, const uchar _Y)
 {
-    if(PrincipalMatrix[_X][_Y].isHidden &&
-       !PrincipalMatrix[_X][_Y].hasFlag)
+    if(principalMatrix[_X][_Y].isHidden &&
+       !principalMatrix[_X][_Y].hasFlag)
     {
-        PrincipalMatrix[_X][_Y].isHidden = false;
-        PrincipalMatrix[_X][_Y].button->hide();
+        principalMatrix[_X][_Y].isHidden = false;
+        principalMatrix[_X][_Y].button->hide();
 
-        if(PrincipalMatrix[_X][_Y].state == ZERO)
+        if(principalMatrix[_X][_Y].state == ZERO)
         {
             if(_X == 0 &&
                _Y == 0)
             {
-                if(PrincipalMatrix[_X+1][_Y].isHidden)
-                    vCasaLivre(_X+1, _Y);
-                if(PrincipalMatrix[_X][_Y+1].isHidden)
-                    vCasaLivre(_X, _Y+1);
-                if(PrincipalMatrix[_X+1][_Y+1].isHidden)
-                    vCasaLivre(_X+1, _Y+1);
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCellClean(_X+1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCellClean(_X, _Y+1);
+                if(principalMatrix[_X+1][_Y+1].isHidden)
+                    vCellClean(_X+1, _Y+1);
             }
             else if(_X == 0 &&
                     _Y == iY-1)
             {
-                if(PrincipalMatrix[_X+1][_Y].isHidden)
-                    vCasaLivre(_X+1, _Y);
-                if(PrincipalMatrix[_X][_Y-1].isHidden)
-                    vCasaLivre(_X, _Y-1);
-                if(PrincipalMatrix[_X+1][_Y-1].isHidden)
-                    vCasaLivre(_X+1, _Y-1);
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCellClean(_X+1, _Y);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCellClean(_X, _Y-1);
+                if(principalMatrix[_X+1][_Y-1].isHidden)
+                    vCellClean(_X+1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y == 0)
             {
-                if(PrincipalMatrix[_X-1][_Y].isHidden)
-                    vCasaLivre(_X-1, _Y);
-                if(PrincipalMatrix[_X][_Y+1].isHidden)
-                    vCasaLivre(_X, _Y+1);
-                if(PrincipalMatrix[_X-1][_Y+1].isHidden)
-                    vCasaLivre(_X-1, _Y+1);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCellClean(_X-1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCellClean(_X, _Y+1);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCellClean(_X-1, _Y+1);
             }
             else if(_X == iX-1 &&
                     _Y == iY-1)
             {
-                if(PrincipalMatrix[_X-1][_Y].isHidden)
-                    vCasaLivre(_X-1, _Y);
-                if(PrincipalMatrix[_X][_Y-1].isHidden)
-                    vCasaLivre(_X, _Y-1);
-                if(PrincipalMatrix[_X-1][_Y-1].isHidden)
-                    vCasaLivre(_X-1, _Y-1);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCellClean(_X-1, _Y);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCellClean(_X, _Y-1);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCellClean(_X-1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y == 0)
             {
-                if(PrincipalMatrix[_X-1][_Y].isHidden)
-                    vCasaLivre(_X-1, _Y);
-                if(PrincipalMatrix[_X][_Y+1].isHidden)
-                    vCasaLivre(_X, _Y+1);
-                if(PrincipalMatrix[_X-1][_Y+1].isHidden)
-                    vCasaLivre(_X-1, _Y+1);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCellClean(_X-1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCellClean(_X, _Y+1);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCellClean(_X-1, _Y+1);
             }
             else if(_X == iX-1 &&
                     _Y == iY-1)
             {
-                if(PrincipalMatrix[_X-1][_Y].isHidden)
-                    vCasaLivre(_X-1, _Y);
-                if(PrincipalMatrix[_X][_Y-1].isHidden)
-                    vCasaLivre(_X, _Y-1);
-                if(PrincipalMatrix[_X-1][_Y-1].isHidden)
-                    vCasaLivre(_X-1, _Y-1);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCellClean(_X-1, _Y);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCellClean(_X, _Y-1);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCellClean(_X-1, _Y-1);
             }
             else if(_X == 0 &&
                     _Y > 0 &&
                     _Y < iY-1)
             {
-                if(PrincipalMatrix[_X+1][_Y].isHidden)
-                    vCasaLivre(_X+1, _Y);
-                if(PrincipalMatrix[_X][_Y+1].isHidden)
-                    vCasaLivre(_X, _Y+1);
-                if(PrincipalMatrix[_X+1][_Y+1].isHidden)
-                    vCasaLivre(_X+1, _Y+1);
-                if(PrincipalMatrix[_X][_Y-1].isHidden)
-                    vCasaLivre(_X, _Y-1);
-                if(PrincipalMatrix[_X+1][_Y-1].isHidden)
-                    vCasaLivre(_X+1, _Y-1);
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCellClean(_X+1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCellClean(_X, _Y+1);
+                if(principalMatrix[_X+1][_Y+1].isHidden)
+                    vCellClean(_X+1, _Y+1);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCellClean(_X, _Y-1);
+                if(principalMatrix[_X+1][_Y-1].isHidden)
+                    vCellClean(_X+1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y > 0 &&
                     _Y < iY-1)
             {
-                if(PrincipalMatrix[_X-1][_Y].isHidden)
-                    vCasaLivre(_X-1, _Y);
-                if(PrincipalMatrix[_X][_Y+1].isHidden)
-                    vCasaLivre(_X, _Y+1);
-                if(PrincipalMatrix[_X-1][_Y+1].isHidden)
-                    vCasaLivre(_X-1, _Y+1);
-                if(PrincipalMatrix[_X][_Y-1].isHidden)
-                    vCasaLivre(_X, _Y-1);
-                if(PrincipalMatrix[_X-1][_Y-1].isHidden)
-                    vCasaLivre(_X-1, _Y-1);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCellClean(_X-1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCellClean(_X, _Y+1);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCellClean(_X-1, _Y+1);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCellClean(_X, _Y-1);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCellClean(_X-1, _Y-1);
             }
             else if(_X > 0 &&
                     _X < iX-1 &&
                     _Y == 0)
             {
-                if(PrincipalMatrix[_X-1][_Y].isHidden)
-                    vCasaLivre(_X-1, _Y);
-                if(PrincipalMatrix[_X+1][_Y].isHidden)
-                    vCasaLivre(_X+1, _Y);
-                if(PrincipalMatrix[_X-1][_Y+1].isHidden)
-                    vCasaLivre(_X-1, _Y+1);
-                if(PrincipalMatrix[_X][_Y+1].isHidden)
-                    vCasaLivre(_X, _Y+1);
-                if(PrincipalMatrix[_X+1][_Y+1].isHidden)
-                    vCasaLivre(_X+1, _Y+1);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCellClean(_X-1, _Y);
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCellClean(_X+1, _Y);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCellClean(_X-1, _Y+1);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCellClean(_X, _Y+1);
+                if(principalMatrix[_X+1][_Y+1].isHidden)
+                    vCellClean(_X+1, _Y+1);
             }
             else if(_X > 0 &&
                     _X < iX-1 &&
                     _Y == iY-1)
             {
-                if(PrincipalMatrix[_X+1][_Y].isHidden)
-                    vCasaLivre(_X+1, _Y);
-                if(PrincipalMatrix[_X-1][_Y].isHidden)
-                    vCasaLivre(_X-1, _Y);
-                if(PrincipalMatrix[_X-1][_Y-1].isHidden)
-                    vCasaLivre(_X-1, _Y-1);
-                if(PrincipalMatrix[_X][_Y-1].isHidden)
-                    vCasaLivre(_X, _Y-1);
-                if(PrincipalMatrix[_X+1][_Y-1].isHidden)
-                    vCasaLivre(_X+1, _Y-1);
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCellClean(_X+1, _Y);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCellClean(_X-1, _Y);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCellClean(_X-1, _Y-1);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCellClean(_X, _Y-1);
+                if(principalMatrix[_X+1][_Y-1].isHidden)
+                    vCellClean(_X+1, _Y-1);
             }
             else
             {
-                if(PrincipalMatrix[_X-1][_Y-1].isHidden)
-                    vCasaLivre(_X-1, _Y-1);
-                if(PrincipalMatrix[_X-1][_Y].isHidden)
-                    vCasaLivre(_X-1, _Y);
-                if(PrincipalMatrix[_X-1][_Y+1].isHidden)
-                    vCasaLivre(_X-1, _Y+1);
-                if(PrincipalMatrix[_X][_Y-1].isHidden)
-                    vCasaLivre(_X, _Y-1);
-                if(PrincipalMatrix[_X][_Y+1].isHidden)
-                    vCasaLivre(_X, _Y+1);
-                if(PrincipalMatrix[_X+1][_Y-1].isHidden)
-                    vCasaLivre(_X+1, _Y-1);
-                if(PrincipalMatrix[_X+1][_Y].isHidden)
-                    vCasaLivre(_X+1, _Y);
-                if(PrincipalMatrix[_X+1][_Y+1].isHidden)
-                    vCasaLivre(_X+1, _Y+1);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCellClean(_X-1, _Y-1);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCellClean(_X-1, _Y);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCellClean(_X-1, _Y+1);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCellClean(_X, _Y-1);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCellClean(_X, _Y+1);
+                if(principalMatrix[_X+1][_Y-1].isHidden)
+                    vCellClean(_X+1, _Y-1);
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCellClean(_X+1, _Y);
+                if(principalMatrix[_X+1][_Y+1].isHidden)
+                    vCellClean(_X+1, _Y+1);
             }
         }
         else
         {
-            PrincipalMatrix[_X][_Y].isHidden = false;
-            PrincipalMatrix[_X][_Y].button->hide();
+            principalMatrix[_X][_Y].isHidden = false;
+            principalMatrix[_X][_Y].button->hide();
         }
         iHiddenCells--;
         if(iHiddenCells == 0)
@@ -619,19 +662,19 @@ void Mines_Bollos::vCasaLivre(const uchar _X, const uchar _Y)
 
 }
 
-void Mines_Bollos::vResetPrincipal_Matrix()
+void MinesBollos::vResetPrincipalMatrix()
 {
-    for(std::vector<Cell>& i: PrincipalMatrix)
+    for(std::vector<Cell>& i: principalMatrix)
     {
         for (Cell& j: i){
             delete j.label;
             delete j.button;
         }
     }
-    PrincipalMatrix.clear();
+    principalMatrix.clear();
 }
 
-void Mines_Bollos::vConfigureInterface()
+void MinesBollos::vConfigureInterface()
 {
     labelTimerInGame = new QLabel (this);
     lcd_numberMinesLeft = new QLCDNumber (this);
@@ -677,12 +720,12 @@ void Mines_Bollos::vConfigureInterface()
 
     sbCustomizedX = new QSpinBox(this);
     sbCustomizedX->setMinimum(10);
-    sbCustomizedX->setMaximum(40);
+    sbCustomizedX->setMaximum(100);
     sbCustomizedX->setValue(20);
 
     sbCustomizedY = new QSpinBox(this);
     sbCustomizedY->setMinimum(10);
-    sbCustomizedY->setMaximum(40);
+    sbCustomizedY->setMaximum(100);
     sbCustomizedY->setValue(20);
 
 
@@ -747,28 +790,28 @@ void Mines_Bollos::vConfigureInterface()
 
 
     connect(buttonEasy, &QPushButton::pressed,
-            this, &Mines_Bollos::SLOT_Easy);
+            this, &MinesBollos::SLOT_Easy);
 
     connect(buttonMedium, &QPushButton::pressed, this,
-            &Mines_Bollos::SLOT_Medium);
+            &MinesBollos::SLOT_Medium);
 
     connect(buttonHard, &QPushButton::pressed,
-            this, &Mines_Bollos::SLOT_Hard);
+            this, &MinesBollos::SLOT_Hard);
 
     connect(buttonCustomizedNewGame, &QPushButton::pressed,
-            this, &Mines_Bollos::SLOT_Customized);
+            this, &MinesBollos::SLOT_Customized);
 
     connect(buttonRestartInGame, &QPushButton::pressed,
-            this, &Mines_Bollos::SLOT_Restart);
+            this, &MinesBollos::SLOT_Restart);
 
     connect(buttonQuitInGame, &QPushButton::pressed,
-            this, &Mines_Bollos::SLOT_Quit);
+            this, &MinesBollos::SLOT_Quit);
 
     connect(cbFirstCellClean, &QPushButton::released,
-            this, &Mines_Bollos::SLOT_UpdateFirstCellClean);
+            this, &MinesBollos::SLOT_UpdateFirstCellClean);
 
     connect(cbDarkModeEnabled, &QPushButton::released,
-            this, &Mines_Bollos::SLOT_DarkMode);
+            this, &MinesBollos::SLOT_DarkMode);
 
     labelMinesBollos = new QLabel(this);
     labelMinesBollos->setText("Mines\nBollos");
@@ -779,7 +822,7 @@ void Mines_Bollos::vConfigureInterface()
 
 }
 
-void Mines_Bollos::vHideInterface()
+void MinesBollos::vHideInterface()
 {
     buttonEasy->hide();
     buttonMedium->hide();
@@ -796,9 +839,10 @@ void Mines_Bollos::vHideInterface()
     labelCustomized_nMines->hide();
 
     cbFirstCellClean->hide();
+    cbDarkModeEnabled->hide();
 }
 
-void Mines_Bollos::vShowInterface()
+void MinesBollos::vShowInterface()
 {
     buttonEasy->show();
     buttonMedium->show();
@@ -815,9 +859,10 @@ void Mines_Bollos::vShowInterface()
     labelCustomized_nMines->show();
 
     cbFirstCellClean->show();
+    cbDarkModeEnabled->show();
 }
 
-void Mines_Bollos::SLOT_Easy()
+void MinesBollos::SLOT_Easy()
 {
     vHideInterface();
 
@@ -828,7 +873,7 @@ void Mines_Bollos::SLOT_Easy()
     difficult = EASY;
 }
 
-void Mines_Bollos::SLOT_Medium()
+void MinesBollos::SLOT_Medium()
 {
     vHideInterface();
 
@@ -842,7 +887,7 @@ void Mines_Bollos::SLOT_Medium()
 
 }
 
-void Mines_Bollos::SLOT_Hard()
+void MinesBollos::SLOT_Hard()
 {
     vHideInterface();
 
@@ -856,7 +901,7 @@ void Mines_Bollos::SLOT_Hard()
 
 }
 
-void Mines_Bollos::SLOT_Customized()
+void MinesBollos::SLOT_Customized()
 {
     vHideInterface();
 
@@ -873,7 +918,7 @@ void Mines_Bollos::SLOT_Customized()
 
 }
 
-void Mines_Bollos::vAjustInterfaceInGame()
+void MinesBollos::vAjustInterfaceInGame()
 {
     int width = this->width();
     int height = this->height();
@@ -888,7 +933,7 @@ void Mines_Bollos::vAjustInterfaceInGame()
 }
 
 
-void Mines_Bollos::vHideInterfaceInGame()
+void MinesBollos::vHideInterfaceInGame()
 {
     labelTimerInGame->hide();
     lcd_numberMinesLeft->hide();
@@ -899,7 +944,7 @@ void Mines_Bollos::vHideInterfaceInGame()
 
 }
 
-void Mines_Bollos::vShowInterfaceInGame()
+void MinesBollos::vShowInterfaceInGame()
 {
     labelTimerInGame->show();
     lcd_numberMinesLeft->show();
@@ -910,7 +955,7 @@ void Mines_Bollos::vShowInterfaceInGame()
 
 }
 
-void Mines_Bollos::SLOT_Restart()
+void MinesBollos::SLOT_Restart()
 {
     if(timerTimeInGame->isActive()
        )
@@ -920,7 +965,7 @@ void Mines_Bollos::SLOT_Restart()
 
     timerTimeInGame = new QTimer (this);
 
-    vResetPrincipal_Matrix();
+    vResetPrincipalMatrix();
 
     labelStatisLastMatch->setText(" ");
 
@@ -929,7 +974,7 @@ void Mines_Bollos::SLOT_Restart()
     vNewGame(iX, iY, nMines);
 }
 
-void Mines_Bollos::SLOT_Quit(){
+void MinesBollos::SLOT_Quit(){
 
     if (timerTimeInGame->isActive())
         timerTimeInGame->stop();
@@ -938,14 +983,14 @@ void Mines_Bollos::SLOT_Quit(){
 
     labelStatisLastMatch->setText(" ");
 
-    vResetPrincipal_Matrix();
+    vResetPrincipalMatrix();
     vHideInterfaceInGame();
     vShowInterface();
 
     difficult = NONE;
 }
 
-void Mines_Bollos::SLOT_UpdateTime()
+void MinesBollos::SLOT_UpdateTime()
 {
 
     iTimeInSeconds++;
@@ -954,28 +999,28 @@ void Mines_Bollos::SLOT_UpdateTime()
 
 
 
-void Mines_Bollos::vAddOrRemoveFlag(const uchar& _X, const uchar& _Y)
+void MinesBollos::vAddOrRemoveFlag(const uchar& _X, const uchar& _Y)
 {
-    switch (PrincipalMatrix[_X][_Y].hasFlag){
+    switch (principalMatrix[_X][_Y].hasFlag){
         case false:
-            PrincipalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
-            PrincipalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
-            PrincipalMatrix[_X][_Y].hasFlag = true;
+            principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
+            principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
+            principalMatrix[_X][_Y].hasFlag = true;
             iMinesLeft--;
             lcd_numberMinesLeft->display(iMinesLeft);
             break;
 
         case true:
-            PrincipalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
-            PrincipalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
-            PrincipalMatrix[_X][_Y].hasFlag = false;
+            principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
+            principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
+            principalMatrix[_X][_Y].hasFlag = false;
             iMinesLeft++;
             lcd_numberMinesLeft->display(iMinesLeft);
             break;
     }
 }
 
-void Mines_Bollos::SLOT_OnButtonClicked(const QMouseEvent *e)
+void MinesBollos::SLOT_OnButtonClicked(const QMouseEvent *e)
 {
     QPushButton_adapted *buttonClicked = (QPushButton_adapted *) sender();
 
@@ -983,7 +1028,7 @@ void Mines_Bollos::SLOT_OnButtonClicked(const QMouseEvent *e)
     {
         for (uchar i=0; i<iX; i++)
         {
-            if(buttonClicked == PrincipalMatrix[i][j].button)
+            if(buttonClicked == principalMatrix[i][j].button)
             {
                 switch (e->button())
                 {
@@ -996,7 +1041,7 @@ void Mines_Bollos::SLOT_OnButtonClicked(const QMouseEvent *e)
 
                         if(bFirst)
                         {
-                            if(bFirstCellClean  &&  PrincipalMatrix[i][j].state != ZERO)
+                            if(bFirstCellClean  &&  principalMatrix[i][j].state != ZERO)
                             {
                                 vNewGame(iX, iY, nMines, i, j);
                             }
@@ -1004,13 +1049,13 @@ void Mines_Bollos::SLOT_OnButtonClicked(const QMouseEvent *e)
                             vStartTimer();
                         }
 
-                        if(PrincipalMatrix[i][j].state == MINE)
+                        if(principalMatrix[i][j].state == MINE)
                         {
-                            if(!PrincipalMatrix[i][j].hasFlag)
+                            if(!principalMatrix[i][j].hasFlag)
                                 vGameLost(i, j);
                         }
                         else
-                            vCasaLivre(i, j);
+                            vCellClean(i, j);
 
                         return;
 
@@ -1022,21 +1067,21 @@ void Mines_Bollos::SLOT_OnButtonClicked(const QMouseEvent *e)
     }
 }
 
-void Mines_Bollos::vStartTimer()
+void MinesBollos::vStartTimer()
 {
     iTimeInSeconds = 0;
     timerTimeInGame->start(1e3);
 
     connect(timerTimeInGame, &QTimer::timeout,
-            this, &Mines_Bollos::SLOT_UpdateTime);
+            this, &MinesBollos::SLOT_UpdateTime);
 }
 
-void Mines_Bollos::SLOT_UpdateFirstCellClean()
+void MinesBollos::SLOT_UpdateFirstCellClean()
 {
     bFirstCellClean = cbFirstCellClean->isChecked();
 }
 
-void Mines_Bollos::SLOT_DarkMode()
+void MinesBollos::SLOT_DarkMode()
 {
     vConfigureDarkMode(cbDarkModeEnabled->isChecked());
 
@@ -1047,7 +1092,7 @@ void Mines_Bollos::SLOT_DarkMode()
         cbDarkModeEnabled->setText("Enable dark mode");
 }
 
-void Mines_Bollos::vGenerateStatics()
+void MinesBollos::vGenerateStatics()
 {
     int iCorrectFlags = 0,
             iWrongFlags = 0,
@@ -1055,8 +1100,8 @@ void Mines_Bollos::vGenerateStatics()
 
     for (int i=0; i<(iX-1); i++){
         for (int j=0; j<=(iY-1); j++){
-            if(PrincipalMatrix[i][j].hasFlag == true){
-                if (PrincipalMatrix[i][j].state == MINE)
+            if(principalMatrix[i][j].hasFlag == true){
+                if (principalMatrix[i][j].state == MINE)
                     iCorrectFlags++;
                 else
                     iWrongFlags++;
@@ -1082,7 +1127,7 @@ void Mines_Bollos::vGenerateStatics()
     labelStatisLastMatch->setText(QS_Statics);
 }
 
-void Mines_Bollos::vConfigureDarkMode(const bool bDark)
+void MinesBollos::vConfigureDarkMode(const bool bDark)
 {
     if(bDark){
         qApp->setStyle (QStyleFactory::create ("Fusion"));
