@@ -30,7 +30,7 @@
  * @brief
  *
  */
-enum STATE{
+enum CELL_STATE: char{
     MINE = -1,
     ZERO = 0,
     ONE = 1,
@@ -47,7 +47,7 @@ enum STATE{
  * @brief
  *
  */
-enum GAME_DIFFICULTY{
+enum GAME_DIFFICULTY: char{
     NONE,
     EASY,
     MEDIUM,
@@ -60,19 +60,59 @@ enum GAME_DIFFICULTY{
  *
  */
 struct Cell{
-    STATE S_Cell; /**< TODO: describe */
-    QPushButton_adapted *QPB_a; /**< TODO: describe */
-    QLabel *QL; /**< TODO: describe */
-    bool bHiddenState; /**< TODO: describe */
-    bool bFlag; /**< TODO: describe */
+    CELL_STATE state; /**< TODO: describe */
+    QPushButton_adapted *button; /**< TODO: describe */
+    QLabel *label; /**< TODO: describe */
+    bool isHidden; /**< TODO: describe */
+    bool hasFlag; /**< TODO: describe */
+
+    Cell():
+        state(ZERO),
+        button(nullptr),
+        label(nullptr),
+        isHidden(true),
+        hasFlag(false)
+    {
+
+    }
 };
 
+struct Vector2Dshort {
+
+
+    short x;
+    short y;
+
+    Vector2Dshort():
+        x( 0 ),
+        y( 0 )
+    {
+
+    }
+
+    Vector2Dshort(const qint16& _x, const qint16& _y):
+        x(_x),
+        y(_y)
+    {
+
+    }
+
+    float length() const{
+        return sqrtf(static_cast<float>(x*x + y*y));
+    }
+
+
+    float distanceToPoint(const Vector2Dshort& point) const{
+        return Vector2Dshort(point.x - x, point.y - y).length();
+    }
+
+};
 
 /**
  * @brief
  *
  */
-class Mines_Bollos : public QMainWindow
+class MinesBollos : public QMainWindow
 {
     Q_OBJECT
 
@@ -83,12 +123,12 @@ public:
      *
      * @param parent
      */
-    Mines_Bollos(QWidget *parent = nullptr);
+    MinesBollos(QWidget *parent = nullptr);
     /**
      * @brief
      *
      */
-    ~Mines_Bollos();
+    ~MinesBollos();
 
     /**
      * @brief
@@ -101,12 +141,17 @@ public:
      */
 
 private:
-    void vNewGame(int _X , int _Y, int i_nMines_, int i_X_Clean = -2, int i_Y_Clean = -2);
+    void vNewGame(const uchar _X,
+                  const uchar _Y,
+                  ushort i_nMines_,
+                  const uchar i_X_Clean = 255,
+                  const uchar i_Y_Clean = 255);
     /**
      * @brief
      *
      */
-    void vResetPrincipal_Matrix();
+
+    void vResetPrincipalMatrix();
     /**
      * @brief
      *
@@ -128,7 +173,7 @@ private:
      * @param _X
      * @param _Y
      */
-    void vCasaLivre(int _X, int _Y);
+    void vCellClean(const uchar _X, const uchar _Y);
     /**
      * @brief
      *
@@ -150,14 +195,14 @@ private:
      * @param _X
      * @param _Y
      */
-    void vAddOrRemoveFlag(int _X, int _Y);
+    void vAddOrRemoveFlag(const uchar& _X, const uchar& _Y);
     /**
      * @brief
      *
      * @param _X
      * @param _Y
      */
-    void vGameLost(int _X, int _Y);
+    void vGameLost(const uchar _X, const uchar _Y);
     /**
      * @brief
      *
@@ -231,70 +276,69 @@ private slots:
      *
      * @param e
      */
-    void SLOT_OnQPushButton_adapteded_Clicked(QMouseEvent *e);
+    void SLOT_OnButtonClicked(const QMouseEvent* e);
 
 private:
 
-    std::vector<std::vector<Cell>> Principal_Matrix; /**< TODO: describe */
-    int i_limit_height; /**< TODO: describe */
-    int i_limit_width; /**< TODO: describe */
+    std::vector< std::vector<Cell> > principalMatrix; /**< TODO: describe */
+    int iLimitHeight; /**< TODO: describe */
+    int iLimitWidth; /**< TODO: describe */
 
-    int i_X; /**< TODO: describe */
-    int i_Y; /**< TODO: describe */
-    int i_nMines; /**< TODO: describe */
-    int i_TimeInSeconds; /**< TODO: describe */
-    int i_MinesLeft; /**< TODO: describe */
-    int i_HiddenCells; /**< TODO: describe */
+    uchar iX; /**< TODO: describe */
+    uchar iY; /**< TODO: describe */
+    ushort nMines; /**< TODO: describe */
+    ushort iTimeInSeconds; /**< TODO: describe */
+    ushort iMinesLeft; /**< TODO: describe */
+    ushort iHiddenCells; /**< TODO: describe */
     int fm; /**< TODO: describe */
 
-    int i_CellsToUnlock; /**< TODO: describe */
+    ushort iCellsToUnlock; /**< TODO: describe */
 
     bool bFirst; /**< TODO: describe */
     bool bFirstCellClean; /**< TODO: describe */
 
-    GAME_DIFFICULTY GAME_STATE; /**< TODO: describe */
+    GAME_DIFFICULTY difficult; /**< TODO: describe */
 
-    QPushButton *QPB_Easy; /**< TODO: describe */
-    QPushButton *QPB_Medium; /**< TODO: describe */
-    QPushButton *QPB_Hard; /**< TODO: describe */
+    QPushButton *buttonEasy; /**< TODO: describe */
+    QPushButton *buttonMedium; /**< TODO: describe */
+    QPushButton *buttonHard; /**< TODO: describe */
 
-    QPushButton *QPB_CustomizedNewGame; /**< TODO: describe */
+    QPushButton *buttonCustomizedNewGame; /**< TODO: describe */
 
-    QSpinBox *QSB_Customized_X; /**< TODO: describe */
-    QSpinBox *QSB_Customized_Y; /**< TODO: describe */
-    QSpinBox *QSB_Customized_nMines; /**< TODO: describe */
+    QSpinBox *sbCustomizedX; /**< TODO: describe */
+    QSpinBox *sbCustomizedY; /**< TODO: describe */
+    QSpinBox *sbCustomizednMines; /**< TODO: describe */
 
-    QLabel *QL_Customized_X; /**< TODO: describe */
-    QLabel *QL_Customized_Y; /**< TODO: describe */
-    QLabel *QL_Customized_nMines; /**< TODO: describe */
+    QLabel *labelCustomizedX; /**< TODO: describe */
+    QLabel *labelCustomizedY; /**< TODO: describe */
+    QLabel *labelCustomized_nMines; /**< TODO: describe */
 
-    QCheckBox *QCB_FirstCellClean; /**< TODO: describe */
-    QCheckBox *QCB_DarkModeEnabled;
+    QCheckBox *cbFirstCellClean; /**< TODO: describe */
+    QCheckBox *cbDarkModeEnabled;
 
-    QTimer *QTIMER_TimeInGame; /**< TODO: describe */
-    QLabel *QL_TimerInGame; /**< TODO: describe */
-    QLCDNumber *QLCDN_MinesLeft; /**< TODO: describe */
-    QPushButton *QPB_RestartInGame; /**< TODO: describe */
-    QPushButton *QPB_QuitInGame; /**< TODO: describe */
+    QTimer *timerTimeInGame; /**< TODO: describe */
+    QLabel *labelTimerInGame; /**< TODO: describe */
+    QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
+    QPushButton *buttonRestartInGame; /**< TODO: describe */
+    QPushButton *buttonQuitInGame; /**< TODO: describe */
 
-    QLabel *QL_Mines_Bollos; /**< TODO: describe */
-    QLabel *QL_YouWon_YouLost; /**< TODO: describe */
-    QLabel *QL_StatisLastMatch; /**< TODO: describe */
+    QLabel *labelMinesBollos; /**< TODO: describe */
+    QLabel *labelYouWonYouLost; /**< TODO: describe */
+    QLabel *labelStatisLastMatch; /**< TODO: describe */
 
-    QImage *QI_Zero; /**< TODO: describe */
-    QImage *QI_One; /**< TODO: describe */
-    QImage *QI_Two; /**< TODO: describe */
-    QImage *QI_Three; /**< TODO: describe */
-    QImage *QI_Four; /**< TODO: describe */
-    QImage *QI_Five; /**< TODO: describe */
-    QImage *QI_Six; /**< TODO: describe */
-    QImage *QI_Seven; /**< TODO: describe */
-    QImage *QI_Eight; /**< TODO: describe */
-    QImage *QI_Flag; /**< TODO: describe */
-    QImage *QI_NoFlag; /**< TODO: describe */
-    QImage *QI_Mine; /**< TODO: describe */
-    QImage *QI_Boom; /**< TODO: describe */
-    QImage *QI_WrongFlag; /**< TODO: describe */
-
+    QImage *imgZero; /**< TODO: describe */
+    QImage *imgOne; /**< TODO: describe */
+    QImage *imgTwo; /**< TODO: describe */
+    QImage *imgThree; /**< TODO: describe */
+    QImage *imgFour; /**< TODO: describe */
+    QImage *imgFive; /**< TODO: describe */
+    QImage *imgSix; /**< TODO: describe */
+    QImage *imgSeven; /**< TODO: describe */
+    QImage *imgEight; /**< TODO: describe */
+    QImage *imgFlag; /**< TODO: describe */
+    QImage *imgNoFlag; /**< TODO: describe */
+    QImage *imgMine; /**< TODO: describe */
+    QImage *imgBoom; /**< TODO: describe */
+    QImage *imgWrongFlag; /**< TODO: describe */
 };
 #endif // MINES_BOLLOS_H
