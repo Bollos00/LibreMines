@@ -19,20 +19,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    mines_bollos.cpp \
-    qpushbutton_adapted.cpp
+    src/main.cpp \
+    src/minesbollos.cpp \
+    src/qpushbutton_adapted.cpp
 
 HEADERS += \
-    mines_bollos.h \
-    qpushbutton_adapted.h
+    src/minesbollos.h \
+    src/qpushbutton_adapted.h
 
-FORMS +=
+RESOURCES += \
+    share/minesbollos.qrc
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-RESOURCES += \
-    mines_bollos.qrc

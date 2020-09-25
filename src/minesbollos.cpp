@@ -1,4 +1,4 @@
-#include "mines_bollos.h"
+#include "minesbollos.h"
 
 MinesBollos::MinesBollos(QWidget *parent) :
     QMainWindow(parent),
@@ -16,20 +16,20 @@ MinesBollos::MinesBollos(QWidget *parent) :
     bFirst( 0 ),
     bFirstCellClean( 0 ),
     difficult( NONE ),
-    imgZero ( new QImage(":/Media_rsc/Media/Minesweeper_zero.png") ),
-    imgOne ( new QImage(":/Media_rsc/Media/Minesweeper_one.png") ),
-    imgTwo ( new QImage(":/Media_rsc/Media/Minesweeper_two.png") ),
-    imgThree ( new QImage(":/Media_rsc/Media/Minesweeper_three.png") ),
-    imgFour( new QImage(":/Media_rsc/Media/Minesweeper_four.png") ),
-    imgFive ( new QImage(":/Media_rsc/Media/Minesweeper_five.png") ),
-    imgSix( new QImage(":/Media_rsc/Media/Minesweeper_six.png") ),
-    imgSeven ( new QImage(":/Media_rsc/Media/Minesweeper_seven.png") ),
-    imgEight ( new QImage(":/Media_rsc/Media/Minesweeper_eight.png") ),
-    imgFlag ( new QImage(":/Media_rsc/Media/Minesweeper_flag.png") ),
-    imgNoFlag ( new QImage(":/Media_rsc/Media/Minesweeper_no_flag.png") ),
-    imgMine ( new QImage(":/Media_rsc/Media/Minesweeper_mine.png") ),
-    imgBoom ( new QImage(":/Media_rsc/Media/Minesweeper_boom.png") ),
-    imgWrongFlag ( new QImage(":/Media_rsc/Media/Minesweeper_wrong_flag.png") )
+    imgZero ( new QImage(":/Media_rsc/Media/Minesweeper_zero_dark.png") ),
+    imgOne ( new QImage(":/Media_rsc/Media/Minesweeper_one_dark.png") ),
+    imgTwo ( new QImage(":/Media_rsc/Media/Minesweeper_two_dark.png") ),
+    imgThree ( new QImage(":/Media_rsc/Media/Minesweeper_three_dark.png") ),
+    imgFour( new QImage(":/Media_rsc/Media/Minesweeper_four_dark.png") ),
+    imgFive ( new QImage(":/Media_rsc/Media/Minesweeper_five_dark.png") ),
+    imgSix( new QImage(":/Media_rsc/Media/Minesweeper_six_dark.png") ),
+    imgSeven ( new QImage(":/Media_rsc/Media/Minesweeper_seven_dark.png") ),
+    imgEight ( new QImage(":/Media_rsc/Media/Minesweeper_eight_dark.png") ),
+    imgFlag ( new QImage(":/Media_rsc/Media/Minesweeper_flag_dark.png") ),
+    imgNoFlag ( new QImage(":/Media_rsc/Media/Minesweeper_no_flag_dark.png") ),
+    imgMine ( new QImage(":/Media_rsc/Media/Minesweeper_mine_dark.png") ),
+    imgBoom ( new QImage(":/Media_rsc/Media/Minesweeper_boom_dark.png") ),
+    imgWrongFlag ( new QImage(":/Media_rsc/Media/Minesweeper_wrong_flag_dark.png") )
 {
     vConfigureInterface();
 
@@ -789,22 +789,22 @@ void MinesBollos::vConfigureInterface()
                                labelCustomizedY->width(), labelCustomizedY->height());
 
 
-    connect(buttonEasy, &QPushButton::pressed,
+    connect(buttonEasy, &QPushButton::released,
             this, &MinesBollos::SLOT_Easy);
 
-    connect(buttonMedium, &QPushButton::pressed, this,
-            &MinesBollos::SLOT_Medium);
+    connect(buttonMedium, &QPushButton::released,
+            this, &MinesBollos::SLOT_Medium);
 
-    connect(buttonHard, &QPushButton::pressed,
+    connect(buttonHard, &QPushButton::released,
             this, &MinesBollos::SLOT_Hard);
 
-    connect(buttonCustomizedNewGame, &QPushButton::pressed,
+    connect(buttonCustomizedNewGame, &QPushButton::released,
             this, &MinesBollos::SLOT_Customized);
 
-    connect(buttonRestartInGame, &QPushButton::pressed,
+    connect(buttonRestartInGame, &QPushButton::released,
             this, &MinesBollos::SLOT_Restart);
 
-    connect(buttonQuitInGame, &QPushButton::pressed,
+    connect(buttonQuitInGame, &QPushButton::released,
             this, &MinesBollos::SLOT_Quit);
 
     connect(cbFirstCellClean, &QPushButton::released,
@@ -1129,7 +1129,24 @@ void MinesBollos::vGenerateStatics()
 
 void MinesBollos::vConfigureDarkMode(const bool bDark)
 {
-    if(bDark){
+    if(bDark)
+    {
+        imgZero->load(":/Media_rsc/Images/Minesweeper_zero_dark.png");
+        imgOne->load(":/Media_rsc/Images/Minesweeper_one_dark.png");
+        imgTwo->load(":/Media_rsc/Images/Minesweeper_two_dark.png");
+        imgThree->load(":/Media_rsc/Images/Minesweeper_three_dark.png");
+        imgFour->load(":/Media_rsc/Images/Minesweeper_four_dark.png");
+        imgFive->load(":/Media_rsc/Images/Minesweeper_five_dark.png");
+        imgSix->load(":/Media_rsc/Images/Minesweeper_six_dark.png");
+        imgSeven->load(":/Media_rsc/Images/Minesweeper_seven_dark.png");
+        imgEight->load(":/Media_rsc/Images/Minesweeper_eight_dark.png");
+        imgFlag->load(":/Media_rsc/Images/Minesweeper_flag_dark.png");
+        imgNoFlag->load(":/Media_rsc/Images/Minesweeper_no_flag_dark.png");
+        imgMine->load(":/Media_rsc/Images/Minesweeper_mine_dark.png");
+        imgBoom->load(":/Media_rsc/Images/Minesweeper_boom_dark.png");
+        imgWrongFlag->load(":/Media_rsc/Images/Minesweeper_wrong_flag_dark.png");
+
+
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette darkPalette;
         darkPalette.setColor (QPalette::BrightText,      Qt::red);
@@ -1147,10 +1164,24 @@ void MinesBollos::vConfigureDarkMode(const bool bDark)
         darkPalette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
 
         qApp->setPalette(darkPalette);
-
     }
 
-    else {
+    else
+    {
+        imgZero->load(":/Media_rsc/Images/Minesweeper_zero_light.png");
+        imgOne->load(":/Media_rsc/Images/Minesweeper_one_light.png");
+        imgTwo->load(":/Media_rsc/Images/Minesweeper_two_light.png");
+        imgThree->load(":/Media_rsc/Images/Minesweeper_three_light.png");
+        imgFour->load(":/Media_rsc/Images/Minesweeper_four_light.png");
+        imgFive->load(":/Media_rsc/Images/Minesweeper_five_light.png");
+        imgSix->load(":/Media_rsc/Images/Minesweeper_six_light.png");
+        imgSeven->load(":/Media_rsc/Images/Minesweeper_seven_light.png");
+        imgEight->load(":/Media_rsc/Images/Minesweeper_eight_light.png");
+        imgFlag->load(":/Media_rsc/Images/Minesweeper_flag_light.png");
+        imgNoFlag->load(":/Media_rsc/Images/Minesweeper_no_flag_light.png");
+        imgMine->load(":/Media_rsc/Images/Minesweeper_mine_light.png");
+        imgBoom->load(":/Media_rsc/Images/Minesweeper_boom_light.png");
+        imgWrongFlag->load(":/Media_rsc/Images/Minesweeper_wrong_flag_light.png");
 
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette lightPalette;
@@ -1171,19 +1202,4 @@ void MinesBollos::vConfigureDarkMode(const bool bDark)
         qApp->setPalette(lightPalette);
 
     }
-
-    imgZero->invertPixels();
-    imgOne->invertPixels();
-    imgTwo->invertPixels();
-    imgThree->invertPixels();
-    imgFour->invertPixels();
-    imgFive->invertPixels();
-    imgSix->invertPixels();
-    imgSeven->invertPixels();
-    imgEight->invertPixels();
-    imgFlag->invertPixels();
-    imgNoFlag->invertPixels();
-    imgMine->invertPixels();
-    imgBoom->invertPixels();
-    imgWrongFlag->invertPixels();
 }
