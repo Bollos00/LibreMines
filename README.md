@@ -1,3 +1,3 @@
 # Mines_Bollos
-A Minesweeper game created using QtCreator
+A Minesweeper game created with Qt5 libraries
 By Bollos

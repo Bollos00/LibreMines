@@ -1,9 +1,6 @@
-#include "mines_bollos.h"
-
 #include <QApplication>
-#include <QStyleFactory>
 
-
+#include "minesbollos.h"
 
 int main(int argc, char *argv[])
 {
