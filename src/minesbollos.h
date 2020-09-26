@@ -21,6 +21,7 @@
 #include <QCheckBox>
 #include <QStyleFactory>
 #include <QApplication>
+#include <QKeyEvent>
 
 #include "qpushbutton_adapted.h"
 
@@ -108,6 +109,14 @@ struct Vector2Dshort {
 
 };
 
+struct KeyboardController
+{
+    bool ctrlPressed;
+    bool active;
+    uchar currentX;
+    uchar currentY;
+};
+
 /**
  * @brief
  *
@@ -139,6 +148,9 @@ public:
      * @param i_X_Clean
      * @param i_Y_Clean
      */
+
+protected:
+    bool eventFilter(QObject* object, QEvent* event);
 
 private:
     void vNewGame(const uchar _X,
@@ -173,7 +185,7 @@ private:
      * @param _X
      * @param _Y
      */
-    void vCellClean(const uchar _X, const uchar _Y);
+    void vCleanCell(const uchar _X, const uchar _Y);
     /**
      * @brief
      *
@@ -195,7 +207,7 @@ private:
      * @param _X
      * @param _Y
      */
-    void vAddOrRemoveFlag(const uchar& _X, const uchar& _Y);
+    void vAddOrRemoveFlag(const uchar _X, const uchar _Y);
     /**
      * @brief
      *
@@ -220,6 +232,14 @@ private:
     void vGenerateStatics();
 
     void vConfigureDarkMode(const bool bDark);
+
+    void vSetKeyboardControllerCurrentCell(const uchar x, const uchar y);
+    void vUnsetKeyboardControll();
+    void vKeyboardControllerMoveLeft();
+    void vKeyboardControllerMoveRight();
+    void vKeyboardControllerMoveDown();
+    void vKeyboardControllerMoveUp();
+    void vKeyboardControllerMoveToClosest();
 
 private slots:
     /**
@@ -340,5 +360,8 @@ private:
     QImage *imgMine; /**< TODO: describe */
     QImage *imgBoom; /**< TODO: describe */
     QImage *imgWrongFlag; /**< TODO: describe */
+
+    KeyboardController controller;
+    bool bGameOn;
 };
 #endif // MINES_BOLLOS_H

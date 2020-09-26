@@ -33,6 +33,9 @@ MinesBollos::MinesBollos(QWidget *parent) :
 {
     vConfigureInterface();
 
+    timerTimeInGame = nullptr;
+    qApp->installEventFilter(this);
+
     vConfigureDarkMode(true);
 }
 
@@ -84,12 +87,144 @@ MinesBollos::~MinesBollos()
 
 }
 
-void MinesBollos::vNewGame(const uchar _X,
-                            const uchar _Y,
-                            ushort i_nMines_,
-                            const uchar i_X_Clean,
-                            const uchar i_Y_Clean)
+bool MinesBollos::eventFilter(QObject* object, QEvent* event)
 {
+    if(difficult == NONE || !bGameOn)
+        return false;
+
+    switch(event->type())
+    {
+        case QEvent::KeyPress:
+        {
+            Qt::Key key = (Qt::Key)((QKeyEvent*)event)->key();
+
+        }break;
+
+        case QEvent::KeyRelease:
+        {
+            Qt::Key key = (Qt::Key)((QKeyEvent*)event)->key();
+
+            switch(key)
+            {
+                case Qt::Key_A:
+                case Qt::Key_Left:
+                    if(!controller.active)
+                    {
+                        controller.active = true;
+                        vSetKeyboardControllerCurrentCell(0, 0);
+                        vKeyboardControllerMoveToClosest();
+                    }
+                    else
+                    {
+                        vKeyboardControllerMoveLeft();
+                    }
+                    return true;
+
+                case Qt::Key_W:
+                case Qt::Key_Up:
+                    if(!controller.active)
+                    {
+                        controller.active = true;
+                        vSetKeyboardControllerCurrentCell(0, 0);
+                        vKeyboardControllerMoveToClosest();
+                    }
+                    else
+                    {
+                        vKeyboardControllerMoveUp();
+                    }
+                    return true;
+
+                case Qt::Key_S:
+                case Qt::Key_Down:
+                    if(!controller.active)
+                    {
+                        controller.active = true;
+                        vSetKeyboardControllerCurrentCell(0, 0);
+                        vKeyboardControllerMoveToClosest();
+                    }
+                    else
+                    {
+                        vKeyboardControllerMoveDown();
+                    }
+                    return true;
+
+                case Qt::Key_D:
+                case Qt::Key_Right:
+                    if(!controller.active)
+                    {
+                        controller.active = true;
+                        vSetKeyboardControllerCurrentCell(0, 0);
+                        vKeyboardControllerMoveToClosest();
+                    }
+                    else
+                    {
+                        vKeyboardControllerMoveRight();
+                    }
+                    return true;
+
+                case Qt::Key_1:
+                case Qt::Key_O:
+                    if(controller.active)
+                    {
+                        if(bFirst)
+                        {
+                            if(bFirstCellClean  &&  principalMatrix[controller.currentX][controller.currentY].state != ZERO)
+                            {
+                                vNewGame(iX, iY, nMines, controller.currentX, controller.currentY);
+                            }
+                            bFirst = false;
+                            vStartTimer();
+                        }
+
+                        if(principalMatrix[controller.currentX][controller.currentY].state == MINE)
+                        {
+                            if(!principalMatrix[controller.currentX][controller.currentY].hasFlag)
+                                vGameLost(controller.currentX, controller.currentY);
+                        }
+                        else
+                            vCleanCell(controller.currentX, controller.currentY);
+
+                        vKeyboardControllerMoveToClosest();
+                    }
+                    return true;;
+
+                case Qt::Key_2:
+                case Qt::Key_P:
+                    if(controller.active)
+                    {
+                        vAddOrRemoveFlag(controller.currentX, controller.currentY);
+                        vSetKeyboardControllerCurrentCell(controller.currentX, controller.currentY);
+                    }
+                    return true;
+
+                case Qt::Key_Escape:
+                    if(controller.active)
+                    {
+                        controller.active = false;
+                        vUnsetKeyboardControll();
+                    }
+                    return true;
+                default:
+                    break;
+            }
+
+        }break;
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
+void MinesBollos::vNewGame(const uchar _X,
+                           const uchar _Y,
+                           ushort i_nMines_,
+                           const uchar i_X_Clean,
+                           const uchar i_Y_Clean)
+{
+    bGameOn = true;
+
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
 
@@ -122,8 +257,8 @@ void MinesBollos::vNewGame(const uchar _X,
             QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio),
             QPM_Mine = QPixmap::fromImage(*imgMine).scaled(fm, fm, Qt::KeepAspectRatio);
 
-    if(bRemakingGame){
-
+    if(bRemakingGame)
+    {
         for(std::vector<Cell>& i: principalMatrix)
         {
             for(Cell& j: i)
@@ -219,11 +354,11 @@ void MinesBollos::vNewGame(const uchar _X,
 
             cell.button->setEnabled(true);
 
-            if(cell.state == ZERO){
-
+            if(cell.state == ZERO)
+            {
                 iHiddenCells++;
 
-                char minesNeighbors = 0;
+                uchar minesNeighbors = 0;
 
                 if(i == 0 &&
                    j == 0)
@@ -344,7 +479,8 @@ void MinesBollos::vNewGame(const uchar _X,
                         minesNeighbors++;
                 }
 
-                switch (minesNeighbors) {
+                switch (minesNeighbors)
+                {
                     case 0:
                         cell.state = ZERO;
                         cell.label->setPixmap(QPM_Zero);
@@ -408,13 +544,15 @@ void MinesBollos::vNewGame(const uchar _X,
 
 
 
-void MinesBollos::vGameLost(const uchar _X, const uchar _Y){
-
+void MinesBollos::vGameLost(const uchar _X, const uchar _Y)
+{
+    bGameOn = false;
     qDebug()<<"You Lost";
 
     timerTimeInGame->stop();
 
-    switch (difficult) {
+    switch (difficult)
+    {
         case NONE:
             break;
         case EASY:
@@ -467,13 +605,15 @@ void MinesBollos::vGameLost(const uchar _X, const uchar _Y){
     }
 }
 
-void MinesBollos::vGameWon(){
-
+void MinesBollos::vGameWon()
+{
+    bGameOn = false;
     qDebug()<<"You won: "<<iTimeInSeconds<<" Seconds";
 
     timerTimeInGame->stop();
 
-    switch (difficult) {
+    switch (difficult)
+    {
         case NONE:
             break;
         case EASY:
@@ -500,7 +640,7 @@ void MinesBollos::vGameWon(){
 
 }
 
-void MinesBollos::vCellClean(const uchar _X, const uchar _Y)
+void MinesBollos::vCleanCell(const uchar _X, const uchar _Y)
 {
     if(principalMatrix[_X][_Y].isHidden &&
        !principalMatrix[_X][_Y].hasFlag)
@@ -514,140 +654,140 @@ void MinesBollos::vCellClean(const uchar _X, const uchar _Y)
                _Y == 0)
             {
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCellClean(_X+1, _Y);
+                    vCleanCell(_X+1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCellClean(_X, _Y+1);
+                    vCleanCell(_X, _Y+1);
                 if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCellClean(_X+1, _Y+1);
+                    vCleanCell(_X+1, _Y+1);
             }
             else if(_X == 0 &&
                     _Y == iY-1)
             {
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCellClean(_X+1, _Y);
+                    vCleanCell(_X+1, _Y);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCellClean(_X, _Y-1);
+                    vCleanCell(_X, _Y-1);
                 if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCellClean(_X+1, _Y-1);
+                    vCleanCell(_X+1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y == 0)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCellClean(_X-1, _Y);
+                    vCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCellClean(_X, _Y+1);
+                    vCleanCell(_X, _Y+1);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCellClean(_X-1, _Y+1);
+                    vCleanCell(_X-1, _Y+1);
             }
             else if(_X == iX-1 &&
                     _Y == iY-1)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCellClean(_X-1, _Y);
+                    vCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCellClean(_X, _Y-1);
+                    vCleanCell(_X, _Y-1);
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCellClean(_X-1, _Y-1);
+                    vCleanCell(_X-1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y == 0)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCellClean(_X-1, _Y);
+                    vCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCellClean(_X, _Y+1);
+                    vCleanCell(_X, _Y+1);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCellClean(_X-1, _Y+1);
+                    vCleanCell(_X-1, _Y+1);
             }
             else if(_X == iX-1 &&
                     _Y == iY-1)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCellClean(_X-1, _Y);
+                    vCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCellClean(_X, _Y-1);
+                    vCleanCell(_X, _Y-1);
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCellClean(_X-1, _Y-1);
+                    vCleanCell(_X-1, _Y-1);
             }
             else if(_X == 0 &&
                     _Y > 0 &&
                     _Y < iY-1)
             {
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCellClean(_X+1, _Y);
+                    vCleanCell(_X+1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCellClean(_X, _Y+1);
+                    vCleanCell(_X, _Y+1);
                 if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCellClean(_X+1, _Y+1);
+                    vCleanCell(_X+1, _Y+1);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCellClean(_X, _Y-1);
+                    vCleanCell(_X, _Y-1);
                 if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCellClean(_X+1, _Y-1);
+                    vCleanCell(_X+1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y > 0 &&
                     _Y < iY-1)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCellClean(_X-1, _Y);
+                    vCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCellClean(_X, _Y+1);
+                    vCleanCell(_X, _Y+1);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCellClean(_X-1, _Y+1);
+                    vCleanCell(_X-1, _Y+1);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCellClean(_X, _Y-1);
+                    vCleanCell(_X, _Y-1);
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCellClean(_X-1, _Y-1);
+                    vCleanCell(_X-1, _Y-1);
             }
             else if(_X > 0 &&
                     _X < iX-1 &&
                     _Y == 0)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCellClean(_X-1, _Y);
+                    vCleanCell(_X-1, _Y);
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCellClean(_X+1, _Y);
+                    vCleanCell(_X+1, _Y);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCellClean(_X-1, _Y+1);
+                    vCleanCell(_X-1, _Y+1);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCellClean(_X, _Y+1);
+                    vCleanCell(_X, _Y+1);
                 if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCellClean(_X+1, _Y+1);
+                    vCleanCell(_X+1, _Y+1);
             }
             else if(_X > 0 &&
                     _X < iX-1 &&
                     _Y == iY-1)
             {
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCellClean(_X+1, _Y);
+                    vCleanCell(_X+1, _Y);
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCellClean(_X-1, _Y);
+                    vCleanCell(_X-1, _Y);
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCellClean(_X-1, _Y-1);
+                    vCleanCell(_X-1, _Y-1);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCellClean(_X, _Y-1);
+                    vCleanCell(_X, _Y-1);
                 if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCellClean(_X+1, _Y-1);
+                    vCleanCell(_X+1, _Y-1);
             }
             else
             {
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCellClean(_X-1, _Y-1);
+                    vCleanCell(_X-1, _Y-1);
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCellClean(_X-1, _Y);
+                    vCleanCell(_X-1, _Y);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCellClean(_X-1, _Y+1);
+                    vCleanCell(_X-1, _Y+1);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCellClean(_X, _Y-1);
+                    vCleanCell(_X, _Y-1);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCellClean(_X, _Y+1);
+                    vCleanCell(_X, _Y+1);
                 if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCellClean(_X+1, _Y-1);
+                    vCleanCell(_X+1, _Y-1);
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCellClean(_X+1, _Y);
+                    vCleanCell(_X+1, _Y);
                 if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCellClean(_X+1, _Y+1);
+                    vCleanCell(_X+1, _Y+1);
             }
         }
         else
@@ -657,7 +797,11 @@ void MinesBollos::vCellClean(const uchar _X, const uchar _Y)
         }
         iHiddenCells--;
         if(iHiddenCells == 0)
+        {
+            vUnsetKeyboardControll();
+            controller.active = false;
             vGameWon();
+        }
     }
 
 }
@@ -666,7 +810,8 @@ void MinesBollos::vResetPrincipalMatrix()
 {
     for(std::vector<Cell>& i: principalMatrix)
     {
-        for (Cell& j: i){
+        for (Cell& j: i)
+        {
             delete j.label;
             delete j.button;
         }
@@ -818,8 +963,6 @@ void MinesBollos::vConfigureInterface()
     labelMinesBollos->setFont(QFont("Ubuntu", 15));
     labelMinesBollos->setGeometry(9*width/10, 85*height/100, 2*width/10, height/10);
     labelMinesBollos->show();
-
-
 }
 
 void MinesBollos::vHideInterface()
@@ -999,25 +1142,25 @@ void MinesBollos::SLOT_UpdateTime()
 
 
 
-void MinesBollos::vAddOrRemoveFlag(const uchar& _X, const uchar& _Y)
+void MinesBollos::vAddOrRemoveFlag(const uchar _X, const uchar _Y)
 {
-    switch (principalMatrix[_X][_Y].hasFlag){
-        case false:
-            principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
-            principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
-            principalMatrix[_X][_Y].hasFlag = true;
-            iMinesLeft--;
-            lcd_numberMinesLeft->display(iMinesLeft);
-            break;
-
-        case true:
-            principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
-            principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
-            principalMatrix[_X][_Y].hasFlag = false;
-            iMinesLeft++;
-            lcd_numberMinesLeft->display(iMinesLeft);
-            break;
+    if(principalMatrix[_X][_Y].hasFlag)
+    {
+        principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
+        principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
+        principalMatrix[_X][_Y].hasFlag = false;
+        iMinesLeft++;
+        lcd_numberMinesLeft->display(iMinesLeft);
     }
+    else
+    {
+        principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
+        principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
+        principalMatrix[_X][_Y].hasFlag = true;
+        iMinesLeft--;
+        lcd_numberMinesLeft->display(iMinesLeft);
+    }
+
 }
 
 void MinesBollos::SLOT_OnButtonClicked(const QMouseEvent *e)
@@ -1055,7 +1198,7 @@ void MinesBollos::SLOT_OnButtonClicked(const QMouseEvent *e)
                                 vGameLost(i, j);
                         }
                         else
-                            vCellClean(i, j);
+                            vCleanCell(i, j);
 
                         return;
 
@@ -1098,9 +1241,12 @@ void MinesBollos::vGenerateStatics()
             iWrongFlags = 0,
             iUnlockedCells = iCellsToUnlock - iHiddenCells;
 
-    for (int i=0; i<(iX-1); i++){
-        for (int j=0; j<=(iY-1); j++){
-            if(principalMatrix[i][j].hasFlag == true){
+    for (int i=0; i<(iX-1); i++)
+    {
+        for (int j=0; j<=(iY-1); j++)
+        {
+            if(principalMatrix[i][j].hasFlag)
+            {
                 if (principalMatrix[i][j].state == MINE)
                     iCorrectFlags++;
                 else
@@ -1146,7 +1292,6 @@ void MinesBollos::vConfigureDarkMode(const bool bDark)
         imgBoom->load(":/Media_rsc/Images/Minesweeper_boom_dark.png");
         imgWrongFlag->load(":/Media_rsc/Images/Minesweeper_wrong_flag_dark.png");
 
-
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette darkPalette;
         darkPalette.setColor (QPalette::BrightText,      Qt::red);
@@ -1165,7 +1310,6 @@ void MinesBollos::vConfigureDarkMode(const bool bDark)
 
         qApp->setPalette(darkPalette);
     }
-
     else
     {
         imgZero->load(":/Media_rsc/Images/Minesweeper_zero_light.png");
@@ -1200,6 +1344,136 @@ void MinesBollos::vConfigureDarkMode(const bool bDark)
         lightPalette.setColor (QPalette::Highlight,       QColor (213, 225, 37));
 
         qApp->setPalette(lightPalette);
-
     }
+}
+
+void MinesBollos::vSetKeyboardControllerCurrentCell(const uchar x, const uchar y)
+{
+    controller.currentX = x;
+    controller.currentY = y;
+
+    Cell& cell = principalMatrix[controller.currentX][controller.currentY];
+
+    QImage img = cell.hasFlag ? *imgFlag : *imgNoFlag;
+    img.invertPixels();
+    cell.button->setIcon(QIcon(QPixmap::fromImage(img).scaled(fm, fm, Qt::KeepAspectRatio)));
+
+    qDebug() << "Current: "<< x << ", " << y;
+}
+
+void MinesBollos::vUnsetKeyboardControll()
+{
+    Cell& cell = principalMatrix[controller.currentX][controller.currentY];
+
+    if(!cell.isHidden)
+        return;
+
+    QImage* img = cell.hasFlag ? imgFlag : imgNoFlag;
+    cell.button->setIcon(QIcon(QPixmap::fromImage(*img).scaled(fm, fm, Qt::KeepAspectRatio)));
+}
+
+void MinesBollos::vKeyboardControllerMoveLeft()
+{
+    vUnsetKeyboardControll();
+
+    uchar destX = (controller.currentX == 0) ? (iX -1) : (controller.currentX - 1);
+
+    while(!principalMatrix[destX][controller.currentY].isHidden)
+    {
+        if( destX == 0)
+        {
+            destX = iX - 1;
+        }
+        else
+        {
+            --destX;
+        }
+    }
+    vSetKeyboardControllerCurrentCell(destX, controller.currentY);
+}
+
+void MinesBollos::vKeyboardControllerMoveRight()
+{
+    vUnsetKeyboardControll();
+
+    uchar destX = (controller.currentX == iX - 1) ? (0) : (controller.currentX + 1);
+
+    while(!principalMatrix[destX][controller.currentY].isHidden)
+    {
+        if( destX == iX - 1)
+        {
+            destX = 0;
+        }
+        else
+        {
+            ++destX;
+        }
+    }
+    vSetKeyboardControllerCurrentCell(destX, controller.currentY);
+}
+
+void MinesBollos::vKeyboardControllerMoveDown()
+{
+    vUnsetKeyboardControll();
+
+    uchar destY = (controller.currentY == iY - 1) ? (0) : (controller.currentY + 1);
+
+    while(!principalMatrix[controller.currentX][destY].isHidden)
+    {
+        if( destY == iY - 1)
+        {
+            destY = 0;
+        }
+        else
+        {
+            ++destY;
+        }
+    }
+    vSetKeyboardControllerCurrentCell(controller.currentX, destY);
+}
+
+void MinesBollos::vKeyboardControllerMoveUp()
+{
+    vUnsetKeyboardControll();
+
+    uchar destY = (controller.currentY == 0) ? (iY -1) : (controller.currentY - 1);
+
+    while(!principalMatrix[controller.currentX][destY].isHidden)
+    {
+        if( destY == 0)
+        {
+            destY = iY - 1;
+        }
+        else
+        {
+            --destY;
+        }
+    }
+    vSetKeyboardControllerCurrentCell(controller.currentX, destY);
+}
+
+void MinesBollos::vKeyboardControllerMoveToClosest()
+{
+    vUnsetKeyboardControll();
+    uchar x = 0;
+    uchar y = 0;
+
+    float closestDistance = 100e3;
+
+    for(uchar i = 0; i< iX; i++)
+    {
+        for(uchar j = 0; j < iY; j++)
+        {
+            float distance = sqrtf( powf((float)controller.currentX - (float)i, 2) + powf((float)controller.currentY - (float)j, 2) );
+            if(principalMatrix[i][j].isHidden &&
+               distance < closestDistance)
+            {
+                x = i;
+                y = j;
+                closestDistance = distance;
+            }
+        }
+    }
+
+    vSetKeyboardControllerCurrentCell(x, y);
 }
