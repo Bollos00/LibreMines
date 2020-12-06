@@ -1,5 +1,25 @@
-#ifndef MINES_BOLLOS_H
-#define MINES_BOLLOS_H
+/*****************************************************************************
+ * LibreMines                                                                *
+ * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ *                                                                           *
+ * This program is free software: you can redistribute it and/or modify      *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * This program is distributed in the hope that it will be useful,           *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
+ *****************************************************************************
+ */
+
+
+#ifndef LIBREMINES_H
+#define LIBREMINES_H
 
 #include "stdlib.h"
 #include <cmath>
@@ -121,7 +141,7 @@ struct KeyboardController
  * @brief
  *
  */
-class MinesBollos : public QMainWindow
+class LibreMines : public QMainWindow
 {
     Q_OBJECT
 
@@ -132,12 +152,12 @@ public:
      *
      * @param parent
      */
-    MinesBollos(QWidget *parent = nullptr);
+    LibreMines(QWidget *parent = nullptr);
     /**
      * @brief
      *
      */
-    ~MinesBollos();
+    ~LibreMines();
 
     /**
      * @brief
@@ -233,13 +253,13 @@ private:
 
     void vConfigureDarkMode(const bool bDark);
 
-    void vSetKeyboardControllerCurrentCell(const uchar x, const uchar y);
-    void vUnsetKeyboardControll();
+    void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
+    void vKeyboardControllUnsetCurrentCell();
     void vKeyboardControllerMoveLeft();
     void vKeyboardControllerMoveRight();
     void vKeyboardControllerMoveDown();
     void vKeyboardControllerMoveUp();
-    void vKeyboardControllerMoveToClosest();
+    void vKeyboardControllerUpdateCurrentCell();
 
 private slots:
     /**
@@ -342,7 +362,6 @@ private:
     QPushButton *buttonRestartInGame; /**< TODO: describe */
     QPushButton *buttonQuitInGame; /**< TODO: describe */
 
-    QLabel *labelMinesBollos; /**< TODO: describe */
     QLabel *labelYouWonYouLost; /**< TODO: describe */
     QLabel *labelStatisLastMatch; /**< TODO: describe */
 
@@ -364,4 +383,4 @@ private:
     KeyboardController controller;
     bool bGameOn;
 };
-#endif // MINES_BOLLOS_H
+#endif // LIBREMINES_H

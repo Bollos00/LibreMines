@@ -1,6 +1,26 @@
-#include "minesbollos.h"
+/*****************************************************************************
+ * LibreMines                                                                *
+ * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ *                                                                           *
+ * This program is free software: you can redistribute it and/or modify      *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * This program is distributed in the hope that it will be useful,           *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
+ *****************************************************************************
+ */
 
-MinesBollos::MinesBollos(QWidget *parent) :
+
+#include "libremines.h"
+
+LibreMines::LibreMines(QWidget *parent) :
     QMainWindow(parent),
     principalMatrix( std::vector< std::vector<Cell> >(0) ),
     iLimitHeight( 0 ),
@@ -36,39 +56,18 @@ MinesBollos::MinesBollos(QWidget *parent) :
     timerTimeInGame = nullptr;
     qApp->installEventFilter(this);
 
+    controller.ctrlPressed = false;
+    controller.active = false;
+    controller.currentX = 0;
+    controller.currentY = 0;
+
+
     vConfigureDarkMode(true);
 }
 
-MinesBollos::~MinesBollos()
+LibreMines::~LibreMines()
 {
     vResetPrincipalMatrix();
-
-    delete buttonEasy;
-    delete buttonMedium;
-    delete buttonHard;
-
-    delete buttonCustomizedNewGame;
-
-    delete sbCustomizedX;
-    delete sbCustomizedY;
-    delete sbCustomizednMines;
-
-    delete labelCustomizedX;
-    delete labelCustomizedY;
-    delete labelCustomized_nMines;
-
-    delete cbFirstCellClean;
-    delete cbDarkModeEnabled;
-
-    delete timerTimeInGame;
-    delete labelTimerInGame;
-    delete lcd_numberMinesLeft;
-    delete buttonRestartInGame;
-    delete buttonQuitInGame;
-
-    delete labelMinesBollos;
-    delete labelYouWonYouLost;
-    delete labelStatisLastMatch;
 
     delete imgZero;
     delete imgOne;
@@ -84,10 +83,9 @@ MinesBollos::~MinesBollos()
     delete imgMine;
     delete imgBoom;
     delete imgWrongFlag;
-
 }
 
-bool MinesBollos::eventFilter(QObject* object, QEvent* event)
+bool LibreMines::eventFilter(QObject* object, QEvent* event)
 {
     if(difficult == NONE || !bGameOn)
         return false;
@@ -98,6 +96,16 @@ bool MinesBollos::eventFilter(QObject* object, QEvent* event)
         {
             Qt::Key key = (Qt::Key)((QKeyEvent*)event)->key();
 
+            switch(key)
+            {
+                case Qt::Key_Control:
+                    controller.ctrlPressed = true;
+                    return true;
+
+                default:
+                    break;
+            }
+
         }break;
 
         case QEvent::KeyRelease:
@@ -106,13 +114,16 @@ bool MinesBollos::eventFilter(QObject* object, QEvent* event)
 
             switch(key)
             {
+                case Qt::Key_Control:
+                    controller.ctrlPressed = false;
+                    return true;
+
                 case Qt::Key_A:
                 case Qt::Key_Left:
                     if(!controller.active)
                     {
                         controller.active = true;
-                        vSetKeyboardControllerCurrentCell(0, 0);
-                        vKeyboardControllerMoveToClosest();
+                        vKeyboardControllerSetCurrentCell(0, 0);
                     }
                     else
                     {
@@ -125,8 +136,7 @@ bool MinesBollos::eventFilter(QObject* object, QEvent* event)
                     if(!controller.active)
                     {
                         controller.active = true;
-                        vSetKeyboardControllerCurrentCell(0, 0);
-                        vKeyboardControllerMoveToClosest();
+                        vKeyboardControllerSetCurrentCell(0, 0);
                     }
                     else
                     {
@@ -139,8 +149,7 @@ bool MinesBollos::eventFilter(QObject* object, QEvent* event)
                     if(!controller.active)
                     {
                         controller.active = true;
-                        vSetKeyboardControllerCurrentCell(0, 0);
-                        vKeyboardControllerMoveToClosest();
+                        vKeyboardControllerSetCurrentCell(0, 0);
                     }
                     else
                     {
@@ -153,8 +162,7 @@ bool MinesBollos::eventFilter(QObject* object, QEvent* event)
                     if(!controller.active)
                     {
                         controller.active = true;
-                        vSetKeyboardControllerCurrentCell(0, 0);
-                        vKeyboardControllerMoveToClosest();
+                        vKeyboardControllerSetCurrentCell(0, 0);
                     }
                     else
                     {
@@ -168,7 +176,7 @@ bool MinesBollos::eventFilter(QObject* object, QEvent* event)
                     {
                         if(bFirst)
                         {
-                            if(bFirstCellClean  &&  principalMatrix[controller.currentX][controller.currentY].state != ZERO)
+                            if(bFirstCellClean && principalMatrix[controller.currentX][controller.currentY].state != ZERO)
                             {
                                 vNewGame(iX, iY, nMines, controller.currentX, controller.currentY);
                             }
@@ -179,31 +187,47 @@ bool MinesBollos::eventFilter(QObject* object, QEvent* event)
                         if(principalMatrix[controller.currentX][controller.currentY].state == MINE)
                         {
                             if(!principalMatrix[controller.currentX][controller.currentY].hasFlag)
+                            {
                                 vGameLost(controller.currentX, controller.currentY);
+                            }
                         }
                         else
+                        {
                             vCleanCell(controller.currentX, controller.currentY);
-
-                        vKeyboardControllerMoveToClosest();
+                            vKeyboardControllerUpdateCurrentCell();
+                        }
+                        return true;
                     }
-                    return true;;
+                    else
+                    {
+                        return false;
+                    }
 
                 case Qt::Key_2:
                 case Qt::Key_P:
                     if(controller.active)
                     {
                         vAddOrRemoveFlag(controller.currentX, controller.currentY);
-                        vSetKeyboardControllerCurrentCell(controller.currentX, controller.currentY);
+                        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
+                        return true;
                     }
-                    return true;
+                    else
+                    {
+                        return false;
+                    }
 
                 case Qt::Key_Escape:
                     if(controller.active)
                     {
                         controller.active = false;
-                        vUnsetKeyboardControll();
+                        vKeyboardControllUnsetCurrentCell();
+                        return true;
                     }
-                    return true;
+                    else
+                    {
+                        return false;
+                    }
+
                 default:
                     break;
             }
@@ -217,11 +241,11 @@ bool MinesBollos::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-void MinesBollos::vNewGame(const uchar _X,
-                           const uchar _Y,
-                           ushort i_nMines_,
-                           const uchar i_X_Clean,
-                           const uchar i_Y_Clean)
+void LibreMines::vNewGame(const uchar _X,
+                          const uchar _Y,
+                          ushort i_nMines_,
+                          const uchar i_X_Clean,
+                          const uchar i_Y_Clean)
 {
     bGameOn = true;
 
@@ -237,7 +261,13 @@ void MinesBollos::vNewGame(const uchar _X,
     const bool bRemakingGame = (i_X_Clean != 255 && i_Y_Clean != 255);
 
     if(!bRemakingGame)
+    {
+        controller.ctrlPressed = false;
+        controller.active = false;
+        controller.currentX = 0;
+        controller.currentY = 0;
         principalMatrix = std::vector<std::vector<Cell>> (iX, std::vector<Cell>(iY));
+    }
 
     if(iLimitWidth/iX < iLimitHeight/iY)
         fm = iLimitWidth/iX;
@@ -292,7 +322,7 @@ void MinesBollos::vNewGame(const uchar _X,
                 cell.hasFlag = false;
 
                 connect(cell.button, &QPushButton_adapted::SIGNAL_Clicked,
-                        this, &MinesBollos::SLOT_OnButtonClicked);
+                        this, &LibreMines::SLOT_OnButtonClicked);
 
                 qApp->processEvents();
             }
@@ -544,7 +574,7 @@ void MinesBollos::vNewGame(const uchar _X,
 
 
 
-void MinesBollos::vGameLost(const uchar _X, const uchar _Y)
+void LibreMines::vGameLost(const uchar _X, const uchar _Y)
 {
     bGameOn = false;
     qDebug()<<"You Lost";
@@ -603,9 +633,15 @@ void MinesBollos::vGameLost(const uchar _X, const uchar _Y)
             }
         }
     }
+
+    if(controller.active)
+    {
+        controller.active = false;
+        vKeyboardControllUnsetCurrentCell();
+    }
 }
 
-void MinesBollos::vGameWon()
+void LibreMines::vGameWon()
 {
     bGameOn = false;
     qDebug()<<"You won: "<<iTimeInSeconds<<" Seconds";
@@ -638,9 +674,15 @@ void MinesBollos::vGameWon()
         }
     }
 
+    if(controller.active)
+    {
+        controller.active = false;
+        vKeyboardControllUnsetCurrentCell();
+    }
+
 }
 
-void MinesBollos::vCleanCell(const uchar _X, const uchar _Y)
+void LibreMines::vCleanCell(const uchar _X, const uchar _Y)
 {
     if(principalMatrix[_X][_Y].isHidden &&
        !principalMatrix[_X][_Y].hasFlag)
@@ -798,7 +840,7 @@ void MinesBollos::vCleanCell(const uchar _X, const uchar _Y)
         iHiddenCells--;
         if(iHiddenCells == 0)
         {
-            vUnsetKeyboardControll();
+            vKeyboardControllUnsetCurrentCell();
             controller.active = false;
             vGameWon();
         }
@@ -806,7 +848,7 @@ void MinesBollos::vCleanCell(const uchar _X, const uchar _Y)
 
 }
 
-void MinesBollos::vResetPrincipalMatrix()
+void LibreMines::vResetPrincipalMatrix()
 {
     for(std::vector<Cell>& i: principalMatrix)
     {
@@ -819,8 +861,9 @@ void MinesBollos::vResetPrincipalMatrix()
     principalMatrix.clear();
 }
 
-void MinesBollos::vConfigureInterface()
+void LibreMines::vConfigureInterface()
 {
+    this->setFont(QFont("Liberation Sans"));
     labelTimerInGame = new QLabel (this);
     lcd_numberMinesLeft = new QLCDNumber (this);
     buttonRestartInGame = new QPushButton (this);
@@ -828,13 +871,13 @@ void MinesBollos::vConfigureInterface()
     labelYouWonYouLost = new QLabel(this);
     labelStatisLastMatch = new QLabel(this);
 
-    labelTimerInGame->setFont(QFont("Ubuntu", 40));
+    labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
     lcd_numberMinesLeft->setDecMode();
     lcd_numberMinesLeft->display(0);
     buttonQuitInGame->setText("Quit");
     buttonRestartInGame->setText("Restart");
-    labelYouWonYouLost->setFont(QFont("Ubuntu", 15));
+    labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
     vHideInterfaceInGame();
 
@@ -847,21 +890,21 @@ void MinesBollos::vConfigureInterface()
 
 
     buttonEasy = new QPushButton(this);
-    buttonEasy->setText("Easy\n\n8x8\n\n10 mines");
-    buttonEasy->setFont(QFont("Ubuntu",20));
+    buttonEasy->setText("Easy\n\n8x8\n\n10 Mines");
+    buttonEasy->setFont(QFont("Liberation Sans",20));
 
     buttonMedium= new QPushButton(this);
-    buttonMedium->setText("Medium\n\n16x16\n\n40mines");
-    buttonMedium->setFont(QFont("Ubuntu",20));
+    buttonMedium->setText("Medium\n\n16x16\n\n40 Mines");
+    buttonMedium->setFont(QFont("Liberation Sans",20));
 
 
     buttonHard = new QPushButton(this);
-    buttonHard->setText("Hard\n\n30x16\n\n99Mines");
-    buttonHard->setFont(QFont("Ubuntu",20));
+    buttonHard->setText("Hard\n\n30x16\n\n99 Mines");
+    buttonHard->setFont(QFont("Liberation Sans",20));
 
     buttonCustomizedNewGame = new QPushButton(this);
     buttonCustomizedNewGame->setText("Customized New Game");
-    buttonCustomizedNewGame->setFont(QFont("Ubuntu",20));
+    buttonCustomizedNewGame->setFont(QFont("Liberation Sans",20));
 
     sbCustomizedX = new QSpinBox(this);
     sbCustomizedX->setMinimum(10);
@@ -887,7 +930,7 @@ void MinesBollos::vConfigureInterface()
     labelCustomizedY->setText("Height: ");
 
     labelCustomized_nMines = new QLabel(this);
-    labelCustomized_nMines->setText("Percent of Mines_Bollos: ");
+    labelCustomized_nMines->setText("Percent of Mines: ");
 
     cbFirstCellClean = new QCheckBox(this);
     cbFirstCellClean->setText("First Cell Clean");
@@ -935,37 +978,31 @@ void MinesBollos::vConfigureInterface()
 
 
     connect(buttonEasy, &QPushButton::released,
-            this, &MinesBollos::SLOT_Easy);
+            this, &LibreMines::SLOT_Easy);
 
     connect(buttonMedium, &QPushButton::released,
-            this, &MinesBollos::SLOT_Medium);
+            this, &LibreMines::SLOT_Medium);
 
     connect(buttonHard, &QPushButton::released,
-            this, &MinesBollos::SLOT_Hard);
+            this, &LibreMines::SLOT_Hard);
 
     connect(buttonCustomizedNewGame, &QPushButton::released,
-            this, &MinesBollos::SLOT_Customized);
+            this, &LibreMines::SLOT_Customized);
 
     connect(buttonRestartInGame, &QPushButton::released,
-            this, &MinesBollos::SLOT_Restart);
+            this, &LibreMines::SLOT_Restart);
 
     connect(buttonQuitInGame, &QPushButton::released,
-            this, &MinesBollos::SLOT_Quit);
+            this, &LibreMines::SLOT_Quit);
 
     connect(cbFirstCellClean, &QPushButton::released,
-            this, &MinesBollos::SLOT_UpdateFirstCellClean);
+            this, &LibreMines::SLOT_UpdateFirstCellClean);
 
     connect(cbDarkModeEnabled, &QPushButton::released,
-            this, &MinesBollos::SLOT_DarkMode);
-
-    labelMinesBollos = new QLabel(this);
-    labelMinesBollos->setText("Mines\nBollos");
-    labelMinesBollos->setFont(QFont("Ubuntu", 15));
-    labelMinesBollos->setGeometry(9*width/10, 85*height/100, 2*width/10, height/10);
-    labelMinesBollos->show();
+            this, &LibreMines::SLOT_DarkMode);
 }
 
-void MinesBollos::vHideInterface()
+void LibreMines::vHideInterface()
 {
     buttonEasy->hide();
     buttonMedium->hide();
@@ -985,7 +1022,7 @@ void MinesBollos::vHideInterface()
     cbDarkModeEnabled->hide();
 }
 
-void MinesBollos::vShowInterface()
+void LibreMines::vShowInterface()
 {
     buttonEasy->show();
     buttonMedium->show();
@@ -1005,7 +1042,7 @@ void MinesBollos::vShowInterface()
     cbDarkModeEnabled->show();
 }
 
-void MinesBollos::SLOT_Easy()
+void LibreMines::SLOT_Easy()
 {
     vHideInterface();
 
@@ -1016,7 +1053,7 @@ void MinesBollos::SLOT_Easy()
     difficult = EASY;
 }
 
-void MinesBollos::SLOT_Medium()
+void LibreMines::SLOT_Medium()
 {
     vHideInterface();
 
@@ -1030,7 +1067,7 @@ void MinesBollos::SLOT_Medium()
 
 }
 
-void MinesBollos::SLOT_Hard()
+void LibreMines::SLOT_Hard()
 {
     vHideInterface();
 
@@ -1044,7 +1081,7 @@ void MinesBollos::SLOT_Hard()
 
 }
 
-void MinesBollos::SLOT_Customized()
+void LibreMines::SLOT_Customized()
 {
     vHideInterface();
 
@@ -1054,14 +1091,14 @@ void MinesBollos::SLOT_Customized()
 
     int x = sbCustomizedX->value();
     int y = sbCustomizedY->value();
-    int Mines_Bollos = static_cast<int> (round(x*y*sbCustomizednMines->value()/100));
-    vNewGame(x,y,Mines_Bollos);
+    int mines = static_cast<int> (round(x*y*sbCustomizednMines->value()/100));
+    vNewGame(x, y, mines);
 
     difficult = CUSTOMIZED;
 
 }
 
-void MinesBollos::vAjustInterfaceInGame()
+void LibreMines::vAjustInterfaceInGame()
 {
     int width = this->width();
     int height = this->height();
@@ -1076,7 +1113,7 @@ void MinesBollos::vAjustInterfaceInGame()
 }
 
 
-void MinesBollos::vHideInterfaceInGame()
+void LibreMines::vHideInterfaceInGame()
 {
     labelTimerInGame->hide();
     lcd_numberMinesLeft->hide();
@@ -1087,7 +1124,7 @@ void MinesBollos::vHideInterfaceInGame()
 
 }
 
-void MinesBollos::vShowInterfaceInGame()
+void LibreMines::vShowInterfaceInGame()
 {
     labelTimerInGame->show();
     lcd_numberMinesLeft->show();
@@ -1098,7 +1135,7 @@ void MinesBollos::vShowInterfaceInGame()
 
 }
 
-void MinesBollos::SLOT_Restart()
+void LibreMines::SLOT_Restart()
 {
     if(timerTimeInGame->isActive()
        )
@@ -1117,7 +1154,7 @@ void MinesBollos::SLOT_Restart()
     vNewGame(iX, iY, nMines);
 }
 
-void MinesBollos::SLOT_Quit(){
+void LibreMines::SLOT_Quit(){
 
     if (timerTimeInGame->isActive())
         timerTimeInGame->stop();
@@ -1133,7 +1170,7 @@ void MinesBollos::SLOT_Quit(){
     difficult = NONE;
 }
 
-void MinesBollos::SLOT_UpdateTime()
+void LibreMines::SLOT_UpdateTime()
 {
 
     iTimeInSeconds++;
@@ -1142,7 +1179,7 @@ void MinesBollos::SLOT_UpdateTime()
 
 
 
-void MinesBollos::vAddOrRemoveFlag(const uchar _X, const uchar _Y)
+void LibreMines::vAddOrRemoveFlag(const uchar _X, const uchar _Y)
 {
     if(principalMatrix[_X][_Y].hasFlag)
     {
@@ -1163,7 +1200,7 @@ void MinesBollos::vAddOrRemoveFlag(const uchar _X, const uchar _Y)
 
 }
 
-void MinesBollos::SLOT_OnButtonClicked(const QMouseEvent *e)
+void LibreMines::SLOT_OnButtonClicked(const QMouseEvent *e)
 {
     QPushButton_adapted *buttonClicked = (QPushButton_adapted *) sender();
 
@@ -1210,21 +1247,21 @@ void MinesBollos::SLOT_OnButtonClicked(const QMouseEvent *e)
     }
 }
 
-void MinesBollos::vStartTimer()
+void LibreMines::vStartTimer()
 {
     iTimeInSeconds = 0;
     timerTimeInGame->start(1e3);
 
     connect(timerTimeInGame, &QTimer::timeout,
-            this, &MinesBollos::SLOT_UpdateTime);
+            this, &LibreMines::SLOT_UpdateTime);
 }
 
-void MinesBollos::SLOT_UpdateFirstCellClean()
+void LibreMines::SLOT_UpdateFirstCellClean()
 {
     bFirstCellClean = cbFirstCellClean->isChecked();
 }
 
-void MinesBollos::SLOT_DarkMode()
+void LibreMines::SLOT_DarkMode()
 {
     vConfigureDarkMode(cbDarkModeEnabled->isChecked());
 
@@ -1235,7 +1272,7 @@ void MinesBollos::SLOT_DarkMode()
         cbDarkModeEnabled->setText("Enable dark mode");
 }
 
-void MinesBollos::vGenerateStatics()
+void LibreMines::vGenerateStatics()
 {
     int iCorrectFlags = 0,
             iWrongFlags = 0,
@@ -1273,7 +1310,7 @@ void MinesBollos::vGenerateStatics()
     labelStatisLastMatch->setText(QS_Statics);
 }
 
-void MinesBollos::vConfigureDarkMode(const bool bDark)
+void LibreMines::vConfigureDarkMode(const bool bDark)
 {
     if(bDark)
     {
@@ -1347,133 +1384,127 @@ void MinesBollos::vConfigureDarkMode(const bool bDark)
     }
 }
 
-void MinesBollos::vSetKeyboardControllerCurrentCell(const uchar x, const uchar y)
+void LibreMines::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
 {
     controller.currentX = x;
     controller.currentY = y;
 
     Cell& cell = principalMatrix[controller.currentX][controller.currentY];
 
-    QImage img = cell.hasFlag ? *imgFlag : *imgNoFlag;
-    img.invertPixels();
-    cell.button->setIcon(QIcon(QPixmap::fromImage(img).scaled(fm, fm, Qt::KeepAspectRatio)));
+    if(cell.isHidden)
+    {
 
-    qDebug() << "Current: "<< x << ", " << y;
+        QImage img = cell.hasFlag ? *imgFlag : *imgNoFlag;
+        img.invertPixels();
+        cell.button->setIcon(QIcon(QPixmap::fromImage(img).scaled(fm, fm, Qt::KeepAspectRatio)));
+    }
+    else
+    {
+        QImage img = QImage();
+
+        if(cell.state == ZERO)
+            img = *imgZero;
+        else if(cell.state == ONE)
+            img = *imgOne;
+        else if(cell.state == TWO)
+            img = *imgTwo;
+        else if(cell.state == THREE)
+            img = *imgThree;
+        else if(cell.state == FOUR)
+            img = *imgFour;
+        else if(cell.state == FIVE)
+            img = *imgFive;
+        else if(cell.state == SIX)
+            img = *imgSix;
+        else if(cell.state == SEVEN)
+            img = *imgSeven;
+        else if(cell.state == EIGHT)
+            img = *imgEight;
+        else
+            qFatal(Q_FUNC_INFO);
+
+        img.invertPixels();
+
+        cell.label->setPixmap(QPixmap::fromImage(img).scaled(fm, fm, Qt::KeepAspectRatio));
+    }
 }
 
-void MinesBollos::vUnsetKeyboardControll()
+void LibreMines::vKeyboardControllUnsetCurrentCell()
 {
     Cell& cell = principalMatrix[controller.currentX][controller.currentY];
 
-    if(!cell.isHidden)
-        return;
-
-    QImage* img = cell.hasFlag ? imgFlag : imgNoFlag;
-    cell.button->setIcon(QIcon(QPixmap::fromImage(*img).scaled(fm, fm, Qt::KeepAspectRatio)));
-}
-
-void MinesBollos::vKeyboardControllerMoveLeft()
-{
-    vUnsetKeyboardControll();
-
-    uchar destX = (controller.currentX == 0) ? (iX -1) : (controller.currentX - 1);
-
-    while(!principalMatrix[destX][controller.currentY].isHidden)
+    if(cell.isHidden)
     {
-        if( destX == 0)
-        {
-            destX = iX - 1;
-        }
+        QImage* img = cell.hasFlag ? imgFlag : imgNoFlag;
+        cell.button->setIcon(QIcon(QPixmap::fromImage(*img).scaled(fm, fm, Qt::KeepAspectRatio)));
+    }
+    else
+    {
+        QImage* img = nullptr;
+
+        if(cell.state == ZERO)
+            img = imgZero;
+        else if(cell.state == ONE)
+            img = imgOne;
+        else if(cell.state == TWO)
+            img = imgTwo;
+        else if(cell.state == THREE)
+            img = imgThree;
+        else if(cell.state == FOUR)
+            img = imgFour;
+        else if(cell.state == FIVE)
+            img = imgFive;
+        else if(cell.state == SIX)
+            img = imgSix;
+        else if(cell.state == SEVEN)
+            img = imgSeven;
+        else if(cell.state == EIGHT)
+            img = imgEight;
         else
-        {
-            --destX;
-        }
+            qFatal(Q_FUNC_INFO);
+
+        cell.label->setPixmap(QPixmap::fromImage(*img).scaled(fm, fm, Qt::KeepAspectRatio));
     }
-    vSetKeyboardControllerCurrentCell(destX, controller.currentY);
 }
 
-void MinesBollos::vKeyboardControllerMoveRight()
+void LibreMines::vKeyboardControllerMoveLeft()
 {
-    vUnsetKeyboardControll();
+    vKeyboardControllUnsetCurrentCell();
 
-    uchar destX = (controller.currentX == iX - 1) ? (0) : (controller.currentX + 1);
+    uchar destX = (controller.ctrlPressed) ? 0 : (controller.currentX == 0) ? iX - 1 : (controller.currentX - 1);
 
-    while(!principalMatrix[destX][controller.currentY].isHidden)
-    {
-        if( destX == iX - 1)
-        {
-            destX = 0;
-        }
-        else
-        {
-            ++destX;
-        }
-    }
-    vSetKeyboardControllerCurrentCell(destX, controller.currentY);
+    vKeyboardControllerSetCurrentCell(destX, controller.currentY);
 }
 
-void MinesBollos::vKeyboardControllerMoveDown()
+void LibreMines::vKeyboardControllerMoveRight()
 {
-    vUnsetKeyboardControll();
+    vKeyboardControllUnsetCurrentCell();
 
-    uchar destY = (controller.currentY == iY - 1) ? (0) : (controller.currentY + 1);
+    uchar destX = (controller.ctrlPressed) ? iX - 1 : (controller.currentX == iX - 1) ? 0 : (controller.currentX + 1);
 
-    while(!principalMatrix[controller.currentX][destY].isHidden)
-    {
-        if( destY == iY - 1)
-        {
-            destY = 0;
-        }
-        else
-        {
-            ++destY;
-        }
-    }
-    vSetKeyboardControllerCurrentCell(controller.currentX, destY);
+    vKeyboardControllerSetCurrentCell(destX, controller.currentY);
 }
 
-void MinesBollos::vKeyboardControllerMoveUp()
+void LibreMines::vKeyboardControllerMoveDown()
 {
-    vUnsetKeyboardControll();
+    vKeyboardControllUnsetCurrentCell();
 
-    uchar destY = (controller.currentY == 0) ? (iY -1) : (controller.currentY - 1);
+    uchar destY = (controller.ctrlPressed) ? iY - 1 : (controller.currentY == iY - 1) ? 0 : (controller.currentY + 1);
 
-    while(!principalMatrix[controller.currentX][destY].isHidden)
-    {
-        if( destY == 0)
-        {
-            destY = iY - 1;
-        }
-        else
-        {
-            --destY;
-        }
-    }
-    vSetKeyboardControllerCurrentCell(controller.currentX, destY);
+    vKeyboardControllerSetCurrentCell(controller.currentX, destY);
 }
 
-void MinesBollos::vKeyboardControllerMoveToClosest()
+void LibreMines::vKeyboardControllerMoveUp()
 {
-    vUnsetKeyboardControll();
-    uchar x = 0;
-    uchar y = 0;
+    vKeyboardControllUnsetCurrentCell();
 
-    float closestDistance = 100e3;
+    uchar destY = (controller.ctrlPressed) ? 0 : (controller.currentY == 0) ? iY -1 : (controller.currentY - 1);
 
-    for(uchar i = 0; i< iX; i++)
-    {
-        for(uchar j = 0; j < iY; j++)
-        {
-            float distance = sqrtf( powf((float)controller.currentX - (float)i, 2) + powf((float)controller.currentY - (float)j, 2) );
-            if(principalMatrix[i][j].isHidden &&
-               distance < closestDistance)
-            {
-                x = i;
-                y = j;
-                closestDistance = distance;
-            }
-        }
-    }
+    vKeyboardControllerSetCurrentCell(controller.currentX, destY);
+}
 
-    vSetKeyboardControllerCurrentCell(x, y);
+void LibreMines::vKeyboardControllerUpdateCurrentCell()
+{
+    vKeyboardControllUnsetCurrentCell();
+    vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
 }
