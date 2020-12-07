@@ -37,11 +37,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    src/common.cpp \
     src/main.cpp \
     src/libremines.cpp \
     src/qpushbutton_adapted.cpp
 
 HEADERS += \
+    src/common.h \
     src/libremines.h \
     src/qpushbutton_adapted.h
 
