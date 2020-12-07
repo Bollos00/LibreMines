@@ -21,121 +21,15 @@
 #ifndef LIBREMINES_H
 #define LIBREMINES_H
 
-#include "stdlib.h"
-#include <cmath>
-
-#include <QVector>
-#include <QtCore/QRandomGenerator>
-#include <QLabel>
-#include <QObject>
-#include <QDebug>
 #include <QDesktopWidget>
 #include <QSpinBox>
-#include <QFont>
 #include <QTimer>
 #include <QLCDNumber>
-#include <QMouseEvent>
-#include <QImage>
-#include <QPixmap>
-#include <QIcon>
 #include <QCheckBox>
-#include <QStyleFactory>
-#include <QApplication>
-#include <QKeyEvent>
-
-#include "qpushbutton_adapted.h"
-
 #include <QMainWindow>
 
-/**
- * @brief
- *
- */
-enum CELL_STATE: char{
-    MINE = -1,
-    ZERO = 0,
-    ONE = 1,
-    TWO = 2,
-    THREE = 3,
-    FOUR = 4,
-    FIVE = 5,
-    SIX = 6,
-    SEVEN = 7,
-    EIGHT = 8
-};
+#include "common.h"
 
-/**
- * @brief
- *
- */
-enum GAME_DIFFICULTY: char{
-    NONE,
-    EASY,
-    MEDIUM,
-    HARD,
-    CUSTOMIZED
-};
-
-/**
- * @brief
- *
- */
-struct Cell{
-    CELL_STATE state; /**< TODO: describe */
-    QPushButton_adapted *button; /**< TODO: describe */
-    QLabel *label; /**< TODO: describe */
-    bool isHidden; /**< TODO: describe */
-    bool hasFlag; /**< TODO: describe */
-
-    Cell():
-        state(ZERO),
-        button(nullptr),
-        label(nullptr),
-        isHidden(true),
-        hasFlag(false)
-    {
-
-    }
-};
-
-struct Vector2Dshort {
-
-
-    short x;
-    short y;
-
-    Vector2Dshort():
-        x( 0 ),
-        y( 0 )
-    {
-
-    }
-
-    Vector2Dshort(const qint16& _x, const qint16& _y):
-        x(_x),
-        y(_y)
-    {
-
-    }
-
-    float length() const{
-        return sqrtf(static_cast<float>(x*x + y*y));
-    }
-
-
-    float distanceToPoint(const Vector2Dshort& point) const{
-        return Vector2Dshort(point.x - x, point.y - y).length();
-    }
-
-};
-
-struct KeyboardController
-{
-    bool ctrlPressed;
-    bool active;
-    uchar currentX;
-    uchar currentY;
-};
 
 /**
  * @brief

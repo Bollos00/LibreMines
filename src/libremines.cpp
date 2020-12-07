@@ -17,6 +17,13 @@
  *****************************************************************************
  */
 
+#include <QtCore/QRandomGenerator>
+#include <QDebug>
+#include <QFont>
+#include <QMouseEvent>
+#include <QStyleFactory>
+#include <QApplication>
+#include <QKeyEvent>
 
 #include "libremines.h"
 
@@ -262,6 +269,7 @@ void LibreMines::vNewGame(const uchar _X,
 
     if(!bRemakingGame)
     {
+        bFirst = true;
         controller.ctrlPressed = false;
         controller.active = false;
         controller.currentX = 0;
@@ -1059,8 +1067,6 @@ void LibreMines::SLOT_Medium()
 
     timerTimeInGame = new QTimer(this);
 
-    bFirst = true;
-
     vNewGame(16, 16, 40);
 
     difficult = MEDIUM;
@@ -1073,8 +1079,6 @@ void LibreMines::SLOT_Hard()
 
     timerTimeInGame = new QTimer(this);
 
-    bFirst = true;
-
     vNewGame(30, 16, 99);
 
     difficult = HARD;
@@ -1086,8 +1090,6 @@ void LibreMines::SLOT_Customized()
     vHideInterface();
 
     timerTimeInGame = new QTimer(this);
-
-    bFirst = true;
 
     int x = sbCustomizedX->value();
     int y = sbCustomizedY->value();
@@ -1149,8 +1151,6 @@ void LibreMines::SLOT_Restart()
 
     labelStatisLastMatch->setText(" ");
 
-    bFirst = true;
-
     vNewGame(iX, iY, nMines);
 }
 
@@ -1172,7 +1172,6 @@ void LibreMines::SLOT_Quit(){
 
 void LibreMines::SLOT_UpdateTime()
 {
-
     iTimeInSeconds++;
     labelTimerInGame->setNum(iTimeInSeconds);
 }
@@ -1221,12 +1220,13 @@ void LibreMines::SLOT_OnButtonClicked(const QMouseEvent *e)
 
                         if(bFirst)
                         {
-                            if(bFirstCellClean  &&  principalMatrix[i][j].state != ZERO)
+                            if(bFirstCellClean && principalMatrix[i][j].state != ZERO)
                             {
                                 vNewGame(iX, iY, nMines, i, j);
                             }
                             bFirst = false;
                             vStartTimer();
+                            qDebug() << "Start";
                         }
 
                         if(principalMatrix[i][j].state == MINE)
