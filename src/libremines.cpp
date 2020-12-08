@@ -254,8 +254,6 @@ void LibreMines::vNewGame(const uchar _X,
                           const uchar i_X_Clean,
                           const uchar i_Y_Clean)
 {
-    bGameOn = true;
-
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
 
@@ -269,6 +267,7 @@ void LibreMines::vNewGame(const uchar _X,
 
     if(!bRemakingGame)
     {
+        bGameOn = false;
         bFirst = true;
         controller.ctrlPressed = false;
         controller.active = false;
@@ -578,6 +577,8 @@ void LibreMines::vNewGame(const uchar _X,
 
     buttonQuitInGame->setEnabled(true);
     buttonRestartInGame->setEnabled(true);
+
+    bGameOn = true;
 }
 
 
