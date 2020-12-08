@@ -18,16 +18,58 @@
  */
 
 
-#include <QApplication>
+#ifndef LIBREMINESGAMEENGINE_H
+#define LIBREMINESGAMEENGINE_H
 
-#include "libreminesgui.h"
+#include "common.h"
 
-int main(int argc, char *argv[])
+class LibreMinesGameEngine
 {
-    QApplication a(argc, argv);
+private:
+    class Cell
+    {
+    public:
+        Cell();
 
-    LibreMines* w = new LibreMines();
+        CELL_STATE state;
+        bool isHidden;
+        bool hasFlag;
+    };
 
-    w->show();
-    return a.exec();
-}
+public:
+    LibreMinesGameEngine();
+    void vNewGame(const uchar _X,
+                  const uchar _Y,
+                  ushort i_nMines_,
+                  const uchar i_X_Clean = 255,
+                  const uchar i_Y_Clean = 255);
+
+    void vResetPrincipalMatrix();
+    void vCleanCell(const uchar _X, const uchar _Y);
+    void vAddOrRemoveFlag(const uchar _X, const uchar _Y);
+    void vGameLost(const uchar _X, const uchar _Y);
+    void vGameWon();
+    void vStartTimer();
+    void vGenerateEndGameStatics();
+
+private:
+    std::vector< std::vector<Cell> > principalMatrix; /**< TODO: describe */
+
+    uchar iX; /**< TODO: describe */
+    uchar iY; /**< TODO: describe */
+
+    ushort nMines; /**< TODO: describe */
+    ushort iTimeInSeconds; /**< TODO: describe */
+    ushort iMinesLeft; /**< TODO: describe */
+    ushort iHiddenCells; /**< TODO: describe */
+    ushort iCellsToUnlock; /**< TODO: describe */
+
+    bool bFirst; /**< TODO: describe */
+    bool bFirstCellClean; /**< TODO: describe */
+
+    bool bGameActive;
+
+
+};
+
+#endif // LIBREMINESGAMEENGINE_H

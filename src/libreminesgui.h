@@ -18,8 +18,8 @@
  */
 
 
-#ifndef LIBREMINES_H
-#define LIBREMINES_H
+#ifndef LIBREMINESGUI_H
+#define LIBREMINESGUI_H
 
 #include <QDesktopWidget>
 #include <QSpinBox>
@@ -277,4 +277,4 @@ private:
     KeyboardController controller;
     bool bGameOn;
 };
-#endif // LIBREMINES_H
+#endif // LIBREMINESGUI_H

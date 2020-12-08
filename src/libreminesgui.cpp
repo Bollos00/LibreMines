@@ -25,7 +25,7 @@
 #include <QApplication>
 #include <QKeyEvent>
 
-#include "libremines.h"
+#include "libreminesgui.h"
 
 LibreMines::LibreMines(QWidget *parent) :
     QMainWindow(parent),

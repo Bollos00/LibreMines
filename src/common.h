@@ -58,29 +58,31 @@ enum GAME_DIFFICULTY: char{
  * @brief
  *
  */
-struct Cell{
+class Cell
+{
+public:
+    Cell();
+
     CELL_STATE state; /**< TODO: describe */
     QPushButton_adapted *button; /**< TODO: describe */
     QLabel *label; /**< TODO: describe */
     bool isHidden; /**< TODO: describe */
     bool hasFlag; /**< TODO: describe */
 
-    Cell();
 };
 
-struct Vector2Dshort {
+class Vector2Dshort
+{
+public:
+    Vector2Dshort();
+    Vector2Dshort(const qint16 _x, const qint16 _y);
 
+    float length() const;
+    float distanceToPoint(const Vector2Dshort& point) const;
 
     short x;
     short y;
 
-    Vector2Dshort();
-
-    Vector2Dshort(const qint16 _x, const qint16 _y);
-
-    float length() const;
-
-    float distanceToPoint(const Vector2Dshort& point) const;
 
 };
 
