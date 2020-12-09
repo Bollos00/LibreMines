@@ -27,21 +27,19 @@
 
 #include "libreminesgui.h"
 
+LibreMines::CellGui::CellGui():
+    button(nullptr),
+    label(nullptr)
+{
+
+}
+
 LibreMines::LibreMines(QWidget *parent) :
     QMainWindow(parent),
-    principalMatrix( std::vector< std::vector<Cell> >(0) ),
+    principalMatrix( std::vector< std::vector<CellGui> >(0) ),
     iLimitHeight( 0 ),
     iLimitWidth( 0 ),
-    iX( 0 ),
-    iY( 0 ),
-    nMines( 0 ),
-    iTimeInSeconds( 0 ),
-    iMinesLeft( 0 ),
-    iHiddenCells( 0 ),
     fm( 0 ),
-    iCellsToUnlock( 0 ),
-    bFirst( 0 ),
-    bFirstCellClean( 0 ),
     difficult( NONE ),
     imgZero ( new QImage(":/Media_rsc/Media/Minesweeper_zero_dark.png") ),
     imgOne ( new QImage(":/Media_rsc/Media/Minesweeper_one_dark.png") ),
@@ -254,32 +252,27 @@ void LibreMines::vNewGame(const uchar _X,
                           const uchar i_X_Clean,
                           const uchar i_Y_Clean)
 {
-    buttonQuitInGame->setEnabled(false);
-    buttonRestartInGame->setEnabled(false);
-
-    iX = _X;
-    iY = _Y;
-    nMines = i_nMines_;
-    iMinesLeft = i_nMines_;
-    iHiddenCells = 0;
 
     const bool bRemakingGame = (i_X_Clean != 255 && i_Y_Clean != 255);
 
     if(!bRemakingGame)
     {
-        bGameOn = false;
-        bFirst = true;
         controller.ctrlPressed = false;
         controller.active = false;
         controller.currentX = 0;
         controller.currentY = 0;
-        principalMatrix = std::vector<std::vector<Cell>> (iX, std::vector<Cell>(iY));
+        principalMatrix = std::vector<std::vector<CellGui>> (_X, std::vector<CellGui>(_Y));
     }
 
-    if(iLimitWidth/iX < iLimitHeight/iY)
-        fm = iLimitWidth/iX;
+    buttonQuitInGame->setEnabled(false);
+    buttonRestartInGame->setEnabled(false);
+
+    gameEngine.vNewGame(_X, _Y, i_nMines_, i_X_Clean, i_Y_Clean);
+
+    if(iLimitWidth/_X < iLimitHeight/_Y)
+        fm = iLimitWidth/_X;
     else
-        fm = iLimitHeight/iY;
+        fm = iLimitHeight/_Y;
 
     const QPixmap
             QPM_Zero = QPixmap::fromImage(*imgZero).scaled(fm, fm, Qt::KeepAspectRatio),
@@ -294,28 +287,53 @@ void LibreMines::vNewGame(const uchar _X,
             QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio),
             QPM_Mine = QPixmap::fromImage(*imgMine).scaled(fm, fm, Qt::KeepAspectRatio);
 
-    if(bRemakingGame)
+    if(!bRemakingGame)
     {
-        for(std::vector<Cell>& i: principalMatrix)
+        for(uchar j=0; j<_Y; j++)
         {
-            for(Cell& j: i)
+            for (uchar i=0; i<_X; i++)
             {
-                j.state = ZERO;
-            }
-        }
-    }
-    else
-    {
-        for(uchar j=0; j<iY; j++)
-        {
-            for (uchar i=0; i<iX; i++)
-            {
-                Cell& cell = principalMatrix[i][j];
+                CellGui& cell = principalMatrix[i][j];
 
                 cell.label = new QLabel(this);
                 cell.button = new QPushButton_adapted(this);
 
                 cell.label->setGeometry(i*fm,j*fm,fm,fm);
+
+                switch(gameEngine.principalMatrix[i][j].state)
+                {
+                    case ZERO:
+                        cell.label->setPixmap(QPM_Zero);
+                        break;
+                    case ONE:
+                        cell.label->setPixmap(QPM_One);
+                        break;
+                    case TWO:
+                        cell.label->setPixmap(QPM_Two);
+                        break;
+                    case THREE:
+                        cell.label->setPixmap(QPM_Three);
+                        break;
+                    case FOUR:
+                        cell.label->setPixmap(QPM_Four);
+                        break;
+                    case FIVE:
+                        cell.label->setPixmap(QPM_Five);
+                        break;
+                    case SIX:
+                        cell.label->setPixmap(QPM_Six);
+                        break;
+                    case SEVEN:
+                        cell.label->setPixmap(QPM_Seven);
+                        break;
+                    case EIGHT:
+                        cell.label->setPixmap(QPM_Eight);
+                        break;
+                    case MINE:
+                        cell.label->setPixmap(QPM_Mine);
+                        break;
+                }
+
                 cell.label->show();
 
                 cell.button->setGeometry(i*fm,j*fm,fm,fm);
@@ -323,10 +341,6 @@ void LibreMines::vNewGame(const uchar _X,
                 cell.button->setIconSize(QSize(fm, fm));
                 cell.button->show();
                 cell.button->setEnabled(false);
-
-                cell.state = ZERO;
-                cell.isHidden = true;
-                cell.hasFlag = false;
 
                 connect(cell.button, &QPushButton_adapted::SIGNAL_Clicked,
                         this, &LibreMines::SLOT_OnButtonClicked);
@@ -336,249 +350,14 @@ void LibreMines::vNewGame(const uchar _X,
         }
     }
 
-
-    QVector<Vector2Dshort> vt_vt2d_CleanPoints = QVector<Vector2Dshort>();
-
-    if(bRemakingGame)
-    {
-        vt_vt2d_CleanPoints.reserve(9);
-
-        for (short i=-1; i<=1; i++)
-        {
-            for (short j=-1; j<=1; j++)
-            {
-                vt_vt2d_CleanPoints.append(Vector2Dshort(i_X_Clean + i, i_Y_Clean + j));
-            }
-        }
-    }
-
-    while(i_nMines_ > 0)
-    {
-        uchar i = QRandomGenerator::global()->bounded(0,iX);
-        uchar j = QRandomGenerator::global()->bounded(0,iY);
-
-        bool bPointClean = false;
-
-        if(bRemakingGame)
-        {
-            for (const Vector2Dshort& n: vt_vt2d_CleanPoints)
-            {
-                if(n.x == i &&
-                   n.y == j)
-                {
-                    bPointClean = true;
-                    break;
-                }
-            }
-        }
-
-        Cell& cell = principalMatrix[i][j];
-
-        if(cell.state == ZERO &&
-           !bPointClean)
-        {
-            i_nMines_--;
-            cell.state = MINE;
-            cell.label->setPixmap(QPM_Mine);
-        }
-    }
-
-    for(uchar j=0; j<iY; j++)
-    {
-        for (uchar i=0; i<iX; i++)
-        {
-            Cell& cell = principalMatrix[i][j];
-
-            cell.button->setEnabled(true);
-
-            if(cell.state == ZERO)
-            {
-                iHiddenCells++;
-
-                uchar minesNeighbors = 0;
-
-                if(i == 0 &&
-                   j == 0)
-                {
-                    if(principalMatrix[i+1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].state == MINE)
-                        minesNeighbors++;
-                }
-                else if(i == 0 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i+1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].state == MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j==0)
-                {
-                    if(principalMatrix[i-1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].state == MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i-1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].state == MINE)
-                        minesNeighbors++;
-                }
-                else if(i == 0 &&
-                        j > 0 &&
-                        j < iY-1)
-                {
-                    if(principalMatrix[i+1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].state == MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j >0 &&
-                        j < iY-1)
-                {
-                    if(principalMatrix[i-1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].state == MINE)
-                        minesNeighbors++;
-                }
-                else if(i > 0 &&
-                        i < iX-1 &&
-                        j == 0){
-                    if(principalMatrix[i-1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].state == MINE)
-                        minesNeighbors++;
-                }
-                else if(i > 0 &&
-                        i < iX-1 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i+1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].state == MINE)
-                        minesNeighbors++;
-                }
-                else
-                {
-                    if(principalMatrix[i-1][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j].state == MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].state == MINE)
-                        minesNeighbors++;
-                }
-
-                switch (minesNeighbors)
-                {
-                    case 0:
-                        cell.state = ZERO;
-                        cell.label->setPixmap(QPM_Zero);
-                        break;
-
-                    case 1:
-                        cell.state = ONE;
-                        cell.label->setPixmap(QPM_One);
-                        break;
-
-                    case 2:
-                        cell.state = TWO;
-                        cell.label->setPixmap(QPM_Two);
-                        break;
-
-                    case 3:
-                        cell.state = THREE;
-                        cell.label->setPixmap(QPM_Three);
-                        break;
-
-                    case 4:
-                        cell.state = FOUR;
-                        cell.label->setPixmap(QPM_Four);
-                        break;
-
-                    case 5:
-                        cell.state = FIVE;
-                        cell.label->setPixmap(QPM_Five);
-                        break;
-
-                    case 6:
-                        cell.state = SIX;
-                        cell.label->setPixmap(QPM_Six);
-                        break;
-
-                    case 7:
-                        cell.state = SEVEN;
-                        cell.label->setPixmap(QPM_Seven);
-                        break;
-
-                    case 8:
-                        cell.state = EIGHT;
-                        cell.label->setPixmap(QPM_Eight);
-                        break;
-                }
-            }
-        }
-    }
-
-    iCellsToUnlock = iHiddenCells;
-
     vAjustInterfaceInGame();
     vShowInterfaceInGame();
-    lcd_numberMinesLeft->display(iMinesLeft);
+    lcd_numberMinesLeft->display(gameEngine.iMinesLeft);
     labelTimerInGame->setNum(0);
     labelYouWonYouLost->setText(" ");
 
     buttonQuitInGame->setEnabled(true);
     buttonRestartInGame->setEnabled(true);
-
-    bGameOn = true;
 }
 
 
@@ -620,7 +399,7 @@ void LibreMines::vGameLost(const uchar _X, const uchar _Y)
     {
         for (uchar i=0; i<iX; i++)
         {
-            Cell& cell = principalMatrix[i][j];
+            CellGui& cell = principalMatrix[i][j];
 
             if(cell.isHidden)
             {
@@ -859,9 +638,9 @@ void LibreMines::vCleanCell(const uchar _X, const uchar _Y)
 
 void LibreMines::vResetPrincipalMatrix()
 {
-    for(std::vector<Cell>& i: principalMatrix)
+    for(std::vector<CellGui>& i: principalMatrix)
     {
-        for (Cell& j: i)
+        for (CellGui& j: i)
         {
             delete j.label;
             delete j.button;
@@ -1390,7 +1169,7 @@ void LibreMines::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
     controller.currentX = x;
     controller.currentY = y;
 
-    Cell& cell = principalMatrix[controller.currentX][controller.currentY];
+    CellGui& cell = principalMatrix[controller.currentX][controller.currentY];
 
     if(cell.isHidden)
     {
@@ -1432,7 +1211,7 @@ void LibreMines::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
 
 void LibreMines::vKeyboardControllUnsetCurrentCell()
 {
-    Cell& cell = principalMatrix[controller.currentX][controller.currentY];
+    CellGui& cell = principalMatrix[controller.currentX][controller.currentY];
 
     if(cell.isHidden)
     {
@@ -1509,3 +1288,4 @@ void LibreMines::vKeyboardControllerUpdateCurrentCell()
     vKeyboardControllUnsetCurrentCell();
     vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
 }
+

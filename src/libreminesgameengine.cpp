@@ -19,9 +19,11 @@
 
 
 #include "libreminesgameengine.h"
-#include <QRandomGenerator>
 
-LibreMinesGameEngine::Cell::Cell():
+#include <QRandomGenerator>
+#include <QTimer>
+
+LibreMinesGameEngine::CellGameEngine::CellGameEngine():
     state(ZERO),
     isHidden(true),
     hasFlag(false)
@@ -52,15 +54,15 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
     {
         bGameActive = false;
         bFirst = true;
-        principalMatrix = std::vector<std::vector<Cell>> (iX, std::vector<Cell>(iY));
+        principalMatrix = std::vector<std::vector<CellGameEngine>> (iX, std::vector<CellGameEngine>(iY));
     }
 
 
     if(bRemakingGame)
     {
-        for(std::vector<Cell>& i: principalMatrix)
+        for(std::vector<CellGameEngine>& i: principalMatrix)
         {
-            for(Cell& j: i)
+            for(CellGameEngine& j: i)
             {
                 j.state = ZERO;
             }
@@ -72,7 +74,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
         {
             for (uchar i=0; i<iX; i++)
             {
-                Cell& cell = principalMatrix[i][j];
+                CellGameEngine& cell = principalMatrix[i][j];
 
                 cell.state = ZERO;
                 cell.isHidden = true;
@@ -119,14 +121,13 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
             }
         }
 
-        Cell& cell = principalMatrix[i][j];
+        CellGameEngine& cell = principalMatrix[i][j];
 
         if(cell.state == ZERO &&
            !bPointClean)
         {
             i_nMines_--;
             cell.state = MINE;
-            cell.label->setPixmap(QPM_Mine);
         }
     }
 
@@ -134,9 +135,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
     {
         for (uchar i=0; i<iX; i++)
         {
-            Cell& cell = principalMatrix[i][j];
-
-            cell.button->setEnabled(true);
+            CellGameEngine& cell = principalMatrix[i][j];
 
             if(cell.state == ZERO)
             {
@@ -267,65 +266,45 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                 {
                     case 0:
                         cell.state = ZERO;
-                        cell.label->setPixmap(QPM_Zero);
                         break;
 
                     case 1:
                         cell.state = ONE;
-                        cell.label->setPixmap(QPM_One);
                         break;
 
                     case 2:
                         cell.state = TWO;
-                        cell.label->setPixmap(QPM_Two);
                         break;
 
                     case 3:
                         cell.state = THREE;
-                        cell.label->setPixmap(QPM_Three);
                         break;
 
                     case 4:
                         cell.state = FOUR;
-                        cell.label->setPixmap(QPM_Four);
                         break;
 
                     case 5:
                         cell.state = FIVE;
-                        cell.label->setPixmap(QPM_Five);
                         break;
 
                     case 6:
                         cell.state = SIX;
-                        cell.label->setPixmap(QPM_Six);
                         break;
 
                     case 7:
                         cell.state = SEVEN;
-                        cell.label->setPixmap(QPM_Seven);
                         break;
 
                     case 8:
                         cell.state = EIGHT;
-                        cell.label->setPixmap(QPM_Eight);
                         break;
                 }
             }
         }
     }
-
     iCellsToUnlock = iHiddenCells;
-
-    vAjustInterfaceInGame();
-    vShowInterfaceInGame();
-    lcd_numberMinesLeft->display(iMinesLeft);
-    labelTimerInGame->setNum(0);
-    labelYouWonYouLost->setText(" ");
-
-    buttonQuitInGame->setEnabled(true);
-    buttonRestartInGame->setEnabled(true);
-
-    bGameOn = true;
+    bGameActive = true;
 
 }
 
@@ -336,31 +315,199 @@ void LibreMinesGameEngine::vResetPrincipalMatrix()
 
 void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
 {
+    if(principalMatrix[_X][_Y].isHidden &&
+       !principalMatrix[_X][_Y].hasFlag)
+    {
+        principalMatrix[_X][_Y].isHidden = false;
+        emit SIGNAL_showCell(_X, _Y);
 
-}
-
-void LibreMinesGameEngine::vAddOrRemoveFlag(const uchar _X, const uchar _Y)
-{
-
-}
-
-void LibreMinesGameEngine::vGameLost(const uchar _X, const uchar _Y)
-{
-
-}
-
-void LibreMinesGameEngine::vGameWon()
-{
-
+        if(principalMatrix[_X][_Y].state == ZERO)
+        {
+            if(_X == 0 &&
+               _Y == 0)
+            {
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCleanCell(_X+1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCleanCell(_X, _Y+1);
+                if(principalMatrix[_X+1][_Y+1].isHidden)
+                    vCleanCell(_X+1, _Y+1);
+            }
+            else if(_X == 0 &&
+                    _Y == iY-1)
+            {
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCleanCell(_X+1, _Y);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCleanCell(_X, _Y-1);
+                if(principalMatrix[_X+1][_Y-1].isHidden)
+                    vCleanCell(_X+1, _Y-1);
+            }
+            else if(_X == iX-1 &&
+                    _Y == 0)
+            {
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCleanCell(_X-1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCleanCell(_X, _Y+1);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCleanCell(_X-1, _Y+1);
+            }
+            else if(_X == iX-1 &&
+                    _Y == iY-1)
+            {
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCleanCell(_X-1, _Y);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCleanCell(_X, _Y-1);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCleanCell(_X-1, _Y-1);
+            }
+            else if(_X == iX-1 &&
+                    _Y == 0)
+            {
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCleanCell(_X-1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCleanCell(_X, _Y+1);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCleanCell(_X-1, _Y+1);
+            }
+            else if(_X == iX-1 &&
+                    _Y == iY-1)
+            {
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCleanCell(_X-1, _Y);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCleanCell(_X, _Y-1);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCleanCell(_X-1, _Y-1);
+            }
+            else if(_X == 0 &&
+                    _Y > 0 &&
+                    _Y < iY-1)
+            {
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCleanCell(_X+1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCleanCell(_X, _Y+1);
+                if(principalMatrix[_X+1][_Y+1].isHidden)
+                    vCleanCell(_X+1, _Y+1);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCleanCell(_X, _Y-1);
+                if(principalMatrix[_X+1][_Y-1].isHidden)
+                    vCleanCell(_X+1, _Y-1);
+            }
+            else if(_X == iX-1 &&
+                    _Y > 0 &&
+                    _Y < iY-1)
+            {
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCleanCell(_X-1, _Y);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCleanCell(_X, _Y+1);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCleanCell(_X-1, _Y+1);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCleanCell(_X, _Y-1);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCleanCell(_X-1, _Y-1);
+            }
+            else if(_X > 0 &&
+                    _X < iX-1 &&
+                    _Y == 0)
+            {
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCleanCell(_X-1, _Y);
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCleanCell(_X+1, _Y);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCleanCell(_X-1, _Y+1);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCleanCell(_X, _Y+1);
+                if(principalMatrix[_X+1][_Y+1].isHidden)
+                    vCleanCell(_X+1, _Y+1);
+            }
+            else if(_X > 0 &&
+                    _X < iX-1 &&
+                    _Y == iY-1)
+            {
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCleanCell(_X+1, _Y);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCleanCell(_X-1, _Y);
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCleanCell(_X-1, _Y-1);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCleanCell(_X, _Y-1);
+                if(principalMatrix[_X+1][_Y-1].isHidden)
+                    vCleanCell(_X+1, _Y-1);
+            }
+            else
+            {
+                if(principalMatrix[_X-1][_Y-1].isHidden)
+                    vCleanCell(_X-1, _Y-1);
+                if(principalMatrix[_X-1][_Y].isHidden)
+                    vCleanCell(_X-1, _Y);
+                if(principalMatrix[_X-1][_Y+1].isHidden)
+                    vCleanCell(_X-1, _Y+1);
+                if(principalMatrix[_X][_Y-1].isHidden)
+                    vCleanCell(_X, _Y-1);
+                if(principalMatrix[_X][_Y+1].isHidden)
+                    vCleanCell(_X, _Y+1);
+                if(principalMatrix[_X+1][_Y-1].isHidden)
+                    vCleanCell(_X+1, _Y-1);
+                if(principalMatrix[_X+1][_Y].isHidden)
+                    vCleanCell(_X+1, _Y);
+                if(principalMatrix[_X+1][_Y+1].isHidden)
+                    vCleanCell(_X+1, _Y+1);
+            }
+        }
+        iHiddenCells--;
+        if(iHiddenCells == 0)
+        {
+            vGameWon();
+        }
+    }
 }
 
 void LibreMinesGameEngine::vStartTimer()
 {
-
+    iTimeInSeconds = 0;
+    timerTimeInGame.reset(new QTimer());
+    timerTimeInGame->start(1000);
 }
 
 void LibreMinesGameEngine::vGenerateEndGameStatics()
 {
 
+}
+
+void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
+{
+    vCleanCell(_X, _Y);
+}
+
+void LibreMinesGameEngine::SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y)
+{
+    if(principalMatrix[_X][_Y].hasFlag)
+    {
+        principalMatrix[_X][_Y].hasFlag = false;
+        iMinesLeft++;
+        emit SIGNAL_minesLeft(iMinesLeft);
+    }
+    else
+    {
+        principalMatrix[_X][_Y].hasFlag = true;
+        iMinesLeft--;
+        emit SIGNAL_minesLeft(iMinesLeft);
+    }
+
+}
+
+void LibreMinesGameEngine::SLOT_UpdateTime()
+{
+    iTimeInSeconds++;
+    emit SIGNAL_currentTime(iTimeInSeconds);
 }
 

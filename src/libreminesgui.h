@@ -29,6 +29,7 @@
 #include <QMainWindow>
 
 #include "common.h"
+#include "libreminesgameengine.h"
 
 
 /**
@@ -39,6 +40,15 @@ class LibreMines : public QMainWindow
 {
     Q_OBJECT
 
+private:
+    class CellGui
+    {
+    public:
+        CellGui();
+
+        QPushButton_adapted *button; /**< TODO: describe */
+        QLabel *label; /**< TODO: describe */
+    };
 
 public:
     /**
@@ -155,7 +165,7 @@ private:
     void vKeyboardControllerMoveUp();
     void vKeyboardControllerUpdateCurrentCell();
 
-private slots:
+private Q_SLOTS:
     /**
      * @brief
      *
@@ -214,22 +224,13 @@ private slots:
 
 private:
 
-    std::vector< std::vector<Cell> > principalMatrix; /**< TODO: describe */
+    LibreMinesGameEngine gameEngine;
+    std::vector< std::vector<CellGui> > principalMatrix; /**< TODO: describe */
+
     int iLimitHeight; /**< TODO: describe */
     int iLimitWidth; /**< TODO: describe */
 
-    uchar iX; /**< TODO: describe */
-    uchar iY; /**< TODO: describe */
-    ushort nMines; /**< TODO: describe */
-    ushort iTimeInSeconds; /**< TODO: describe */
-    ushort iMinesLeft; /**< TODO: describe */
-    ushort iHiddenCells; /**< TODO: describe */
     int fm; /**< TODO: describe */
-
-    ushort iCellsToUnlock; /**< TODO: describe */
-
-    bool bFirst; /**< TODO: describe */
-    bool bFirstCellClean; /**< TODO: describe */
 
     GAME_DIFFICULTY difficult; /**< TODO: describe */
 
@@ -275,6 +276,5 @@ private:
     QImage *imgWrongFlag; /**< TODO: describe */
 
     KeyboardController controller;
-    bool bGameOn;
 };
 #endif // LIBREMINESGUI_H

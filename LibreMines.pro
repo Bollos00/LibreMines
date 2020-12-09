@@ -39,12 +39,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     src/common.cpp \
     src/main.cpp \
-    src/libremines.cpp \
+    src/libreminesgui.cpp \
+    src/libreminesgameengine.cpp \
     src/qpushbutton_adapted.cpp
 
 HEADERS += \
     src/common.h \
-    src/libremines.h \
+    src/libreminesgui.h \
+    src/libreminesgameengine.h \
     src/qpushbutton_adapted.h
 
 RESOURCES += \
