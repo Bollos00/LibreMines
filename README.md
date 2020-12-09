@@ -11,13 +11,13 @@ The following dependencies are required for building and running LibreMines:
 
 
 On Arch Linux and derivatives systems the dependencies can be installed with pacman:
-```
-sudo pacman -S base-devel qt5-base
+```sh
+sudo pacman -S base-devel qt5-base cmake
 ```
 
 For ubuntu you can install the dependencies with the following command:
-```
-sudo apt-get install build-essential qt5-default
+```sh
+sudo apt-get install build-essential qt5-default cmake
 ```
 
 For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/).
@@ -25,17 +25,16 @@ For others systems, check the [qt online installers](https://download.qt.io/offi
 ### Building
 
 Follow those steps for build LibreMines from source code:
-```
+```sh
 git clone https://github.com/Bollos00/LibreMines.git
 cd LibreMines
-mkdir build && cd build
-qmake .. CONFIG+=release
-make
+cmake -S . -B build
+cmake --build build
 ```
 
-The executable `libremines` will be generated on the working directory, now it is possible to run it with:
-```
-./libremines
+The executable `libremines` will be generated in the build directory, now it is possible to run it with:
+```sh
+./build/libremines
 ```
 
 ## How to play
