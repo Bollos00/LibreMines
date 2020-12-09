@@ -16,43 +16,62 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.     #
 #############################################################################
 
-QT       += core gui
+message(STATUS "Using CMake version ${CMAKE_VERSION}")
+cmake_minimum_required(VERSION 3.1...${CMAKE_VERSION})
+project(libremines)
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+    message(STATUS "Using default build type Release")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+endif()
 
-TARGET = libremines
-TEMPLATE = app
+# https://cmake.org/cmake/help/latest/prop_tgt/CXX_STANDARD.html
+string(COMPARE EQUAL "${CMAKE_CXX_STANDARD}" "" no_cmake_cxx_standard_set)
+if(no_cmake_cxx_standard_set)
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    message(STATUS "Using default C++ standard ${CMAKE_CXX_STANDARD}")
+else()
+    message(STATUS "Using user specified C++ standard ${CMAKE_CXX_STANDARD}")
+endif()
 
-CONFIG += staticlib c++11
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+#set(CMAKE_AUTOUIC ON)
+
+add_executable(${PROJECT_NAME}
+    src/common.cpp
+    src/common.h
+    src/main.cpp
+    src/libremines.cpp
+    src/libremines.h
+    src/qpushbutton_adapted.cpp
+    src/qpushbutton_adapted.h
+    share/minesbollos.qrc
+)
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
+target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DEPRECATED_WARNINGS)
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+#target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DISABLE_DEPRECATED_BEFORE=0x060000)    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += \
-    src/common.cpp \
-    src/main.cpp \
-    src/libreminesgui.cpp \
-    src/libreminesgameengine.cpp \
-    src/qpushbutton_adapted.cpp
+find_package(Qt5 REQUIRED COMPONENTS Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
 
-HEADERS += \
-    src/common.h \
-    src/libreminesgui.h \
-    src/libreminesgameengine.h \
-    src/qpushbutton_adapted.h
-
-RESOURCES += \
-    share/minesbollos.qrc
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+# create install target
+include(GNUInstallDirs)
+install(
+    TARGETS
+    ${PROJECT_NAME}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # set include path for installed library target
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
