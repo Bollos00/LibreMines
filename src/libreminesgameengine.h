@@ -22,11 +22,14 @@
 #define LIBREMINESGAMEENGINE_H
 
 #include <QPointer>
+#include <QElapsedTimer>
 
 #include "common.h"
 
-class LibreMinesGameEngine
+class LibreMinesGameEngine: public QObject
 {
+    Q_OBJECT
+
 public:
     class CellGameEngine
     {
@@ -50,10 +53,17 @@ public:
     void vCleanCell(const uchar _X, const uchar _Y);
     void vGameLost(const uchar _X, const uchar _Y);
     void vGameWon();
-    void vStartTimer();
+
     void vGenerateEndGameStatics();
 
-public:
+    const std::vector< std::vector<CellGameEngine> >& getPrincipalMatrix()const;
+    uchar rows()const;
+    uchar lines()const;
+    ushort mines()const;
+    bool isGameActive()const;
+
+    void setFirstCellClean(const bool x);
+private:
     std::vector< std::vector<CellGameEngine> > principalMatrix; /**< TODO: describe */
 
     uchar iX; /**< TODO: describe */
@@ -66,6 +76,7 @@ public:
     ushort iCellsToUnlock; /**< TODO: describe */
 
     QScopedPointer<QTimer> timerTimeInGame; /**< TODO: describe */
+    QElapsedTimer elapsedPreciseTimeInGame;
 
     bool bFirst; /**< TODO: describe */
     bool bFirstCellClean; /**< TODO: describe */
@@ -77,10 +88,17 @@ Q_SIGNALS:
     void SIGNAL_endGameStatics(const QString&);
     void SIGNAL_currentTime(const ushort);
     void SIGNAL_minesLeft(const ushort);
+    void SIGNAL_flagCell(const uchar _X, const uchar _Y);
+    void SIGNAL_unflagCell(const uchar _X, const uchar _Y);
+    void SIGNAL_gameWon();
+    void SIGNAL_gameLost(const uchar _X, const uchar _Y);
+    void SIGNAL_remakeGame();
 
 public Q_SLOTS:
     void SLOT_cleanCell(const uchar _X, const uchar _Y);
     void SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y);
+    void SLOT_stop();
+    void SLOT_startTimer();
 
 private Q_SLOTS:
     void SLOT_UpdateTime();

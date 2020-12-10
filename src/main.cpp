@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    LibreMines* w = new LibreMines();
+    LibreMinesGui* w = new LibreMinesGui();
 
     w->show();
     return a.exec();

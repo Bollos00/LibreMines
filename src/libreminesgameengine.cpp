@@ -106,8 +106,6 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
         uchar i = QRandomGenerator::global()->bounded(0, iX);
         uchar j = QRandomGenerator::global()->bounded(0, iY);
 
-        bool bPointClean = false;
-
         if(bRemakingGame)
         {
             for (const Vector2Dshort& n: vt_vt2d_CleanPoints)
@@ -115,16 +113,14 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                 if(n.x == i &&
                    n.y == j)
                 {
-                    bPointClean = true;
-                    break;
+                    continue;
                 }
             }
         }
 
         CellGameEngine& cell = principalMatrix[i][j];
 
-        if(cell.state == ZERO &&
-           !bPointClean)
+        if(cell.state == ZERO)
         {
             i_nMines_--;
             cell.state = MINE;
@@ -262,61 +258,71 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                         minesNeighbors++;
                 }
 
-                switch (minesNeighbors)
-                {
-                    case 0:
-                        cell.state = ZERO;
-                        break;
+                cell.state = (CELL_STATE)minesNeighbors;
+//                switch (minesNeighbors)
+//                {
+//                    case 0:
+//                        cell.state = ZERO;
+//                        break;
 
-                    case 1:
-                        cell.state = ONE;
-                        break;
+//                    case 1:
+//                        cell.state = ONE;
+//                        break;
 
-                    case 2:
-                        cell.state = TWO;
-                        break;
+//                    case 2:
+//                        cell.state = TWO;
+//                        break;
 
-                    case 3:
-                        cell.state = THREE;
-                        break;
+//                    case 3:
+//                        cell.state = THREE;
+//                        break;
 
-                    case 4:
-                        cell.state = FOUR;
-                        break;
+//                    case 4:
+//                        cell.state = FOUR;
+//                        break;
 
-                    case 5:
-                        cell.state = FIVE;
-                        break;
+//                    case 5:
+//                        cell.state = FIVE;
+//                        break;
 
-                    case 6:
-                        cell.state = SIX;
-                        break;
+//                    case 6:
+//                        cell.state = SIX;
+//                        break;
 
-                    case 7:
-                        cell.state = SEVEN;
-                        break;
+//                    case 7:
+//                        cell.state = SEVEN;
+//                        break;
 
-                    case 8:
-                        cell.state = EIGHT;
-                        break;
-                }
+//                    case 8:
+//                        cell.state = EIGHT;
+//                        break;
+//                }
             }
         }
     }
     iCellsToUnlock = iHiddenCells;
     bGameActive = true;
 
+    if(bRemakingGame)
+    {
+        emit SIGNAL_remakeGame();
+    }
 }
 
 void LibreMinesGameEngine::vResetPrincipalMatrix()
 {
-
+    principalMatrix.clear();
 }
 
 void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
 {
-    if(principalMatrix[_X][_Y].isHidden &&
-       !principalMatrix[_X][_Y].hasFlag)
+    if(!principalMatrix[_X][_Y].hasFlag &&
+       principalMatrix[_X][_Y].state == MINE)
+    {
+        vGameLost(_X, _Y);
+    }
+    else if(principalMatrix[_X][_Y].isHidden &&
+            !principalMatrix[_X][_Y].hasFlag)
     {
         principalMatrix[_X][_Y].isHidden = false;
         emit SIGNAL_showCell(_X, _Y);
@@ -471,38 +477,113 @@ void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
     }
 }
 
-void LibreMinesGameEngine::vStartTimer()
+void LibreMinesGameEngine::vGameLost(const uchar _X, const uchar _Y)
 {
-    iTimeInSeconds = 0;
-    timerTimeInGame.reset(new QTimer());
-    timerTimeInGame->start(1000);
+    bGameActive = false;
+
+    timerTimeInGame.reset();
+    emit SIGNAL_gameLost(_X, _Y);
 }
+
+void LibreMinesGameEngine::vGameWon()
+{
+    int timeInNs = elapsedPreciseTimeInGame.nsecsElapsed();
+    bGameActive = false;
+
+    timerTimeInGame.reset();
+    emit SIGNAL_gameWon();
+}
+
 
 void LibreMinesGameEngine::vGenerateEndGameStatics()
 {
 
 }
 
+const std::vector<std::vector<LibreMinesGameEngine::CellGameEngine> >& LibreMinesGameEngine::getPrincipalMatrix() const
+{
+    return principalMatrix;
+}
+
+uchar LibreMinesGameEngine::rows() const
+{
+    return iX;
+}
+
+uchar LibreMinesGameEngine::lines() const
+{
+    return iY;
+}
+
+ushort LibreMinesGameEngine::mines() const
+{
+    return nMines;
+}
+
+bool LibreMinesGameEngine::isGameActive() const
+{
+    return bGameActive;
+}
+
+void LibreMinesGameEngine::setFirstCellClean(const bool x)
+{
+    bFirstCellClean = x;
+}
+
+
 void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 {
+    if(bFirst && bFirstCellClean && principalMatrix[_X][_Y].state != ZERO)
+    {
+        vNewGame(iX, iY, nMines, _X, _Y);
+        SLOT_startTimer();
+        bFirst = false;
+    }
+    else if(bFirst)
+    {
+        SLOT_startTimer();
+        bFirst = false;
+    }
     vCleanCell(_X, _Y);
 }
 
 void LibreMinesGameEngine::SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y)
 {
+    if(!principalMatrix[_X][_Y].isHidden)
+        return;
+
     if(principalMatrix[_X][_Y].hasFlag)
     {
         principalMatrix[_X][_Y].hasFlag = false;
         iMinesLeft++;
-        emit SIGNAL_minesLeft(iMinesLeft);
+        emit SIGNAL_unflagCell(_X, _Y);
     }
     else
     {
         principalMatrix[_X][_Y].hasFlag = true;
         iMinesLeft--;
-        emit SIGNAL_minesLeft(iMinesLeft);
+        emit SIGNAL_flagCell(_X, _Y);
     }
 
+    emit SIGNAL_minesLeft(iMinesLeft);
+}
+
+void LibreMinesGameEngine::SLOT_stop()
+{
+    timerTimeInGame.reset();
+    bGameActive = false;
+    vResetPrincipalMatrix();
+}
+
+void LibreMinesGameEngine::SLOT_startTimer()
+{
+    iTimeInSeconds = 0;
+    timerTimeInGame.reset(new QTimer());
+    timerTimeInGame->start(1000);
+    QObject::connect(timerTimeInGame.get(), &QTimer::timeout,
+                     this, &LibreMinesGameEngine::SLOT_UpdateTime);
+
+    elapsedPreciseTimeInGame.start();
 }
 
 void LibreMinesGameEngine::SLOT_UpdateTime()

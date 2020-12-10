@@ -36,7 +36,7 @@
  * @brief
  *
  */
-class LibreMines : public QMainWindow
+class LibreMinesGui : public QMainWindow
 {
     Q_OBJECT
 
@@ -56,12 +56,12 @@ public:
      *
      * @param parent
      */
-    LibreMines(QWidget *parent = nullptr);
+    LibreMinesGui(QWidget *parent = nullptr);
     /**
      * @brief
      *
      */
-    ~LibreMines();
+    ~LibreMinesGui();
 
     /**
      * @brief
@@ -79,14 +79,9 @@ protected:
 private:
     void vNewGame(const uchar _X,
                   const uchar _Y,
-                  ushort i_nMines_,
-                  const uchar i_X_Clean = 255,
-                  const uchar i_Y_Clean = 255);
-    /**
-     * @brief
-     *
-     */
+                  ushort i_nMines_);
 
+    void vAttributeAllCells();
     void vResetPrincipalMatrix();
     /**
      * @brief
@@ -106,13 +101,6 @@ private:
     /**
      * @brief
      *
-     * @param _X
-     * @param _Y
-     */
-    void vCleanCell(const uchar _X, const uchar _Y);
-    /**
-     * @brief
-     *
      */
     void vAjustInterfaceInGame();
     /**
@@ -125,19 +113,6 @@ private:
      *
      */
     void vShowInterfaceInGame();
-    /**
-     * @brief
-     *
-     * @param _X
-     * @param _Y
-     */
-    void vAddOrRemoveFlag(const uchar _X, const uchar _Y);
-    /**
-     * @brief
-     *
-     * @param _X
-     * @param _Y
-     */
     void vGameLost(const uchar _X, const uchar _Y);
     /**
      * @brief
@@ -148,14 +123,9 @@ private:
      * @brief
      *
      */
-    void vStartTimer();
-    /**
-     * @brief
-     *
-     */
     void vGenerateStatics();
 
-    void vConfigureDarkMode(const bool bDark);
+    void vConfigureTheme(const bool bDark);
 
     void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
     void vKeyboardControllUnsetCurrentCell();
@@ -163,7 +133,6 @@ private:
     void vKeyboardControllerMoveRight();
     void vKeyboardControllerMoveDown();
     void vKeyboardControllerMoveUp();
-    void vKeyboardControllerUpdateCurrentCell();
 
 private Q_SLOTS:
     /**
@@ -212,19 +181,29 @@ private Q_SLOTS:
     /**
      * @brief
      *
-     */
-    void SLOT_UpdateTime();
-
-    /**
-     * @brief
-     *
      * @param e
      */
     void SLOT_OnButtonClicked(const QMouseEvent* e);
 
+    void SLOT_showCell(const uchar _X, const uchar _Y);
+    void SLOT_endGameStatics(const QString&);
+    void SLOT_currentTime(const ushort time);
+    void SLOT_minesLeft(const ushort minesLeft);
+    void SLOT_flagCell(const uchar _X, const uchar _Y);
+    void SLOT_unflagCell(const uchar _X, const uchar _Y);
+
+    void SLOT_remakeGame();
+    void SLOT_gameWon();
+    void SLOT_gameLost();
+
+Q_SIGNALS:
+    void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
+    void SIGNAL_addOrRemoveFlag(const uchar _X, const uchar _Y);
+    void SIGNAL_stopGame();
+
 private:
 
-    LibreMinesGameEngine gameEngine;
+    QScopedPointer<LibreMinesGameEngine> gameEngine;
     std::vector< std::vector<CellGui> > principalMatrix; /**< TODO: describe */
 
     int iLimitHeight; /**< TODO: describe */
@@ -251,7 +230,6 @@ private:
     QCheckBox *cbFirstCellClean; /**< TODO: describe */
     QCheckBox *cbDarkModeEnabled;
 
-    QTimer *timerTimeInGame; /**< TODO: describe */
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
     QPushButton *buttonRestartInGame; /**< TODO: describe */

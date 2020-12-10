@@ -27,15 +27,16 @@
 
 #include "libreminesgui.h"
 
-LibreMines::CellGui::CellGui():
+LibreMinesGui::CellGui::CellGui():
     button(nullptr),
     label(nullptr)
 {
 
 }
 
-LibreMines::LibreMines(QWidget *parent) :
+LibreMinesGui::LibreMinesGui(QWidget *parent) :
     QMainWindow(parent),
+    gameEngine( new LibreMinesGameEngine() ),
     principalMatrix( std::vector< std::vector<CellGui> >(0) ),
     iLimitHeight( 0 ),
     iLimitWidth( 0 ),
@@ -58,7 +59,6 @@ LibreMines::LibreMines(QWidget *parent) :
 {
     vConfigureInterface();
 
-    timerTimeInGame = nullptr;
     qApp->installEventFilter(this);
 
     controller.ctrlPressed = false;
@@ -67,10 +67,10 @@ LibreMines::LibreMines(QWidget *parent) :
     controller.currentY = 0;
 
 
-    vConfigureDarkMode(true);
+    vConfigureTheme(true);
 }
 
-LibreMines::~LibreMines()
+LibreMinesGui::~LibreMinesGui()
 {
     vResetPrincipalMatrix();
 
@@ -90,9 +90,10 @@ LibreMines::~LibreMines()
     delete imgWrongFlag;
 }
 
-bool LibreMines::eventFilter(QObject* object, QEvent* event)
+bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
 {
-    if(difficult == NONE || !bGameOn)
+    // If the game is not running, do not deal woth the event
+    if(!gameEngine->isGameActive())
         return false;
 
     switch(event->type())
@@ -179,28 +180,7 @@ bool LibreMines::eventFilter(QObject* object, QEvent* event)
                 case Qt::Key_O:
                     if(controller.active)
                     {
-                        if(bFirst)
-                        {
-                            if(bFirstCellClean && principalMatrix[controller.currentX][controller.currentY].state != ZERO)
-                            {
-                                vNewGame(iX, iY, nMines, controller.currentX, controller.currentY);
-                            }
-                            bFirst = false;
-                            vStartTimer();
-                        }
-
-                        if(principalMatrix[controller.currentX][controller.currentY].state == MINE)
-                        {
-                            if(!principalMatrix[controller.currentX][controller.currentY].hasFlag)
-                            {
-                                vGameLost(controller.currentX, controller.currentY);
-                            }
-                        }
-                        else
-                        {
-                            vCleanCell(controller.currentX, controller.currentY);
-                            vKeyboardControllerUpdateCurrentCell();
-                        }
+                        emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
                         return true;
                     }
                     else
@@ -212,8 +192,7 @@ bool LibreMines::eventFilter(QObject* object, QEvent* event)
                 case Qt::Key_P:
                     if(controller.active)
                     {
-                        vAddOrRemoveFlag(controller.currentX, controller.currentY);
-                        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
+                        emit SIGNAL_addOrRemoveFlag(controller.currentX, controller.currentY);
                         return true;
                     }
                     else
@@ -246,34 +225,95 @@ bool LibreMines::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-void LibreMines::vNewGame(const uchar _X,
+void LibreMinesGui::vNewGame(const uchar _X,
                           const uchar _Y,
-                          ushort i_nMines_,
-                          const uchar i_X_Clean,
-                          const uchar i_Y_Clean)
+                          ushort i_nMines_)
 {
-
-    const bool bRemakingGame = (i_X_Clean != 255 && i_Y_Clean != 255);
-
-    if(!bRemakingGame)
-    {
-        controller.ctrlPressed = false;
-        controller.active = false;
-        controller.currentX = 0;
-        controller.currentY = 0;
-        principalMatrix = std::vector<std::vector<CellGui>> (_X, std::vector<CellGui>(_Y));
-    }
+    controller.ctrlPressed = false;
+    controller.active = false;
+    controller.currentX = 0;
+    controller.currentY = 0;
+    principalMatrix = std::vector<std::vector<CellGui>> (_X, std::vector<CellGui>(_Y));
 
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
 
-    gameEngine.vNewGame(_X, _Y, i_nMines_, i_X_Clean, i_Y_Clean);
+    gameEngine->vNewGame(_X, _Y, i_nMines_);
 
     if(iLimitWidth/_X < iLimitHeight/_Y)
         fm = iLimitWidth/_X;
     else
         fm = iLimitHeight/_Y;
 
+    const QPixmap QPM_Zero = QPixmap::fromImage(*imgZero).scaled(fm, fm, Qt::KeepAspectRatio);
+    const QPixmap QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio);
+
+    for(uchar j=0; j<_Y; j++)
+    {
+        for (uchar i=0; i<_X; i++)
+        {
+            CellGui& cell = principalMatrix[i][j];
+
+            cell.label = new QLabel(this);
+            cell.button = new QPushButton_adapted(this);
+
+            cell.label->setGeometry(i*fm, j*fm, fm, fm);
+            cell.label->setPixmap(QPM_Zero);
+            cell.label->show();
+
+            cell.button->setGeometry(i*fm, j*fm, fm, fm);
+            cell.button->setIcon(QIcon(QPM_NoFlag));
+            cell.button->setIconSize(QSize(fm, fm));
+            cell.button->show();
+            cell.button->setEnabled(false);
+
+            connect(cell.button, &QPushButton_adapted::SIGNAL_Clicked,
+                    this, &LibreMinesGui::SLOT_OnButtonClicked);
+
+            qApp->processEvents();
+        }
+    }
+
+    vAjustInterfaceInGame();
+    vShowInterfaceInGame();
+    labelTimerInGame->setNum(0);
+    labelYouWonYouLost->setText(" ");
+
+    buttonQuitInGame->setEnabled(true);
+    buttonRestartInGame->setEnabled(true);
+
+    vAttributeAllCells();
+
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_showCell,
+            this, &LibreMinesGui::SLOT_showCell);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_endGameStatics,
+            this, &LibreMinesGui::SLOT_endGameStatics);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_currentTime,
+            this, &LibreMinesGui::SLOT_currentTime);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_minesLeft,
+            this, &LibreMinesGui::SLOT_minesLeft);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_flagCell,
+            this, &LibreMinesGui::SLOT_flagCell);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_unflagCell,
+            this, &LibreMinesGui::SLOT_unflagCell);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_gameWon,
+            this, &LibreMinesGui::SLOT_gameWon);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_gameLost,
+            this, &LibreMinesGui::SLOT_gameLost);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_remakeGame,
+            this, &LibreMinesGui::SLOT_remakeGame);
+
+
+    connect(this, &LibreMinesGui::SIGNAL_cleanCell,
+            gameEngine.get(), &LibreMinesGameEngine::SLOT_cleanCell);
+    connect(this, &LibreMinesGui::SIGNAL_addOrRemoveFlag,
+            gameEngine.get(), &LibreMinesGameEngine::SLOT_addOrRemoveFlag);
+    connect(this, &LibreMinesGui::SIGNAL_stopGame,
+            gameEngine.get(), &LibreMinesGameEngine::SLOT_stop);
+}
+
+void LibreMinesGui::vAttributeAllCells()
+{
     const QPixmap
             QPM_Zero = QPixmap::fromImage(*imgZero).scaled(fm, fm, Qt::KeepAspectRatio),
             QPM_One = QPixmap::fromImage(*imgOne).scaled(fm, fm, Qt::KeepAspectRatio),
@@ -284,359 +324,166 @@ void LibreMines::vNewGame(const uchar _X,
             QPM_Six = QPixmap::fromImage(*imgSix).scaled(fm, fm, Qt::KeepAspectRatio),
             QPM_Seven = QPixmap::fromImage(*imgSeven).scaled(fm, fm, Qt::KeepAspectRatio),
             QPM_Eight = QPixmap::fromImage(*imgEight).scaled(fm, fm, Qt::KeepAspectRatio),
-            QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio),
             QPM_Mine = QPixmap::fromImage(*imgMine).scaled(fm, fm, Qt::KeepAspectRatio);
 
-    if(!bRemakingGame)
+    for(uchar j=0; j<gameEngine->lines(); ++j)
     {
-        for(uchar j=0; j<_Y; j++)
-        {
-            for (uchar i=0; i<_X; i++)
-            {
-                CellGui& cell = principalMatrix[i][j];
-
-                cell.label = new QLabel(this);
-                cell.button = new QPushButton_adapted(this);
-
-                cell.label->setGeometry(i*fm,j*fm,fm,fm);
-
-                switch(gameEngine.principalMatrix[i][j].state)
-                {
-                    case ZERO:
-                        cell.label->setPixmap(QPM_Zero);
-                        break;
-                    case ONE:
-                        cell.label->setPixmap(QPM_One);
-                        break;
-                    case TWO:
-                        cell.label->setPixmap(QPM_Two);
-                        break;
-                    case THREE:
-                        cell.label->setPixmap(QPM_Three);
-                        break;
-                    case FOUR:
-                        cell.label->setPixmap(QPM_Four);
-                        break;
-                    case FIVE:
-                        cell.label->setPixmap(QPM_Five);
-                        break;
-                    case SIX:
-                        cell.label->setPixmap(QPM_Six);
-                        break;
-                    case SEVEN:
-                        cell.label->setPixmap(QPM_Seven);
-                        break;
-                    case EIGHT:
-                        cell.label->setPixmap(QPM_Eight);
-                        break;
-                    case MINE:
-                        cell.label->setPixmap(QPM_Mine);
-                        break;
-                }
-
-                cell.label->show();
-
-                cell.button->setGeometry(i*fm,j*fm,fm,fm);
-                cell.button->setIcon(QIcon(QPM_NoFlag));
-                cell.button->setIconSize(QSize(fm, fm));
-                cell.button->show();
-                cell.button->setEnabled(false);
-
-                connect(cell.button, &QPushButton_adapted::SIGNAL_Clicked,
-                        this, &LibreMines::SLOT_OnButtonClicked);
-
-                qApp->processEvents();
-            }
-        }
-    }
-
-    vAjustInterfaceInGame();
-    vShowInterfaceInGame();
-    lcd_numberMinesLeft->display(gameEngine.iMinesLeft);
-    labelTimerInGame->setNum(0);
-    labelYouWonYouLost->setText(" ");
-
-    buttonQuitInGame->setEnabled(true);
-    buttonRestartInGame->setEnabled(true);
-}
-
-
-
-void LibreMines::vGameLost(const uchar _X, const uchar _Y)
-{
-    bGameOn = false;
-    qDebug()<<"You Lost";
-
-    timerTimeInGame->stop();
-
-    switch (difficult)
-    {
-        case NONE:
-            break;
-        case EASY:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: EASY");
-            break;
-        case MEDIUM:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: MEDIUM");
-            break;
-        case HARD:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: HARD");
-            break;
-        case CUSTOMIZED:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: CUSTOM\n" +
-                                        QString::number(iX) +
-                                        "x" +
-                                        QString::number(iY) +
-                                        " : " +
-                                        QString::number(nMines) +
-                                        " Mines");
-    }
-    principalMatrix[_X][_Y].label->setPixmap(QPixmap::fromImage(*imgBoom).scaled(fm, fm, Qt::KeepAspectRatio));
-
-    vGenerateStatics();
-
-    for(uchar j=0; j<iY; j++)
-    {
-        for (uchar i=0; i<iX; i++)
+        for(uchar i=0; i<gameEngine->rows(); ++i)
         {
             CellGui& cell = principalMatrix[i][j];
 
-            if(cell.isHidden)
+            cell.button->setEnabled(true);
+
+            switch(gameEngine->getPrincipalMatrix()[i][j].state)
             {
-                if(cell.state == MINE &&
-                   !cell.hasFlag)
-                {
-                    cell.button->hide();
-                }
-                else if (cell.state != MINE &&
-                         cell.hasFlag)
-                {
-                    cell.button->hide();
-                    cell.label->setPixmap(QPixmap::fromImage(*imgWrongFlag).scaled(fm, fm, Qt::KeepAspectRatio));
-                }
-                else
-                {
-                    cell.button->setEnabled(false);
-                }
+
+                case ZERO:
+                    cell.label->setPixmap(QPM_Zero);
+                    break;
+                case ONE:
+                    cell.label->setPixmap(QPM_One);
+                    break;
+                case TWO:
+                    cell.label->setPixmap(QPM_Two);
+                    break;
+                case THREE:
+                    cell.label->setPixmap(QPM_Three);
+                    break;
+                case FOUR:
+                    cell.label->setPixmap(QPM_Four);
+                    break;
+                case FIVE:
+                    cell.label->setPixmap(QPM_Five);
+                    break;
+                case SIX:
+                    cell.label->setPixmap(QPM_Six);
+                    break;
+                case SEVEN:
+                    cell.label->setPixmap(QPM_Seven);
+                    break;
+                case EIGHT:
+                    cell.label->setPixmap(QPM_Eight);
+                    break;
+                case MINE:
+                    cell.label->setPixmap(QPM_Mine);
+                    break;
             }
         }
     }
-
-    if(controller.active)
-    {
-        controller.active = false;
-        vKeyboardControllUnsetCurrentCell();
-    }
 }
 
-void LibreMines::vGameWon()
+
+
+void LibreMinesGui::vGameLost(const uchar _X, const uchar _Y)
 {
-    bGameOn = false;
-    qDebug()<<"You won: "<<iTimeInSeconds<<" Seconds";
+//    bGameOn = false;
+//    qDebug()<<"You Lost";
 
-    timerTimeInGame->stop();
+//    timerTimeInGame->stop();
 
-    switch (difficult)
-    {
-        case NONE:
-            break;
-        case EASY:
-            labelYouWonYouLost->setText("You Won\nDifficulty: EASY");
-            break;
-        case MEDIUM:
-            labelYouWonYouLost->setText("You Won\nDifficulty: MEDIUM");
-            break;
-        case HARD:
-            labelYouWonYouLost->setText("You Won\nDifficulty: HARD");
-            break;
-        case CUSTOMIZED:
-            labelYouWonYouLost->setText("You Won\nDifficulty: CUSTOM\n" + QString::number(iX) + "x" + QString::number(iY) + " : " + QString::number(nMines) + " Mines");
-    }
+//    switch (difficult)
+//    {
+//        case NONE:
+//            break;
+//        case EASY:
+//            labelYouWonYouLost->setText("You Lost\nDifficulty: EASY");
+//            break;
+//        case MEDIUM:
+//            labelYouWonYouLost->setText("You Lost\nDifficulty: MEDIUM");
+//            break;
+//        case HARD:
+//            labelYouWonYouLost->setText("You Lost\nDifficulty: HARD");
+//            break;
+//        case CUSTOMIZED:
+//            labelYouWonYouLost->setText("You Lost\nDifficulty: CUSTOM\n" +
+//                                        QString::number(iX) +
+//                                        "x" +
+//                                        QString::number(iY) +
+//                                        " : " +
+//                                        QString::number(nMines) +
+//                                        " Mines");
+//    }
+//    principalMatrix[_X][_Y].label->setPixmap(QPixmap::fromImage(*imgBoom).scaled(fm, fm, Qt::KeepAspectRatio));
 
-    vGenerateStatics();
-    for(uchar j=0; j<iY; j++)
-    {
-        for (uchar i=0; i<iX; i++)
-        {
-            principalMatrix[i][j].button->setEnabled(!principalMatrix[i][j].isHidden);
-        }
-    }
+//    vGenerateStatics();
 
-    if(controller.active)
-    {
-        controller.active = false;
-        vKeyboardControllUnsetCurrentCell();
-    }
+//    for(uchar j=0; j<iY; j++)
+//    {
+//        for (uchar i=0; i<iX; i++)
+//        {
+//            CellGui& cell = principalMatrix[i][j];
 
+//            if(cell.isHidden)
+//            {
+//                if(cell.state == MINE &&
+//                   !cell.hasFlag)
+//                {
+//                    cell.button->hide();
+//                }
+//                else if (cell.state != MINE &&
+//                         cell.hasFlag)
+//                {
+//                    cell.button->hide();
+//                    cell.label->setPixmap(QPixmap::fromImage(*imgWrongFlag).scaled(fm, fm, Qt::KeepAspectRatio));
+//                }
+//                else
+//                {
+//                    cell.button->setEnabled(false);
+//                }
+//            }
+//        }
+//    }
+
+//    if(controller.active)
+//    {
+//        controller.active = false;
+//        vKeyboardControllUnsetCurrentCell();
+//    }
 }
 
-void LibreMines::vCleanCell(const uchar _X, const uchar _Y)
+void LibreMinesGui::vGameWon()
 {
-    if(principalMatrix[_X][_Y].isHidden &&
-       !principalMatrix[_X][_Y].hasFlag)
-    {
-        principalMatrix[_X][_Y].isHidden = false;
-        principalMatrix[_X][_Y].button->hide();
+//    bGameOn = false;
+//    qDebug()<<"You won: "<<iTimeInSeconds<<" Seconds";
 
-        if(principalMatrix[_X][_Y].state == ZERO)
-        {
-            if(_X == 0 &&
-               _Y == 0)
-            {
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
-                if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCleanCell(_X+1, _Y+1);
-            }
-            else if(_X == 0 &&
-                    _Y == iY-1)
-            {
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
-                if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCleanCell(_X+1, _Y-1);
-            }
-            else if(_X == iX-1 &&
-                    _Y == 0)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
-            }
-            else if(_X == iX-1 &&
-                    _Y == iY-1)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
-            }
-            else if(_X == iX-1 &&
-                    _Y == 0)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
-            }
-            else if(_X == iX-1 &&
-                    _Y == iY-1)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
-            }
-            else if(_X == 0 &&
-                    _Y > 0 &&
-                    _Y < iY-1)
-            {
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
-                if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCleanCell(_X+1, _Y+1);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
-                if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCleanCell(_X+1, _Y-1);
-            }
-            else if(_X == iX-1 &&
-                    _Y > 0 &&
-                    _Y < iY-1)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
-            }
-            else if(_X > 0 &&
-                    _X < iX-1 &&
-                    _Y == 0)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
-                if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCleanCell(_X+1, _Y+1);
-            }
-            else if(_X > 0 &&
-                    _X < iX-1 &&
-                    _Y == iY-1)
-            {
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
-                if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCleanCell(_X+1, _Y-1);
-            }
-            else
-            {
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
-                if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCleanCell(_X+1, _Y-1);
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
-                if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCleanCell(_X+1, _Y+1);
-            }
-        }
-        else
-        {
-            principalMatrix[_X][_Y].isHidden = false;
-            principalMatrix[_X][_Y].button->hide();
-        }
-        iHiddenCells--;
-        if(iHiddenCells == 0)
-        {
-            vKeyboardControllUnsetCurrentCell();
-            controller.active = false;
-            vGameWon();
-        }
-    }
+//    timerTimeInGame->stop();
+
+//    switch (difficult)
+//    {
+//        case NONE:
+//            break;
+//        case EASY:
+//            labelYouWonYouLost->setText("You Won\nDifficulty: EASY");
+//            break;
+//        case MEDIUM:
+//            labelYouWonYouLost->setText("You Won\nDifficulty: MEDIUM");
+//            break;
+//        case HARD:
+//            labelYouWonYouLost->setText("You Won\nDifficulty: HARD");
+//            break;
+//        case CUSTOMIZED:
+//            labelYouWonYouLost->setText("You Won\nDifficulty: CUSTOM\n" + QString::number(iX) + "x" + QString::number(iY) + " : " + QString::number(nMines) + " Mines");
+//    }
+
+//    vGenerateStatics();
+//    for(uchar j=0; j<iY; j++)
+//    {
+//        for (uchar i=0; i<iX; i++)
+//        {
+//            principalMatrix[i][j].button->setEnabled(!principalMatrix[i][j].isHidden);
+//        }
+//    }
+
+//    if(controller.active)
+//    {
+//        controller.active = false;
+//        vKeyboardControllUnsetCurrentCell();
+//    }
 
 }
 
-void LibreMines::vResetPrincipalMatrix()
+
+void LibreMinesGui::vResetPrincipalMatrix()
 {
     for(std::vector<CellGui>& i: principalMatrix)
     {
@@ -649,7 +496,7 @@ void LibreMines::vResetPrincipalMatrix()
     principalMatrix.clear();
 }
 
-void LibreMines::vConfigureInterface()
+void LibreMinesGui::vConfigureInterface()
 {
     this->setFont(QFont("Liberation Sans"));
     labelTimerInGame = new QLabel (this);
@@ -766,31 +613,31 @@ void LibreMines::vConfigureInterface()
 
 
     connect(buttonEasy, &QPushButton::released,
-            this, &LibreMines::SLOT_Easy);
+            this, &LibreMinesGui::SLOT_Easy);
 
     connect(buttonMedium, &QPushButton::released,
-            this, &LibreMines::SLOT_Medium);
+            this, &LibreMinesGui::SLOT_Medium);
 
     connect(buttonHard, &QPushButton::released,
-            this, &LibreMines::SLOT_Hard);
+            this, &LibreMinesGui::SLOT_Hard);
 
     connect(buttonCustomizedNewGame, &QPushButton::released,
-            this, &LibreMines::SLOT_Customized);
+            this, &LibreMinesGui::SLOT_Customized);
 
     connect(buttonRestartInGame, &QPushButton::released,
-            this, &LibreMines::SLOT_Restart);
+            this, &LibreMinesGui::SLOT_Restart);
 
     connect(buttonQuitInGame, &QPushButton::released,
-            this, &LibreMines::SLOT_Quit);
+            this, &LibreMinesGui::SLOT_Quit);
 
     connect(cbFirstCellClean, &QPushButton::released,
-            this, &LibreMines::SLOT_UpdateFirstCellClean);
+            this, &LibreMinesGui::SLOT_UpdateFirstCellClean);
 
     connect(cbDarkModeEnabled, &QPushButton::released,
-            this, &LibreMines::SLOT_DarkMode);
+            this, &LibreMinesGui::SLOT_DarkMode);
 }
 
-void LibreMines::vHideInterface()
+void LibreMinesGui::vHideInterface()
 {
     buttonEasy->hide();
     buttonMedium->hide();
@@ -810,7 +657,7 @@ void LibreMines::vHideInterface()
     cbDarkModeEnabled->hide();
 }
 
-void LibreMines::vShowInterface()
+void LibreMinesGui::vShowInterface()
 {
     buttonEasy->show();
     buttonMedium->show();
@@ -830,46 +677,35 @@ void LibreMines::vShowInterface()
     cbDarkModeEnabled->show();
 }
 
-void LibreMines::SLOT_Easy()
+void LibreMinesGui::SLOT_Easy()
 {
     vHideInterface();
-
-    timerTimeInGame = new QTimer(this);
-
     vNewGame(8, 8, 10);
 
     difficult = EASY;
 }
 
-void LibreMines::SLOT_Medium()
+void LibreMinesGui::SLOT_Medium()
 {
     vHideInterface();
-
-    timerTimeInGame = new QTimer(this);
-
     vNewGame(16, 16, 40);
 
     difficult = MEDIUM;
 
 }
 
-void LibreMines::SLOT_Hard()
+void LibreMinesGui::SLOT_Hard()
 {
     vHideInterface();
-
-    timerTimeInGame = new QTimer(this);
-
     vNewGame(30, 16, 99);
 
     difficult = HARD;
 
 }
 
-void LibreMines::SLOT_Customized()
+void LibreMinesGui::SLOT_Customized()
 {
     vHideInterface();
-
-    timerTimeInGame = new QTimer(this);
 
     int x = sbCustomizedX->value();
     int y = sbCustomizedY->value();
@@ -880,7 +716,7 @@ void LibreMines::SLOT_Customized()
 
 }
 
-void LibreMines::vAjustInterfaceInGame()
+void LibreMinesGui::vAjustInterfaceInGame()
 {
     int width = this->width();
     int height = this->height();
@@ -895,7 +731,7 @@ void LibreMines::vAjustInterfaceInGame()
 }
 
 
-void LibreMines::vHideInterfaceInGame()
+void LibreMinesGui::vHideInterfaceInGame()
 {
     labelTimerInGame->hide();
     lcd_numberMinesLeft->hide();
@@ -906,7 +742,7 @@ void LibreMines::vHideInterfaceInGame()
 
 }
 
-void LibreMines::vShowInterfaceInGame()
+void LibreMinesGui::vShowInterfaceInGame()
 {
     labelTimerInGame->show();
     lcd_numberMinesLeft->show();
@@ -917,31 +753,26 @@ void LibreMines::vShowInterfaceInGame()
 
 }
 
-void LibreMines::SLOT_Restart()
+void LibreMinesGui::SLOT_Restart()
 {
-    if(timerTimeInGame->isActive()
-       )
-        timerTimeInGame->stop();
-
-    delete timerTimeInGame;
-
-    timerTimeInGame = new QTimer (this);
-
     vResetPrincipalMatrix();
 
     labelStatisLastMatch->setText(" ");
 
-    vNewGame(iX, iY, nMines);
+    uchar x = gameEngine->rows();
+    uchar y = gameEngine->lines();
+    ushort mines = gameEngine->mines();
+
+    emit SIGNAL_stopGame();
+    vResetPrincipalMatrix();
+    vNewGame(x, y, mines);
 }
 
-void LibreMines::SLOT_Quit(){
-
-    if (timerTimeInGame->isActive())
-        timerTimeInGame->stop();
-
-    delete timerTimeInGame;
-
+void LibreMinesGui::SLOT_Quit()
+{
     labelStatisLastMatch->setText(" ");
+
+    emit SIGNAL_stopGame();
 
     vResetPrincipalMatrix();
     vHideInterfaceInGame();
@@ -950,73 +781,28 @@ void LibreMines::SLOT_Quit(){
     difficult = NONE;
 }
 
-void LibreMines::SLOT_UpdateTime()
+void LibreMinesGui::SLOT_OnButtonClicked(const QMouseEvent *e)
 {
-    iTimeInSeconds++;
-    labelTimerInGame->setNum(iTimeInSeconds);
-}
+    if(!gameEngine->isGameActive())
+        return;
 
-
-
-void LibreMines::vAddOrRemoveFlag(const uchar _X, const uchar _Y)
-{
-    if(principalMatrix[_X][_Y].hasFlag)
-    {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
-        principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
-        principalMatrix[_X][_Y].hasFlag = false;
-        iMinesLeft++;
-        lcd_numberMinesLeft->display(iMinesLeft);
-    }
-    else
-    {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
-        principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
-        principalMatrix[_X][_Y].hasFlag = true;
-        iMinesLeft--;
-        lcd_numberMinesLeft->display(iMinesLeft);
-    }
-
-}
-
-void LibreMines::SLOT_OnButtonClicked(const QMouseEvent *e)
-{
     QPushButton_adapted *buttonClicked = (QPushButton_adapted *) sender();
 
-    for(uchar j=0; j<iY; j++)
+    for(uchar j=0; j<gameEngine->lines(); j++)
     {
-        for (uchar i=0; i<iX; i++)
+        for (uchar i=0; i<gameEngine->rows(); i++)
         {
+            // Find the emissor of the signal
             if(buttonClicked == principalMatrix[i][j].button)
             {
                 switch (e->button())
                 {
                     case Qt::RightButton:
-
-                        vAddOrRemoveFlag(i, j);
+                        emit SIGNAL_addOrRemoveFlag(i, j);
                         return;
 
                     case Qt::LeftButton:
-
-                        if(bFirst)
-                        {
-                            if(bFirstCellClean && principalMatrix[i][j].state != ZERO)
-                            {
-                                vNewGame(iX, iY, nMines, i, j);
-                            }
-                            bFirst = false;
-                            vStartTimer();
-                            qDebug() << "Start";
-                        }
-
-                        if(principalMatrix[i][j].state == MINE)
-                        {
-                            if(!principalMatrix[i][j].hasFlag)
-                                vGameLost(i, j);
-                        }
-                        else
-                            vCleanCell(i, j);
-
+                        emit SIGNAL_cleanCell(i, j);
                         return;
 
                     default:
@@ -1027,23 +813,87 @@ void LibreMines::SLOT_OnButtonClicked(const QMouseEvent *e)
     }
 }
 
-void LibreMines::vStartTimer()
+void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
 {
-    iTimeInSeconds = 0;
-    timerTimeInGame->start(1e3);
+    principalMatrix[_X][_Y].button->hide();
 
-    connect(timerTimeInGame, &QTimer::timeout,
-            this, &LibreMines::SLOT_UpdateTime);
+    if(controller.active && controller.currentX == _X && controller.currentY == _Y)
+    {
+        vKeyboardControllUnsetCurrentCell();
+        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
+    }
 }
 
-void LibreMines::SLOT_UpdateFirstCellClean()
+void LibreMinesGui::SLOT_endGameStatics(const QString &)
 {
-    bFirstCellClean = cbFirstCellClean->isChecked();
+
 }
 
-void LibreMines::SLOT_DarkMode()
+void LibreMinesGui::SLOT_currentTime(const ushort time)
 {
-    vConfigureDarkMode(cbDarkModeEnabled->isChecked());
+    labelTimerInGame->setNum(time);
+}
+
+void LibreMinesGui::SLOT_minesLeft(const ushort minesLeft)
+{
+    lcd_numberMinesLeft->display(minesLeft);
+}
+
+void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
+{
+    if(principalMatrix[_X][_Y].button->isHidden())
+        qDebug(Q_FUNC_INFO);
+    else
+    {
+        principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
+        principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
+    }
+
+    if(controller.active && controller.currentX == _X && controller.currentY == _Y)
+    {
+        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
+    }
+}
+
+void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
+{
+    if(principalMatrix[_X][_Y].button->isHidden())
+        qDebug(Q_FUNC_INFO);
+    else
+    {
+        principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio)));
+        principalMatrix[_X][_Y].button->setIconSize(QSize(fm, fm));
+    }
+
+    if(controller.active && controller.currentX == _X && controller.currentY == _Y)
+    {
+        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
+    }
+}
+
+void LibreMinesGui::SLOT_remakeGame()
+{
+    vAttributeAllCells();
+}
+
+void LibreMinesGui::SLOT_gameWon()
+{
+
+}
+
+void LibreMinesGui::SLOT_gameLost()
+{
+
+}
+
+void LibreMinesGui::SLOT_UpdateFirstCellClean()
+{
+    gameEngine->setFirstCellClean(cbFirstCellClean->isChecked());
+}
+
+void LibreMinesGui::SLOT_DarkMode()
+{
+    vConfigureTheme(cbDarkModeEnabled->isChecked());
 
     if(cbDarkModeEnabled->isChecked())
         cbDarkModeEnabled->setText("Disable dark mode");
@@ -1052,45 +902,45 @@ void LibreMines::SLOT_DarkMode()
         cbDarkModeEnabled->setText("Enable dark mode");
 }
 
-void LibreMines::vGenerateStatics()
+void LibreMinesGui::vGenerateStatics()
 {
-    int iCorrectFlags = 0,
-            iWrongFlags = 0,
-            iUnlockedCells = iCellsToUnlock - iHiddenCells;
+//    int iCorrectFlags = 0,
+//            iWrongFlags = 0,
+//            iUnlockedCells = iCellsToUnlock - iHiddenCells;
 
-    for (int i=0; i<(iX-1); i++)
-    {
-        for (int j=0; j<=(iY-1); j++)
-        {
-            if(principalMatrix[i][j].hasFlag)
-            {
-                if (principalMatrix[i][j].state == MINE)
-                    iCorrectFlags++;
-                else
-                    iWrongFlags++;
-            }
-        }
-    }
-    if(iTimeInSeconds == 0)
-        iTimeInSeconds = 1;
+//    for (int i=0; i<(iX-1); i++)
+//    {
+//        for (int j=0; j<=(iY-1); j++)
+//        {
+//            if(principalMatrix[i][j].hasFlag)
+//            {
+//                if (principalMatrix[i][j].state == MINE)
+//                    iCorrectFlags++;
+//                else
+//                    iWrongFlags++;
+//            }
+//        }
+//    }
+//    if(iTimeInSeconds == 0)
+//        iTimeInSeconds = 1;
 
-    double dFlagsPerSecond = (double)iCorrectFlags/iTimeInSeconds,
-            dCellsPerSecond = (double)iUnlockedCells/iTimeInSeconds,
-            dPercentageGameComplete = (double)100*iUnlockedCells/iCellsToUnlock;
+//    double dFlagsPerSecond = (double)iCorrectFlags/iTimeInSeconds,
+//            dCellsPerSecond = (double)iUnlockedCells/iTimeInSeconds,
+//            dPercentageGameComplete = (double)100*iUnlockedCells/iCellsToUnlock;
 
-    QString QS_Statics = "Correct Flags: " + QString::number(iCorrectFlags)
-                         +"\nWrongFlags: " + QString::number(iWrongFlags)
-                         +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
-                         +"\n"
-                         +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
-                         +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
-                         +"\n"
-                         +"\nGame Complete: " + QString::number(dPercentageGameComplete, 'f', 2) + " %";
+//    QString QS_Statics = "Correct Flags: " + QString::number(iCorrectFlags)
+//                         +"\nWrongFlags: " + QString::number(iWrongFlags)
+//                         +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
+//                         +"\n"
+//                         +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
+//                         +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
+//                         +"\n"
+//                         +"\nGame Complete: " + QString::number(dPercentageGameComplete, 'f', 2) + " %";
 
-    labelStatisLastMatch->setText(QS_Statics);
+//    labelStatisLastMatch->setText(QS_Statics);
 }
 
-void LibreMines::vConfigureDarkMode(const bool bDark)
+void LibreMinesGui::vConfigureTheme(const bool bDark)
 {
     if(bDark)
     {
@@ -1164,128 +1014,123 @@ void LibreMines::vConfigureDarkMode(const bool bDark)
     }
 }
 
-void LibreMines::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
+void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
 {
     controller.currentX = x;
     controller.currentY = y;
 
-    CellGui& cell = principalMatrix[controller.currentX][controller.currentY];
+    const LibreMinesGameEngine::CellGameEngine& cellGE = gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
+    CellGui& cellGui= principalMatrix[controller.currentX][controller.currentY];
 
-    if(cell.isHidden)
+    if(cellGE.isHidden)
     {
 
-        QImage img = cell.hasFlag ? *imgFlag : *imgNoFlag;
+        QImage img = cellGE.hasFlag ? *imgFlag : *imgNoFlag;
         img.invertPixels();
-        cell.button->setIcon(QIcon(QPixmap::fromImage(img).scaled(fm, fm, Qt::KeepAspectRatio)));
+        cellGui.button->setIcon(QIcon(QPixmap::fromImage(img).scaled(fm, fm, Qt::KeepAspectRatio)));
     }
     else
     {
         QImage img = QImage();
 
-        if(cell.state == ZERO)
+        if(cellGE.state == ZERO)
             img = *imgZero;
-        else if(cell.state == ONE)
+        else if(cellGE.state == ONE)
             img = *imgOne;
-        else if(cell.state == TWO)
+        else if(cellGE.state == TWO)
             img = *imgTwo;
-        else if(cell.state == THREE)
+        else if(cellGE.state == THREE)
             img = *imgThree;
-        else if(cell.state == FOUR)
+        else if(cellGE.state == FOUR)
             img = *imgFour;
-        else if(cell.state == FIVE)
+        else if(cellGE.state == FIVE)
             img = *imgFive;
-        else if(cell.state == SIX)
+        else if(cellGE.state == SIX)
             img = *imgSix;
-        else if(cell.state == SEVEN)
+        else if(cellGE.state == SEVEN)
             img = *imgSeven;
-        else if(cell.state == EIGHT)
+        else if(cellGE.state == EIGHT)
             img = *imgEight;
         else
             qFatal(Q_FUNC_INFO);
 
         img.invertPixels();
 
-        cell.label->setPixmap(QPixmap::fromImage(img).scaled(fm, fm, Qt::KeepAspectRatio));
+        cellGui.label->setPixmap(QPixmap::fromImage(img).scaled(fm, fm, Qt::KeepAspectRatio));
     }
 }
 
-void LibreMines::vKeyboardControllUnsetCurrentCell()
+void LibreMinesGui::vKeyboardControllUnsetCurrentCell()
 {
-    CellGui& cell = principalMatrix[controller.currentX][controller.currentY];
+    const LibreMinesGameEngine::CellGameEngine& cellGE = gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
+    CellGui& cellGui= principalMatrix[controller.currentX][controller.currentY];
 
-    if(cell.isHidden)
+    if(cellGE.isHidden)
     {
-        QImage* img = cell.hasFlag ? imgFlag : imgNoFlag;
-        cell.button->setIcon(QIcon(QPixmap::fromImage(*img).scaled(fm, fm, Qt::KeepAspectRatio)));
+        QImage* img = cellGE.hasFlag ? imgFlag : imgNoFlag;
+        cellGui.button->setIcon(QIcon(QPixmap::fromImage(*img).scaled(fm, fm, Qt::KeepAspectRatio)));
     }
     else
     {
         QImage* img = nullptr;
 
-        if(cell.state == ZERO)
+        if(cellGE.state == ZERO)
             img = imgZero;
-        else if(cell.state == ONE)
+        else if(cellGE.state == ONE)
             img = imgOne;
-        else if(cell.state == TWO)
+        else if(cellGE.state == TWO)
             img = imgTwo;
-        else if(cell.state == THREE)
+        else if(cellGE.state == THREE)
             img = imgThree;
-        else if(cell.state == FOUR)
+        else if(cellGE.state == FOUR)
             img = imgFour;
-        else if(cell.state == FIVE)
+        else if(cellGE.state == FIVE)
             img = imgFive;
-        else if(cell.state == SIX)
+        else if(cellGE.state == SIX)
             img = imgSix;
-        else if(cell.state == SEVEN)
+        else if(cellGE.state == SEVEN)
             img = imgSeven;
-        else if(cell.state == EIGHT)
+        else if(cellGE.state == EIGHT)
             img = imgEight;
         else
             qFatal(Q_FUNC_INFO);
 
-        cell.label->setPixmap(QPixmap::fromImage(*img).scaled(fm, fm, Qt::KeepAspectRatio));
+        cellGui.label->setPixmap(QPixmap::fromImage(*img).scaled(fm, fm, Qt::KeepAspectRatio));
     }
 }
 
-void LibreMines::vKeyboardControllerMoveLeft()
+void LibreMinesGui::vKeyboardControllerMoveLeft()
 {
     vKeyboardControllUnsetCurrentCell();
 
-    uchar destX = (controller.ctrlPressed) ? 0 : (controller.currentX == 0) ? iX - 1 : (controller.currentX - 1);
+    uchar destX = (controller.ctrlPressed) ? 0 : (controller.currentX == 0) ? gameEngine->rows() - 1 : (controller.currentX - 1);
 
     vKeyboardControllerSetCurrentCell(destX, controller.currentY);
 }
 
-void LibreMines::vKeyboardControllerMoveRight()
+void LibreMinesGui::vKeyboardControllerMoveRight()
 {
     vKeyboardControllUnsetCurrentCell();
 
-    uchar destX = (controller.ctrlPressed) ? iX - 1 : (controller.currentX == iX - 1) ? 0 : (controller.currentX + 1);
+    uchar destX = (controller.ctrlPressed) ? gameEngine->rows() - 1 : (controller.currentX == gameEngine->rows() - 1) ? 0 : (controller.currentX + 1);
 
     vKeyboardControllerSetCurrentCell(destX, controller.currentY);
 }
 
-void LibreMines::vKeyboardControllerMoveDown()
+void LibreMinesGui::vKeyboardControllerMoveDown()
 {
     vKeyboardControllUnsetCurrentCell();
 
-    uchar destY = (controller.ctrlPressed) ? iY - 1 : (controller.currentY == iY - 1) ? 0 : (controller.currentY + 1);
+    uchar destY = (controller.ctrlPressed) ? gameEngine->lines() - 1 : (controller.currentY == gameEngine->lines() - 1) ? 0 : (controller.currentY + 1);
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
 }
 
-void LibreMines::vKeyboardControllerMoveUp()
+void LibreMinesGui::vKeyboardControllerMoveUp()
 {
     vKeyboardControllUnsetCurrentCell();
 
-    uchar destY = (controller.ctrlPressed) ? 0 : (controller.currentY == 0) ? iY -1 : (controller.currentY - 1);
+    uchar destY = (controller.ctrlPressed) ? 0 : (controller.currentY == 0) ? gameEngine->lines() -1 : (controller.currentY - 1);
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
 }
-
-void LibreMines::vKeyboardControllerUpdateCurrentCell()
-{
-    vKeyboardControllUnsetCurrentCell();
-    vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
-}
-
