@@ -54,22 +54,6 @@ enum GAME_DIFFICULTY: char{
     CUSTOMIZED
 };
 
-/**
- * @brief
- *
- */
-class Cell
-{
-public:
-    Cell();
-
-    CELL_STATE state; /**< TODO: describe */
-    QPushButton_adapted *button; /**< TODO: describe */
-    QLabel *label; /**< TODO: describe */
-    bool isHidden; /**< TODO: describe */
-    bool hasFlag; /**< TODO: describe */
-
-};
 
 class Vector2Dshort
 {
