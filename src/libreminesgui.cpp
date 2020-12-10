@@ -24,6 +24,7 @@
 #include <QStyleFactory>
 #include <QApplication>
 #include <QKeyEvent>
+#include <QScreen>
 
 #include "libreminesgui.h"
 
@@ -36,7 +37,7 @@ LibreMinesGui::CellGui::CellGui():
 
 LibreMinesGui::LibreMinesGui(QWidget *parent) :
     QMainWindow(parent),
-    gameEngine( new LibreMinesGameEngine() ),
+    gameEngine(),
     principalMatrix( std::vector< std::vector<CellGui> >(0) ),
     iLimitHeight( 0 ),
     iLimitWidth( 0 ),
@@ -66,7 +67,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent) :
     controller.currentX = 0;
     controller.currentY = 0;
 
-
     vConfigureTheme(true);
 }
 
@@ -92,8 +92,9 @@ LibreMinesGui::~LibreMinesGui()
 
 bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
 {
+    Q_UNUSED(object)
     // If the game is not running, do not deal woth the event
-    if(!gameEngine->isGameActive())
+    if(!gameEngine || !gameEngine->isGameActive())
         return false;
 
     switch(event->type())
@@ -226,8 +227,8 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
 }
 
 void LibreMinesGui::vNewGame(const uchar _X,
-                          const uchar _Y,
-                          ushort i_nMines_)
+                             const uchar _Y,
+                             ushort i_nMines_)
 {
     controller.ctrlPressed = false;
     controller.active = false;
@@ -238,6 +239,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
 
+    gameEngine.reset(new LibreMinesGameEngine());
+
+    gameEngine->setFirstCellClean(cbFirstCellClean->isChecked());
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
     if(iLimitWidth/_X < iLimitHeight/_Y)
@@ -372,117 +376,6 @@ void LibreMinesGui::vAttributeAllCells()
     }
 }
 
-
-
-void LibreMinesGui::vGameLost(const uchar _X, const uchar _Y)
-{
-//    bGameOn = false;
-//    qDebug()<<"You Lost";
-
-//    timerTimeInGame->stop();
-
-//    switch (difficult)
-//    {
-//        case NONE:
-//            break;
-//        case EASY:
-//            labelYouWonYouLost->setText("You Lost\nDifficulty: EASY");
-//            break;
-//        case MEDIUM:
-//            labelYouWonYouLost->setText("You Lost\nDifficulty: MEDIUM");
-//            break;
-//        case HARD:
-//            labelYouWonYouLost->setText("You Lost\nDifficulty: HARD");
-//            break;
-//        case CUSTOMIZED:
-//            labelYouWonYouLost->setText("You Lost\nDifficulty: CUSTOM\n" +
-//                                        QString::number(iX) +
-//                                        "x" +
-//                                        QString::number(iY) +
-//                                        " : " +
-//                                        QString::number(nMines) +
-//                                        " Mines");
-//    }
-//    principalMatrix[_X][_Y].label->setPixmap(QPixmap::fromImage(*imgBoom).scaled(fm, fm, Qt::KeepAspectRatio));
-
-//    vGenerateStatics();
-
-//    for(uchar j=0; j<iY; j++)
-//    {
-//        for (uchar i=0; i<iX; i++)
-//        {
-//            CellGui& cell = principalMatrix[i][j];
-
-//            if(cell.isHidden)
-//            {
-//                if(cell.state == MINE &&
-//                   !cell.hasFlag)
-//                {
-//                    cell.button->hide();
-//                }
-//                else if (cell.state != MINE &&
-//                         cell.hasFlag)
-//                {
-//                    cell.button->hide();
-//                    cell.label->setPixmap(QPixmap::fromImage(*imgWrongFlag).scaled(fm, fm, Qt::KeepAspectRatio));
-//                }
-//                else
-//                {
-//                    cell.button->setEnabled(false);
-//                }
-//            }
-//        }
-//    }
-
-//    if(controller.active)
-//    {
-//        controller.active = false;
-//        vKeyboardControllUnsetCurrentCell();
-//    }
-}
-
-void LibreMinesGui::vGameWon()
-{
-//    bGameOn = false;
-//    qDebug()<<"You won: "<<iTimeInSeconds<<" Seconds";
-
-//    timerTimeInGame->stop();
-
-//    switch (difficult)
-//    {
-//        case NONE:
-//            break;
-//        case EASY:
-//            labelYouWonYouLost->setText("You Won\nDifficulty: EASY");
-//            break;
-//        case MEDIUM:
-//            labelYouWonYouLost->setText("You Won\nDifficulty: MEDIUM");
-//            break;
-//        case HARD:
-//            labelYouWonYouLost->setText("You Won\nDifficulty: HARD");
-//            break;
-//        case CUSTOMIZED:
-//            labelYouWonYouLost->setText("You Won\nDifficulty: CUSTOM\n" + QString::number(iX) + "x" + QString::number(iY) + " : " + QString::number(nMines) + " Mines");
-//    }
-
-//    vGenerateStatics();
-//    for(uchar j=0; j<iY; j++)
-//    {
-//        for (uchar i=0; i<iX; i++)
-//        {
-//            principalMatrix[i][j].button->setEnabled(!principalMatrix[i][j].isHidden);
-//        }
-//    }
-
-//    if(controller.active)
-//    {
-//        controller.active = false;
-//        vKeyboardControllUnsetCurrentCell();
-//    }
-
-}
-
-
 void LibreMinesGui::vResetPrincipalMatrix()
 {
     for(std::vector<CellGui>& i: principalMatrix)
@@ -509,14 +402,14 @@ void LibreMinesGui::vConfigureInterface()
     labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
     lcd_numberMinesLeft->setDecMode();
-    lcd_numberMinesLeft->display(0);
+    lcd_numberMinesLeft->display(0);;
     buttonQuitInGame->setText("Quit");
     buttonRestartInGame->setText("Restart");
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
     vHideInterfaceInGame();
 
-    QRect rec = QApplication::desktop()->screenGeometry();
+    QRect rec = QGuiApplication::primaryScreen()->geometry();
     int height  = rec.height();
     int width = rec.width();
     this->setGeometry(0,0,width,height);
@@ -629,9 +522,6 @@ void LibreMinesGui::vConfigureInterface()
 
     connect(buttonQuitInGame, &QPushButton::released,
             this, &LibreMinesGui::SLOT_Quit);
-
-    connect(cbFirstCellClean, &QPushButton::released,
-            this, &LibreMinesGui::SLOT_UpdateFirstCellClean);
 
     connect(cbDarkModeEnabled, &QPushButton::released,
             this, &LibreMinesGui::SLOT_DarkMode);
@@ -779,6 +669,8 @@ void LibreMinesGui::SLOT_Quit()
     vShowInterface();
 
     difficult = NONE;
+
+    gameEngine.reset();
 }
 
 void LibreMinesGui::SLOT_OnButtonClicked(const QMouseEvent *e)
@@ -824,9 +716,9 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
     }
 }
 
-void LibreMinesGui::SLOT_endGameStatics(const QString &)
+void LibreMinesGui::SLOT_endGameStatics(const QString& statics)
 {
-
+    labelStatisLastMatch->setText(statics);
 }
 
 void LibreMinesGui::SLOT_currentTime(const ushort time)
@@ -878,17 +770,104 @@ void LibreMinesGui::SLOT_remakeGame()
 
 void LibreMinesGui::SLOT_gameWon()
 {
+    switch (difficult)
+    {
+        case NONE:
+            break;
+        case EASY:
+            labelYouWonYouLost->setText("You Won\nDifficulty: EASY");
+            break;
+        case MEDIUM:
+            labelYouWonYouLost->setText("You Won\nDifficulty: MEDIUM");
+            break;
+        case HARD:
+            labelYouWonYouLost->setText("You Won\nDifficulty: HARD");
+            break;
+        case CUSTOMIZED:
+            labelYouWonYouLost->setText("You Won\nDifficulty: CUSTOM\n" +
+                                        QString::number(gameEngine->rows()) +
+                                        "x" + QString::number(gameEngine->lines()) +
+                                        " : " + QString::number(gameEngine->mines()) + " Mines");
+    }
+
+    for(uchar j=0; j<gameEngine->lines(); j++)
+    {
+        for (uchar i=0; i<gameEngine->rows(); i++)
+        {
+            principalMatrix[i][j].button->setEnabled(!principalMatrix[i][j].button->isHidden());
+        }
+    }
+
+    if(controller.active)
+    {
+        controller.active = false;
+        vKeyboardControllUnsetCurrentCell();
+    }
 
 }
 
-void LibreMinesGui::SLOT_gameLost()
+void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
 {
+    qDebug()<<"You Lost";
 
-}
+    switch (difficult)
+    {
+        case NONE:
+            break;
+        case EASY:
+            labelYouWonYouLost->setText("You Lost\nDifficulty: EASY");
+            break;
+        case MEDIUM:
+            labelYouWonYouLost->setText("You Lost\nDifficulty: MEDIUM");
+            break;
+        case HARD:
+            labelYouWonYouLost->setText("You Lost\nDifficulty: HARD");
+            break;
+        case CUSTOMIZED:
+            labelYouWonYouLost->setText("You Lost\nDifficulty: CUSTOM\n" +
+                                        QString::number(gameEngine->rows()) +
+                                        "x" +
+                                        QString::number(gameEngine->lines()) +
+                                        " : " +
+                                        QString::number(gameEngine->mines()) +
+                                        " Mines");
+    }
+    principalMatrix[_X][_Y].label->setPixmap(QPixmap::fromImage(*imgBoom).scaled(fm, fm, Qt::KeepAspectRatio));
 
-void LibreMinesGui::SLOT_UpdateFirstCellClean()
-{
-    gameEngine->setFirstCellClean(cbFirstCellClean->isChecked());
+
+    for(uchar j=0; j<gameEngine->lines(); j++)
+    {
+        for (uchar i=0; i<gameEngine->rows(); i++)
+        {
+            CellGui& cellGui = principalMatrix[i][j];
+            const LibreMinesGameEngine::CellGameEngine& cellGE = gameEngine->getPrincipalMatrix()[i][j];
+
+            if(cellGE.isHidden)
+            {
+                if(cellGE.state == MINE &&
+                   !cellGE.hasFlag)
+                {
+                    cellGui.button->hide();
+                }
+                else if (cellGE.state != MINE &&
+                         cellGE.hasFlag)
+                {
+                    cellGui.button->hide();
+                    cellGui.label->setPixmap(QPixmap::fromImage(*imgWrongFlag).scaled(fm, fm, Qt::KeepAspectRatio));
+                }
+                else
+                {
+                    cellGui.button->setEnabled(false);
+                }
+            }
+        }
+    }
+
+    if(controller.active)
+    {
+        controller.active = false;
+        vKeyboardControllUnsetCurrentCell();
+    }
 }
 
 void LibreMinesGui::SLOT_DarkMode()
@@ -902,43 +881,6 @@ void LibreMinesGui::SLOT_DarkMode()
         cbDarkModeEnabled->setText("Enable dark mode");
 }
 
-void LibreMinesGui::vGenerateStatics()
-{
-//    int iCorrectFlags = 0,
-//            iWrongFlags = 0,
-//            iUnlockedCells = iCellsToUnlock - iHiddenCells;
-
-//    for (int i=0; i<(iX-1); i++)
-//    {
-//        for (int j=0; j<=(iY-1); j++)
-//        {
-//            if(principalMatrix[i][j].hasFlag)
-//            {
-//                if (principalMatrix[i][j].state == MINE)
-//                    iCorrectFlags++;
-//                else
-//                    iWrongFlags++;
-//            }
-//        }
-//    }
-//    if(iTimeInSeconds == 0)
-//        iTimeInSeconds = 1;
-
-//    double dFlagsPerSecond = (double)iCorrectFlags/iTimeInSeconds,
-//            dCellsPerSecond = (double)iUnlockedCells/iTimeInSeconds,
-//            dPercentageGameComplete = (double)100*iUnlockedCells/iCellsToUnlock;
-
-//    QString QS_Statics = "Correct Flags: " + QString::number(iCorrectFlags)
-//                         +"\nWrongFlags: " + QString::number(iWrongFlags)
-//                         +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
-//                         +"\n"
-//                         +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
-//                         +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
-//                         +"\n"
-//                         +"\nGame Complete: " + QString::number(dPercentageGameComplete, 'f', 2) + " %";
-
-//    labelStatisLastMatch->setText(QS_Statics);
-}
 
 void LibreMinesGui::vConfigureTheme(const bool bDark)
 {

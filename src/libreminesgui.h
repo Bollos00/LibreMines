@@ -113,17 +113,6 @@ private:
      *
      */
     void vShowInterfaceInGame();
-    void vGameLost(const uchar _X, const uchar _Y);
-    /**
-     * @brief
-     *
-     */
-    void vGameWon();
-    /**
-     * @brief
-     *
-     */
-    void vGenerateStatics();
 
     void vConfigureTheme(const bool bDark);
 
@@ -167,12 +156,6 @@ private Q_SLOTS:
      */
     void SLOT_Restart();
 
-    /**
-     * @brief
-     *
-     */
-    void SLOT_UpdateFirstCellClean();
-
     ///
     /// \brief SLOT_DarkMode
     ///
@@ -186,7 +169,7 @@ private Q_SLOTS:
     void SLOT_OnButtonClicked(const QMouseEvent* e);
 
     void SLOT_showCell(const uchar _X, const uchar _Y);
-    void SLOT_endGameStatics(const QString&);
+    void SLOT_endGameStatics(const QString&statics);
     void SLOT_currentTime(const ushort time);
     void SLOT_minesLeft(const ushort minesLeft);
     void SLOT_flagCell(const uchar _X, const uchar _Y);
@@ -194,7 +177,7 @@ private Q_SLOTS:
 
     void SLOT_remakeGame();
     void SLOT_gameWon();
-    void SLOT_gameLost();
+    void SLOT_gameLost(const uchar _X, const uchar _Y);
 
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);

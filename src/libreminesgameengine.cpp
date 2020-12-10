@@ -108,14 +108,18 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
 
         if(bRemakingGame)
         {
+            bool forbidden = false;
             for (const Vector2Dshort& n: vt_vt2d_CleanPoints)
             {
                 if(n.x == i &&
                    n.y == j)
                 {
-                    continue;
+                    forbidden = true;
+                    break;
                 }
             }
+            if(forbidden)
+                continue;
         }
 
         CellGameEngine& cell = principalMatrix[i][j];
@@ -259,44 +263,6 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                 }
 
                 cell.state = (CELL_STATE)minesNeighbors;
-//                switch (minesNeighbors)
-//                {
-//                    case 0:
-//                        cell.state = ZERO;
-//                        break;
-
-//                    case 1:
-//                        cell.state = ONE;
-//                        break;
-
-//                    case 2:
-//                        cell.state = TWO;
-//                        break;
-
-//                    case 3:
-//                        cell.state = THREE;
-//                        break;
-
-//                    case 4:
-//                        cell.state = FOUR;
-//                        break;
-
-//                    case 5:
-//                        cell.state = FIVE;
-//                        break;
-
-//                    case 6:
-//                        cell.state = SIX;
-//                        break;
-
-//                    case 7:
-//                        cell.state = SEVEN;
-//                        break;
-
-//                    case 8:
-//                        cell.state = EIGHT;
-//                        break;
-//                }
             }
         }
     }
@@ -479,25 +445,64 @@ void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
 
 void LibreMinesGameEngine::vGameLost(const uchar _X, const uchar _Y)
 {
+    qint64 timeInNs = elapsedPreciseTimeInGame.nsecsElapsed();
     bGameActive = false;
 
     timerTimeInGame.reset();
     emit SIGNAL_gameLost(_X, _Y);
+    vGenerateEndGameStatics(timeInNs);
 }
 
 void LibreMinesGameEngine::vGameWon()
 {
-    int timeInNs = elapsedPreciseTimeInGame.nsecsElapsed();
+    qint64 timeInNs = elapsedPreciseTimeInGame.nsecsElapsed();
     bGameActive = false;
 
     timerTimeInGame.reset();
     emit SIGNAL_gameWon();
+    vGenerateEndGameStatics(timeInNs);
 }
 
 
-void LibreMinesGameEngine::vGenerateEndGameStatics()
+void LibreMinesGameEngine::vGenerateEndGameStatics(qint64 iTimeInNs)
 {
 
+    int iCorrectFlags = 0,
+            iWrongFlags = 0,
+            iUnlockedCells = iCellsToUnlock - iHiddenCells;
+
+    for (int i=0; i<iX; i++)
+    {
+        for (int j=0; j<iY; j++)
+        {
+            if(principalMatrix[i][j].hasFlag)
+            {
+                if (principalMatrix[i][j].state == MINE)
+                    iCorrectFlags++;
+                else
+                    iWrongFlags++;
+            }
+        }
+    }
+
+    double timeInSecs = (double)iTimeInNs*1e-9;
+
+    double dFlagsPerSecond = (double)iCorrectFlags/timeInSecs,
+            dCellsPerSecond = (double)iUnlockedCells/timeInSecs,
+            dPercentageGameComplete = (double)100*iUnlockedCells/iCellsToUnlock;
+
+    QString QS_Statics =
+            "Total time: " + QString::number(timeInSecs, 'f', 3) + " secs"
+            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
+            +"\nWrongFlags: " + QString::number(iWrongFlags)
+            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
+            +"\n"
+            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
+            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
+            +"\n"
+            +"\nGame Complete: " + QString::number(dPercentageGameComplete, 'f', 2) + " %";
+
+    emit SIGNAL_endGameStatics(QS_Statics);
 }
 
 const std::vector<std::vector<LibreMinesGameEngine::CellGameEngine> >& LibreMinesGameEngine::getPrincipalMatrix() const

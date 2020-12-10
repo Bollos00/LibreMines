@@ -54,7 +54,7 @@ public:
     void vGameLost(const uchar _X, const uchar _Y);
     void vGameWon();
 
-    void vGenerateEndGameStatics();
+    void vGenerateEndGameStatics(qint64 iTimeInNs);
 
     const std::vector< std::vector<CellGameEngine> >& getPrincipalMatrix()const;
     uchar rows()const;
