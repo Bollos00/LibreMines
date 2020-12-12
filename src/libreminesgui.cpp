@@ -598,7 +598,7 @@ void LibreMinesGui::vShowInterface()
 
     cbFirstCellClean->show();
     cbDarkModeEnabled->show();
-    cbCleanNeighborCellsWhenClickedOnShowedLabel->hide();
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->show();
 }
 
 void LibreMinesGui::SLOT_Easy()
