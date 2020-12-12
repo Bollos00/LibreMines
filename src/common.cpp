@@ -22,16 +22,6 @@
 
 #include <cmath>
 
-Cell::Cell():
-    state(ZERO),
-    button(nullptr),
-    label(nullptr),
-    isHidden(true),
-    hasFlag(false)
-{
-
-}
-
 Vector2Dshort::Vector2Dshort():
     x( 0 ),
     y( 0 )
