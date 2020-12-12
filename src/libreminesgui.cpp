@@ -181,7 +181,17 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                 case Qt::Key_O:
                     if(controller.active)
                     {
-                        emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
+                        const LibreMinesGameEngine::CellGameEngine& cell =
+                                gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
+
+                        if(cell.isHidden)
+                        {
+                            emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
+                        }
+                        else if(cbCleanNeighborCellsWhenClickedOnShowedLabel->isChecked())
+                        {
+                            emit SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
+                        }
                         return true;
                     }
                     else
@@ -252,13 +262,16 @@ void LibreMinesGui::vNewGame(const uchar _X,
     const QPixmap QPM_Zero = QPixmap::fromImage(*imgZero).scaled(fm, fm, Qt::KeepAspectRatio);
     const QPixmap QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio);
 
+    const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
+            cbCleanNeighborCellsWhenClickedOnShowedLabel->isChecked();
+
     for(uchar j=0; j<_Y; j++)
     {
         for (uchar i=0; i<_X; i++)
         {
             CellGui& cell = principalMatrix[i][j];
 
-            cell.label = new QLabel(this);
+            cell.label = new QLabel_adapted(this);
             cell.button = new QPushButton_adapted(this);
 
             cell.label->setGeometry(i*fm, j*fm, fm, fm);
@@ -272,7 +285,13 @@ void LibreMinesGui::vNewGame(const uchar _X,
             cell.button->setEnabled(false);
 
             connect(cell.button, &QPushButton_adapted::SIGNAL_Clicked,
-                    this, &LibreMinesGui::SLOT_OnButtonClicked);
+                    this, &LibreMinesGui::SLOT_OnCellButtonClicked);
+
+            if(bCleanNeighborCellsWhenClickedOnShowedLabel)
+            {
+                connect(cell.label, &QLabel_adapted::SIGNAL_clicked,
+                        this, &LibreMinesGui::SLOT_onCellLabelClicked);
+            }
 
             qApp->processEvents();
         }
@@ -310,6 +329,11 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     connect(this, &LibreMinesGui::SIGNAL_cleanCell,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_cleanCell);
+    if(bCleanNeighborCellsWhenClickedOnShowedLabel)
+    {
+        connect(this, &LibreMinesGui::SIGNAL_cleanNeighborCells,
+                gameEngine.get(), &LibreMinesGameEngine::SLOT_cleanNeighborCells);
+    }
     connect(this, &LibreMinesGui::SIGNAL_addOrRemoveFlag,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_addOrRemoveFlag);
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
@@ -468,6 +492,10 @@ void LibreMinesGui::vConfigureInterface()
     cbDarkModeEnabled->setText("Disable Dark Mode");
     cbDarkModeEnabled->setChecked(true);
 
+    cbCleanNeighborCellsWhenClickedOnShowedLabel = new QCheckBox(this);
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->setText("Clean Neighbor Cells When\nClicked On Showed Label");
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->setChecked(false);
+
     buttonEasy->setGeometry(width/20, height/20,
                             width/2 - 2*width/20, 4*(height/2 - 2*height/20)/5 );
 
@@ -482,6 +510,10 @@ void LibreMinesGui::vConfigureInterface()
 
     cbDarkModeEnabled->setGeometry(width/20, cbFirstCellClean->y() + cbFirstCellClean->height(),
                                    width/2 - 2*width/20,  (height/2 - 2*height/20)/10);
+
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->setGeometry(
+                width/20, cbDarkModeEnabled->y() + cbDarkModeEnabled->height(),
+                width/2 - 2*width/20,  (height/2 - 2*height/20)/10);
 
     buttonCustomizedNewGame->setGeometry(buttonEasy->x() + buttonEasy->width() + width/20, buttonEasy->y() + buttonEasy->height() + height/20,
                                          width/2 - 2*width/20, 2*(height/2 - 2*height/20)/5 );
@@ -545,6 +577,7 @@ void LibreMinesGui::vHideInterface()
 
     cbFirstCellClean->hide();
     cbDarkModeEnabled->hide();
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->hide();
 }
 
 void LibreMinesGui::vShowInterface()
@@ -565,6 +598,7 @@ void LibreMinesGui::vShowInterface()
 
     cbFirstCellClean->show();
     cbDarkModeEnabled->show();
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->hide();
 }
 
 void LibreMinesGui::SLOT_Easy()
@@ -611,11 +645,16 @@ void LibreMinesGui::vAjustInterfaceInGame()
     int width = this->width();
     int height = this->height();
 
-    labelTimerInGame->setGeometry(85*width/100, height/20, 15*width/100, height/8);
-    lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(), labelTimerInGame->width(), height/7);
-    buttonRestartInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(), lcd_numberMinesLeft->width()/2, height/20);
-    buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(), buttonRestartInGame->width(), buttonRestartInGame->height());
-    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+height/10, lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
+    labelTimerInGame->setGeometry(85*width/100, height/20,
+                                  15*width/100, height/8);
+    lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
+                                     labelTimerInGame->width(), height/7);
+    buttonRestartInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
+                                     lcd_numberMinesLeft->width()/2, height/20);
+    buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
+                                  buttonRestartInGame->width(), buttonRestartInGame->height());
+    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+height/10,
+                                    lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
     labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
                                       labelYouWonYouLost->width(), height/5);
 }
@@ -673,7 +712,7 @@ void LibreMinesGui::SLOT_Quit()
     gameEngine.reset();
 }
 
-void LibreMinesGui::SLOT_OnButtonClicked(const QMouseEvent *e)
+void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
 {
     if(!gameEngine->isGameActive())
         return;
@@ -703,6 +742,35 @@ void LibreMinesGui::SLOT_OnButtonClicked(const QMouseEvent *e)
             }
         }
     }
+}
+
+void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
+{
+    if(!gameEngine->isGameActive())
+        return;
+
+    QLabel_adapted *buttonClicked = (QLabel_adapted *) sender();
+
+    for(uchar j=0; j<gameEngine->lines(); j++)
+    {
+        for (uchar i=0; i<gameEngine->rows(); i++)
+        {
+            // Find the emissor of the signal
+            if(buttonClicked == principalMatrix[i][j].label)
+            {
+                switch (e->button())
+                {
+                    case Qt::LeftButton:
+                        emit SIGNAL_cleanNeighborCells(i, j);
+                        return;
+
+                    default:
+                        return;
+                }
+            }
+        }
+    }
+
 }
 
 void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)

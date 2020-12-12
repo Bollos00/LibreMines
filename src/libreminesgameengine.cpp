@@ -591,6 +591,28 @@ void LibreMinesGameEngine::SLOT_startTimer()
     elapsedPreciseTimeInGame.start();
 }
 
+void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _Y)
+{
+    for(short i=_X-1; i<=_X+1; i++)
+    {
+        if(i<0 || i>=iX)
+            continue;
+
+        for(short j=_Y-1; j<=_Y+1; j++)
+        {
+            if(j<0 || j>=iY)
+                continue;
+
+            const CellGameEngine& cell = principalMatrix[i][j];
+
+            if(cell.isHidden && !cell.hasFlag)
+            {
+                vCleanCell(i, j);
+            }
+        }
+    }
+}
+
 void LibreMinesGameEngine::SLOT_UpdateTime()
 {
     iTimeInSeconds++;

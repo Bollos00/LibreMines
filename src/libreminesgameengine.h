@@ -99,6 +99,7 @@ public Q_SLOTS:
     void SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y);
     void SLOT_stop();
     void SLOT_startTimer();
+    void SLOT_cleanNeighborCells(const uchar _X, const uchar _Y);
 
 private Q_SLOTS:
     void SLOT_UpdateTime();

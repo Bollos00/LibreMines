@@ -23,8 +23,6 @@
 
 #include <QLabel>
 
-#include "qpushbutton_adapted.h"
-
 /**
  * @brief
  *

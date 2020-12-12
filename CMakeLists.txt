@@ -48,6 +48,8 @@ add_executable(${PROJECT_NAME}
     src/libreminesgameengine.h
     src/libreminesgui.cpp
     src/libreminesgui.h
+    src/qlabel_adapted.cpp
+    src/qlabel_adapted.h
     src/qpushbutton_adapted.cpp
     src/qpushbutton_adapted.h
     share/minesbollos.qrc

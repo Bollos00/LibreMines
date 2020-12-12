@@ -42,7 +42,7 @@ public:
      */
     explicit QPushButton_adapted(QWidget *parent = nullptr);
 
-private slots:
+protected:
     /**
      * @brief
      *
@@ -50,13 +50,13 @@ private slots:
      */
     void mousePressEvent(QMouseEvent *e);
 
-signals:
+Q_SIGNALS:
     /**
      * @brief
      *
      * @param
      */
-    void SIGNAL_Clicked(QMouseEvent *event);
+    void SIGNAL_Clicked(const QMouseEvent *const event);
 };
 
 #endif // QPUSHBUTTON_ADAPTED_H
