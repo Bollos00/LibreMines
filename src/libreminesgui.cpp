@@ -240,6 +240,37 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
                              ushort i_nMines_)
 {
+    {
+        QScopedPointer<QFile> fileScores( new QFile("scoresLibreMines") );
+
+        if(fileScores->open(QIODevice::ReadOnly))
+        {
+            QDataStream stream(fileScores.get());
+
+            QString tag;
+
+            stream >> tag;
+
+            qDebug() << "\n***************************";
+            while(tag == "BEGIN")
+            {
+                LibreMinesScore score;
+                stream >> score;
+
+                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$";
+                qDebug() << score;
+                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$\n";
+
+                stream >> tag;
+
+                Q_ASSERT(tag == "END");
+
+                stream >> tag;
+            }
+            qDebug() << "***************************";
+        }
+    }
+
     controller.ctrlPressed = false;
     controller.active = false;
     controller.currentX = 0;
@@ -792,9 +823,29 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                       double dCellsPerSecond)
 {
     score.gameDifficulty = difficult;
+    score.username = qgetenv("USER");
 
-    qDebug() << score;
+    // Save the score of the current game on the file scoresLibreMines on
+    //  the working directory. If the file does not exist, a new one will
+    //  be created.
+    {
+        QScopedPointer<QFile> fileScores( new QFile("scoresLibreMines") );
 
+        if(fileScores->exists())
+            fileScores->open(QIODevice::Append);
+        else
+            fileScores->open(QIODevice::WriteOnly);
+
+        QDataStream stream(fileScores.get());
+
+        stream.setVersion(QDataStream::Qt_5_12);
+
+        stream << QString("BEGIN");
+        stream << score;
+        stream << QString("END");
+    }
+
+//    qDebug() << score;
 
     QString QS_Statics =
             "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"

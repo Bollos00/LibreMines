@@ -31,9 +31,10 @@ LibreMinesScore::operator QString() const
     }
 
 
-    return  QString("Time: " + QString::number(this->iTimeInNs*1e-9) + "secs\n"
+    return  QString(this->username + '\n'
+                    + "Time: " + QString::number(this->iTimeInNs*1e-9) + " secs\n"
                     + "Difficulty: " + strGameDiffuclty + '\n'
-                    + "Percentage Game Completed: " + QString::number(this->dPercentageGameCompleted));
+                    + "Game Completed: " + QString::number(this->dPercentageGameCompleted)) + '%';
 }
 
 bool LibreMinesScore::bFirstIsBetter(const LibreMinesScore &first, const LibreMinesScore &second)
@@ -66,6 +67,7 @@ bool LibreMinesScore::bFirstIsBetter(const LibreMinesScore &first, const LibreMi
 
 QDataStream& operator<< (QDataStream& stream, const LibreMinesScore& score)
 {
+    stream.setVersion(QDataStream::Qt_5_12);
     //write
     stream << score.iTimeInNs;
     stream << (uchar)score.gameDifficulty;
@@ -74,14 +76,15 @@ QDataStream& operator<< (QDataStream& stream, const LibreMinesScore& score)
     stream << score.mines;
     stream << score.bGameCompleted;
     stream << score.dPercentageGameCompleted;
+    stream << score.username;
 
     return stream;
 };
 
 QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score)
 {
+    stream.setVersion(QDataStream::Qt_5_12);
     //read
-
     stream >> score.iTimeInNs;
     uchar charGameDifficulty;
     stream >> charGameDifficulty;
@@ -91,6 +94,7 @@ QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score)
     stream >> score.mines;
     stream >> score.bGameCompleted;
     stream >> score.dPercentageGameCompleted;
+    stream >> score.username;
 
     return stream;
 };

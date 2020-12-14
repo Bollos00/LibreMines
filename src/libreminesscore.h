@@ -17,6 +17,7 @@ public:
     ushort mines;
     bool bGameCompleted;
     double dPercentageGameCompleted;
+    QString username;
 
     static bool bFirstIsBetter(const LibreMinesScore& first, const LibreMinesScore& second);
 };
