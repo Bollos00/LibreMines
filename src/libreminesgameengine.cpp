@@ -450,7 +450,7 @@ void LibreMinesGameEngine::vGameLost(const uchar _X, const uchar _Y)
 
     timerTimeInGame.reset();
     emit SIGNAL_gameLost(_X, _Y);
-    vGenerateEndGameStatics(timeInNs);
+    vGenerateEndGameScore(timeInNs);
 }
 
 void LibreMinesGameEngine::vGameWon()
@@ -460,11 +460,11 @@ void LibreMinesGameEngine::vGameWon()
 
     timerTimeInGame.reset();
     emit SIGNAL_gameWon();
-    vGenerateEndGameStatics(timeInNs);
+    vGenerateEndGameScore(timeInNs);
 }
 
 
-void LibreMinesGameEngine::vGenerateEndGameStatics(qint64 iTimeInNs)
+void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs)
 {
 
     int iCorrectFlags = 0,
@@ -491,18 +491,16 @@ void LibreMinesGameEngine::vGenerateEndGameStatics(qint64 iTimeInNs)
             dCellsPerSecond = (double)iUnlockedCells/timeInSecs,
             dPercentageGameComplete = (double)100*iUnlockedCells/iCellsToUnlock;
 
-    QString QS_Statics =
-            "Total time: " + QString::number(timeInSecs, 'f', 3) + " secs"
-            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
-            +"\nWrongFlags: " + QString::number(iWrongFlags)
-            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
-            +"\n"
-            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
-            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
-            +"\n"
-            +"\nGame Complete: " + QString::number(dPercentageGameComplete, 'f', 2) + " %";
+    LibreMinesScore score;
+    score.iTimeInNs = iTimeInNs;
+    score.gameDifficulty = NONE;
+    score.width = iX;
+    score.length = iY;
+    score.mines = nMines;
+    score.bGameCompleted = iUnlockedCells == iCellsToUnlock;
+    score.dPercentageGameCompleted = dPercentageGameComplete;
 
-    emit SIGNAL_endGameStatics(QS_Statics);
+    emit SIGNAL_endGameScore(score, iCorrectFlags, iWrongFlags, iUnlockedCells, dFlagsPerSecond, dCellsPerSecond);
 }
 
 const std::vector<std::vector<LibreMinesGameEngine::CellGameEngine> >& LibreMinesGameEngine::getPrincipalMatrix() const

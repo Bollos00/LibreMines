@@ -173,7 +173,12 @@ private Q_SLOTS:
     void SLOT_onCellLabelClicked(const QMouseEvent *const e);
 
     void SLOT_showCell(const uchar _X, const uchar _Y);
-    void SLOT_endGameStatics(const QString&statics);
+    void SLOT_endGameScore(LibreMinesScore score,
+                           int iCorrectFlags,
+                           int iWrongFlags,
+                           int iUnlockedCells,
+                           double dFlagsPerSecond,
+                           double dCellsPerSecond);
     void SLOT_currentTime(const ushort time);
     void SLOT_minesLeft(const ushort minesLeft);
     void SLOT_flagCell(const uchar _X, const uchar _Y);

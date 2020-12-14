@@ -44,7 +44,7 @@ enum CELL_STATE: char{
  * @brief
  *
  */
-enum GAME_DIFFICULTY: char{
+enum GAME_DIFFICULTY: uchar{
     NONE,
     EASY,
     MEDIUM,

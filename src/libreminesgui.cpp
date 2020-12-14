@@ -309,8 +309,8 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_showCell,
             this, &LibreMinesGui::SLOT_showCell);
-    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_endGameStatics,
-            this, &LibreMinesGui::SLOT_endGameStatics);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_endGameScore,
+            this, &LibreMinesGui::SLOT_endGameScore);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_currentTime,
             this, &LibreMinesGui::SLOT_currentTime);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_minesLeft,
@@ -784,9 +784,30 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
     }
 }
 
-void LibreMinesGui::SLOT_endGameStatics(const QString& statics)
+void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
+                                      int iCorrectFlags,
+                                      int iWrongFlags,
+                                      int iUnlockedCells,
+                                      double dFlagsPerSecond,
+                                      double dCellsPerSecond)
 {
-    labelStatisLastMatch->setText(statics);
+    score.gameDifficulty = difficult;
+
+    qDebug() << score;
+
+
+    QString QS_Statics =
+            "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
+            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
+            +"\nWrongFlags: " + QString::number(iWrongFlags)
+            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
+            +"\n"
+            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
+            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
+            +"\n"
+            +"\nGame Complete: " + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
+
+    labelStatisLastMatch->setText(QS_Statics);
 }
 
 void LibreMinesGui::SLOT_currentTime(const ushort time)
