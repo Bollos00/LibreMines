@@ -109,7 +109,7 @@ void LibreMinesScoresDialog::setScores(QList<LibreMinesScore> scores,
         connect(QLE_username, &QLineEdit::textChanged,
                 [editableUser](const QString& text){ editableUser->setText(text); });
         connect(QPB_Save, &QPushButton::released,
-                [this]{ this->saveEditableScore = true;  this->close(); });
+                [this]{ if(!this->QLE_username->text().isEmpty()){ this->saveEditableScore = true;  this->close(); } });
         connect(QPB_Cancel, &QPushButton::released,
                 this, &QDialog::close);
 

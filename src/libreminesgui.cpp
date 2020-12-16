@@ -799,7 +799,8 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
     // Save the score of the current game on the file scoresLibreMines on
     //  the "~/.local/share/libremines/" directory. If the file does not
     //  exist, a new one will be created.
-    if(score.dPercentageGameCompleted != 0){
+    if(score.dPercentageGameCompleted != 0)
+    {
         QDir destDir = QDir::home();
 
         destDir.setFilter(QDir::AllDirs);
@@ -822,9 +823,14 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
 
         QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
 
+        if(!fileScores->exists())
+        {
+            fileScores->open(QIODevice::NewOnly);
+            fileScores->close();
+        }
+
         bool saveScore = false;
         // Search for existing scores on the current level
-        if(fileScores->exists())
         {
             fileScores->open(QIODevice::ReadOnly);
 
