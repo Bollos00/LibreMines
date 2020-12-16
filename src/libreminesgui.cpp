@@ -25,8 +25,10 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QScreen>
+#include <QDir>
 
 #include "libreminesgui.h"
+#include "libreminesscoresdialog.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -181,7 +183,17 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                 case Qt::Key_O:
                     if(controller.active)
                     {
-                        emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
+                        const LibreMinesGameEngine::CellGameEngine& cell =
+                                gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
+
+                        if(cell.isHidden)
+                        {
+                            emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
+                        }
+                        else if(cbCleanNeighborCellsWhenClickedOnShowedLabel->isChecked())
+                        {
+                            emit SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
+                        }
                         return true;
                     }
                     else
@@ -252,13 +264,16 @@ void LibreMinesGui::vNewGame(const uchar _X,
     const QPixmap QPM_Zero = QPixmap::fromImage(*imgZero).scaled(fm, fm, Qt::KeepAspectRatio);
     const QPixmap QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(fm, fm, Qt::KeepAspectRatio);
 
+    const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
+            cbCleanNeighborCellsWhenClickedOnShowedLabel->isChecked();
+
     for(uchar j=0; j<_Y; j++)
     {
         for (uchar i=0; i<_X; i++)
         {
             CellGui& cell = principalMatrix[i][j];
 
-            cell.label = new QLabel(this);
+            cell.label = new QLabel_adapted(this);
             cell.button = new QPushButton_adapted(this);
 
             cell.label->setGeometry(i*fm, j*fm, fm, fm);
@@ -272,7 +287,13 @@ void LibreMinesGui::vNewGame(const uchar _X,
             cell.button->setEnabled(false);
 
             connect(cell.button, &QPushButton_adapted::SIGNAL_Clicked,
-                    this, &LibreMinesGui::SLOT_OnButtonClicked);
+                    this, &LibreMinesGui::SLOT_OnCellButtonClicked);
+
+            if(bCleanNeighborCellsWhenClickedOnShowedLabel)
+            {
+                connect(cell.label, &QLabel_adapted::SIGNAL_clicked,
+                        this, &LibreMinesGui::SLOT_onCellLabelClicked);
+            }
 
             qApp->processEvents();
         }
@@ -290,8 +311,8 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_showCell,
             this, &LibreMinesGui::SLOT_showCell);
-    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_endGameStatics,
-            this, &LibreMinesGui::SLOT_endGameStatics);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_endGameScore,
+            this, &LibreMinesGui::SLOT_endGameScore);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_currentTime,
             this, &LibreMinesGui::SLOT_currentTime);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_minesLeft,
@@ -310,6 +331,11 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     connect(this, &LibreMinesGui::SIGNAL_cleanCell,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_cleanCell);
+    if(bCleanNeighborCellsWhenClickedOnShowedLabel)
+    {
+        connect(this, &LibreMinesGui::SIGNAL_cleanNeighborCells,
+                gameEngine.get(), &LibreMinesGameEngine::SLOT_cleanNeighborCells);
+    }
     connect(this, &LibreMinesGui::SIGNAL_addOrRemoveFlag,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_addOrRemoveFlag);
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
@@ -468,6 +494,10 @@ void LibreMinesGui::vConfigureInterface()
     cbDarkModeEnabled->setText("Disable Dark Mode");
     cbDarkModeEnabled->setChecked(true);
 
+    cbCleanNeighborCellsWhenClickedOnShowedLabel = new QCheckBox(this);
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->setText("Clean Neighbor Cells When\nClicked On Showed Label");
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->setChecked(false);
+
     buttonEasy->setGeometry(width/20, height/20,
                             width/2 - 2*width/20, 4*(height/2 - 2*height/20)/5 );
 
@@ -482,6 +512,10 @@ void LibreMinesGui::vConfigureInterface()
 
     cbDarkModeEnabled->setGeometry(width/20, cbFirstCellClean->y() + cbFirstCellClean->height(),
                                    width/2 - 2*width/20,  (height/2 - 2*height/20)/10);
+
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->setGeometry(
+                width/20, cbDarkModeEnabled->y() + cbDarkModeEnabled->height(),
+                width/2 - 2*width/20,  (height/2 - 2*height/20)/10);
 
     buttonCustomizedNewGame->setGeometry(buttonEasy->x() + buttonEasy->width() + width/20, buttonEasy->y() + buttonEasy->height() + height/20,
                                          width/2 - 2*width/20, 2*(height/2 - 2*height/20)/5 );
@@ -545,6 +579,7 @@ void LibreMinesGui::vHideInterface()
 
     cbFirstCellClean->hide();
     cbDarkModeEnabled->hide();
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->hide();
 }
 
 void LibreMinesGui::vShowInterface()
@@ -565,6 +600,7 @@ void LibreMinesGui::vShowInterface()
 
     cbFirstCellClean->show();
     cbDarkModeEnabled->show();
+    cbCleanNeighborCellsWhenClickedOnShowedLabel->show();
 }
 
 void LibreMinesGui::SLOT_Easy()
@@ -611,11 +647,16 @@ void LibreMinesGui::vAjustInterfaceInGame()
     int width = this->width();
     int height = this->height();
 
-    labelTimerInGame->setGeometry(85*width/100, height/20, 15*width/100, height/8);
-    lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(), labelTimerInGame->width(), height/7);
-    buttonRestartInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(), lcd_numberMinesLeft->width()/2, height/20);
-    buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(), buttonRestartInGame->width(), buttonRestartInGame->height());
-    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+height/10, lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
+    labelTimerInGame->setGeometry(85*width/100, height/20,
+                                  15*width/100, height/8);
+    lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
+                                     labelTimerInGame->width(), height/7);
+    buttonRestartInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
+                                     lcd_numberMinesLeft->width()/2, height/20);
+    buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
+                                  buttonRestartInGame->width(), buttonRestartInGame->height());
+    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+height/10,
+                                    lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
     labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
                                       labelYouWonYouLost->width(), height/5);
 }
@@ -673,7 +714,7 @@ void LibreMinesGui::SLOT_Quit()
     gameEngine.reset();
 }
 
-void LibreMinesGui::SLOT_OnButtonClicked(const QMouseEvent *e)
+void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
 {
     if(!gameEngine->isGameActive())
         return;
@@ -705,6 +746,35 @@ void LibreMinesGui::SLOT_OnButtonClicked(const QMouseEvent *e)
     }
 }
 
+void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
+{
+    if(!gameEngine->isGameActive())
+        return;
+
+    QLabel_adapted *buttonClicked = (QLabel_adapted *) sender();
+
+    for(uchar j=0; j<gameEngine->lines(); j++)
+    {
+        for (uchar i=0; i<gameEngine->rows(); i++)
+        {
+            // Find the emissor of the signal
+            if(buttonClicked == principalMatrix[i][j].label)
+            {
+                switch (e->button())
+                {
+                    case Qt::LeftButton:
+                        emit SIGNAL_cleanNeighborCells(i, j);
+                        return;
+
+                    default:
+                        return;
+                }
+            }
+        }
+    }
+
+}
+
 void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
 {
     principalMatrix[_X][_Y].button->hide();
@@ -716,9 +786,129 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
     }
 }
 
-void LibreMinesGui::SLOT_endGameStatics(const QString& statics)
+void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
+                                      int iCorrectFlags,
+                                      int iWrongFlags,
+                                      int iUnlockedCells,
+                                      double dFlagsPerSecond,
+                                      double dCellsPerSecond)
 {
-    labelStatisLastMatch->setText(statics);
+    score.gameDifficulty = difficult;
+    score.username = qgetenv("USER");
+
+    // Save the score of the current game on the file scoresLibreMines on
+    //  the "~/.local/share/libremines/" directory. If the file does not
+    //  exist, a new one will be created.
+    if(score.dPercentageGameCompleted != 0){
+        QDir destDir = QDir::home();
+
+        destDir.setFilter(QDir::AllDirs);
+
+        if(!destDir.cd(".local"))
+        {
+            Q_ASSERT(destDir.mkdir(".local"));
+            Q_ASSERT(destDir.cd(".local"));
+        }
+        if(!destDir.cd("share"))
+        {
+            Q_ASSERT(destDir.mkdir("share"));
+            Q_ASSERT(destDir.cd("share"));
+        }
+        if(!destDir.cd("libremines"))
+        {
+            Q_ASSERT(destDir.mkdir("libremines"));
+            Q_ASSERT(destDir.cd("libremines"));
+        }
+
+        QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
+
+        bool saveScore = false;
+        // Search for existing scores on the current level
+        if(fileScores->exists())
+        {
+            fileScores->open(QIODevice::ReadOnly);
+
+            QList<LibreMinesScore> scores;
+
+            QDataStream stream(fileScores.get());
+            stream.setVersion(QDataStream::Qt_5_12);
+
+            while(!stream.atEnd())
+            {
+                LibreMinesScore s;
+                stream >> s;
+
+                if(s.gameDifficulty == score.gameDifficulty &&
+                   s.length == score.length &&
+                   s.width == score.width &&
+                   s.mines == score.mines)
+                {
+                    scores.append(s);
+                }
+            }
+            LibreMinesScore::sort(scores);
+
+//            qDebug() << "\n##########################################";
+//            for(const auto& s: scores)
+//            {
+//                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$";
+//                qDebug() << s;
+//                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$\n";
+//            }
+//            qDebug() << "##########################################";
+
+            int index = 0;
+            for(int i=0; i<scores.size(); ++i)
+            {
+                if(LibreMinesScore::bFirstIsBetter(scores.at(i), score))
+                    index = i+1;
+                else
+                    break;
+            }
+
+            // open the dialog
+            LibreMinesScoresDialog dialog(this, scores.size() + 1);
+            dialog.setScores(scores, &score, index);
+            int result = dialog.exec();
+
+            if(dialog.bSaveEditableScore())
+            {
+                score.username = dialog.stringUserName();
+                saveScore = true;
+            }
+        }
+
+        if(saveScore)
+        {
+            qDebug() << "Saving score";
+
+            fileScores.reset( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
+
+            if(fileScores->exists())
+                fileScores->open(QIODevice::Append);
+            else
+                fileScores->open(QIODevice::WriteOnly);
+
+            QDataStream stream(fileScores.get());
+
+            stream.setVersion(QDataStream::Qt_5_12);
+
+            stream << score;
+        }
+    }
+
+    QString QS_Statics =
+            "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
+            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
+            +"\nWrongFlags: " + QString::number(iWrongFlags)
+            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
+            +"\n"
+            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
+            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
+            +"\n"
+            +"\nGame Complete: " + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
+
+    labelStatisLastMatch->setText(QS_Statics);
 }
 
 void LibreMinesGui::SLOT_currentTime(const ushort time)

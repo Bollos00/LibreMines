@@ -30,6 +30,8 @@
 
 #include "common.h"
 #include "libreminesgameengine.h"
+#include "qlabel_adapted.h"
+#include "qpushbutton_adapted.h"
 
 
 /**
@@ -47,7 +49,7 @@ private:
         CellGui();
 
         QPushButton_adapted *button; /**< TODO: describe */
-        QLabel *label; /**< TODO: describe */
+        QLabel_adapted *label; /**< TODO: describe */
     };
 
 public:
@@ -166,10 +168,17 @@ private Q_SLOTS:
      *
      * @param e
      */
-    void SLOT_OnButtonClicked(const QMouseEvent* e);
+    void SLOT_OnCellButtonClicked(const QMouseEvent *const e);
+
+    void SLOT_onCellLabelClicked(const QMouseEvent *const e);
 
     void SLOT_showCell(const uchar _X, const uchar _Y);
-    void SLOT_endGameStatics(const QString&statics);
+    void SLOT_endGameScore(LibreMinesScore score,
+                           int iCorrectFlags,
+                           int iWrongFlags,
+                           int iUnlockedCells,
+                           double dFlagsPerSecond,
+                           double dCellsPerSecond);
     void SLOT_currentTime(const ushort time);
     void SLOT_minesLeft(const ushort minesLeft);
     void SLOT_flagCell(const uchar _X, const uchar _Y);
@@ -181,6 +190,7 @@ private Q_SLOTS:
 
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
+    void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);
     void SIGNAL_addOrRemoveFlag(const uchar _X, const uchar _Y);
     void SIGNAL_stopGame();
 
@@ -212,6 +222,7 @@ private:
 
     QCheckBox *cbFirstCellClean; /**< TODO: describe */
     QCheckBox *cbDarkModeEnabled;
+    QCheckBox* cbCleanNeighborCellsWhenClickedOnShowedLabel;
 
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */

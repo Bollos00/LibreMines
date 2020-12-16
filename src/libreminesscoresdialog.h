@@ -18,45 +18,33 @@
  */
 
 
-#ifndef QPUSHBUTTON_ADAPTED_H
-#define QPUSHBUTTON_ADAPTED_H
+#ifndef LIBREMINESSCORESDIALOG_H
+#define LIBREMINESSCORESDIALOG_H
 
-#include <QObject>
-#include <QWidget>
-#include <QPushButton>
-#include <QMouseEvent>
+#include <QDialog>
+#include <QTableWidget>
 
-/**
- * @brief
- *
- */
-class QPushButton_adapted : public QPushButton
+#include "libreminesscore.h"
+
+class LibreMinesScoresDialog : public QDialog
 {
     Q_OBJECT
-
 public:
-    /**
-     * @brief
-     *
-     * @param parent
-     */
-    explicit QPushButton_adapted(QWidget *parent = nullptr);
+    LibreMinesScoresDialog(QWidget *parent, int rowsCount);
+    void setScores(QList<LibreMinesScore> scores,
+                   const LibreMinesScore *const editableScore = nullptr,
+                   const int editableScorePosition = -1);
 
-protected:
-    /**
-     * @brief
-     *
-     * @param e
-     */
-    void mousePressEvent(QMouseEvent *e);
+    bool bSaveEditableScore()const;
+    QString stringUserName()const;
 
-Q_SIGNALS:
-    /**
-     * @brief
-     *
-     * @param
-     */
-    void SIGNAL_Clicked(const QMouseEvent *const event);
+private:
+    QTableWidget* table;
+    QPushButton* QPB_Save;
+    QPushButton* QPB_Cancel;
+    QLineEdit* QLE_username;
+
+    bool saveEditableScore;
 };
 
-#endif // QPUSHBUTTON_ADAPTED_H
+#endif // LIBREMINESSCORESDIALOG_H

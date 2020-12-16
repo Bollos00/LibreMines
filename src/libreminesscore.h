@@ -18,45 +18,33 @@
  */
 
 
-#ifndef QPUSHBUTTON_ADAPTED_H
-#define QPUSHBUTTON_ADAPTED_H
+#ifndef LIBREMINESSCORE_H
+#define LIBREMINESSCORE_H
 
-#include <QObject>
-#include <QWidget>
-#include <QPushButton>
-#include <QMouseEvent>
+#include "common.h"
 
-/**
- * @brief
- *
- */
-class QPushButton_adapted : public QPushButton
+class LibreMinesScore
 {
-    Q_OBJECT
-
 public:
-    /**
-     * @brief
-     *
-     * @param parent
-     */
-    explicit QPushButton_adapted(QWidget *parent = nullptr);
+    LibreMinesScore();
 
-protected:
-    /**
-     * @brief
-     *
-     * @param e
-     */
-    void mousePressEvent(QMouseEvent *e);
+    operator QString() const;
 
-Q_SIGNALS:
-    /**
-     * @brief
-     *
-     * @param
-     */
-    void SIGNAL_Clicked(const QMouseEvent *const event);
+    qint64 iTimeInNs;
+    GAME_DIFFICULTY gameDifficulty;
+    uchar width;
+    uchar length;
+    ushort mines;
+    bool bGameCompleted;
+    double dPercentageGameCompleted;
+    QString username;
+
+    static bool bFirstIsBetter(const LibreMinesScore& first, const LibreMinesScore& second);
+    static void sort(QList<LibreMinesScore> &l);
 };
 
-#endif // QPUSHBUTTON_ADAPTED_H
+QDataStream& operator<< (QDataStream& stream, const LibreMinesScore& score);
+QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score);
+QDebug operator<<(QDebug debug, const LibreMinesScore& score);
+
+#endif // LIBREMINESSCORE_H

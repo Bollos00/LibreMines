@@ -25,6 +25,7 @@
 #include <QElapsedTimer>
 
 #include "common.h"
+#include "libreminesscore.h"
 
 class LibreMinesGameEngine: public QObject
 {
@@ -49,13 +50,6 @@ public:
                   const uchar i_X_Clean = 255,
                   const uchar i_Y_Clean = 255);
 
-    void vResetPrincipalMatrix();
-    void vCleanCell(const uchar _X, const uchar _Y);
-    void vGameLost(const uchar _X, const uchar _Y);
-    void vGameWon();
-
-    void vGenerateEndGameStatics(qint64 iTimeInNs);
-
     const std::vector< std::vector<CellGameEngine> >& getPrincipalMatrix()const;
     uchar rows()const;
     uchar lines()const;
@@ -64,6 +58,13 @@ public:
 
     void setFirstCellClean(const bool x);
 private:
+    void vResetPrincipalMatrix();
+    void vCleanCell(const uchar _X, const uchar _Y);
+    void vGameLost(const uchar _X, const uchar _Y);
+    void vGameWon();
+
+    void vGenerateEndGameScore(qint64 iTimeInNs);
+
     std::vector< std::vector<CellGameEngine> > principalMatrix; /**< TODO: describe */
 
     uchar iX; /**< TODO: describe */
@@ -85,7 +86,12 @@ private:
 
 Q_SIGNALS:
     void SIGNAL_showCell(const uchar _X, const uchar _Y);
-    void SIGNAL_endGameStatics(const QString&);
+    void SIGNAL_endGameScore(LibreMinesScore score,
+                             int iCorrectFlags,
+                             int iWrongFlags,
+                             int iUnlockedCells,
+                             double dFlagsPerSecond,
+                             double dCellsPerSecond);
     void SIGNAL_currentTime(const ushort);
     void SIGNAL_minesLeft(const ushort);
     void SIGNAL_flagCell(const uchar _X, const uchar _Y);
@@ -99,6 +105,7 @@ public Q_SLOTS:
     void SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y);
     void SLOT_stop();
     void SLOT_startTimer();
+    void SLOT_cleanNeighborCells(const uchar _X, const uchar _Y);
 
 private Q_SLOTS:
     void SLOT_UpdateTime();
