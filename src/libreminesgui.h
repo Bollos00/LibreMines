@@ -58,7 +58,7 @@ public:
      *
      * @param parent
      */
-    LibreMinesGui(QWidget *parent = nullptr);
+    LibreMinesGui(QWidget *parent = nullptr, const int thatWidth = -1, const int thatHeight = -1, const int thatMaximumCellLength = 999999999);
     /**
      * @brief
      *
@@ -89,7 +89,7 @@ private:
      * @brief
      *
      */
-    void vConfigureInterface();
+    void vConfigureInterface(int width, int height);
     /**
      * @brief
      *
@@ -199,10 +199,14 @@ private:
     QScopedPointer<LibreMinesGameEngine> gameEngine;
     std::vector< std::vector<CellGui> > principalMatrix; /**< TODO: describe */
 
-    int iLimitHeight; /**< TODO: describe */
-    int iLimitWidth; /**< TODO: describe */
+    int iLimitHeightField; /**< TODO: describe */
+    int iLimitWidthField; /**< TODO: describe */
 
-    int fm; /**< TODO: describe */
+    int iWidthMainWindow;
+    int iHeightMainWindow;
+
+    int cellLength; /**< TODO: describe */
+    const int maximumCellLength;
 
     GAME_DIFFICULTY difficult; /**< TODO: describe */
 
@@ -223,6 +227,9 @@ private:
     QCheckBox *cbFirstCellClean; /**< TODO: describe */
     QCheckBox *cbDarkModeEnabled;
     QCheckBox* cbCleanNeighborCellsWhenClickedOnShowedLabel;
+
+    QLabel* labelUsername;
+    QLineEdit* lineEditUsername;
 
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */

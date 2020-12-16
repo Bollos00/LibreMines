@@ -40,9 +40,9 @@ public:
 
 private:
     QTableWidget* table;
-    QPushButton* QPB_Save;
-    QPushButton* QPB_Cancel;
-    QLineEdit* QLE_username;
+    QPushButton* buttonSave;
+    QPushButton* buttonCancel;
+    QLineEdit* lineEditUsername;
 
     bool saveEditableScore;
 };

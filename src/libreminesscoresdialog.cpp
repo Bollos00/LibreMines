@@ -26,15 +26,15 @@
 LibreMinesScoresDialog::LibreMinesScoresDialog(QWidget* parent, int rowsCount):
     QDialog(parent),
     table(nullptr),
-    QPB_Save(nullptr),
-    QPB_Cancel(nullptr),
-    QLE_username(nullptr),
+    buttonSave(nullptr),
+    buttonCancel(nullptr),
+    lineEditUsername(nullptr),
     saveEditableScore(false)
 {
     table = new QTableWidget(this);
-    QPB_Save = new QPushButton("Save", this);
-    QPB_Cancel = new QPushButton("Cancel", this);
-    QLE_username = new QLineEdit(this);
+    buttonSave = new QPushButton("Save", this);
+    buttonCancel = new QPushButton("Cancel", this);
+    lineEditUsername = new QLineEdit(this);
 
     table->setEnabled(true);
 
@@ -64,9 +64,9 @@ LibreMinesScoresDialog::LibreMinesScoresDialog(QWidget* parent, int rowsCount):
     table->setColumnWidth(2, 100);
 
     table->setGeometry(0, 0, 450, 600);
-    QPB_Save->setGeometry(table->x() + table->width() + 15, 200, 200, 50);
-    QPB_Cancel->setGeometry(QPB_Save->x(), QPB_Save->y() + QPB_Save->height() + 15, 200, 50);
-    QLE_username->setGeometry(QPB_Cancel->x(), QPB_Cancel->y() + QPB_Cancel->height() + 15, 200, 50);
+    buttonSave->setGeometry(table->x() + table->width() + 15, 200, 200, 50);
+    buttonCancel->setGeometry(buttonSave->x(), buttonSave->y() + buttonSave->height() + 15, 200, 50);
+    lineEditUsername->setGeometry(buttonCancel->x(), buttonCancel->y() + buttonCancel->height() + 15, 200, 50);
     this->setFixedSize(700, 600);
     table->setFixedSize(table->size());
 }
@@ -79,7 +79,7 @@ void LibreMinesScoresDialog::setScores(QList<LibreMinesScore> scores,
     {
         Q_ASSERT(editableScorePosition != -1);
         scores.insert(editableScorePosition, *editableScore);
-        QLE_username->setText(editableScore->username);
+        lineEditUsername->setText(editableScore->username);
     }
 
     // use iterators instead?
@@ -106,14 +106,14 @@ void LibreMinesScoresDialog::setScores(QList<LibreMinesScore> scores,
 
         table->setCurrentItem(editableUser);
 
-        connect(QLE_username, &QLineEdit::textChanged,
+        connect(lineEditUsername, &QLineEdit::textChanged,
                 [editableUser](const QString& text){ editableUser->setText(text); });
-        connect(QPB_Save, &QPushButton::released,
-                [this]{ if(!this->QLE_username->text().isEmpty()){ this->saveEditableScore = true;  this->close(); } });
-        connect(QPB_Cancel, &QPushButton::released,
+        connect(buttonSave, &QPushButton::released,
+                [this]{ if(!this->lineEditUsername->text().isEmpty()){ this->saveEditableScore = true;  this->close(); } });
+        connect(buttonCancel, &QPushButton::released,
                 this, &QDialog::close);
 
-        QLE_username->setFocus();
+        lineEditUsername->setFocus();
     }
 }
 
@@ -124,5 +124,5 @@ bool LibreMinesScoresDialog::bSaveEditableScore() const
 
 QString LibreMinesScoresDialog::stringUserName() const
 {
-    return QLE_username->text();
+    return lineEditUsername->text();
 }
