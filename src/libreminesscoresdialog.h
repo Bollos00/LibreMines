@@ -18,33 +18,33 @@
  */
 
 
-#ifndef LIBREMINESSCORE_H
-#define LIBREMINESSCORE_H
+#ifndef LIBREMINESSCORESDIALOG_H
+#define LIBREMINESSCORESDIALOG_H
 
-#include "common.h"
+#include <QDialog>
+#include <QTableWidget>
 
-class LibreMinesScore
+#include "libreminesscore.h"
+
+class LibreMinesScoresDialog : public QDialog
 {
+    Q_OBJECT
 public:
-    LibreMinesScore();
+    LibreMinesScoresDialog(QWidget *parent, int rowsCount);
+    void setScores(QList<LibreMinesScore> scores,
+                   const LibreMinesScore *const editableScore = nullptr,
+                   const int editableScorePosition = -1);
 
-    operator QString() const;
+    bool bSaveEditableScore()const;
+    QString stringUserName()const;
 
-    qint64 iTimeInNs;
-    GAME_DIFFICULTY gameDifficulty;
-    uchar width;
-    uchar length;
-    ushort mines;
-    bool bGameCompleted;
-    double dPercentageGameCompleted;
-    QString username;
+private:
+    QTableWidget* table;
+    QPushButton* QPB_Save;
+    QPushButton* QPB_Cancel;
+    QLineEdit* QLE_username;
 
-    static bool bFirstIsBetter(const LibreMinesScore& first, const LibreMinesScore& second);
-    static void sort(QList<LibreMinesScore> &l);
+    bool saveEditableScore;
 };
 
-QDataStream& operator<< (QDataStream& stream, const LibreMinesScore& score);
-QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score);
-QDebug operator<<(QDebug debug, const LibreMinesScore& score);
-
-#endif // LIBREMINESSCORE_H
+#endif // LIBREMINESSCORESDIALOG_H

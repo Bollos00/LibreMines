@@ -25,8 +25,10 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QScreen>
+#include <QDir>
 
 #include "libreminesgui.h"
+#include "libreminesscoresdialog.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -240,37 +242,6 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
                              ushort i_nMines_)
 {
-    {
-        QScopedPointer<QFile> fileScores( new QFile("scoresLibreMines") );
-
-        if(fileScores->open(QIODevice::ReadOnly))
-        {
-            QDataStream stream(fileScores.get());
-
-            QString tag;
-
-            stream >> tag;
-
-            qDebug() << "\n***************************";
-            while(tag == "BEGIN")
-            {
-                LibreMinesScore score;
-                stream >> score;
-
-                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$";
-                qDebug() << score;
-                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$\n";
-
-                stream >> tag;
-
-                Q_ASSERT(tag == "END");
-
-                stream >> tag;
-            }
-            qDebug() << "***************************";
-        }
-    }
-
     controller.ctrlPressed = false;
     controller.active = false;
     controller.currentX = 0;
@@ -826,26 +797,105 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
     score.username = qgetenv("USER");
 
     // Save the score of the current game on the file scoresLibreMines on
-    //  the working directory. If the file does not exist, a new one will
-    //  be created.
-    {
-        QScopedPointer<QFile> fileScores( new QFile("scoresLibreMines") );
+    //  the "~/.local/share/libremines/" directory. If the file does not
+    //  exist, a new one will be created.
+    if(score.dPercentageGameCompleted != 0){
+        QDir destDir = QDir::home();
 
+        destDir.setFilter(QDir::AllDirs);
+
+        if(!destDir.cd(".local"))
+        {
+            Q_ASSERT(destDir.mkdir(".local"));
+            Q_ASSERT(destDir.cd(".local"));
+        }
+        if(!destDir.cd("share"))
+        {
+            Q_ASSERT(destDir.mkdir("share"));
+            Q_ASSERT(destDir.cd("share"));
+        }
+        if(!destDir.cd("libremines"))
+        {
+            Q_ASSERT(destDir.mkdir("libremines"));
+            Q_ASSERT(destDir.cd("libremines"));
+        }
+
+        QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
+
+        bool saveScore = false;
+        // Search for existing scores on the current level
         if(fileScores->exists())
-            fileScores->open(QIODevice::Append);
-        else
-            fileScores->open(QIODevice::WriteOnly);
+        {
+            fileScores->open(QIODevice::ReadOnly);
 
-        QDataStream stream(fileScores.get());
+            QList<LibreMinesScore> scores;
 
-        stream.setVersion(QDataStream::Qt_5_12);
+            QDataStream stream(fileScores.get());
+            stream.setVersion(QDataStream::Qt_5_12);
 
-        stream << QString("BEGIN");
-        stream << score;
-        stream << QString("END");
+            while(!stream.atEnd())
+            {
+                LibreMinesScore s;
+                stream >> s;
+
+                if(s.gameDifficulty == score.gameDifficulty &&
+                   s.length == score.length &&
+                   s.width == score.width &&
+                   s.mines == score.mines)
+                {
+                    scores.append(s);
+                }
+            }
+            LibreMinesScore::sort(scores);
+
+//            qDebug() << "\n##########################################";
+//            for(const auto& s: scores)
+//            {
+//                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$";
+//                qDebug() << s;
+//                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$\n";
+//            }
+//            qDebug() << "##########################################";
+
+            int index = 0;
+            for(int i=0; i<scores.size(); ++i)
+            {
+                if(LibreMinesScore::bFirstIsBetter(scores.at(i), score))
+                    index = i+1;
+                else
+                    break;
+            }
+
+            // open the dialog
+            LibreMinesScoresDialog dialog(this, scores.size() + 1);
+            dialog.setScores(scores, &score, index);
+            int result = dialog.exec();
+
+            if(dialog.bSaveEditableScore())
+            {
+                score.username = dialog.stringUserName();
+                saveScore = true;
+            }
+        }
+
+        if(saveScore)
+        {
+            qDebug() << "Saving score";
+
+            fileScores.reset( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
+
+            if(fileScores->exists())
+                fileScores->open(QIODevice::Append);
+            else
+                fileScores->open(QIODevice::WriteOnly);
+
+            QDataStream stream(fileScores.get());
+
+            stream.setVersion(QDataStream::Qt_5_12);
+
+            stream << score;
+        }
     }
-
-//    qDebug() << score;
 
     QString QS_Statics =
             "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
