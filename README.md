@@ -43,7 +43,7 @@ The executable `libremines` will be generated in the build directory, now it is 
 
 ### Installing on the system
 
-At least if you want install LibreMines on your system, use the following command:
+At least, if you want install LibreMines on your system, use the following command:
 ```sh
 sudo make install
 ```
