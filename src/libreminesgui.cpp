@@ -68,17 +68,22 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
 
     qApp->installEventFilter(this);
 
+    this->setAttribute(Qt::WA_DeleteOnClose);
+
     controller.ctrlPressed = false;
     controller.active = false;
     controller.currentX = 0;
     controller.currentY = 0;
 
-    vConfigureTheme(true);
+    vLastSessionLoadConfigurationFile();
+    vConfigureTheme(cbDarkModeEnabled->isChecked());
 }
 
 LibreMinesGui::~LibreMinesGui()
 {
     vResetPrincipalMatrix();
+
+    vLastSessionSaveConfigurationFile();
 
     delete imgZero;
     delete imgOne;
@@ -200,7 +205,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                         {
                             emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
                         }
-                        else if(cbCleanNeighborCellsWhenClickedOnShowedLabel->isChecked())
+                        else if(cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked())
                         {
                             emit SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
                         }
@@ -278,7 +283,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     const QPixmap QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
-            cbCleanNeighborCellsWhenClickedOnShowedLabel->isChecked();
+            cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked();
 
     for(uchar j=0; j<_Y; j++)
     {
@@ -516,9 +521,9 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     cbDarkModeEnabled->setText("Disable Dark Mode");
     cbDarkModeEnabled->setChecked(true);
 
-    cbCleanNeighborCellsWhenClickedOnShowedLabel = new QCheckBox(this);
-    cbCleanNeighborCellsWhenClickedOnShowedLabel->setText("Clean Neighbor Cells When\nClicked On Showed Label");
-    cbCleanNeighborCellsWhenClickedOnShowedLabel->setChecked(false);
+    cbCleanNeighborCellsWhenClickedOnShowedCell = new QCheckBox(this);
+    cbCleanNeighborCellsWhenClickedOnShowedCell->setText("Clean Neighbor Cells When\nClicked On Showed Cell");
+    cbCleanNeighborCellsWhenClickedOnShowedCell->setChecked(false);
 
     labelUsername = new QLabel(this);
     labelUsername->setText("Username: ");
@@ -541,7 +546,7 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     cbDarkModeEnabled->setGeometry(iWidthMainWindow/20, cbFirstCellClean->y() + cbFirstCellClean->height(),
                                    iWidthMainWindow/2 - 2*iWidthMainWindow/20,  (iHeightMainWindow/2 - 2*iHeightMainWindow/20)/10);
 
-    cbCleanNeighborCellsWhenClickedOnShowedLabel->setGeometry(
+    cbCleanNeighborCellsWhenClickedOnShowedCell->setGeometry(
                 iWidthMainWindow/20, cbDarkModeEnabled->y() + cbDarkModeEnabled->height(),
                 iWidthMainWindow/2 - 2*iWidthMainWindow/20,  (iHeightMainWindow/2 - 2*iHeightMainWindow/20)/10);
 
@@ -613,7 +618,7 @@ void LibreMinesGui::vHideInterface()
 
     cbFirstCellClean->hide();
     cbDarkModeEnabled->hide();
-    cbCleanNeighborCellsWhenClickedOnShowedLabel->hide();
+    cbCleanNeighborCellsWhenClickedOnShowedCell->hide();
 
     labelUsername->hide();
     lineEditUsername->setEnabled(false);
@@ -639,7 +644,7 @@ void LibreMinesGui::vShowInterface()
 
     cbFirstCellClean->show();
     cbDarkModeEnabled->show();
-    cbCleanNeighborCellsWhenClickedOnShowedLabel->show();
+    cbCleanNeighborCellsWhenClickedOnShowedCell->show();
 
     labelUsername->show();
     lineEditUsername->setEnabled(true);
@@ -1114,12 +1119,6 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
 void LibreMinesGui::SLOT_DarkMode()
 {
     vConfigureTheme(cbDarkModeEnabled->isChecked());
-
-    if(cbDarkModeEnabled->isChecked())
-        cbDarkModeEnabled->setText("Disable dark mode");
-
-    else
-        cbDarkModeEnabled->setText("Enable dark mode");
 }
 
 
@@ -1159,6 +1158,8 @@ void LibreMinesGui::vConfigureTheme(const bool bDark)
         darkPalette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
 
         qApp->setPalette(darkPalette);
+
+        cbDarkModeEnabled->setText("Disable dark mode");
     }
     else
     {
@@ -1194,6 +1195,8 @@ void LibreMinesGui::vConfigureTheme(const bool bDark)
         lightPalette.setColor (QPalette::Highlight,       QColor (213, 225, 37));
 
         qApp->setPalette(lightPalette);
+
+        cbDarkModeEnabled->setText("Enable dark mode");
     }
 }
 
@@ -1316,4 +1319,137 @@ void LibreMinesGui::vKeyboardControllerMoveUp()
     uchar destY = (controller.ctrlPressed) ? 0 : (controller.currentY == 0) ? gameEngine->lines() -1 : (controller.currentY - 1);
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
+}
+
+void LibreMinesGui::vLastSessionLoadConfigurationFile()
+{
+    QDir destDir = QDir::home();
+
+    destDir.setFilter(QDir::AllDirs);
+
+    if(!destDir.cd(".local"))
+    {
+        Q_ASSERT(destDir.mkdir(".local"));
+        Q_ASSERT(destDir.cd(".local"));
+    }
+    if(!destDir.cd("share"))
+    {
+        Q_ASSERT(destDir.mkdir("share"));
+        Q_ASSERT(destDir.cd("share"));
+    }
+    if(!destDir.cd("libremines"))
+    {
+        Q_ASSERT(destDir.mkdir("libremines"));
+        Q_ASSERT(destDir.cd("libremines"));
+    }
+
+    QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("libreminesLastSession.txt")) );
+
+    if(fileScores->open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(fileScores.get());
+
+        while(!stream.atEnd())
+        {
+            QString s = stream.readLine();
+
+            if(s.at(0) == '#')
+                continue;
+
+           QStringList terms = s.split(" ");
+
+           if(terms.size() < 2)
+               continue;
+
+           if(terms.at(0).compare("FirstCellClean", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               cbFirstCellClean->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
+           }
+           else if(terms.at(0).compare("Theme", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               cbDarkModeEnabled->setChecked(terms.at(1).compare("Dark", Qt::CaseInsensitive) == 0);
+           }
+           else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               cbCleanNeighborCellsWhenClickedOnShowedCell->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
+           }
+           else if(terms.at(0).compare("Username", Qt::CaseInsensitive) == 0)
+           {
+               QString name;
+               for(int i=1; i<terms.size(); ++i)
+               {
+                   name.append(terms.at(i));
+                   name.append(' ');
+               }
+               lineEditUsername->setText(name);
+           }
+           else if(terms.at(0).compare("CustomizedPercentageOfMines", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               sbCustomizednMines->setValue(terms.at(1).toInt());
+           }
+           else if(terms.at(0).compare("CustomizedX", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               sbCustomizedX->setValue(terms.at(1).toInt());
+           }
+           else if(terms.at(0).compare("CustomizedY", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               sbCustomizedY->setValue(terms.at(1).toInt());
+           }
+        }
+    }
+}
+
+void LibreMinesGui::vLastSessionSaveConfigurationFile()
+{
+    QDir destDir = QDir::home();
+
+    destDir.setFilter(QDir::AllDirs);
+
+    if(!destDir.cd(".local"))
+    {
+        Q_ASSERT(destDir.mkdir(".local"));
+        Q_ASSERT(destDir.cd(".local"));
+    }
+    if(!destDir.cd("share"))
+    {
+        Q_ASSERT(destDir.mkdir("share"));
+        Q_ASSERT(destDir.cd("share"));
+    }
+    if(!destDir.cd("libremines"))
+    {
+        Q_ASSERT(destDir.mkdir("libremines"));
+        Q_ASSERT(destDir.cd("libremines"));
+    }
+
+    QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("libreminesLastSession.txt")) );
+
+    fileScores->open(QIODevice::WriteOnly);
+
+    QTextStream stream(fileScores.get());
+
+    stream << "FirstCellClean" << ' ' << (cbFirstCellClean->isChecked() ? "On" : "Off") << '\n'
+           << "Theme" << ' ' << (cbDarkModeEnabled->isChecked() ? "Dark" : "Light") << '\n'
+           << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked() ? "On" : "Off") << '\n'
+           << "Username" << ' ' << lineEditUsername->text() << '\n'
+           << "CustomizedPercentageOfMines" << ' ' << sbCustomizednMines->value() << '\n'
+           << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
+           << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n';
 }

@@ -112,8 +112,6 @@ void LibreMinesScoresDialog::setScores(QList<LibreMinesScore> scores,
                 [this]{ if(!this->lineEditUsername->text().isEmpty()){ this->saveEditableScore = true;  this->close(); } });
         connect(buttonCancel, &QPushButton::released,
                 this, &QDialog::close);
-
-        lineEditUsername->setFocus();
     }
 }
 

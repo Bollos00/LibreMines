@@ -125,6 +125,9 @@ private:
     void vKeyboardControllerMoveDown();
     void vKeyboardControllerMoveUp();
 
+    void vLastSessionLoadConfigurationFile();
+    void vLastSessionSaveConfigurationFile();
+
 private Q_SLOTS:
     /**
      * @brief
@@ -226,7 +229,7 @@ private:
 
     QCheckBox *cbFirstCellClean; /**< TODO: describe */
     QCheckBox *cbDarkModeEnabled;
-    QCheckBox* cbCleanNeighborCellsWhenClickedOnShowedLabel;
+    QCheckBox* cbCleanNeighborCellsWhenClickedOnShowedCell;
 
     QLabel* labelUsername;
     QLineEdit* lineEditUsername;
