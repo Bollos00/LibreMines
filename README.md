@@ -6,8 +6,8 @@
 ### Installing Dependencies
 
 The following dependencies are required for building and running LibreMines:
-* [Qt5 Core](https://doc.qt.io/qt-5/qtcore-index.html)
-* [Qt5 Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
+* [Qt5 Core](https://doc.qt.io/qt-5/qtcore-index.html) >= 5.12
+* [Qt5 Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
 * [CMake](https://cmake.org/)
 
 

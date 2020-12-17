@@ -93,7 +93,7 @@ void LibreMinesScore::sort(QList<LibreMinesScore>& l)
         {
             if(LibreMinesScore::bFirstIsBetter(l[j], l[i]))
             {
-                l.swapItemsAt(i, j);
+                l.move(j, i);
             }
         }
     }
