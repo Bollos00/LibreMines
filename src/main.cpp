@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setApplicationName("libremines");
-    a.setApplicationVersion("1.0.0");
+    a.setApplicationVersion("1.1.0");
 
     InitializeOptions ops = getOptions(a.arguments());
 

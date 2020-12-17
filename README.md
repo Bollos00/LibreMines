@@ -1,5 +1,5 @@
 # [LibreMines](https://github.com/Bollos00/LibreMines)
-![](./Screenshots/Screenshot3.png)
+![](./Screenshots/Screenshot5.png)
 
 ## Installation
 
@@ -8,6 +8,7 @@
 The following dependencies are required for building and running LibreMines:
 * [Qt5 Core](https://doc.qt.io/qt-5/qtcore-index.html)
 * [Qt5 Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
+* [CMake](https://cmake.org/)
 
 
 On Arch Linux and derivatives systems the dependencies can be installed with pacman:
@@ -20,7 +21,7 @@ For ubuntu you can install the dependencies with the following command:
 sudo apt-get install build-essential qt5-default cmake
 ```
 
-For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/).
+For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/) or your preferred package manager.
 
 ### Building
 
@@ -28,13 +29,23 @@ Follow those steps for build LibreMines from source code:
 ```sh
 git clone https://github.com/Bollos00/LibreMines.git
 cd LibreMines
-cmake -S . -B build
-cmake --build build
+mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
+make
 ```
+
+Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation.
 
 The executable `libremines` will be generated in the build directory, now it is possible to run it with:
 ```sh
-./build/libremines
+./libremines
+```
+
+### Installing on the system
+
+At least if you want install LibreMines on your system, use the following command:
+```sh
+sudo make install
 ```
 
 ## How to play
