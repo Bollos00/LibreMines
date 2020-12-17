@@ -49,26 +49,27 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     cellLength( 0 ),
     maximumCellLength (thatMaximumCellLength),
     difficult( NONE ),
-    imgZero ( new QImage(":/Media_rsc/Media/Minesweeper_zero_dark.png") ),
-    imgOne ( new QImage(":/Media_rsc/Media/Minesweeper_one_dark.png") ),
-    imgTwo ( new QImage(":/Media_rsc/Media/Minesweeper_two_dark.png") ),
-    imgThree ( new QImage(":/Media_rsc/Media/Minesweeper_three_dark.png") ),
-    imgFour( new QImage(":/Media_rsc/Media/Minesweeper_four_dark.png") ),
-    imgFive ( new QImage(":/Media_rsc/Media/Minesweeper_five_dark.png") ),
-    imgSix( new QImage(":/Media_rsc/Media/Minesweeper_six_dark.png") ),
-    imgSeven ( new QImage(":/Media_rsc/Media/Minesweeper_seven_dark.png") ),
-    imgEight ( new QImage(":/Media_rsc/Media/Minesweeper_eight_dark.png") ),
-    imgFlag ( new QImage(":/Media_rsc/Media/Minesweeper_flag_dark.png") ),
-    imgNoFlag ( new QImage(":/Media_rsc/Media/Minesweeper_no_flag_dark.png") ),
-    imgMine ( new QImage(":/Media_rsc/Media/Minesweeper_mine_dark.png") ),
-    imgBoom ( new QImage(":/Media_rsc/Media/Minesweeper_boom_dark.png") ),
-    imgWrongFlag ( new QImage(":/Media_rsc/Media/Minesweeper_wrong_flag_dark.png") )
+    imgZero ( new QImage(":/images_rsc/Media/Minesweeper_zero_dark.png") ),
+    imgOne ( new QImage(":/images_rsc/Media/Minesweeper_one_dark.png") ),
+    imgTwo ( new QImage(":/images_rsc/Media/Minesweeper_two_dark.png") ),
+    imgThree ( new QImage(":/images_rsc/Media/Minesweeper_three_dark.png") ),
+    imgFour( new QImage(":/images_rsc/Media/Minesweeper_four_dark.png") ),
+    imgFive ( new QImage(":/images_rsc/Media/Minesweeper_five_dark.png") ),
+    imgSix( new QImage(":/images_rsc/Media/Minesweeper_six_dark.png") ),
+    imgSeven ( new QImage(":/images_rsc/Media/Minesweeper_seven_dark.png") ),
+    imgEight ( new QImage(":/images_rsc/Media/Minesweeper_eight_dark.png") ),
+    imgFlag ( new QImage(":/images_rsc/Media/Minesweeper_flag_dark.png") ),
+    imgNoFlag ( new QImage(":/images_rsc/Media/Minesweeper_no_flag_dark.png") ),
+    imgMine ( new QImage(":/images_rsc/Media/Minesweeper_mine_dark.png") ),
+    imgBoom ( new QImage(":/images_rsc/Media/Minesweeper_boom_dark.png") ),
+    imgWrongFlag ( new QImage(":/images_rsc/Media/Minesweeper_wrong_flag_dark.png") )
 {
     vConfigureInterface(thatWidth, thatHeight);
 
     qApp->installEventFilter(this);
 
     this->setAttribute(Qt::WA_DeleteOnClose);
+    this->setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
 
     controller.ctrlPressed = false;
     controller.active = false;
@@ -922,8 +923,25 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                     break;
             }
 
+            QString strGameDiffuclty;
+            if(score.gameDifficulty == EASY)
+                strGameDiffuclty = "Easy";
+            else if(score.gameDifficulty == MEDIUM)
+                strGameDiffuclty = "Medium";
+            else if(score.gameDifficulty == HARD)
+                strGameDiffuclty = "Hard";
+            else if(score.gameDifficulty == CUSTOMIZED)
+            {
+                strGameDiffuclty = "Customized " + QString::number(score.width) +
+                                   " x " + QString::number(score.length) + " : " +
+                                   QString::number(score.mines);
+            }
+
             // open the dialog
             LibreMinesScoresDialog dialog(this, scores.size() + 1);
+            dialog.setWindowTitle(strGameDiffuclty);
+            dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
+
             dialog.setScores(scores, &score, index);
             int result = dialog.exec();
 
@@ -1126,20 +1144,20 @@ void LibreMinesGui::vConfigureTheme(const bool bDark)
 {
     if(bDark)
     {
-        imgZero->load(":/Media_rsc/Images/Minesweeper_zero_dark.png");
-        imgOne->load(":/Media_rsc/Images/Minesweeper_one_dark.png");
-        imgTwo->load(":/Media_rsc/Images/Minesweeper_two_dark.png");
-        imgThree->load(":/Media_rsc/Images/Minesweeper_three_dark.png");
-        imgFour->load(":/Media_rsc/Images/Minesweeper_four_dark.png");
-        imgFive->load(":/Media_rsc/Images/Minesweeper_five_dark.png");
-        imgSix->load(":/Media_rsc/Images/Minesweeper_six_dark.png");
-        imgSeven->load(":/Media_rsc/Images/Minesweeper_seven_dark.png");
-        imgEight->load(":/Media_rsc/Images/Minesweeper_eight_dark.png");
-        imgFlag->load(":/Media_rsc/Images/Minesweeper_flag_dark.png");
-        imgNoFlag->load(":/Media_rsc/Images/Minesweeper_no_flag_dark.png");
-        imgMine->load(":/Media_rsc/Images/Minesweeper_mine_dark.png");
-        imgBoom->load(":/Media_rsc/Images/Minesweeper_boom_dark.png");
-        imgWrongFlag->load(":/Media_rsc/Images/Minesweeper_wrong_flag_dark.png");
+        imgZero->load(":/images_rsc/Images/Minesweeper_zero_dark.png");
+        imgOne->load(":/images_rsc/Images/Minesweeper_one_dark.png");
+        imgTwo->load(":/images_rsc/Images/Minesweeper_two_dark.png");
+        imgThree->load(":/images_rsc/Images/Minesweeper_three_dark.png");
+        imgFour->load(":/images_rsc/Images/Minesweeper_four_dark.png");
+        imgFive->load(":/images_rsc/Images/Minesweeper_five_dark.png");
+        imgSix->load(":/images_rsc/Images/Minesweeper_six_dark.png");
+        imgSeven->load(":/images_rsc/Images/Minesweeper_seven_dark.png");
+        imgEight->load(":/images_rsc/Images/Minesweeper_eight_dark.png");
+        imgFlag->load(":/images_rsc/Images/Minesweeper_flag_dark.png");
+        imgNoFlag->load(":/images_rsc/Images/Minesweeper_no_flag_dark.png");
+        imgMine->load(":/images_rsc/Images/Minesweeper_mine_dark.png");
+        imgBoom->load(":/images_rsc/Images/Minesweeper_boom_dark.png");
+        imgWrongFlag->load(":/images_rsc/Images/Minesweeper_wrong_flag_dark.png");
 
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette darkPalette;
@@ -1163,20 +1181,20 @@ void LibreMinesGui::vConfigureTheme(const bool bDark)
     }
     else
     {
-        imgZero->load(":/Media_rsc/Images/Minesweeper_zero_light.png");
-        imgOne->load(":/Media_rsc/Images/Minesweeper_one_light.png");
-        imgTwo->load(":/Media_rsc/Images/Minesweeper_two_light.png");
-        imgThree->load(":/Media_rsc/Images/Minesweeper_three_light.png");
-        imgFour->load(":/Media_rsc/Images/Minesweeper_four_light.png");
-        imgFive->load(":/Media_rsc/Images/Minesweeper_five_light.png");
-        imgSix->load(":/Media_rsc/Images/Minesweeper_six_light.png");
-        imgSeven->load(":/Media_rsc/Images/Minesweeper_seven_light.png");
-        imgEight->load(":/Media_rsc/Images/Minesweeper_eight_light.png");
-        imgFlag->load(":/Media_rsc/Images/Minesweeper_flag_light.png");
-        imgNoFlag->load(":/Media_rsc/Images/Minesweeper_no_flag_light.png");
-        imgMine->load(":/Media_rsc/Images/Minesweeper_mine_light.png");
-        imgBoom->load(":/Media_rsc/Images/Minesweeper_boom_light.png");
-        imgWrongFlag->load(":/Media_rsc/Images/Minesweeper_wrong_flag_light.png");
+        imgZero->load(":/images_rsc/Images/Minesweeper_zero_light.png");
+        imgOne->load(":/images_rsc/Images/Minesweeper_one_light.png");
+        imgTwo->load(":/images_rsc/Images/Minesweeper_two_light.png");
+        imgThree->load(":/images_rsc/Images/Minesweeper_three_light.png");
+        imgFour->load(":/images_rsc/Images/Minesweeper_four_light.png");
+        imgFive->load(":/images_rsc/Images/Minesweeper_five_light.png");
+        imgSix->load(":/images_rsc/Images/Minesweeper_six_light.png");
+        imgSeven->load(":/images_rsc/Images/Minesweeper_seven_light.png");
+        imgEight->load(":/images_rsc/Images/Minesweeper_eight_light.png");
+        imgFlag->load(":/images_rsc/Images/Minesweeper_flag_light.png");
+        imgNoFlag->load(":/images_rsc/Images/Minesweeper_no_flag_light.png");
+        imgMine->load(":/images_rsc/Images/Minesweeper_mine_light.png");
+        imgBoom->load(":/images_rsc/Images/Minesweeper_boom_light.png");
+        imgWrongFlag->load(":/images_rsc/Images/Minesweeper_wrong_flag_light.png");
 
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette lightPalette;

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons_rsc">
+        <file>icons/libremines.svg</file>
+    </qresource>
+</RCC>

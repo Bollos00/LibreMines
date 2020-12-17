@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/Media_rsc">
+    <qresource prefix="/images_rsc">
         <file>Images/Minesweeper_zero_dark.png</file>
         <file>Images/Minesweeper_wrong_flag_dark.png</file>
         <file>Images/Minesweeper_two_dark.png</file>

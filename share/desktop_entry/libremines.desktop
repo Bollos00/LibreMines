@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=LibreMines
+Comment=A Qt5 based Minesweeper game
+Icon=libremines
+Terminal=False
+Type=Application
+Categories=Game;LogicGame
+Keywords=Minesweeper;mines
+Exec=libremines

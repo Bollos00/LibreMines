@@ -56,7 +56,8 @@ add_executable(${PROJECT_NAME}
     src/qlabel_adapted.h
     src/qpushbutton_adapted.cpp
     src/qpushbutton_adapted.h
-    share/minesbollos.qrc
+    share/images.qrc
+    share/icons.qrc
 )
 
 # The following define makes your compiler emit warnings if you use
@@ -83,3 +84,6 @@ install(
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
+install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
