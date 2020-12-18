@@ -27,7 +27,7 @@
  * @brief
  *
  */
-enum CELL_STATE: char{
+enum CELL_STATE: qint8{
     MINE = -1,
     ZERO = 0,
     ONE = 1,
