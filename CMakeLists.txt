@@ -38,12 +38,15 @@ endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-#set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC ON)
 
 add_executable(${PROJECT_NAME}
     src/common.cpp
     src/common.h
     src/main.cpp
+    src/libreminespreferencesdialog.cpp
+    src/libreminespreferencesdialog.h
+    src/libreminespreferencesdialog.ui
     src/libreminesgameengine.cpp
     src/libreminesgameengine.h
     src/libreminesgui.cpp

@@ -62,8 +62,11 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     imgNoFlag ( new QImage(":/images_rsc/Media/Minesweeper_no_flag_dark.png") ),
     imgMine ( new QImage(":/images_rsc/Media/Minesweeper_mine_dark.png") ),
     imgBoom ( new QImage(":/images_rsc/Media/Minesweeper_boom_dark.png") ),
-    imgWrongFlag ( new QImage(":/images_rsc/Media/Minesweeper_wrong_flag_dark.png") )
+    imgWrongFlag ( new QImage(":/images_rsc/Media/Minesweeper_wrong_flag_dark.png") ),
+    preferences( new LibreMinesPreferencesDialog(this) )
 {
+    preferences->show();
+
     vConfigureInterface(thatWidth, thatHeight);
 
     qApp->installEventFilter(this);
@@ -1385,6 +1388,8 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
                    continue;
 
                cbFirstCellClean->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
+
+               preferences->setOptionFirstCellClean(terms.at(1));
            }
            else if(terms.at(0).compare("Theme", Qt::CaseInsensitive) == 0)
            {
@@ -1392,6 +1397,8 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
                    continue;
 
                cbDarkModeEnabled->setChecked(terms.at(1).compare("Dark", Qt::CaseInsensitive) == 0);
+
+               preferences->setOptionTheme(terms.at(1));
            }
            else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
            {
@@ -1399,6 +1406,8 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
                    continue;
 
                cbCleanNeighborCellsWhenClickedOnShowedCell->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
+
+               preferences->setOptionCleanNeighborCellsWhenClickedOnShowedCell(terms.at(1));
            }
            else if(terms.at(0).compare("Username", Qt::CaseInsensitive) == 0)
            {
@@ -1409,6 +1418,8 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
                    name.append(' ');
                }
                lineEditUsername->setText(name);
+
+               preferences->setOptionUsername(name);
            }
            else if(terms.at(0).compare("CustomizedPercentageOfMines", Qt::CaseInsensitive) == 0)
            {
@@ -1463,10 +1474,10 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
 
     QTextStream stream(fileScores.get());
 
-    stream << "FirstCellClean" << ' ' << (cbFirstCellClean->isChecked() ? "On" : "Off") << '\n'
-           << "Theme" << ' ' << (cbDarkModeEnabled->isChecked() ? "Dark" : "Light") << '\n'
-           << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked() ? "On" : "Off") << '\n'
-           << "Username" << ' ' << lineEditUsername->text() << '\n'
+    stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
+           << "Theme" << ' ' << preferences->optionTheme() << '\n'
+           << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
+           << "Username" << ' ' << preferences->optionUsername() << '\n'
            << "CustomizedPercentageOfMines" << ' ' << sbCustomizednMines->value() << '\n'
            << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
            << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n';

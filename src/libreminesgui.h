@@ -21,7 +21,6 @@
 #ifndef LIBREMINESGUI_H
 #define LIBREMINESGUI_H
 
-#include <QDesktopWidget>
 #include <QSpinBox>
 #include <QTimer>
 #include <QLCDNumber>
@@ -29,6 +28,7 @@
 #include <QMainWindow>
 
 #include "common.h"
+#include "libreminespreferencesdialog.h"
 #include "libreminesgameengine.h"
 #include "qlabel_adapted.h"
 #include "qpushbutton_adapted.h"
@@ -258,5 +258,7 @@ private:
     QImage *imgWrongFlag; /**< TODO: describe */
 
     KeyboardController controller;
+
+    LibreMinesPreferencesDialog* preferences;
 };
 #endif // LIBREMINESGUI_H
