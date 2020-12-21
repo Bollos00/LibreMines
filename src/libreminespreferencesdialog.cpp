@@ -9,6 +9,16 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     ui->setupUi(this);
 
     ui->comboBoxTheme->addItems({"Dark", "Light"});
+
+//    ui->lineEditUsername->setValidator(new QRegExpValidator(QRegExp("^(?i)[a-z][a-z0-9]*$")));
+
+    connect(ui->lineEditUsername, &QLineEdit::textChanged,
+            [this](QString text)
+    { ui->lineEditUsername->setText(text.remove(" ", Qt::CaseInsensitive)); });
+
+    connect(ui->comboBoxTheme, &QComboBox::currentTextChanged,
+            [this](const QString& text)
+    { emit SIGNAL_optionChanged("Theme", text); });
 }
 
 LibreMinesPreferencesDialog::~LibreMinesPreferencesDialog()
@@ -54,5 +64,12 @@ void LibreMinesPreferencesDialog::setOptionTheme(const QString &theme)
 void LibreMinesPreferencesDialog::setOptionUsername(const QString &username)
 {
     ui->lineEditUsername->setText(username);
+}
+
+void LibreMinesPreferencesDialog::closeEvent(QCloseEvent *e)
+{
+    Q_UNUSED(e);
+
+    this->hide();
 }
 

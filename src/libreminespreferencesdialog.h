@@ -25,8 +25,14 @@ public:
     void setOptionTheme(const QString& theme);
     void setOptionUsername(const QString& username);
 
+protected:
+    void closeEvent(QCloseEvent* e);
+
 private:
     Ui::LibreMinesPreferencesDialog *ui;
+
+Q_SIGNALS:
+    void SIGNAL_optionChanged(const QString& name, const QString& value);
 };
 
 #endif // LIBREMINESPREFERENCESDIALOG_H

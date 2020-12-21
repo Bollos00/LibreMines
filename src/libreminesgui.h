@@ -116,7 +116,7 @@ private:
      */
     void vShowInterfaceInGame();
 
-    void vConfigureTheme(const bool bDark);
+    void vConfigureTheme(const QString &theme);
 
     void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
     void vKeyboardControllUnsetCurrentCell();
@@ -161,11 +161,6 @@ private Q_SLOTS:
      */
     void SLOT_Restart();
 
-    ///
-    /// \brief SLOT_DarkMode
-    ///
-    void SLOT_DarkMode();
-
     /**
      * @brief
      *
@@ -190,6 +185,8 @@ private Q_SLOTS:
     void SLOT_remakeGame();
     void SLOT_gameWon();
     void SLOT_gameLost(const uchar _X, const uchar _Y);
+
+    void SLOT_optionChanged(const QString& name, const QString& value);
 
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
@@ -227,13 +224,6 @@ private:
     QLabel *labelCustomizedY; /**< TODO: describe */
     QLabel *labelCustomized_nMines; /**< TODO: describe */
 
-    QCheckBox *cbFirstCellClean; /**< TODO: describe */
-    QCheckBox *cbDarkModeEnabled;
-    QCheckBox* cbCleanNeighborCellsWhenClickedOnShowedCell;
-
-    QLabel* labelUsername;
-    QLineEdit* lineEditUsername;
-
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
     QPushButton *buttonRestartInGame; /**< TODO: describe */
@@ -241,6 +231,12 @@ private:
 
     QLabel *labelYouWonYouLost; /**< TODO: describe */
     QLabel *labelStatisLastMatch; /**< TODO: describe */
+
+    QMenu* menuOptions;
+    QAction* actionPreferences;
+
+    QMenu* menuHelp;
+    QAction* actionAbout;
 
     QImage *imgZero; /**< TODO: describe */
     QImage *imgOne; /**< TODO: describe */
