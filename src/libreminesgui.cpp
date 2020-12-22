@@ -27,6 +27,9 @@
 #include <QScreen>
 #include <QDir>
 #include <QLineEdit>
+#include <QAction>
+#include <QMenuBar>
+#include <QStatusBar>
 
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
@@ -62,8 +65,15 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     imgNoFlag ( new QImage(":/images_rsc/Media/Minesweeper_no_flag_dark.png") ),
     imgMine ( new QImage(":/images_rsc/Media/Minesweeper_mine_dark.png") ),
     imgBoom ( new QImage(":/images_rsc/Media/Minesweeper_boom_dark.png") ),
-    imgWrongFlag ( new QImage(":/images_rsc/Media/Minesweeper_wrong_flag_dark.png") )
+    imgWrongFlag ( new QImage(":/images_rsc/Media/Minesweeper_wrong_flag_dark.png") ),
+    preferences( new LibreMinesPreferencesDialog(this) )
 {
+    connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
+            this, &LibreMinesGui::SLOT_optionChanged);
+
+    connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_visibilityChanged,
+            [this](const bool visible){ this->centralWidget()->setEnabled(!visible); });
+
     vConfigureInterface(thatWidth, thatHeight);
 
     qApp->installEventFilter(this);
@@ -77,7 +87,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     controller.currentY = 0;
 
     vLastSessionLoadConfigurationFile();
-    vConfigureTheme(cbDarkModeEnabled->isChecked());
+    vConfigureTheme(preferences->optionTheme());
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -206,7 +216,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                         {
                             emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
                         }
-                        else if(cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked())
+                        else if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
                         {
                             emit SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
                         }
@@ -269,7 +279,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     gameEngine.reset(new LibreMinesGameEngine());
 
-    gameEngine->setFirstCellClean(cbFirstCellClean->isChecked());
+    gameEngine->setFirstCellClean(preferences->optionFirstCellClean());
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
     if(iLimitWidthField/_X < iLimitHeightField/_Y)
@@ -284,7 +294,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     const QPixmap QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
-            cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked();
+            preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
 
     for(uchar j=0; j<_Y; j++)
     {
@@ -436,6 +446,8 @@ void LibreMinesGui::vResetPrincipalMatrix()
 
 void LibreMinesGui::vConfigureInterface(int width, int height)
 {
+    setCentralWidget(new QWidget(this));
+
     if(width == -1 || height == -1)
     {
         QRect rec = QGuiApplication::primaryScreen()->geometry();
@@ -448,13 +460,39 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
         iHeightMainWindow = height;
     }
 
+
+    actionPreferences = new QAction(this);
+    actionAbout = new QAction(this);
+
+    QMenuBar* menuBarGlobal = new QMenuBar(this);
+
+    menuBarGlobal->setGeometry(0, 0, iWidthMainWindow, 100);
+
+    menuOptions = new QMenu(menuBarGlobal);
+    menuHelp = new QMenu(menuBarGlobal);
+
+    this->setMenuBar(menuBarGlobal);
+    this->setStatusBar(new QStatusBar(this));
+
+    menuBarGlobal->addAction(menuOptions->menuAction());
+    menuBarGlobal->addAction(menuHelp->menuAction());
+
+    menuOptions->addAction(actionPreferences);
+    menuHelp->addAction(actionAbout);
+
+    menuOptions->setTitle("Options");
+    menuHelp->setTitle("Help");
+
+    actionPreferences->setText("Preferences...");
+    actionAbout->setText("About...");
+
     this->setFont(QFont("Liberation Sans"));
-    labelTimerInGame = new QLabel (this);
-    lcd_numberMinesLeft = new QLCDNumber (this);
-    buttonRestartInGame = new QPushButton (this);
-    buttonQuitInGame = new QPushButton (this);
-    labelYouWonYouLost = new QLabel(this);
-    labelStatisLastMatch = new QLabel(this);
+    labelTimerInGame = new QLabel(centralWidget());
+    lcd_numberMinesLeft = new QLCDNumber(centralWidget());
+    buttonRestartInGame = new QPushButton(centralWidget());
+    buttonQuitInGame = new QPushButton(centralWidget());
+    labelYouWonYouLost = new QLabel(centralWidget());
+    labelStatisLastMatch = new QLabel(centralWidget());
 
     labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
@@ -471,66 +509,49 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     iLimitHeightField = 9*iHeightMainWindow/10;
 
 
-    buttonEasy = new QPushButton(this);
+    buttonEasy = new QPushButton(centralWidget());
     buttonEasy->setText("Easy\n\n8x8\n\n10 Mines");
     buttonEasy->setFont(QFont("Liberation Sans",20));
 
-    buttonMedium= new QPushButton(this);
+    buttonMedium= new QPushButton(centralWidget());
     buttonMedium->setText("Medium\n\n16x16\n\n40 Mines");
     buttonMedium->setFont(QFont("Liberation Sans",20));
 
 
-    buttonHard = new QPushButton(this);
+    buttonHard = new QPushButton(centralWidget());
     buttonHard->setText("Hard\n\n30x16\n\n99 Mines");
     buttonHard->setFont(QFont("Liberation Sans",20));
 
-    buttonCustomizedNewGame = new QPushButton(this);
+    buttonCustomizedNewGame = new QPushButton(centralWidget());
     buttonCustomizedNewGame->setText("Customized New Game");
     buttonCustomizedNewGame->setFont(QFont("Liberation Sans",20));
 
-    sbCustomizedX = new QSpinBox(this);
+    sbCustomizedX = new QSpinBox(centralWidget());
     sbCustomizedX->setMinimum(10);
     sbCustomizedX->setMaximum(100);
     sbCustomizedX->setValue(20);
 
-    sbCustomizedY = new QSpinBox(this);
+    sbCustomizedY = new QSpinBox(centralWidget());
     sbCustomizedY->setMinimum(10);
     sbCustomizedY->setMaximum(100);
     sbCustomizedY->setValue(20);
 
 
-    sbCustomizednMines = new QSpinBox(this);
+    sbCustomizednMines = new QSpinBox(centralWidget());
     sbCustomizednMines->setMinimum(0);
     sbCustomizednMines->setMaximum(100);
     sbCustomizednMines->setValue(20);
 
 
-    labelCustomizedX = new QLabel(this);
+    labelCustomizedX = new QLabel(centralWidget());
     labelCustomizedX->setText("Width: ");
 
-    labelCustomizedY = new QLabel(this);
+    labelCustomizedY = new QLabel(centralWidget());
     labelCustomizedY->setText("Height: ");
 
-    labelCustomized_nMines = new QLabel(this);
+    labelCustomized_nMines = new QLabel(centralWidget());
     labelCustomized_nMines->setText("Percent of Mines: ");
 
-    cbFirstCellClean = new QCheckBox(this);
-    cbFirstCellClean->setText("First Cell Clean");
-    cbFirstCellClean->setChecked(false);
-
-    cbDarkModeEnabled = new QCheckBox(this);
-    cbDarkModeEnabled->setText("Disable Dark Mode");
-    cbDarkModeEnabled->setChecked(true);
-
-    cbCleanNeighborCellsWhenClickedOnShowedCell = new QCheckBox(this);
-    cbCleanNeighborCellsWhenClickedOnShowedCell->setText("Clean Neighbor Cells When\nClicked On Showed Cell");
-    cbCleanNeighborCellsWhenClickedOnShowedCell->setChecked(false);
-
-    labelUsername = new QLabel(this);
-    labelUsername->setText("Username: ");
-
-    lineEditUsername = new QLineEdit(this);
-    lineEditUsername->setText(qgetenv("USER"));
 
     buttonEasy->setGeometry(iWidthMainWindow/20, iHeightMainWindow/20,
                             iWidthMainWindow/2 - 2*iWidthMainWindow/20, 4*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
@@ -540,16 +561,6 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
 
     buttonHard->setGeometry(iWidthMainWindow/20, buttonEasy->y() + buttonEasy->height() + iHeightMainWindow/20,
                             iWidthMainWindow/2 - 2*iWidthMainWindow/20,  4*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
-
-    cbFirstCellClean->setGeometry(iWidthMainWindow/20, buttonHard->y() + buttonHard->height() + iHeightMainWindow/20,
-                                  iWidthMainWindow/2 - 2*iWidthMainWindow/20,  (iHeightMainWindow/2 - 2*iHeightMainWindow/20)/10 );
-
-    cbDarkModeEnabled->setGeometry(iWidthMainWindow/20, cbFirstCellClean->y() + cbFirstCellClean->height(),
-                                   iWidthMainWindow/2 - 2*iWidthMainWindow/20,  (iHeightMainWindow/2 - 2*iHeightMainWindow/20)/10);
-
-    cbCleanNeighborCellsWhenClickedOnShowedCell->setGeometry(
-                iWidthMainWindow/20, cbDarkModeEnabled->y() + cbDarkModeEnabled->height(),
-                iWidthMainWindow/2 - 2*iWidthMainWindow/20,  (iHeightMainWindow/2 - 2*iHeightMainWindow/20)/10);
 
     buttonCustomizedNewGame->setGeometry(buttonEasy->x() + buttonEasy->width() + iWidthMainWindow/20, buttonEasy->y() + buttonEasy->height() + iHeightMainWindow/20,
                                          iWidthMainWindow/2 - 2*iWidthMainWindow/20, 2*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
@@ -572,13 +583,6 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     sbCustomizedY->setGeometry(labelCustomizedY->x()+labelCustomizedY->width(), labelCustomizedY->y(),
                                labelCustomizedY->width(), labelCustomizedY->height());
 
-    labelUsername->setGeometry(labelCustomizedY->x(), labelCustomizedY->y() + 2*iWidthMainWindow/20,
-                               buttonCustomizedNewGame->width()/2, (iHeightMainWindow/2 - 2*iHeightMainWindow/20)/10);
-
-    labelUsername->adjustSize();
-    lineEditUsername->setGeometry(labelUsername->x() + labelUsername->width(), labelUsername->y(),
-                                  labelUsername->width()*2, labelUsername->height()*1.2);
-
     connect(buttonEasy, &QPushButton::released,
             this, &LibreMinesGui::SLOT_Easy);
 
@@ -597,8 +601,11 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     connect(buttonQuitInGame, &QPushButton::released,
             this, &LibreMinesGui::SLOT_Quit);
 
-    connect(cbDarkModeEnabled, &QPushButton::released,
-            this, &LibreMinesGui::SLOT_DarkMode);
+    connect(actionPreferences, &QAction::triggered,
+            preferences, &QDialog::show);
+
+    connect(actionAbout, &QAction::triggered,
+            [this](){/* Show About Dialog*/});
 }
 
 void LibreMinesGui::vHideInterface()
@@ -617,14 +624,8 @@ void LibreMinesGui::vHideInterface()
     labelCustomizedY->hide();
     labelCustomized_nMines->hide();
 
-    cbFirstCellClean->hide();
-    cbDarkModeEnabled->hide();
-    cbCleanNeighborCellsWhenClickedOnShowedCell->hide();
-
-    labelUsername->hide();
-    lineEditUsername->setEnabled(false);
-    lineEditUsername->hide();
-
+    // Hide de menu bar too
+    menuBar()->hide();
 }
 
 void LibreMinesGui::vShowInterface()
@@ -643,13 +644,7 @@ void LibreMinesGui::vShowInterface()
     labelCustomizedY->show();
     labelCustomized_nMines->show();
 
-    cbFirstCellClean->show();
-    cbDarkModeEnabled->show();
-    cbCleanNeighborCellsWhenClickedOnShowedCell->show();
-
-    labelUsername->show();
-    lineEditUsername->setEnabled(true);
-    lineEditUsername->show();
+    menuBar()->show();
 }
 
 void LibreMinesGui::SLOT_Easy()
@@ -719,7 +714,6 @@ void LibreMinesGui::vHideInterfaceInGame()
     buttonQuitInGame->hide();
     labelYouWonYouLost->hide();
     labelStatisLastMatch->hide();
-
 }
 
 void LibreMinesGui::vShowInterfaceInGame()
@@ -730,7 +724,6 @@ void LibreMinesGui::vShowInterfaceInGame()
     buttonQuitInGame->show();
     labelYouWonYouLost->show();
     labelStatisLastMatch->show();
-
 }
 
 void LibreMinesGui::SLOT_Restart()
@@ -843,7 +836,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                       double dCellsPerSecond)
 {
     score.gameDifficulty = difficult;
-    score.username = lineEditUsername->text();
+    score.username = preferences->optionUsername();
     if(score.username.isEmpty())
         score.username = qgetenv("USER");
 
@@ -1134,15 +1127,17 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
     }
 }
 
-void LibreMinesGui::SLOT_DarkMode()
+void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value)
 {
-    vConfigureTheme(cbDarkModeEnabled->isChecked());
+    if(name.compare("Theme", Qt::CaseInsensitive) == 0)
+    {
+        vConfigureTheme(value);
+    }
 }
 
-
-void LibreMinesGui::vConfigureTheme(const bool bDark)
+void LibreMinesGui::vConfigureTheme(const QString& theme)
 {
-    if(bDark)
+    if(theme.compare("Dark", Qt::CaseInsensitive) == 0)
     {
         imgZero->load(":/images_rsc/Images/Minesweeper_zero_dark.png");
         imgOne->load(":/images_rsc/Images/Minesweeper_one_dark.png");
@@ -1176,10 +1171,8 @@ void LibreMinesGui::vConfigureTheme(const bool bDark)
         darkPalette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
 
         qApp->setPalette(darkPalette);
-
-        cbDarkModeEnabled->setText("Disable dark mode");
     }
-    else
+    else if(theme.compare("Light", Qt::CaseInsensitive) == 0)
     {
         imgZero->load(":/images_rsc/Images/Minesweeper_zero_light.png");
         imgOne->load(":/images_rsc/Images/Minesweeper_one_light.png");
@@ -1213,8 +1206,6 @@ void LibreMinesGui::vConfigureTheme(const bool bDark)
         lightPalette.setColor (QPalette::Highlight,       QColor (213, 225, 37));
 
         qApp->setPalette(lightPalette);
-
-        cbDarkModeEnabled->setText("Enable dark mode");
     }
 }
 
@@ -1384,31 +1375,28 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
                if(terms.size() != 2)
                    continue;
 
-               cbFirstCellClean->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
+               preferences->setOptionFirstCellClean(terms.at(1));
            }
            else if(terms.at(0).compare("Theme", Qt::CaseInsensitive) == 0)
            {
                if(terms.size() != 2)
                    continue;
 
-               cbDarkModeEnabled->setChecked(terms.at(1).compare("Dark", Qt::CaseInsensitive) == 0);
+               preferences->setOptionTheme(terms.at(1));
            }
            else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
            {
                if(terms.size() != 2)
                    continue;
 
-               cbCleanNeighborCellsWhenClickedOnShowedCell->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
+               preferences->setOptionCleanNeighborCellsWhenClickedOnShowedCell(terms.at(1));
            }
            else if(terms.at(0).compare("Username", Qt::CaseInsensitive) == 0)
            {
-               QString name;
-               for(int i=1; i<terms.size(); ++i)
-               {
-                   name.append(terms.at(i));
-                   name.append(' ');
-               }
-               lineEditUsername->setText(name);
+               if(terms.size() != 2)
+                   continue;
+
+               preferences->setOptionUsername(terms.at(1));
            }
            else if(terms.at(0).compare("CustomizedPercentageOfMines", Qt::CaseInsensitive) == 0)
            {
@@ -1463,10 +1451,10 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
 
     QTextStream stream(fileScores.get());
 
-    stream << "FirstCellClean" << ' ' << (cbFirstCellClean->isChecked() ? "On" : "Off") << '\n'
-           << "Theme" << ' ' << (cbDarkModeEnabled->isChecked() ? "Dark" : "Light") << '\n'
-           << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked() ? "On" : "Off") << '\n'
-           << "Username" << ' ' << lineEditUsername->text() << '\n'
+    stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
+           << "Theme" << ' ' << preferences->optionTheme() << '\n'
+           << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
+           << "Username" << ' ' << preferences->optionUsername() << '\n'
            << "CustomizedPercentageOfMines" << ' ' << sbCustomizednMines->value() << '\n'
            << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
            << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n';

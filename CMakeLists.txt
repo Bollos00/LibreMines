@@ -17,7 +17,7 @@
 #############################################################################
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
-cmake_minimum_required(VERSION 3.1...${CMAKE_VERSION})
+cmake_minimum_required(VERSION 3.1.0)
 project(libremines)
 
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
@@ -38,12 +38,15 @@ endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-#set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC ON)
 
 add_executable(${PROJECT_NAME}
     src/common.cpp
     src/common.h
     src/main.cpp
+    src/libreminespreferencesdialog.cpp
+    src/libreminespreferencesdialog.h
+    src/libreminespreferencesdialog.ui
     src/libreminesgameengine.cpp
     src/libreminesgameengine.h
     src/libreminesgui.cpp
