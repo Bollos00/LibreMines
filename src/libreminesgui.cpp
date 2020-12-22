@@ -71,9 +71,11 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
 
+    // Unable central widget when the preferences dialog is active
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_visibilityChanged,
             [this](const bool visible){ this->centralWidget()->setEnabled(!visible); });
 
+    // Create interface with the passed dimensions
     vConfigureInterface(thatWidth, thatHeight);
 
     qApp->installEventFilter(this);
@@ -81,11 +83,13 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     this->setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
 
+    // Initializr keyboard controller attributes
     controller.ctrlPressed = false;
     controller.active = false;
     controller.currentX = 0;
     controller.currentY = 0;
 
+    // Load configuration file and set the theme
     vLastSessionLoadConfigurationFile();
     vConfigureTheme(preferences->optionTheme());
 }
@@ -268,20 +272,25 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
                              ushort i_nMines_)
 {
+    // Reset the controller attributes
     controller.ctrlPressed = false;
     controller.active = false;
     controller.currentX = 0;
     controller.currentY = 0;
+
+    // Create a new matrix
     principalMatrix = std::vector<std::vector<CellGui>> (_X, std::vector<CellGui>(_Y));
 
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
 
+    // Create the game engine instance
     gameEngine.reset(new LibreMinesGameEngine());
 
     gameEngine->setFirstCellClean(preferences->optionFirstCellClean());
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
+    // Set the length of each cell
     if(iLimitWidthField/_X < iLimitHeightField/_Y)
         cellLength = iLimitWidthField/_X;
     else
@@ -293,9 +302,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     const QPixmap QPM_Zero = QPixmap::fromImage(*imgZero).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
     const QPixmap QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
 
-    const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
-            preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
+    const bool bCleanNeighborCellsWhenClickedOnShowedLabel = preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
 
+    // Create each cell
     for(uchar j=0; j<_Y; j++)
     {
         for (uchar i=0; i<_X; i++)
@@ -336,8 +345,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
     buttonQuitInGame->setEnabled(true);
     buttonRestartInGame->setEnabled(true);
 
+    // Set the correct state of each cell
     vAttributeAllCells();
 
+    // Communication (GameEngine -> GUI)
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_showCell,
             this, &LibreMinesGui::SLOT_showCell);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_endGameScore,
@@ -357,7 +368,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_remakeGame,
             this, &LibreMinesGui::SLOT_remakeGame);
 
-
+    // Communication (GUI -> GameEngine)
     connect(this, &LibreMinesGui::SIGNAL_cleanCell,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_cleanCell);
     if(bCleanNeighborCellsWhenClickedOnShowedLabel)
@@ -446,6 +457,8 @@ void LibreMinesGui::vResetPrincipalMatrix()
 
 void LibreMinesGui::vConfigureInterface(int width, int height)
 {
+    // Create the interface
+
     setCentralWidget(new QWidget(this));
 
     if(width == -1 || height == -1)
@@ -604,6 +617,7 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
 
+    // todo
     connect(actionAbout, &QAction::triggered,
             [this](){/* Show About Dialog*/});
 }
@@ -936,7 +950,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
 
             dialog.setScores(scores, &score, index);
-            int result = dialog.exec();
+            int result = dialog.exec(); Q_UNUSED(result);
 
             if(dialog.bSaveEditableScore())
             {

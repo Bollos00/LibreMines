@@ -30,8 +30,8 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     ui->comboBoxTheme->addItems({"Dark", "Light"});
 
+    // Space character is not allowed. This will remove every space character of the line edit
 //    ui->lineEditUsername->setValidator(new QRegExpValidator(QRegExp("^(?i)[a-z][a-z0-9]*$")));
-
     connect(ui->lineEditUsername, &QLineEdit::textChanged,
             [this](QString text)
     { ui->lineEditUsername->setText(text.remove(" ", Qt::CaseInsensitive)); });

@@ -79,6 +79,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
 
 # create install target
 include(GNUInstallDirs)
+
+# Install the executable
 install(
     TARGETS
     ${PROJECT_NAME}
@@ -88,5 +90,6 @@ install(
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
+# Install the desktop entry and the icon
 install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
 install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
