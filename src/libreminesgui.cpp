@@ -71,6 +71,9 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
 
+    connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_visibilityChanged,
+            [this](const bool visible){ this->centralWidget()->setEnabled(!visible); });
+
     vConfigureInterface(thatWidth, thatHeight);
 
     qApp->installEventFilter(this);

@@ -17,7 +17,7 @@
 #############################################################################
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
-cmake_minimum_required(VERSION 3.1...${CMAKE_VERSION})
+cmake_minimum_required(VERSION 3.1.0)
 project(libremines)
 
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
