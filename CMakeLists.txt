@@ -18,7 +18,17 @@
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
-project(libremines)
+project(libremines
+    VERSION "1.1.2"
+    DESCRIPTION "A Qt based Minesweeper game"
+    HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
+    LANGUAGES "CXX"
+)
+
+# Save the variables of the project (see file `include/cmake/libreminesconfig.h.cmake`) on
+#  the file ${PROJECT_BINARY_DIR}/libreminesconfig.h
+configure_file(${PROJECT_SOURCE_DIR}/include/libreminesconfig.h.in ${PROJECT_BINARY_DIR}/libreminesconfig.h)
+include_directories(${PROJECT_BINARY_DIR})
 
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     message(STATUS "Using default build type Release")
@@ -62,6 +72,9 @@ add_executable(${PROJECT_NAME}
     share/images.qrc
     share/icons.qrc
 )
+
+include_directories(src)
+include_directories(include)
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings

@@ -1,0 +1,32 @@
+/*****************************************************************************
+ * LibreMines                                                                *
+ * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ *                                                                           *
+ * This program is free software: you can redistribute it and/or modify      *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * This program is distributed in the hope that it will be useful,           *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
+ *****************************************************************************
+ */
+
+
+#ifndef LIBREMINESCONFIG_H_CMAKE
+#define LIBREMINESCONFIG_H_CMAKE
+
+#define LIBREMINES_PROJECT_NAME "@PROJECT_NAME@"
+#define LIBREMINES_PROJECT_VERSION "@PROJECT_VERSION@"
+#define LIBREMINES_PROJECT_VERSION_MAJOR "@PROJECT_VERSION_MAJOR@"
+#define LIBREMINES_PROJECT_VERSION_MINOR "@PROJECT_VERSION_MINOR@"
+#define LIBREMINES_PROJECT_VERSION_PATCH "@PROJECT_VERSION_PATCH@"
+#define LIBREMINES_PROJECT_DESCRIPTION "@PROJECT_DESCRIPTION@"
+#define LIBREMINES_PROJECT_HOMEPAGE_URL "@PROJECT_HOMEPAGE_URL@"
+
+#endif // LIBREMINESCONFIG_H_CMAKE
