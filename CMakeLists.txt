@@ -72,10 +72,16 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DEPRECATED_WARNINGS)
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
-#target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DISABLE_DEPRECATED_BEFORE=0x060000)    # disables all the APIs deprecated before Qt 6.0.0
+#target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DISABLE_DEPRECATED_BEFORE=0x060000)
+# disables all the APIs deprecated before Qt 6.0.0
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
+if(USE_QT6)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
+else()
+    find_package(Qt5 REQUIRED COMPONENTS Widgets)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
+endif()
 
 # create install target
 include(GNUInstallDirs)
