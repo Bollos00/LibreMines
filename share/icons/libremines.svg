@@ -13,7 +13,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   sodipodi:docname="libremines_icon.svg">
+   sodipodi:docname="libremines.svg">
   <defs
      id="defs2">
     <marker
@@ -102,7 +102,7 @@
      transform="translate(49.999024,-1.0108844)">
     <g
        id="g213"
-       transform="matrix(0.26458333,0,0,0.26458333,-14.499029,-81.504549)"
+       transform="matrix(0.26431913,0,0,0.30558041,-27.655565,-111.84722)"
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:18.8976;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
       <g
          inkscape:label="0"
@@ -282,7 +282,7 @@
     <g
        inkscape:label="Flag_cable"
        id="g139"
-       transform="matrix(0.26458333,0,0,0.26458333,-14.499029,-81.50455)"
+       transform="matrix(0.26431913,0,0,0.30558041,-27.655565,-111.84722)"
        style="stroke-width:18.8976;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          d="M 264.56693,1084.7244 491.33858,404.40945"
@@ -296,7 +296,7 @@
     <g
        inkscape:label="flag"
        id="g51"
-       transform="matrix(0.26458333,0,0,0.26458333,-14.499029,-81.50455)">
+       transform="matrix(0.26431913,0,0,0.30558041,-27.655565,-111.84722)">
       <path
          d="M 489.82677,396.85039 869.29134,668.97638"
          style="fill:none;stroke:#ff0000;stroke-linecap:round"
