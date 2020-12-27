@@ -188,6 +188,8 @@ private Q_SLOTS:
 
     void SLOT_optionChanged(const QString& name, const QString& value);
 
+    void SLOT_quitApplication();
+
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
     void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);

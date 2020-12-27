@@ -30,6 +30,8 @@
 #include <QAction>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QShortcut>
+#include <QMessageBox>
 
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
@@ -75,6 +77,9 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_visibilityChanged,
             [this](const bool visible){ this->centralWidget()->setEnabled(!visible); });
 
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this), &QShortcut::activated,
+            this, &LibreMinesGui::SLOT_quitApplication);
+
     // Create interface with the passed dimensions
     vConfigureInterface(thatWidth, thatHeight);
 
@@ -82,6 +87,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
 
     this->setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
+    this->setWindowTitle("LibreMines");
 
     // Initializr keyboard controller attributes
     controller.ctrlPressed = false;
@@ -380,6 +386,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_addOrRemoveFlag);
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_stop);
+
+    // Set the initial value of mines left to the total number
+    //  of mines
+    SLOT_minesLeft(gameEngine->mines());
 }
 
 void LibreMinesGui::vAttributeAllCells()
@@ -1147,6 +1157,25 @@ void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value
     {
         vConfigureTheme(value);
     }
+}
+
+void LibreMinesGui::SLOT_quitApplication()
+{
+    if(gameEngine && gameEngine->isGameActive())
+    {
+        QMessageBox messageBox;
+
+        messageBox.setText("There is a game happening.");
+        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        messageBox.setDefaultButton(QMessageBox::No);
+        int result = messageBox.exec();
+
+        if(result == QMessageBox::No)
+            return;
+    }
+
+    this->deleteLater();
 }
 
 void LibreMinesGui::vConfigureTheme(const QString& theme)
