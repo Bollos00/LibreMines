@@ -190,6 +190,8 @@ private Q_SLOTS:
 
     void SLOT_quitApplication();
 
+    void SLOT_showAboutDialog();
+
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
     void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);
@@ -236,9 +238,11 @@ private:
 
     QMenu* menuOptions;
     QAction* actionPreferences;
+    QAction* actionHighScores;
 
     QMenu* menuHelp;
     QAction* actionAbout;
+    QAction* actionAboutQt;
 
     QImage *imgZero; /**< TODO: describe */
     QImage *imgOne; /**< TODO: describe */

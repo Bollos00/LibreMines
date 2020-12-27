@@ -35,6 +35,7 @@
 
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
+#include "libreminesconfig.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -483,9 +484,10 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
         iHeightMainWindow = height;
     }
 
-
     actionPreferences = new QAction(this);
+    actionHighScores = new QAction(this);
     actionAbout = new QAction(this);
+    actionAboutQt = new QAction(this);
 
     QMenuBar* menuBarGlobal = new QMenuBar(this);
 
@@ -500,14 +502,16 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     menuBarGlobal->addAction(menuOptions->menuAction());
     menuBarGlobal->addAction(menuHelp->menuAction());
 
-    menuOptions->addAction(actionPreferences);
-    menuHelp->addAction(actionAbout);
+    menuOptions->addActions({actionPreferences, actionHighScores});
+    menuHelp->addActions({actionAbout, actionAboutQt});
 
     menuOptions->setTitle("Options");
     menuHelp->setTitle("Help");
 
     actionPreferences->setText("Preferences...");
+    actionHighScores->setText("High Scores...");
     actionAbout->setText("About...");
+    actionAboutQt->setText("About Qt...");
 
     this->setFont(QFont("Liberation Sans"));
     labelTimerInGame = new QLabel(centralWidget());
@@ -629,7 +633,10 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
 
     // todo
     connect(actionAbout, &QAction::triggered,
-            [this](){/* Show About Dialog*/});
+            this, &LibreMinesGui::SLOT_showAboutDialog);
+
+    connect(actionAboutQt, &QAction::triggered,
+            [this](){ QMessageBox::aboutQt(this, "LibreMines"); });
 }
 
 void LibreMinesGui::vHideInterface()
@@ -1176,6 +1183,19 @@ void LibreMinesGui::SLOT_quitApplication()
     }
 
     this->deleteLater();
+}
+
+void LibreMinesGui::SLOT_showAboutDialog()
+{
+    QString text =
+            "LibreMines version " + QString(LIBREMINES_PROJECT_VERSION) + "\n"
+            "\n"
+            "LibreMines is a free/libre and open source"
+            " Qt based Minesweeper game.\n"
+            "\n"
+            "Get the source code on <https://github.com/Bollos00/LibreMines>";
+
+    QMessageBox::about(this, "LibreMines", text);
 }
 
 void LibreMinesGui::vConfigureTheme(const QString& theme)
