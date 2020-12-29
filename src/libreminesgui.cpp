@@ -613,12 +613,14 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
 
-    // todo
     connect(actionAbout, &QAction::triggered,
             this, &LibreMinesGui::SLOT_showAboutDialog);
 
     connect(actionAboutQt, &QAction::triggered,
             [this](){ QMessageBox::aboutQt(this, "LibreMines"); });
+
+    connect(actionHighScores, &QAction::triggered,
+            [this](){ QMessageBox::information(this, "High Scores", "Coming soon..."); });
 }
 
 void LibreMinesGui::vHideInterface()
