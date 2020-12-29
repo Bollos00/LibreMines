@@ -128,6 +128,8 @@ private:
     void vLastSessionLoadConfigurationFile();
     void vLastSessionSaveConfigurationFile();
 
+    void vUpdatePreferences();
+
 private Q_SLOTS:
     /**
      * @brief

@@ -65,6 +65,8 @@ add_executable(${PROJECT_NAME}
     src/libreminesscore.h
     src/libreminesscoresdialog.cpp
     src/libreminesscoresdialog.h
+    src/qkeyinput.cpp
+    src/qkeyinput.h
     src/qlabel_adapted.cpp
     src/qlabel_adapted.h
     src/qpushbutton_adapted.cpp

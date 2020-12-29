@@ -74,6 +74,14 @@ struct KeyboardController
     bool active;
     uchar currentX;
     uchar currentY;
+
+    int keyLeft;
+    int keyDown;
+    int keyRight;
+    int keyUp;
+    int keyReleaseCell;
+    int keyFlagCell;
+    bool valid;
 };
 
 

@@ -18,48 +18,31 @@
  */
 
 
-#ifndef LIBREMINESPREFERENCESDIALOG_H
-#define LIBREMINESPREFERENCESDIALOG_H
+#ifndef QKEYINPUT_H
+#define QKEYINPUT_H
 
-#include <QDialog>
+#include <QLineEdit>
+#include <QObject>
 
-namespace Ui {
-class LibreMinesPreferencesDialog;
-}
-
-class LibreMinesPreferencesDialog : public QDialog
+class QKeyInput : public QLineEdit
 {
     Q_OBJECT
-
 public:
-    explicit LibreMinesPreferencesDialog(QWidget *parent = nullptr);
-    ~LibreMinesPreferencesDialog();
+    QKeyInput(QWidget* parent = nullptr);
 
-    bool optionFirstCellClean()const;
-    bool optionCleanNeighborCellsWhenClickedOnShowedCell()const;
-    QString optionTheme()const;
-    QString optionUsername()const;
+    int currentKey()const;
 
-    void setOptionFirstCellClean(const QString& option);
-    void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
-    void setOptionTheme(const QString& theme);
-    void setOptionUsername(const QString& username);
+    bool setKey(const int k);
 
-    QList<int> optionKeyboardControllerKeys()const;
-    QString optionKeyboardControllerKeysString()const;
-    void setOptionKeyboardControllerKeys(const QList<int>& keys);
+    bool isValid()const;
+
+    static QString getTextFromKey(const int k);
 
 protected:
-    void closeEvent(QCloseEvent* e);
-    void hideEvent(QHideEvent* e);
-    void showEvent(QShowEvent* e);
+    void keyPressEvent(QKeyEvent* e);
 
 private:
-    Ui::LibreMinesPreferencesDialog *ui;
-
-Q_SIGNALS:
-    void SIGNAL_optionChanged(const QString& name, const QString& value);
-    void SIGNAL_visibilityChanged(const bool visible);
+    int key;
 };
 
-#endif // LIBREMINESPREFERENCESDIALOG_H
+#endif // QKEYINPUT_H
