@@ -22,6 +22,7 @@
 #include <QCommandLineParser>
 
 #include "libreminesgui.h"
+#include "libreminesconfig.h"
 
 struct InitializeOptions
 {
@@ -49,7 +50,7 @@ InitializeOptions getOptions(const QStringList& args)
     int l = 999999999;
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("A Qt5 based Minesweeper game");
+    parser.setApplicationDescription(LIBREMINES_PROJECT_DESCRIPTION);
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addOptions({
@@ -70,8 +71,8 @@ InitializeOptions getOptions(const QStringList& args)
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    a.setApplicationName("libremines");
-    a.setApplicationVersion("1.1.0");
+    a.setApplicationName(LIBREMINES_PROJECT_NAME);
+    a.setApplicationVersion(LIBREMINES_PROJECT_VERSION);
 
     InitializeOptions ops = getOptions(a.arguments());
 

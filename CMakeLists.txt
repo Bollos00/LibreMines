@@ -18,7 +18,17 @@
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
-project(libremines)
+project(libremines
+    VERSION "1.2.0"
+    DESCRIPTION "A Qt based Minesweeper game"
+    HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
+    LANGUAGES "CXX"
+)
+
+# Save the variables of the project (see file `include/cmake/libreminesconfig.h.cmake`) on
+#  the file ${PROJECT_BINARY_DIR}/libreminesconfig.h
+configure_file(${PROJECT_SOURCE_DIR}/include/libreminesconfig.h.in ${PROJECT_BINARY_DIR}/libreminesconfig.h)
+include_directories(${PROJECT_BINARY_DIR})
 
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     message(STATUS "Using default build type Release")
@@ -55,6 +65,8 @@ add_executable(${PROJECT_NAME}
     src/libreminesscore.h
     src/libreminesscoresdialog.cpp
     src/libreminesscoresdialog.h
+    src/qkeyinput.cpp
+    src/qkeyinput.h
     src/qlabel_adapted.cpp
     src/qlabel_adapted.h
     src/qpushbutton_adapted.cpp
@@ -62,6 +74,9 @@ add_executable(${PROJECT_NAME}
     share/images.qrc
     share/icons.qrc
 )
+
+include_directories(src)
+include_directories(include)
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -72,13 +87,21 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DEPRECATED_WARNINGS)
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
-#target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DISABLE_DEPRECATED_BEFORE=0x060000)    # disables all the APIs deprecated before Qt 6.0.0
+#target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DISABLE_DEPRECATED_BEFORE=0x060000)
+# disables all the APIs deprecated before Qt 6.0.0
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
+if(USE_QT6)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
+else()
+    find_package(Qt5 REQUIRED COMPONENTS Widgets)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
+endif()
 
 # create install target
 include(GNUInstallDirs)
+
+# Install the executable
 install(
     TARGETS
     ${PROJECT_NAME}
@@ -88,5 +111,6 @@ install(
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
+# Install the desktop entry and the icon
 install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
 install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)

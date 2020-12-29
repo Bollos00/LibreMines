@@ -30,9 +30,12 @@
 #include <QAction>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QShortcut>
+#include <QMessageBox>
 
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
+#include "libreminesconfig.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -71,21 +74,34 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
 
+    // Unable central widget when the preferences dialog is active
+    // Also update the preferences ehrn finished
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_visibilityChanged,
-            [this](const bool visible){ this->centralWidget()->setEnabled(!visible); });
+            [this](const bool visible)
+    {
+        this->centralWidget()->setEnabled(!visible);
+        this->vUpdatePreferences();
+    });
 
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this), &QShortcut::activated,
+            this, &LibreMinesGui::SLOT_quitApplication);
+
+    // Create interface with the passed dimensions
     vConfigureInterface(thatWidth, thatHeight);
 
     qApp->installEventFilter(this);
 
     this->setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
+    this->setWindowTitle("LibreMines");
 
+    // Initializr keyboard controller attributes
     controller.ctrlPressed = false;
     controller.active = false;
     controller.currentX = 0;
     controller.currentY = 0;
 
+    // Load configuration file and set the theme
     vLastSessionLoadConfigurationFile();
     vConfigureTheme(preferences->optionTheme());
 }
@@ -115,13 +131,19 @@ LibreMinesGui::~LibreMinesGui()
 bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
 {
     Q_UNUSED(object)
+
     // If the game is not running, do not deal woth the event
     if(!gameEngine || !gameEngine->isGameActive())
         return false;
 
+    // If the GUI is not ready
     if(principalMatrix.empty() ||
        !principalMatrix[0][0].button ||
        !principalMatrix[0][0].button->isEnabled())
+        return false;
+
+    // If the keyboard controller has invalid settings
+    if(!controller.valid)
         return false;
 
 
@@ -147,112 +169,74 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
         {
             Qt::Key key = (Qt::Key)((QKeyEvent*)event)->key();
 
-            switch(key)
+            if(key == Qt::Key_Control)
             {
-                case Qt::Key_Control:
-                    controller.ctrlPressed = false;
+                controller.ctrlPressed = false;
+                return true;
+            }
+
+            // Active the controller depending on the key
+            if(!controller.active)
+            {
+                if(key == controller.keyLeft ||
+                   key == controller.keyUp ||
+                   key == controller.keyDown ||
+                   key == controller.keyRight)
+                {
+                    controller.active = true;
+                    vKeyboardControllerSetCurrentCell(0, 0);
+                    return true;
+                }
+            }
+            else
+            {
+                if(key == controller.keyLeft)
+                {
+                    vKeyboardControllerMoveLeft();
+                    return true;
+                }
+                if(key == controller.keyUp)
+                {
+                    vKeyboardControllerMoveUp();
+                    return true;
+                }
+                if(key == controller.keyDown)
+                {
+                    vKeyboardControllerMoveDown();
+                    return true;
+                }
+                if(key == controller.keyRight)
+                {
+                    vKeyboardControllerMoveRight();
+                    return true;
+                }
+                if(key == controller.keyReleaseCell)
+                {
+                    const LibreMinesGameEngine::CellGameEngine& cell =
+                            gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
+
+                    if(cell.isHidden)
+                    {
+                        emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
+                    }
+                    else if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
+                    {
+                        emit SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
+                    }
                     return true;
 
-                case Qt::Key_A:
-                case Qt::Key_Left:
-                    if(!controller.active)
-                    {
-                        controller.active = true;
-                        vKeyboardControllerSetCurrentCell(0, 0);
-                    }
-                    else
-                    {
-                        vKeyboardControllerMoveLeft();
-                    }
+                }
+                if(key == controller.keyFlagCell)
+                {
+                    emit SIGNAL_addOrRemoveFlag(controller.currentX, controller.currentY);
                     return true;
-
-                case Qt::Key_W:
-                case Qt::Key_Up:
-                    if(!controller.active)
-                    {
-                        controller.active = true;
-                        vKeyboardControllerSetCurrentCell(0, 0);
-                    }
-                    else
-                    {
-                        vKeyboardControllerMoveUp();
-                    }
+                }
+                if(key == Qt::Key_Escape)
+                {
+                    controller.active = false;
+                    vKeyboardControllUnsetCurrentCell();
                     return true;
-
-                case Qt::Key_S:
-                case Qt::Key_Down:
-                    if(!controller.active)
-                    {
-                        controller.active = true;
-                        vKeyboardControllerSetCurrentCell(0, 0);
-                    }
-                    else
-                    {
-                        vKeyboardControllerMoveDown();
-                    }
-                    return true;
-
-                case Qt::Key_D:
-                case Qt::Key_Right:
-                    if(!controller.active)
-                    {
-                        controller.active = true;
-                        vKeyboardControllerSetCurrentCell(0, 0);
-                    }
-                    else
-                    {
-                        vKeyboardControllerMoveRight();
-                    }
-                    return true;
-
-                case Qt::Key_1:
-                case Qt::Key_O:
-                    if(controller.active)
-                    {
-                        const LibreMinesGameEngine::CellGameEngine& cell =
-                                gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
-
-                        if(cell.isHidden)
-                        {
-                            emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
-                        }
-                        else if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
-                        {
-                            emit SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
-                        }
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case Qt::Key_2:
-                case Qt::Key_P:
-                    if(controller.active)
-                    {
-                        emit SIGNAL_addOrRemoveFlag(controller.currentX, controller.currentY);
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case Qt::Key_Escape:
-                    if(controller.active)
-                    {
-                        controller.active = false;
-                        vKeyboardControllUnsetCurrentCell();
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                default:
-                    break;
+                }
             }
 
         }break;
@@ -268,20 +252,34 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
                              ushort i_nMines_)
 {
+
+    // Reset the controller attributes
     controller.ctrlPressed = false;
     controller.active = false;
     controller.currentX = 0;
     controller.currentY = 0;
+
+    if(!controller.valid)
+    {
+        QMessageBox::warning(this, "Keyboard Controller is invalid",
+                             "Dear user, we are unfortunately your Keyboard Controller preferences"
+                             " are invalid. Therefore you will not be able to play with the keyboard.\n"
+                             "To fix it go to (Main Meun > Options > Preferences) and edit your preferences.");
+    }
+
+    // Create a new matrix
     principalMatrix = std::vector<std::vector<CellGui>> (_X, std::vector<CellGui>(_Y));
 
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
 
+    // Create the game engine instance
     gameEngine.reset(new LibreMinesGameEngine());
 
     gameEngine->setFirstCellClean(preferences->optionFirstCellClean());
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
+    // Set the length of each cell
     if(iLimitWidthField/_X < iLimitHeightField/_Y)
         cellLength = iLimitWidthField/_X;
     else
@@ -293,9 +291,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     const QPixmap QPM_Zero = QPixmap::fromImage(*imgZero).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
     const QPixmap QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
 
-    const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
-            preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
+    const bool bCleanNeighborCellsWhenClickedOnShowedLabel = preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
 
+    // Create each cell
     for(uchar j=0; j<_Y; j++)
     {
         for (uchar i=0; i<_X; i++)
@@ -336,8 +334,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
     buttonQuitInGame->setEnabled(true);
     buttonRestartInGame->setEnabled(true);
 
+    // Set the correct state of each cell
     vAttributeAllCells();
 
+    // Communication (GameEngine -> GUI)
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_showCell,
             this, &LibreMinesGui::SLOT_showCell);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_endGameScore,
@@ -357,7 +357,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_remakeGame,
             this, &LibreMinesGui::SLOT_remakeGame);
 
-
+    // Communication (GUI -> GameEngine)
     connect(this, &LibreMinesGui::SIGNAL_cleanCell,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_cleanCell);
     if(bCleanNeighborCellsWhenClickedOnShowedLabel)
@@ -369,6 +369,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_addOrRemoveFlag);
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_stop);
+
+    // Set the initial value of mines left to the total number
+    //  of mines
+    SLOT_minesLeft(gameEngine->mines());
 }
 
 void LibreMinesGui::vAttributeAllCells()
@@ -446,6 +450,8 @@ void LibreMinesGui::vResetPrincipalMatrix()
 
 void LibreMinesGui::vConfigureInterface(int width, int height)
 {
+    // Create the interface
+
     setCentralWidget(new QWidget(this));
 
     if(width == -1 || height == -1)
@@ -460,9 +466,10 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
         iHeightMainWindow = height;
     }
 
-
     actionPreferences = new QAction(this);
+    actionHighScores = new QAction(this);
     actionAbout = new QAction(this);
+    actionAboutQt = new QAction(this);
 
     QMenuBar* menuBarGlobal = new QMenuBar(this);
 
@@ -477,14 +484,16 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
     menuBarGlobal->addAction(menuOptions->menuAction());
     menuBarGlobal->addAction(menuHelp->menuAction());
 
-    menuOptions->addAction(actionPreferences);
-    menuHelp->addAction(actionAbout);
+    menuOptions->addActions({actionPreferences, actionHighScores});
+    menuHelp->addActions({actionAbout, actionAboutQt});
 
     menuOptions->setTitle("Options");
     menuHelp->setTitle("Help");
 
     actionPreferences->setText("Preferences...");
+    actionHighScores->setText("High Scores...");
     actionAbout->setText("About...");
+    actionAboutQt->setText("About Qt...");
 
     this->setFont(QFont("Liberation Sans"));
     labelTimerInGame = new QLabel(centralWidget());
@@ -605,7 +614,13 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
             preferences, &QDialog::show);
 
     connect(actionAbout, &QAction::triggered,
-            [this](){/* Show About Dialog*/});
+            this, &LibreMinesGui::SLOT_showAboutDialog);
+
+    connect(actionAboutQt, &QAction::triggered,
+            [this](){ QMessageBox::aboutQt(this, "LibreMines"); });
+
+    connect(actionHighScores, &QAction::triggered,
+            [this](){ QMessageBox::information(this, "High Scores", "Coming soon..."); });
 }
 
 void LibreMinesGui::vHideInterface()
@@ -936,7 +951,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
 
             dialog.setScores(scores, &score, index);
-            int result = dialog.exec();
+            int result = dialog.exec(); Q_UNUSED(result);
 
             if(dialog.bSaveEditableScore())
             {
@@ -1133,6 +1148,38 @@ void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value
     {
         vConfigureTheme(value);
     }
+}
+
+void LibreMinesGui::SLOT_quitApplication()
+{
+    if(gameEngine && gameEngine->isGameActive())
+    {
+        QMessageBox messageBox;
+
+        messageBox.setText("There is a game happening.");
+        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        messageBox.setDefaultButton(QMessageBox::No);
+        int result = messageBox.exec();
+
+        if(result == QMessageBox::No)
+            return;
+    }
+
+    this->deleteLater();
+}
+
+void LibreMinesGui::SLOT_showAboutDialog()
+{
+    QString text =
+            "LibreMines version " + QString(LIBREMINES_PROJECT_VERSION) + "\n"
+            "\n"
+            "LibreMines is a free/libre and open source"
+            " Qt based Minesweeper game.\n"
+            "\n"
+            "Get the source code on <https://github.com/Bollos00/LibreMines>";
+
+    QMessageBox::about(this, "LibreMines", text);
 }
 
 void LibreMinesGui::vConfigureTheme(const QString& theme)
@@ -1419,8 +1466,25 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                sbCustomizedY->setValue(terms.at(1).toInt());
            }
+           else if(terms.at(0).compare("KeyboardControllerKeys", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 7)
+                   continue;
+
+               preferences->setOptionKeyboardControllerKeys(
+                           {
+                               terms.at(1).toInt(nullptr, 16),
+                               terms.at(2).toInt(nullptr, 16),
+                               terms.at(3).toInt(nullptr, 16),
+                               terms.at(4).toInt(nullptr, 16),
+                               terms.at(5).toInt(nullptr, 16),
+                               terms.at(6).toInt(nullptr, 16),
+                           });
+           }
         }
     }
+
+    vUpdatePreferences();
 }
 
 void LibreMinesGui::vLastSessionSaveConfigurationFile()
@@ -1445,11 +1509,11 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
         Q_ASSERT(destDir.cd("libremines"));
     }
 
-    QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("libreminesLastSession.txt")) );
+    QScopedPointer<QFile> fileLastSession( new QFile(destDir.absoluteFilePath("libreminesLastSession.txt")) );
 
-    fileScores->open(QIODevice::WriteOnly);
+    fileLastSession->open(QIODevice::WriteOnly);
 
-    QTextStream stream(fileScores.get());
+    QTextStream stream(fileLastSession.get());
 
     stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
            << "Theme" << ' ' << preferences->optionTheme() << '\n'
@@ -1457,5 +1521,25 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
            << "Username" << ' ' << preferences->optionUsername() << '\n'
            << "CustomizedPercentageOfMines" << ' ' << sbCustomizednMines->value() << '\n'
            << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
-           << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n';
+           << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
+           << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n';
+}
+
+void LibreMinesGui::vUpdatePreferences()
+{
+    const QList<int> keys = preferences->optionKeyboardControllerKeys();
+
+    controller.keyLeft = keys.at(0);
+    controller.keyUp = keys.at(1);
+    controller.keyRight = keys.at(2);
+    controller.keyDown = keys.at(3);
+    controller.keyReleaseCell= keys.at(4);
+    controller.keyFlagCell = keys.at(5);
+
+    controller.valid = !keys.contains(-1);
+
+    if(preferences->optionUsername().isEmpty())
+    {
+        preferences->setOptionUsername(qgetenv("USER"));
+    }
 }

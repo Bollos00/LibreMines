@@ -128,6 +128,8 @@ private:
     void vLastSessionLoadConfigurationFile();
     void vLastSessionSaveConfigurationFile();
 
+    void vUpdatePreferences();
+
 private Q_SLOTS:
     /**
      * @brief
@@ -188,6 +190,10 @@ private Q_SLOTS:
 
     void SLOT_optionChanged(const QString& name, const QString& value);
 
+    void SLOT_quitApplication();
+
+    void SLOT_showAboutDialog();
+
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
     void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);
@@ -234,9 +240,11 @@ private:
 
     QMenu* menuOptions;
     QAction* actionPreferences;
+    QAction* actionHighScores;
 
     QMenu* menuHelp;
     QAction* actionAbout;
+    QAction* actionAboutQt;
 
     QImage *imgZero; /**< TODO: describe */
     QImage *imgOne; /**< TODO: describe */

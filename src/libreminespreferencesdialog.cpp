@@ -30,8 +30,8 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     ui->comboBoxTheme->addItems({"Dark", "Light"});
 
+    // Space character is not allowed. This will remove every space character of the line edit
 //    ui->lineEditUsername->setValidator(new QRegExpValidator(QRegExp("^(?i)[a-z][a-z0-9]*$")));
-
     connect(ui->lineEditUsername, &QLineEdit::textChanged,
             [this](QString text)
     { ui->lineEditUsername->setText(text.remove(" ", Qt::CaseInsensitive)); });
@@ -39,6 +39,14 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     connect(ui->comboBoxTheme, &QComboBox::currentTextChanged,
             [this](const QString& text)
     { emit SIGNAL_optionChanged("Theme", text); });
+
+    ui->keyInputMoveLeft->setKey(Qt::Key_A);
+    ui->keyInputMoveUp->setKey(Qt::Key_W);
+    ui->keyInputMoveRight->setKey(Qt::Key_D);
+    ui->keyInputMoveDown->setKey(Qt::Key_S);
+    ui->keyInputReleaseCell->setKey(Qt::Key_O);
+    ui->keyInputFlagCell->setKey(Qt::Key_P);
+
 }
 
 LibreMinesPreferencesDialog::~LibreMinesPreferencesDialog()
@@ -84,6 +92,48 @@ void LibreMinesPreferencesDialog::setOptionTheme(const QString &theme)
 void LibreMinesPreferencesDialog::setOptionUsername(const QString &username)
 {
     ui->lineEditUsername->setText(username);
+}
+
+QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
+{
+    return
+    {
+        ui->keyInputMoveLeft->currentKey(),
+        ui->keyInputMoveUp->currentKey(),
+        ui->keyInputMoveRight->currentKey(),
+        ui->keyInputMoveDown->currentKey(),
+        ui->keyInputReleaseCell->currentKey(),
+        ui->keyInputFlagCell->currentKey()
+    };
+}
+
+QString LibreMinesPreferencesDialog::optionKeyboardControllerKeysString() const
+{
+    QString s;
+
+    s += QString::number(ui->keyInputMoveLeft->currentKey(), 16);
+    s += ' ';
+    s += QString::number(ui->keyInputMoveUp->currentKey(), 16);
+    s += ' ';
+    s += QString::number(ui->keyInputMoveRight->currentKey(), 16);
+    s += ' ';
+    s += QString::number(ui->keyInputMoveDown->currentKey(), 16);
+    s += ' ';
+    s += QString::number(ui->keyInputReleaseCell->currentKey(), 16);
+    s += ' ';
+    s += QString::number(ui->keyInputFlagCell->currentKey(), 16);
+
+    return s;
+}
+
+void LibreMinesPreferencesDialog::setOptionKeyboardControllerKeys(const QList<int> &keys)
+{
+    ui->keyInputMoveLeft->setKey(keys.at(0));
+    ui->keyInputMoveUp->setKey(keys.at(1));
+    ui->keyInputMoveRight->setKey(keys.at(2));
+    ui->keyInputMoveDown->setKey(keys.at(3));
+    ui->keyInputReleaseCell->setKey(keys.at(4));
+    ui->keyInputFlagCell->setKey(keys.at(5));
 }
 
 void LibreMinesPreferencesDialog::closeEvent(QCloseEvent *e)

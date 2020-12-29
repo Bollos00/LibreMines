@@ -42,12 +42,15 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                                     const uchar i_X_Clean,
                                     const uchar i_Y_Clean)
 {
+    // Update the instance parameters
     iX = _X;
     iY = _Y;
     nMines = i_nMines_;
     iMinesLeft = i_nMines_;
+
     iHiddenCells = 0;
 
+    // Check if we are just remaking the game with one cell clean
     const bool bRemakingGame = (i_X_Clean != 255 && i_Y_Clean != 255);
 
     if(!bRemakingGame)
@@ -88,6 +91,8 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
 
     QVector<Vector2Dshort> vt_vt2d_CleanPoints = QVector<Vector2Dshort>();
 
+    // If we are remaking the game, we make sure that all of the neighbors
+    //  of the clean cell does not have mines.
     if(bRemakingGame)
     {
         vt_vt2d_CleanPoints.reserve(9);
@@ -101,6 +106,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
         }
     }
 
+    // Add mines on random places until the number of mines is correct
     while(i_nMines_ > 0)
     {
         uchar i = QRandomGenerator::global()->bounded(0, iX);
@@ -131,6 +137,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
         }
     }
 
+    // Update the state of all cells
     for(uchar j=0; j<iY; j++)
     {
         for (uchar i=0; i<iX; i++)
@@ -285,14 +292,17 @@ void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
     if(!principalMatrix[_X][_Y].hasFlag &&
        principalMatrix[_X][_Y].state == MINE)
     {
+        // If the user tried to unlock an unflaged mined cell, (s)he lose
         vGameLost(_X, _Y);
     }
     else if(principalMatrix[_X][_Y].isHidden &&
             !principalMatrix[_X][_Y].hasFlag)
     {
+        // Unlock the cell
         principalMatrix[_X][_Y].isHidden = false;
         emit SIGNAL_showCell(_X, _Y);
 
+        // If the state of the cell is ZERO, unlock all neighbor cells
         if(principalMatrix[_X][_Y].state == ZERO)
         {
             if(_X == 0 &&
@@ -435,9 +445,11 @@ void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
                     vCleanCell(_X+1, _Y+1);
             }
         }
+
         iHiddenCells--;
         if(iHiddenCells == 0)
         {
+            // If there is none hidden cells left, the user wins
             vGameWon();
         }
     }
@@ -582,15 +594,16 @@ void LibreMinesGameEngine::SLOT_startTimer()
 {
     iTimeInSeconds = 0;
     timerTimeInGame.reset(new QTimer());
-    timerTimeInGame->start(1000);
     QObject::connect(timerTimeInGame.get(), &QTimer::timeout,
                      this, &LibreMinesGameEngine::SLOT_UpdateTime);
 
+    timerTimeInGame->start(1000);
     elapsedPreciseTimeInGame.start();
 }
 
 void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _Y)
 {
+    // Clean all hided and unflaged neighbor flags
     for(short i=_X-1; i<=_X+1; i++)
     {
         if(i<0 || i>=iX)
