@@ -36,6 +36,7 @@
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
 #include "libreminesconfig.h"
+#include "libreminesviewscores.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -620,7 +621,7 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
             [this](){ QMessageBox::aboutQt(this, "LibreMines"); });
 
     connect(actionHighScores, &QAction::triggered,
-            [this](){ QMessageBox::information(this, "High Scores", "Coming soon..."); });
+            this, &LibreMinesGui::SLOT_showHighScores);
 }
 
 void LibreMinesGui::vHideInterface()
@@ -904,7 +905,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                 stream >> s;
 
                 if(s.gameDifficulty == score.gameDifficulty &&
-                   s.length == score.length &&
+                   s.heigth == score.heigth &&
                    s.width == score.width &&
                    s.mines == score.mines)
                 {
@@ -941,7 +942,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             else if(score.gameDifficulty == CUSTOMIZED)
             {
                 strGameDiffuclty = "Customized " + QString::number(score.width) +
-                                   " x " + QString::number(score.length) + " : " +
+                                   " x " + QString::number(score.heigth) + " : " +
                                    QString::number(score.mines);
             }
 
@@ -1180,6 +1181,59 @@ void LibreMinesGui::SLOT_showAboutDialog()
             "Get the source code on <https://github.com/Bollos00/LibreMines>";
 
     QMessageBox::about(this, "LibreMines", text);
+}
+
+void LibreMinesGui::SLOT_showHighScores()
+{
+
+    QDir destDir = QDir::home();
+
+    destDir.setFilter(QDir::AllDirs);
+
+    if(!destDir.cd(".local"))
+    {
+        Q_ASSERT(destDir.mkdir(".local"));
+        Q_ASSERT(destDir.cd(".local"));
+    }
+    if(!destDir.cd("share"))
+    {
+        Q_ASSERT(destDir.mkdir("share"));
+        Q_ASSERT(destDir.cd("share"));
+    }
+    if(!destDir.cd("libremines"))
+    {
+        Q_ASSERT(destDir.mkdir("libremines"));
+        Q_ASSERT(destDir.cd("libremines"));
+    }
+
+    QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
+
+    if(!fileScores->exists())
+    {
+        fileScores->open(QIODevice::NewOnly);
+        fileScores->close();
+    }
+
+    fileScores->open(QIODevice::ReadOnly);
+
+    QList<LibreMinesScore> scores;
+
+    QDataStream stream(fileScores.get());
+    stream.setVersion(QDataStream::Qt_5_12);
+
+    while(!stream.atEnd())
+    {
+        LibreMinesScore s;
+        stream >> s;
+
+        scores.append(s);
+    }
+
+    // open the dialog
+    LibreMinesViewScores dialog(this);
+    dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
+    dialog.setScores(scores);
+    dialog.exec();
 }
 
 void LibreMinesGui::vConfigureTheme(const QString& theme)

@@ -194,6 +194,8 @@ private Q_SLOTS:
 
     void SLOT_showAboutDialog();
 
+    void SLOT_showHighScores();
+
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
     void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);

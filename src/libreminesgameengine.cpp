@@ -507,7 +507,7 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs)
     score.iTimeInNs = iTimeInNs;
     score.gameDifficulty = NONE;
     score.width = iX;
-    score.length = iY;
+    score.heigth = iY;
     score.mines = nMines;
     score.bGameCompleted = iUnlockedCells == iCellsToUnlock;
     score.dPercentageGameCompleted = dPercentageGameComplete;

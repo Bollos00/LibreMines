@@ -33,7 +33,7 @@ public:
     qint64 iTimeInNs;
     GAME_DIFFICULTY gameDifficulty;
     uchar width;
-    uchar length;
+    uchar heigth;
     ushort mines;
     bool bGameCompleted;
     double dPercentageGameCompleted;
