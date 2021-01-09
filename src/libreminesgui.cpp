@@ -1240,20 +1240,20 @@ void LibreMinesGui::vConfigureTheme(const QString& theme)
 {
     if(theme.compare("Dark", Qt::CaseInsensitive) == 0)
     {
-        imgZero->load(":/images_rsc/Images/Minesweeper_zero_dark.png");
-        imgOne->load(":/images_rsc/Images/Minesweeper_one_dark.png");
-        imgTwo->load(":/images_rsc/Images/Minesweeper_two_dark.png");
-        imgThree->load(":/images_rsc/Images/Minesweeper_three_dark.png");
-        imgFour->load(":/images_rsc/Images/Minesweeper_four_dark.png");
-        imgFive->load(":/images_rsc/Images/Minesweeper_five_dark.png");
-        imgSix->load(":/images_rsc/Images/Minesweeper_six_dark.png");
-        imgSeven->load(":/images_rsc/Images/Minesweeper_seven_dark.png");
-        imgEight->load(":/images_rsc/Images/Minesweeper_eight_dark.png");
-        imgFlag->load(":/images_rsc/Images/Minesweeper_flag_dark.png");
-        imgNoFlag->load(":/images_rsc/Images/Minesweeper_no_flag_dark.png");
-        imgMine->load(":/images_rsc/Images/Minesweeper_mine_dark.png");
-        imgBoom->load(":/images_rsc/Images/Minesweeper_boom_dark.png");
-        imgWrongFlag->load(":/images_rsc/Images/Minesweeper_wrong_flag_dark.png");
+        imgZero->load(":/minefield_icons/classic_dark/Minesweeper_0.svg");
+        imgOne->load(":/minefield_icons/classic_dark/Minesweeper_1.svg");
+        imgTwo->load(":/minefield_icons/classic_dark/Minesweeper_2.svg");
+        imgThree->load(":/minefield_icons/classic_dark/Minesweeper_3.svg");
+        imgFour->load(":/minefield_icons/classic_dark/Minesweeper_4.svg");
+        imgFive->load(":/minefield_icons/classic_dark/Minesweeper_5.svg");
+        imgSix->load("::/minefield_icons/classic_dark/Minesweeper_6.svg");
+        imgSeven->load(":/minefield_icons/classic_dark/Minesweeper_7.svg");
+        imgEight->load(":/minefield_icons/classic_dark/Minesweeper_8.svg");
+        imgFlag->load(":/minefield_icons/classic_dark/Minesweeper_flag.svg");
+        imgNoFlag->load(":/minefield_icons/classic_dark/Minesweeper_no_flag.svg");
+        imgMine->load(":/minefield_icons/classic_dark/Minesweeper_mine.svg");
+        imgBoom->load(":/minefield_icons/classic_dark/Minesweeper_boom.svg");
+        imgWrongFlag->load(":/minefield_icons/classic_dark/Minesweeper_flag.svg");
 
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette darkPalette;
@@ -1275,20 +1275,20 @@ void LibreMinesGui::vConfigureTheme(const QString& theme)
     }
     else if(theme.compare("Light", Qt::CaseInsensitive) == 0)
     {
-        imgZero->load(":/images_rsc/Images/Minesweeper_zero_light.png");
-        imgOne->load(":/images_rsc/Images/Minesweeper_one_light.png");
-        imgTwo->load(":/images_rsc/Images/Minesweeper_two_light.png");
-        imgThree->load(":/images_rsc/Images/Minesweeper_three_light.png");
-        imgFour->load(":/images_rsc/Images/Minesweeper_four_light.png");
-        imgFive->load(":/images_rsc/Images/Minesweeper_five_light.png");
-        imgSix->load(":/images_rsc/Images/Minesweeper_six_light.png");
-        imgSeven->load(":/images_rsc/Images/Minesweeper_seven_light.png");
-        imgEight->load(":/images_rsc/Images/Minesweeper_eight_light.png");
-        imgFlag->load(":/images_rsc/Images/Minesweeper_flag_light.png");
-        imgNoFlag->load(":/images_rsc/Images/Minesweeper_no_flag_light.png");
-        imgMine->load(":/images_rsc/Images/Minesweeper_mine_light.png");
-        imgBoom->load(":/images_rsc/Images/Minesweeper_boom_light.png");
-        imgWrongFlag->load(":/images_rsc/Images/Minesweeper_wrong_flag_light.png");
+        imgZero->load(":/minefield_icons/classic_light/Minesweeper_0.svg");
+        imgOne->load(":/minefield_icons/classic_light/Minesweeper_1.svg");
+        imgTwo->load(":/minefield_icons/classic_light/Minesweeper_2.svg");
+        imgThree->load(":/minefield_icons/classic_light/Minesweeper_3.svg");
+        imgFour->load(":/minefield_icons/classic_light/Minesweeper_4.svg");
+        imgFive->load(":/minefield_icons/classic_light/Minesweeper_5.svg");
+        imgSix->load("::/minefield_icons/classic_light/Minesweeper_6.svg");
+        imgSeven->load(":/minefield_icons/classic_light/Minesweeper_7.svg");
+        imgEight->load(":/minefield_icons/classic_light/Minesweeper_8.svg");
+        imgFlag->load(":/minefield_icons/classic_light/Minesweeper_flag.svg");
+        imgNoFlag->load(":/minefield_icons/classic_light/Minesweeper_no_flag.svg");
+        imgMine->load(":/minefield_icons/classic_light/Minesweeper_mine.svg");
+        imgBoom->load(":/minefield_icons/classic_light/Minesweeper_boom.svg");
+        imgWrongFlag->load(":/minefield_icons/classic_light/Minesweeper_flag.svg");
 
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette lightPalette;

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="レイヤー_1"
+   x="0px"
+   y="0px"
+   width="76px"
+   height="76px"
+   viewBox="0 0 76 76"
+   enable-background="new 0 0 76 76"
+   xml:space="preserve"
+   sodipodi:docname="Minesweeper_3.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07, custom)"><metadata
+   id="metadata3292"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs3290" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1920"
+   inkscape:window-height="1024"
+   id="namedview3288"
+   showgrid="false"
+   inkscape:zoom="6.7173736"
+   inkscape:cx="65.6385"
+   inkscape:cy="27.428693"
+   inkscape:window-x="0"
+   inkscape:window-y="28"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="レイヤー_1" />
+<g
+   id="rect1313_66_">
+	<polygon
+   fill="#B9B9B9"
+   points="75.001,75.001 1,75.001 1,1 75.001,1  "
+   id="polygon3280" />
+	<path
+   fill="#757575"
+   d="M75.991,0C75.996,0,76,0.004,76,0.009V75.99c0,0.006-0.004,0.01-0.009,0.01H0.009   C0.004,76,0,75.996,0,75.99V0.009C0,0.004,0.004,0,0.009,0H75.991 M74,2H2v72h72V2L74,2z"
+   id="path3282" />
+</g>
+<path
+   fill="#FF0000"
+   d="M66.322,20.4c0-6.295-5.104-11.4-11.4-11.4H9.678v10.688H48.51c1.575,0,2.85,1.275,2.85,2.85v6.413  c0,1.569-1.274,2.85-2.85,2.85H26.778v12.825H48.51c1.575,0,2.85,1.274,2.85,2.85v6.413c0,1.569-1.274,2.85-2.85,2.85H9.678V66  h45.244c6.296,0,11.4-5.11,11.4-11.4V43.912c0-2.376-0.729-4.586-1.977-6.412c1.247-1.832,1.977-4.036,1.977-6.413V20.4z"
+   id="path3285" />
+<path
+   style="fill:#1a1a1a;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+   d="M 2.0834327,38 V 2.0381406 H 38 73.916567 V 38 73.961859 H 38 2.0834327 Z M 57.158522,65.833569 c 4.107017,-0.923447 7.278853,-3.691922 8.570298,-7.480418 0.641088,-1.880649 0.690181,-2.62919 0.645711,-9.845404 -0.03568,-5.790576 -0.04478,-6.058016 -0.234987,-6.906477 -0.309208,-1.379314 -0.895302,-2.834868 -1.541275,-3.82773 l -0.176807,-0.271752 0.399676,-0.677417 c 0.828382,-1.404034 1.319185,-2.964008 1.492161,-4.742692 0.06446,-0.662889 0.08488,-3.086905 0.05926,-7.035195 -0.04237,-6.528649 -0.0475,-6.602244 -0.570073,-8.174508 -0.37743,-1.13558 -0.718554,-1.84039 -1.348485,-2.78616 C 63.728912,12.997179 62.951044,12.148392 62.015042,11.424494 60.778584,10.468227 60.018376,10.059461 58.517282,9.5437399 56.743238,8.9342433 58.738933,8.9807386 32.94994,8.9480779 L 9.601907,8.9185086 v 5.3907554 5.390754 l 19.769964,0.02365 19.769965,0.02365 0.516565,0.253668 c 0.29876,0.146712 0.687557,0.443852 0.922102,0.704723 0.699577,0.778098 0.701114,0.790039 0.671109,5.213182 -0.02612,3.849892 -0.02813,3.886594 -0.233916,4.271995 -0.28125,0.526722 -0.801413,1.029295 -1.339339,1.294047 L 49.23242,31.70441 37.977354,31.72844 26.722288,31.75247 v 6.473994 6.473993 l 11.300358,0.02403 11.300358,0.02403 0.382463,0.20437 c 0.60681,0.32425 0.991956,0.715759 1.289099,1.310394 l 0.275994,0.552313 v 3.866177 3.866177 l -0.275994,0.552313 c -0.297143,0.594635 -0.682289,0.986144 -1.289099,1.310394 l -0.382463,0.20437 -19.860549,0.02345 -19.860548,0.02345 v 4.711736 4.711738 l 23.348033,-0.02917 23.348034,-0.02917 z"
+   id="path8369" /><path
+   style="fill:#666666;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+   d="M 0,38 V 0.04529201 H 38 76 V 38 75.954708 H 38 0 Z m 74.007151,0 V 1.9475566 H 38 1.9928486 V 38 74.052443 H 38 74.007151 Z"
+   id="path8371" /></svg>

@@ -73,7 +73,7 @@ add_executable(${PROJECT_NAME}
     src/qlabel_adapted.h
     src/qpushbutton_adapted.cpp
     src/qpushbutton_adapted.h
-    share/images.qrc
+    share/minefield_icons.qrc
     share/icons.qrc
 )
 

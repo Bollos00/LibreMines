@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file>minefield_icons/classic_light/Minesweeper_0.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_1.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_2.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_3.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_4.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_5.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_6.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_7.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_8.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_boom.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_flag.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_mine.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_no_flag.svg</file>
+        <file>minefield_icons/classic_light/Minesweeper_wrong_flag.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_0.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_1.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_2.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_3.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_4.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_5.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_6.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_7.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_8.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_boom.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_flag.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_mine.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_no_flag.svg</file>
+        <file>minefield_icons/classic_dark/Minesweeper_wrong_flag.svg</file>
+    </qresource>
+</RCC>
