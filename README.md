@@ -20,14 +20,14 @@ sudo pacman -S base-devel qt5-base qt5-svg cmake
 
 For ubuntu you can install the dependencies with the following command:
 ```sh
-sudo apt-get install build-essential qt5-default cmake
+sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev
 ```
 
-On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/)
+On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/)
 
 ```sh
 su -
-pkg install qt5-core qt5-widgets git cmake
+pkg install qt5-core qt5-widgets qt5-svg git cmake
 ```
 
 For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/) or your preferred package manager.
