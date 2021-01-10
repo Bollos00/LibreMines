@@ -56,20 +56,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     cellLength( 0 ),
     maximumCellLength (thatMaximumCellLength),
     difficult( NONE ),
-    imgZero ( new QImage(":/images_rsc/Media/Minesweeper_zero_dark.png") ),
-    imgOne ( new QImage(":/images_rsc/Media/Minesweeper_one_dark.png") ),
-    imgTwo ( new QImage(":/images_rsc/Media/Minesweeper_two_dark.png") ),
-    imgThree ( new QImage(":/images_rsc/Media/Minesweeper_three_dark.png") ),
-    imgFour( new QImage(":/images_rsc/Media/Minesweeper_four_dark.png") ),
-    imgFive ( new QImage(":/images_rsc/Media/Minesweeper_five_dark.png") ),
-    imgSix( new QImage(":/images_rsc/Media/Minesweeper_six_dark.png") ),
-    imgSeven ( new QImage(":/images_rsc/Media/Minesweeper_seven_dark.png") ),
-    imgEight ( new QImage(":/images_rsc/Media/Minesweeper_eight_dark.png") ),
-    imgFlag ( new QImage(":/images_rsc/Media/Minesweeper_flag_dark.png") ),
-    imgNoFlag ( new QImage(":/images_rsc/Media/Minesweeper_no_flag_dark.png") ),
-    imgMine ( new QImage(":/images_rsc/Media/Minesweeper_mine_dark.png") ),
-    imgBoom ( new QImage(":/images_rsc/Media/Minesweeper_boom_dark.png") ),
-    imgWrongFlag ( new QImage(":/images_rsc/Media/Minesweeper_wrong_flag_dark.png") ),
     preferences( new LibreMinesPreferencesDialog(this) )
 {
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
@@ -92,7 +78,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
 
     qApp->installEventFilter(this);
 
-    this->setAttribute(Qt::WA_DeleteOnClose);
+//    this->setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
     this->setWindowTitle("LibreMines");
 
@@ -113,21 +99,6 @@ LibreMinesGui::~LibreMinesGui()
     vResetPrincipalMatrix();
 
     vLastSessionSaveConfigurationFile();
-
-    delete imgZero;
-    delete imgOne;
-    delete imgTwo;
-    delete imgThree;
-    delete imgFour;
-    delete imgFive;
-    delete imgSix;
-    delete imgSeven;
-    delete imgEight;
-    delete imgFlag;
-    delete imgNoFlag;
-    delete imgMine;
-    delete imgBoom;
-    delete imgWrongFlag;
 }
 
 bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
@@ -250,11 +221,16 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
+void LibreMinesGui::closeEvent(QCloseEvent *e)
+{
+    SLOT_quitApplication();
+    e->ignore();
+}
+
 void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
                              ushort i_nMines_)
 {
-
     // Reset the controller attributes
     controller.ctrlPressed = false;
     controller.active = false;
@@ -264,7 +240,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     if(!controller.valid)
     {
         QMessageBox::warning(this, "Keyboard Controller is invalid",
-                             "Dear user, we are unfortunately your Keyboard Controller preferences"
+                             "Dear user, unfortunately your Keyboard Controller preferences"
                              " are invalid. Therefore you will not be able to play with the keyboard.\n"
                              "To fix it go to (Main Meun > Options > Preferences) and edit your preferences.");
     }
@@ -290,8 +266,8 @@ void LibreMinesGui::vNewGame(const uchar _X,
     if(cellLength > maximumCellLength)
         cellLength = maximumCellLength;
 
-    const QPixmap QPM_Zero = QPixmap::fromImage(*imgZero).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
-    const QPixmap QPM_NoFlag = QPixmap::fromImage(*imgNoFlag).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
+    // Update the pixmaps
+    vSetMinefieldTheme(preferences->optionMinefieldTheme());
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel = preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
 
@@ -306,11 +282,11 @@ void LibreMinesGui::vNewGame(const uchar _X,
             cell.button = new QPushButton_adapted(this);
 
             cell.label->setGeometry(i*cellLength, j*cellLength, cellLength, cellLength);
-            cell.label->setPixmap(QPM_Zero);
+            cell.label->setPixmap(*pmZero);
             cell.label->show();
 
             cell.button->setGeometry(i*cellLength, j*cellLength, cellLength, cellLength);
-            cell.button->setIcon(QIcon(QPM_NoFlag));
+            cell.button->setIcon(QIcon(*pmNoFlag));
             cell.button->setIconSize(QSize(cellLength, cellLength));
             cell.button->show();
             cell.button->setEnabled(false);
@@ -379,18 +355,6 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
 void LibreMinesGui::vAttributeAllCells()
 {
-    const QPixmap
-            QPM_Zero = QPixmap::fromImage(*imgZero).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_One = QPixmap::fromImage(*imgOne).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_Two = QPixmap::fromImage(*imgTwo).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_Three = QPixmap::fromImage(*imgThree).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_Four = QPixmap::fromImage(*imgFour).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_Five = QPixmap::fromImage(*imgFive).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_Six = QPixmap::fromImage(*imgSix).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_Seven = QPixmap::fromImage(*imgSeven).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_Eight = QPixmap::fromImage(*imgEight).scaled(cellLength, cellLength, Qt::KeepAspectRatio),
-            QPM_Mine = QPixmap::fromImage(*imgMine).scaled(cellLength, cellLength, Qt::KeepAspectRatio);
-
     for(uchar j=0; j<gameEngine->lines(); ++j)
     {
         for(uchar i=0; i<gameEngine->rows(); ++i)
@@ -403,34 +367,34 @@ void LibreMinesGui::vAttributeAllCells()
             {
 
                 case ZERO:
-                    cell.label->setPixmap(QPM_Zero);
+                    cell.label->setPixmap(*pmZero);
                     break;
                 case ONE:
-                    cell.label->setPixmap(QPM_One);
+                    cell.label->setPixmap(*pmOne);
                     break;
                 case TWO:
-                    cell.label->setPixmap(QPM_Two);
+                    cell.label->setPixmap(*pmTwo);
                     break;
                 case THREE:
-                    cell.label->setPixmap(QPM_Three);
+                    cell.label->setPixmap(*pmThree);
                     break;
                 case FOUR:
-                    cell.label->setPixmap(QPM_Four);
+                    cell.label->setPixmap(*pmFour);
                     break;
                 case FIVE:
-                    cell.label->setPixmap(QPM_Five);
+                    cell.label->setPixmap(*pmFive);
                     break;
                 case SIX:
-                    cell.label->setPixmap(QPM_Six);
+                    cell.label->setPixmap(*pmSix);
                     break;
                 case SEVEN:
-                    cell.label->setPixmap(QPM_Seven);
+                    cell.label->setPixmap(*pmSeven);
                     break;
                 case EIGHT:
-                    cell.label->setPixmap(QPM_Eight);
+                    cell.label->setPixmap(*pmEight);
                     break;
                 case MINE:
-                    cell.label->setPixmap(QPM_Mine);
+                    cell.label->setPixmap(*pmMine);
                     break;
             }
         }
@@ -1011,7 +975,7 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgFlag).scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+        principalMatrix[_X][_Y].button->setIcon(QIcon(*pmFlag));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1027,7 +991,7 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(QPixmap::fromImage(*imgNoFlag).scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+        principalMatrix[_X][_Y].button->setIcon(QIcon(*pmNoFlag));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1106,7 +1070,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
                                         QString::number(gameEngine->mines()) +
                                         " Mines");
     }
-    principalMatrix[_X][_Y].label->setPixmap(QPixmap::fromImage(*imgBoom).scaled(cellLength, cellLength, Qt::KeepAspectRatio));
+    principalMatrix[_X][_Y].label->setPixmap(*pmBoom);
 
 
     for(uchar j=0; j<gameEngine->lines(); j++)
@@ -1127,7 +1091,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
                          cellGE.hasFlag)
                 {
                     cellGui.button->hide();
-                    cellGui.label->setPixmap(QPixmap::fromImage(*imgWrongFlag).scaled(cellLength, cellLength, Qt::KeepAspectRatio));
+                    cellGui.label->setPixmap(*pmWrongFlag);
                 }
                 else
                 {
@@ -1287,40 +1251,35 @@ void LibreMinesGui::vSetApplicationTheme(const QString& theme)
 
 void LibreMinesGui::vSetMinefieldTheme(const QString &theme)
 {
+    QString prefix;
     if(theme.compare("ClassicLight", Qt::CaseInsensitive) == 0)
     {
-        imgZero->load(":/minefield_icons/classic_light/Minesweeper_0.svg");
-        imgOne->load(":/minefield_icons/classic_light/Minesweeper_1.svg");
-        imgTwo->load(":/minefield_icons/classic_light/Minesweeper_2.svg");
-        imgThree->load(":/minefield_icons/classic_light/Minesweeper_3.svg");
-        imgFour->load(":/minefield_icons/classic_light/Minesweeper_4.svg");
-        imgFive->load(":/minefield_icons/classic_light/Minesweeper_5.svg");
-        imgSix->load("::/minefield_icons/classic_light/Minesweeper_6.svg");
-        imgSeven->load(":/minefield_icons/classic_light/Minesweeper_7.svg");
-        imgEight->load(":/minefield_icons/classic_light/Minesweeper_8.svg");
-        imgFlag->load(":/minefield_icons/classic_light/Minesweeper_flag.svg");
-        imgNoFlag->load(":/minefield_icons/classic_light/Minesweeper_no_flag.svg");
-        imgMine->load(":/minefield_icons/classic_light/Minesweeper_mine.svg");
-        imgBoom->load(":/minefield_icons/classic_light/Minesweeper_boom.svg");
-        imgWrongFlag->load(":/minefield_icons/classic_light/Minesweeper_wrong_flag.svg");
+        prefix = ":/minefield_icons/classic_light/Minesweeper_";
     }
     else if(theme.compare("ClassicDark", Qt::CaseInsensitive) == 0)
     {
-        imgZero->load(":/minefield_icons/classic_dark/Minesweeper_0.svg");
-        imgOne->load(":/minefield_icons/classic_dark/Minesweeper_1.svg");
-        imgTwo->load(":/minefield_icons/classic_dark/Minesweeper_2.svg");
-        imgThree->load(":/minefield_icons/classic_dark/Minesweeper_3.svg");
-        imgFour->load(":/minefield_icons/classic_dark/Minesweeper_4.svg");
-        imgFive->load(":/minefield_icons/classic_dark/Minesweeper_5.svg");
-        imgSix->load("::/minefield_icons/classic_dark/Minesweeper_6.svg");
-        imgSeven->load(":/minefield_icons/classic_dark/Minesweeper_7.svg");
-        imgEight->load(":/minefield_icons/classic_dark/Minesweeper_8.svg");
-        imgFlag->load(":/minefield_icons/classic_dark/Minesweeper_flag.svg");
-        imgNoFlag->load(":/minefield_icons/classic_dark/Minesweeper_no_flag.svg");
-        imgMine->load(":/minefield_icons/classic_dark/Minesweeper_mine.svg");
-        imgBoom->load(":/minefield_icons/classic_dark/Minesweeper_boom.svg");
-        imgWrongFlag->load(":/minefield_icons/classic_dark/Minesweeper_wrong_flag.svg");
+        prefix = ":/minefield_icons/classic_dark/Minesweeper_";
     }
+    else
+    {
+        qWarning() << "Minefield selected " << theme << " does not exist";
+        return;
+    }
+
+    pmZero.reset( new QPixmap( QPixmap(prefix + "0.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmOne.reset( new QPixmap(  QPixmap(prefix + "1.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmTwo.reset( new QPixmap(  QPixmap(prefix + "2.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmThree.reset( new QPixmap(QPixmap(prefix + "3.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmFour.reset( new QPixmap( QPixmap(prefix + "4.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmFive.reset( new QPixmap( QPixmap(prefix + "5.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmSix.reset( new QPixmap(  QPixmap(prefix + "6.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmSeven.reset( new QPixmap(QPixmap(prefix + "7.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmEight.reset( new QPixmap(QPixmap(prefix + "8.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmFlag.reset( new QPixmap(QPixmap(prefix + "flag.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmNoFlag.reset( new QPixmap(QPixmap(prefix + "no_flag.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmMine.reset( new QPixmap(QPixmap(prefix + "mine.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmBoom.reset( new QPixmap(QPixmap(prefix + "boom.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmWrongFlag.reset( new QPixmap(QPixmap(prefix + "wrong_flag.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
 }
 
 void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
@@ -1334,38 +1293,39 @@ void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar
     if(cellGE.isHidden)
     {
 
-        QImage img = cellGE.hasFlag ? *imgFlag : *imgNoFlag;
+        QImage img = cellGE.hasFlag ? pmFlag->toImage() : pmNoFlag->toImage();
         img.invertPixels();
-        cellGui.button->setIcon(QIcon(QPixmap::fromImage(img).scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+        cellGui.button->setIcon(QIcon(QPixmap::fromImage(img)));
     }
     else
     {
-        QImage img = QImage();
+        const QPixmap* pm = nullptr;
 
         if(cellGE.state == ZERO)
-            img = *imgZero;
+            pm = pmZero.get();
         else if(cellGE.state == ONE)
-            img = *imgOne;
+            pm = pmOne.get();
         else if(cellGE.state == TWO)
-            img = *imgTwo;
+            pm = pmTwo.get();
         else if(cellGE.state == THREE)
-            img = *imgThree;
+            pm = pmThree.get();
         else if(cellGE.state == FOUR)
-            img = *imgFour;
+            pm = pmFour.get();
         else if(cellGE.state == FIVE)
-            img = *imgFive;
+            pm = pmFive.get();
         else if(cellGE.state == SIX)
-            img = *imgSix;
+            pm = pmSix.get();
         else if(cellGE.state == SEVEN)
-            img = *imgSeven;
+            pm = pmSeven.get();
         else if(cellGE.state == EIGHT)
-            img = *imgEight;
+            pm = pmEight.get();
         else
             qFatal(Q_FUNC_INFO);
 
+        QImage img = pm->toImage();
         img.invertPixels();
 
-        cellGui.label->setPixmap(QPixmap::fromImage(img).scaled(cellLength, cellLength, Qt::KeepAspectRatio));
+        cellGui.label->setPixmap(QPixmap::fromImage(img));
     }
 }
 
@@ -1376,35 +1336,35 @@ void LibreMinesGui::vKeyboardControllUnsetCurrentCell()
 
     if(cellGE.isHidden)
     {
-        QImage* img = cellGE.hasFlag ? imgFlag : imgNoFlag;
-        cellGui.button->setIcon(QIcon(QPixmap::fromImage(*img).scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+        QPixmap* pm = cellGE.hasFlag ? pmFlag.get() : pmNoFlag.get();
+        cellGui.button->setIcon(QIcon(*pm));
     }
     else
     {
-        QImage* img = nullptr;
+        QPixmap* pm = nullptr;
 
         if(cellGE.state == ZERO)
-            img = imgZero;
+            pm = pmZero.get();
         else if(cellGE.state == ONE)
-            img = imgOne;
+            pm = pmOne.get();
         else if(cellGE.state == TWO)
-            img = imgTwo;
+            pm = pmTwo.get();
         else if(cellGE.state == THREE)
-            img = imgThree;
+            pm = pmThree.get();
         else if(cellGE.state == FOUR)
-            img = imgFour;
+            pm = pmFour.get();
         else if(cellGE.state == FIVE)
-            img = imgFive;
+            pm = pmFive.get();
         else if(cellGE.state == SIX)
-            img = imgSix;
+            pm = pmSix.get();
         else if(cellGE.state == SEVEN)
-            img = imgSeven;
+            pm = pmSeven.get();
         else if(cellGE.state == EIGHT)
-            img = imgEight;
+            pm = pmEight.get();
         else
             qFatal(Q_FUNC_INFO);
 
-        cellGui.label->setPixmap(QPixmap::fromImage(*img).scaled(cellLength, cellLength, Qt::KeepAspectRatio));
+        cellGui.label->setPixmap(*pm);
     }
 }
 
