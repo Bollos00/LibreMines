@@ -88,7 +88,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
             this, &LibreMinesGui::SLOT_quitApplication);
 
     // Create interface with the passed dimensions
-    vConfigureInterface(thatWidth, thatHeight);
+    vCreateGUI(thatWidth, thatHeight);
 
     qApp->installEventFilter(this);
 
@@ -104,7 +104,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
 
     // Load configuration file and set the theme
     vLastSessionLoadConfigurationFile();
-    vConfigureTheme(preferences->optionTheme());
+    vSetApplicationTheme(preferences->optionApplicationTheme());
+    vSetMinefieldTheme(preferences->optionMinefieldTheme());
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -449,7 +450,7 @@ void LibreMinesGui::vResetPrincipalMatrix()
     principalMatrix.clear();
 }
 
-void LibreMinesGui::vConfigureInterface(int width, int height)
+void LibreMinesGui::vCreateGUI(int width, int height)
 {
     // Create the interface
 
@@ -624,7 +625,7 @@ void LibreMinesGui::vConfigureInterface(int width, int height)
             this, &LibreMinesGui::SLOT_showHighScores);
 }
 
-void LibreMinesGui::vHideInterface()
+void LibreMinesGui::vHideMainMenu()
 {
     buttonEasy->hide();
     buttonMedium->hide();
@@ -644,7 +645,7 @@ void LibreMinesGui::vHideInterface()
     menuBar()->hide();
 }
 
-void LibreMinesGui::vShowInterface()
+void LibreMinesGui::vShowMainMenu()
 {
     buttonEasy->show();
     buttonMedium->show();
@@ -665,7 +666,7 @@ void LibreMinesGui::vShowInterface()
 
 void LibreMinesGui::SLOT_Easy()
 {
-    vHideInterface();
+    vHideMainMenu();
     vNewGame(8, 8, 10);
 
     difficult = EASY;
@@ -673,7 +674,7 @@ void LibreMinesGui::SLOT_Easy()
 
 void LibreMinesGui::SLOT_Medium()
 {
-    vHideInterface();
+    vHideMainMenu();
     vNewGame(16, 16, 40);
 
     difficult = MEDIUM;
@@ -682,7 +683,7 @@ void LibreMinesGui::SLOT_Medium()
 
 void LibreMinesGui::SLOT_Hard()
 {
-    vHideInterface();
+    vHideMainMenu();
     vNewGame(30, 16, 99);
 
     difficult = HARD;
@@ -691,7 +692,7 @@ void LibreMinesGui::SLOT_Hard()
 
 void LibreMinesGui::SLOT_Customized()
 {
-    vHideInterface();
+    vHideMainMenu();
 
     int x = sbCustomizedX->value();
     int y = sbCustomizedY->value();
@@ -765,7 +766,7 @@ void LibreMinesGui::SLOT_Quit()
 
     vResetPrincipalMatrix();
     vHideInterfaceInGame();
-    vShowInterface();
+    vShowMainMenu();
 
     difficult = NONE;
 
@@ -1145,9 +1146,13 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
 
 void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value)
 {
-    if(name.compare("Theme", Qt::CaseInsensitive) == 0)
+    if(name.compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
     {
-        vConfigureTheme(value);
+        vSetApplicationTheme(value);
+    }
+    else if(name.compare("MinefieldTheme", Qt::CaseInsensitive) == 0)
+    {
+        vSetMinefieldTheme(value);
     }
 }
 
@@ -1236,25 +1241,10 @@ void LibreMinesGui::SLOT_showHighScores()
     dialog.exec();
 }
 
-void LibreMinesGui::vConfigureTheme(const QString& theme)
+void LibreMinesGui::vSetApplicationTheme(const QString& theme)
 {
     if(theme.compare("Dark", Qt::CaseInsensitive) == 0)
     {
-        imgZero->load(":/minefield_icons/classic_dark/Minesweeper_0.svg");
-        imgOne->load(":/minefield_icons/classic_dark/Minesweeper_1.svg");
-        imgTwo->load(":/minefield_icons/classic_dark/Minesweeper_2.svg");
-        imgThree->load(":/minefield_icons/classic_dark/Minesweeper_3.svg");
-        imgFour->load(":/minefield_icons/classic_dark/Minesweeper_4.svg");
-        imgFive->load(":/minefield_icons/classic_dark/Minesweeper_5.svg");
-        imgSix->load("::/minefield_icons/classic_dark/Minesweeper_6.svg");
-        imgSeven->load(":/minefield_icons/classic_dark/Minesweeper_7.svg");
-        imgEight->load(":/minefield_icons/classic_dark/Minesweeper_8.svg");
-        imgFlag->load(":/minefield_icons/classic_dark/Minesweeper_flag.svg");
-        imgNoFlag->load(":/minefield_icons/classic_dark/Minesweeper_no_flag.svg");
-        imgMine->load(":/minefield_icons/classic_dark/Minesweeper_mine.svg");
-        imgBoom->load(":/minefield_icons/classic_dark/Minesweeper_boom.svg");
-        imgWrongFlag->load(":/minefield_icons/classic_dark/Minesweeper_flag.svg");
-
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette darkPalette;
         darkPalette.setColor (QPalette::BrightText,      Qt::red);
@@ -1275,21 +1265,6 @@ void LibreMinesGui::vConfigureTheme(const QString& theme)
     }
     else if(theme.compare("Light", Qt::CaseInsensitive) == 0)
     {
-        imgZero->load(":/minefield_icons/classic_light/Minesweeper_0.svg");
-        imgOne->load(":/minefield_icons/classic_light/Minesweeper_1.svg");
-        imgTwo->load(":/minefield_icons/classic_light/Minesweeper_2.svg");
-        imgThree->load(":/minefield_icons/classic_light/Minesweeper_3.svg");
-        imgFour->load(":/minefield_icons/classic_light/Minesweeper_4.svg");
-        imgFive->load(":/minefield_icons/classic_light/Minesweeper_5.svg");
-        imgSix->load("::/minefield_icons/classic_light/Minesweeper_6.svg");
-        imgSeven->load(":/minefield_icons/classic_light/Minesweeper_7.svg");
-        imgEight->load(":/minefield_icons/classic_light/Minesweeper_8.svg");
-        imgFlag->load(":/minefield_icons/classic_light/Minesweeper_flag.svg");
-        imgNoFlag->load(":/minefield_icons/classic_light/Minesweeper_no_flag.svg");
-        imgMine->load(":/minefield_icons/classic_light/Minesweeper_mine.svg");
-        imgBoom->load(":/minefield_icons/classic_light/Minesweeper_boom.svg");
-        imgWrongFlag->load(":/minefield_icons/classic_light/Minesweeper_flag.svg");
-
         qApp->setStyle (QStyleFactory::create ("Fusion"));
         QPalette lightPalette;
         lightPalette.setColor (QPalette::BrightText,      Qt::cyan);
@@ -1304,9 +1279,47 @@ void LibreMinesGui::vConfigureTheme(const QString& theme)
         lightPalette.setColor (QPalette::AlternateBase,   QColor (202, 202, 202));
         lightPalette.setColor (QPalette::Button,          QColor (202, 202, 202));
         lightPalette.setColor (QPalette::Link,            QColor (213, 125, 37));
-        lightPalette.setColor (QPalette::Highlight,       QColor (213, 225, 37));
+        lightPalette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
 
         qApp->setPalette(lightPalette);
+    }
+}
+
+void LibreMinesGui::vSetMinefieldTheme(const QString &theme)
+{
+    if(theme.compare("ClassicLight", Qt::CaseInsensitive) == 0)
+    {
+        imgZero->load(":/minefield_icons/classic_light/Minesweeper_0.svg");
+        imgOne->load(":/minefield_icons/classic_light/Minesweeper_1.svg");
+        imgTwo->load(":/minefield_icons/classic_light/Minesweeper_2.svg");
+        imgThree->load(":/minefield_icons/classic_light/Minesweeper_3.svg");
+        imgFour->load(":/minefield_icons/classic_light/Minesweeper_4.svg");
+        imgFive->load(":/minefield_icons/classic_light/Minesweeper_5.svg");
+        imgSix->load("::/minefield_icons/classic_light/Minesweeper_6.svg");
+        imgSeven->load(":/minefield_icons/classic_light/Minesweeper_7.svg");
+        imgEight->load(":/minefield_icons/classic_light/Minesweeper_8.svg");
+        imgFlag->load(":/minefield_icons/classic_light/Minesweeper_flag.svg");
+        imgNoFlag->load(":/minefield_icons/classic_light/Minesweeper_no_flag.svg");
+        imgMine->load(":/minefield_icons/classic_light/Minesweeper_mine.svg");
+        imgBoom->load(":/minefield_icons/classic_light/Minesweeper_boom.svg");
+        imgWrongFlag->load(":/minefield_icons/classic_light/Minesweeper_wrong_flag.svg");
+    }
+    else if(theme.compare("ClassicDark", Qt::CaseInsensitive) == 0)
+    {
+        imgZero->load(":/minefield_icons/classic_dark/Minesweeper_0.svg");
+        imgOne->load(":/minefield_icons/classic_dark/Minesweeper_1.svg");
+        imgTwo->load(":/minefield_icons/classic_dark/Minesweeper_2.svg");
+        imgThree->load(":/minefield_icons/classic_dark/Minesweeper_3.svg");
+        imgFour->load(":/minefield_icons/classic_dark/Minesweeper_4.svg");
+        imgFive->load(":/minefield_icons/classic_dark/Minesweeper_5.svg");
+        imgSix->load("::/minefield_icons/classic_dark/Minesweeper_6.svg");
+        imgSeven->load(":/minefield_icons/classic_dark/Minesweeper_7.svg");
+        imgEight->load(":/minefield_icons/classic_dark/Minesweeper_8.svg");
+        imgFlag->load(":/minefield_icons/classic_dark/Minesweeper_flag.svg");
+        imgNoFlag->load(":/minefield_icons/classic_dark/Minesweeper_no_flag.svg");
+        imgMine->load(":/minefield_icons/classic_dark/Minesweeper_mine.svg");
+        imgBoom->load(":/minefield_icons/classic_dark/Minesweeper_boom.svg");
+        imgWrongFlag->load(":/minefield_icons/classic_dark/Minesweeper_wrong_flag.svg");
     }
 }
 
@@ -1478,12 +1491,12 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                preferences->setOptionFirstCellClean(terms.at(1));
            }
-           else if(terms.at(0).compare("Theme", Qt::CaseInsensitive) == 0)
+           else if(terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
            {
                if(terms.size() != 2)
                    continue;
 
-               preferences->setOptionTheme(terms.at(1));
+               preferences->setOptionApplicationTheme(terms.at(1));
            }
            else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
            {
@@ -1535,6 +1548,13 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
                                terms.at(6).toInt(nullptr, 16),
                            });
            }
+           else if(terms.at(0).compare("MinefieldTheme", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               preferences->setOptionMinefieldTheme(terms.at(1));
+           }
         }
     }
 
@@ -1570,13 +1590,14 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
     QTextStream stream(fileLastSession.get());
 
     stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
-           << "Theme" << ' ' << preferences->optionTheme() << '\n'
+           << "ApplicationTheme" << ' ' << preferences->optionApplicationTheme() << '\n'
            << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
            << "Username" << ' ' << preferences->optionUsername() << '\n'
            << "CustomizedPercentageOfMines" << ' ' << sbCustomizednMines->value() << '\n'
            << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
            << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
-           << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n';
+           << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
+           << "ApplicationTheme" << ' ' << preferences->optionMinefieldTheme() << '\n';
 }
 
 void LibreMinesGui::vUpdatePreferences()

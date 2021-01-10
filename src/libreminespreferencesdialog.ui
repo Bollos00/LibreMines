@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>743</width>
-    <height>418</height>
+    <width>778</width>
+    <height>468</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QGroupBox" name="gbCheckBoxes">
      <property name="title">
-      <string>checkBoxes</string>
+      <string>On Game Options</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -41,7 +41,7 @@ Clicked On Showed Cell</string>
    <item row="0" column="1">
     <widget class="QGroupBox" name="gbLineEdits">
      <property name="title">
-      <string>lineEdits</string>
+      <string>User Information</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
@@ -62,22 +62,36 @@ Clicked On Showed Cell</string>
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QGroupBox" name="gbComboBoxes">
+    <widget class="QGroupBox" name="gbAppearance">
      <property name="title">
-      <string>comboBoxes</string>
+      <string>Appearance</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="labelTheme">
+         <widget class="QLabel" name="labelApplicationTheme">
           <property name="text">
-           <string>Theme:</string>
+           <string>Application Theme:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBoxTheme"/>
+         <widget class="QComboBox" name="comboBoxApplicationTheme"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="labelMinefieldTheme">
+          <property name="text">
+           <string>Minefield Theme:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxMinefieldTheme"/>
         </item>
        </layout>
       </item>
@@ -101,6 +115,12 @@ Clicked On Showed Cell</string>
         </item>
         <item>
          <widget class="QKeyInput" name="keyInputMoveLeft">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>100</width>
@@ -128,6 +148,12 @@ Clicked On Showed Cell</string>
         </item>
         <item>
          <widget class="QKeyInput" name="keyInputMoveUp">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>100</width>
@@ -155,6 +181,12 @@ Clicked On Showed Cell</string>
         </item>
         <item>
          <widget class="QKeyInput" name="keyInputMoveRight">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>100</width>
@@ -182,6 +214,12 @@ Clicked On Showed Cell</string>
         </item>
         <item>
          <widget class="QKeyInput" name="keyInputMoveDown">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>100</width>
@@ -209,6 +247,12 @@ Clicked On Showed Cell</string>
         </item>
         <item>
          <widget class="QKeyInput" name="keyInputReleaseCell">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>100</width>
@@ -236,6 +280,12 @@ Clicked On Showed Cell</string>
         </item>
         <item>
          <widget class="QKeyInput" name="keyInputFlagCell">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>100</width>

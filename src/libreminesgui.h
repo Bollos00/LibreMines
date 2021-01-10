@@ -89,17 +89,17 @@ private:
      * @brief
      *
      */
-    void vConfigureInterface(int width, int height);
+    void vCreateGUI(int width, int height);
     /**
      * @brief
      *
      */
-    void vHideInterface();
+    void vHideMainMenu();
     /**
      * @brief
      *
      */
-    void vShowInterface();
+    void vShowMainMenu();
     /**
      * @brief
      *
@@ -116,7 +116,8 @@ private:
      */
     void vShowInterfaceInGame();
 
-    void vConfigureTheme(const QString &theme);
+    void vSetApplicationTheme(const QString& theme);
+    void vSetMinefieldTheme(const QString& theme);
 
     void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
     void vKeyboardControllUnsetCurrentCell();
