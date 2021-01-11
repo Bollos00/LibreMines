@@ -8,25 +8,26 @@
 The following dependencies are required for building and running LibreMines:
 * [Qt5 Core](https://doc.qt.io/qt-5/qtcore-index.html) >= 5.12
 * [Qt5 Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
+* [Qt5 SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
 * [CMake](https://cmake.org/) >= 3.1
 
 Note: Qt6 is also supported
 
 On Arch Linux and derivatives systems the dependencies can be installed with pacman:
 ```sh
-sudo pacman -S base-devel qt5-base cmake
+sudo pacman -S base-devel qt5-base qt5-svg cmake
 ```
 
 For ubuntu you can install the dependencies with the following command:
 ```sh
-sudo apt-get install build-essential qt5-default cmake
+sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev
 ```
 
-On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/)
+On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/)
 
 ```sh
 su -
-pkg install qt5-core qt5-widgets git cmake
+pkg install qt5-core qt5-widgets qt5-svg git cmake
 ```
 
 For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/) or your preferred package manager.
@@ -42,7 +43,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 make
 ```
 
-Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines Qt6 libraries, additionally pass the argument `-DUSE_QT6="YES"`.
+Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines using Qt6 libraries, additionally pass the argument `-DUSE_QT6="YES"`.
 
 The executable `libremines` will be generated in the build directory, now it is possible to run it with:
 ```sh

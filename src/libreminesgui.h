@@ -78,6 +78,8 @@ public:
 protected:
     bool eventFilter(QObject* object, QEvent* event);
 
+    void closeEvent(QCloseEvent* e);
+
 private:
     void vNewGame(const uchar _X,
                   const uchar _Y,
@@ -89,17 +91,17 @@ private:
      * @brief
      *
      */
-    void vConfigureInterface(int width, int height);
+    void vCreateGUI(int width, int height);
     /**
      * @brief
      *
      */
-    void vHideInterface();
+    void vHideMainMenu();
     /**
      * @brief
      *
      */
-    void vShowInterface();
+    void vShowMainMenu();
     /**
      * @brief
      *
@@ -116,7 +118,8 @@ private:
      */
     void vShowInterfaceInGame();
 
-    void vConfigureTheme(const QString &theme);
+    void vSetApplicationTheme(const QString& theme);
+    void vSetMinefieldTheme(const QString& theme);
 
     void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
     void vKeyboardControllUnsetCurrentCell();
@@ -248,20 +251,20 @@ private:
     QAction* actionAbout;
     QAction* actionAboutQt;
 
-    QImage *imgZero; /**< TODO: describe */
-    QImage *imgOne; /**< TODO: describe */
-    QImage *imgTwo; /**< TODO: describe */
-    QImage *imgThree; /**< TODO: describe */
-    QImage *imgFour; /**< TODO: describe */
-    QImage *imgFive; /**< TODO: describe */
-    QImage *imgSix; /**< TODO: describe */
-    QImage *imgSeven; /**< TODO: describe */
-    QImage *imgEight; /**< TODO: describe */
-    QImage *imgFlag; /**< TODO: describe */
-    QImage *imgNoFlag; /**< TODO: describe */
-    QImage *imgMine; /**< TODO: describe */
-    QImage *imgBoom; /**< TODO: describe */
-    QImage *imgWrongFlag; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmZero; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmOne; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmTwo; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmThree; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmFour; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmFive; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmSix; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmSeven; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmEight; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmFlag; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmNoFlag; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmMine; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmBoom; /**< TODO: describe */
+    QScopedPointer<QPixmap> pmWrongFlag; /**< TODO: describe */
 
     KeyboardController controller;
 

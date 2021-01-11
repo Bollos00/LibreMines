@@ -28,7 +28,9 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->comboBoxTheme->addItems({"Dark", "Light"});
+    ui->comboBoxApplicationTheme->addItems({"Dark", "Light"});
+    ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
+
 
     // Space character is not allowed. This will remove every space character of the line edit
 //    ui->lineEditUsername->setValidator(new QRegExpValidator(QRegExp("^(?i)[a-z][a-z0-9]*$")));
@@ -36,9 +38,16 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
             [this](QString text)
     { ui->lineEditUsername->setText(text.remove(" ", Qt::CaseInsensitive)); });
 
-    connect(ui->comboBoxTheme, &QComboBox::currentTextChanged,
+    connect(ui->comboBoxApplicationTheme, &QComboBox::currentTextChanged,
             [this](const QString& text)
-    { emit SIGNAL_optionChanged("Theme", text); });
+    { emit SIGNAL_optionChanged("ApplicationTheme", text); });
+
+    connect(ui->comboBoxMinefieldTheme, &QComboBox::currentTextChanged,
+            [this](QString text)
+    {
+        text.remove(" ", Qt::CaseInsensitive);
+        emit SIGNAL_optionChanged("MinefieldTheme", text);
+    });
 
     ui->keyInputMoveLeft->setKey(Qt::Key_A);
     ui->keyInputMoveUp->setKey(Qt::Key_W);
@@ -64,9 +73,16 @@ bool LibreMinesPreferencesDialog::optionCleanNeighborCellsWhenClickedOnShowedCel
     return ui->cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked();
 }
 
-QString LibreMinesPreferencesDialog::optionTheme() const
+QString LibreMinesPreferencesDialog::optionApplicationTheme() const
 {
-    return ui->comboBoxTheme->currentText();
+    return ui->comboBoxApplicationTheme->currentText();
+}
+
+QString LibreMinesPreferencesDialog::optionMinefieldTheme() const
+{
+    QString s = ui->comboBoxMinefieldTheme->currentText();
+    s.remove(" ", Qt::CaseInsensitive);
+    return s;
 }
 
 QString LibreMinesPreferencesDialog::optionUsername() const
@@ -84,9 +100,18 @@ void LibreMinesPreferencesDialog::setOptionCleanNeighborCellsWhenClickedOnShowed
     ui->cbCleanNeighborCellsWhenClickedOnShowedCell->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
 }
 
-void LibreMinesPreferencesDialog::setOptionTheme(const QString &theme)
+void LibreMinesPreferencesDialog::setOptionApplicationTheme(const QString &theme)
 {
-    ui->comboBoxTheme->setCurrentText(theme);
+    ui->comboBoxApplicationTheme->setCurrentText(theme);
+}
+
+void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &theme)
+{
+    QString s;
+    if(theme == "ClassicLight"){ s = "Classic Light"; }
+    else if(theme == "ClassicDark"){ s = "Classic Dark"; }
+
+    ui->comboBoxMinefieldTheme->setCurrentText(s);
 }
 
 void LibreMinesPreferencesDialog::setOptionUsername(const QString &username)

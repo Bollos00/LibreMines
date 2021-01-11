@@ -37,12 +37,14 @@ public:
 
     bool optionFirstCellClean()const;
     bool optionCleanNeighborCellsWhenClickedOnShowedCell()const;
-    QString optionTheme()const;
+    QString optionApplicationTheme()const;
+    QString optionMinefieldTheme()const;
     QString optionUsername()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
-    void setOptionTheme(const QString& theme);
+    void setOptionApplicationTheme(const QString& theme);
+    void setOptionMinefieldTheme(const QString& theme);
     void setOptionUsername(const QString& username);
 
     QList<int> optionKeyboardControllerKeys()const;
