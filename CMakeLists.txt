@@ -19,7 +19,7 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.2.1"
+    VERSION "1.2.2"
     DESCRIPTION "A Qt based Minesweeper game"
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
@@ -94,10 +94,19 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DEPRECATED_WARNINGS)
 
 if(USE_QT6)
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
+    find_package(Qt6 REQUIRED COMPONENTS Core)
+    find_package(Qt6 REQUIRED COMPONENTS Svg)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Svg)
+
 else()
     find_package(Qt5 REQUIRED COMPONENTS Widgets)
+    find_package(Qt5 REQUIRED COMPONENTS Core)
+    find_package(Qt5 REQUIRED COMPONENTS Svg)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Svg)
 endif()
 
 # create install target

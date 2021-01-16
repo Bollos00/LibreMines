@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -229,11 +229,15 @@ private:
 
     QSpinBox *sbCustomizedX; /**< TODO: describe */
     QSpinBox *sbCustomizedY; /**< TODO: describe */
-    QSpinBox *sbCustomizednMines; /**< TODO: describe */
+    QSpinBox *sbCustomizedPercentageMines; /**< TODO: describe */
+    QSpinBox* sbCustomizedNumbersOfMines;
 
     QLabel *labelCustomizedX; /**< TODO: describe */
     QLabel *labelCustomizedY; /**< TODO: describe */
-    QLabel *labelCustomized_nMines; /**< TODO: describe */
+    QLabel *labelCustomizedPercentageMines; /**< TODO: describe */
+    QLabel* labelCustomizedNumbersOfMines;
+
+    QCheckBox* cbCustomizedMinesInPercentage;
 
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
