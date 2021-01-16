@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************
  */
+
 
 #include <QtCore/QRandomGenerator>
 #include <QDebug>
@@ -512,11 +513,17 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     sbCustomizedY->setValue(20);
 
 
-    sbCustomizednMines = new QSpinBox(centralWidget());
-    sbCustomizednMines->setMinimum(0);
-    sbCustomizednMines->setMaximum(100);
-    sbCustomizednMines->setValue(20);
+    sbCustomizedPercentageMines = new QSpinBox(centralWidget());
+    sbCustomizedPercentageMines->setMinimum(0);
+    sbCustomizedPercentageMines->setMaximum(100);
+    sbCustomizedPercentageMines->setValue(20);
 
+    sbCustomizedNumbersOfMines = new QSpinBox(centralWidget());
+    sbCustomizedNumbersOfMines->setMinimum(0);
+    sbCustomizedNumbersOfMines->setMaximum(sbCustomizedX->value() * sbCustomizedY->value() * sbCustomizedPercentageMines->value() / 100);
+    sbCustomizedNumbersOfMines->setValue(sbCustomizedNumbersOfMines->maximum() * sbCustomizedPercentageMines->value() / 100);
+
+    cbCustomizedMinesInPercentage = new QCheckBox(centralWidget());
 
     labelCustomizedX = new QLabel(centralWidget());
     labelCustomizedX->setText("Width: ");
@@ -524,9 +531,11 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     labelCustomizedY = new QLabel(centralWidget());
     labelCustomizedY->setText("Height: ");
 
-    labelCustomized_nMines = new QLabel(centralWidget());
-    labelCustomized_nMines->setText("Percent of Mines: ");
+    labelCustomizedPercentageMines = new QLabel(centralWidget());
+    labelCustomizedPercentageMines->setText("Percent of Mines: ");
 
+    labelCustomizedNumbersOfMines = new QLabel(centralWidget());
+    labelCustomizedNumbersOfMines->setText("Number of Mines: ");
 
     buttonEasy->setGeometry(iWidthMainWindow/20, iHeightMainWindow/20,
                             iWidthMainWindow/2 - 2*iWidthMainWindow/20, 4*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
@@ -540,23 +549,42 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     buttonCustomizedNewGame->setGeometry(buttonEasy->x() + buttonEasy->width() + iWidthMainWindow/20, buttonEasy->y() + buttonEasy->height() + iHeightMainWindow/20,
                                          iWidthMainWindow/2 - 2*iWidthMainWindow/20, 2*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
 
-    labelCustomized_nMines->setGeometry(buttonCustomizedNewGame->x(), buttonCustomizedNewGame->y()+buttonCustomizedNewGame->height(),
+    labelCustomizedPercentageMines->setGeometry(buttonCustomizedNewGame->x(), buttonCustomizedNewGame->y()+buttonCustomizedNewGame->height(),
                                         buttonCustomizedNewGame->width()/2,2*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/(3*5));
 
-    labelCustomizedX->setGeometry(labelCustomized_nMines->x(), labelCustomized_nMines->y()+labelCustomized_nMines->height(),
-                                  labelCustomized_nMines->width(),labelCustomized_nMines->height());
+    labelCustomizedNumbersOfMines->setGeometry(labelCustomizedPercentageMines->geometry());
+
+    labelCustomizedX->setGeometry(labelCustomizedPercentageMines->x(), labelCustomizedPercentageMines->y()+labelCustomizedPercentageMines->height(),
+                                  labelCustomizedPercentageMines->width(),labelCustomizedPercentageMines->height());
 
     labelCustomizedY->setGeometry(labelCustomizedX->x(), labelCustomizedX->y()+labelCustomizedX->height(),
                                   labelCustomizedX->width(),labelCustomizedX->height());
 
-    sbCustomizednMines->setGeometry(labelCustomized_nMines->x()+labelCustomized_nMines->width(), labelCustomized_nMines->y(),
-                                    labelCustomized_nMines->width(), labelCustomized_nMines->height());
+    sbCustomizedPercentageMines->setGeometry(labelCustomizedPercentageMines->x()+labelCustomizedPercentageMines->width(), labelCustomizedPercentageMines->y(),
+                                    9*labelCustomizedPercentageMines->width()/10, labelCustomizedPercentageMines->height());
+
+    sbCustomizedNumbersOfMines->setGeometry(sbCustomizedPercentageMines->geometry());
+
+    cbCustomizedMinesInPercentage->setGeometry(sbCustomizedNumbersOfMines->x() + sbCustomizedNumbersOfMines->width(), sbCustomizedNumbersOfMines->y(),
+                                               labelCustomizedNumbersOfMines->width()/10, sbCustomizedNumbersOfMines->height());
 
     sbCustomizedX->setGeometry(labelCustomizedX->x()+labelCustomizedX->width(), labelCustomizedX->y(),
                                labelCustomizedX->width(), labelCustomizedX->height());
 
     sbCustomizedY->setGeometry(labelCustomizedY->x()+labelCustomizedY->width(), labelCustomizedY->y(),
                                labelCustomizedY->width(), labelCustomizedY->height());
+
+    labelCustomizedNumbersOfMines->hide();
+    sbCustomizedNumbersOfMines->hide();
+
+    cbCustomizedMinesInPercentage->setStyleSheet(
+                "QCheckBox::indicator "
+                "{"
+                "    width: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
+                "    height: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
+                "}");
+
+    cbCustomizedMinesInPercentage->setChecked(true);
 
     connect(buttonEasy, &QPushButton::released,
             this, &LibreMinesGui::SLOT_Easy);
@@ -587,6 +615,55 @@ void LibreMinesGui::vCreateGUI(int width, int height)
 
     connect(actionHighScores, &QAction::triggered,
             this, &LibreMinesGui::SLOT_showHighScores);
+
+    connect(cbCustomizedMinesInPercentage, &QCheckBox::stateChanged,
+            [this](const int state)
+    {
+       if(state == Qt::Checked)
+       {
+           sbCustomizedPercentageMines->show();
+           labelCustomizedPercentageMines->show();
+
+           sbCustomizedNumbersOfMines->hide();
+           labelCustomizedNumbersOfMines->hide();
+       }
+       else
+       {
+           sbCustomizedPercentageMines->hide();
+           labelCustomizedPercentageMines->hide();
+
+           sbCustomizedNumbersOfMines->show();
+           labelCustomizedNumbersOfMines->show();
+       }
+    });
+
+    connect(sbCustomizedPercentageMines, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](const int value)
+    {
+        if(!sbCustomizedPercentageMines->isHidden())
+            sbCustomizedNumbersOfMines->setValue(sbCustomizedX->value() * sbCustomizedY->value() * value / 100);
+    });
+
+    connect(sbCustomizedNumbersOfMines, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](const int value)
+    {
+        if(!sbCustomizedNumbersOfMines->isHidden())
+            sbCustomizedPercentageMines->setValue(100 * value / (sbCustomizedX->value() * sbCustomizedY->value()) );
+    });
+
+    auto updateCustomizedNumberOfMinesMaximum
+    {
+        [this]()
+        {
+            sbCustomizedNumbersOfMines->setMaximum(sbCustomizedX->value() * sbCustomizedY->value());
+            sbCustomizedNumbersOfMines->setValue(sbCustomizedX->value() * sbCustomizedY->value() * sbCustomizedPercentageMines->value() / 100);
+        }
+    };
+
+    connect(sbCustomizedX, QOverload<int>::of(&QSpinBox::valueChanged),
+            updateCustomizedNumberOfMinesMaximum);
+    connect(sbCustomizedY, QOverload<int>::of(&QSpinBox::valueChanged),
+            updateCustomizedNumberOfMinesMaximum);
 }
 
 void LibreMinesGui::vHideMainMenu()
@@ -599,11 +676,15 @@ void LibreMinesGui::vHideMainMenu()
 
     sbCustomizedX->hide();
     sbCustomizedY->hide();
-    sbCustomizednMines->hide();
+    sbCustomizedPercentageMines->hide();
+    sbCustomizedNumbersOfMines->hide();
 
     labelCustomizedX->hide();
     labelCustomizedY->hide();
-    labelCustomized_nMines->hide();
+    labelCustomizedPercentageMines->hide();
+    labelCustomizedNumbersOfMines->hide();
+
+    cbCustomizedMinesInPercentage->hide();
 
     // Hide de menu bar too
     menuBar()->hide();
@@ -619,11 +700,22 @@ void LibreMinesGui::vShowMainMenu()
 
     sbCustomizedX->show();
     sbCustomizedY->show();
-    sbCustomizednMines->show();
 
     labelCustomizedX->show();
     labelCustomizedY->show();
-    labelCustomized_nMines->show();
+
+    if(cbCustomizedMinesInPercentage->isChecked())
+    {
+        sbCustomizedPercentageMines->show();
+        labelCustomizedPercentageMines->show();
+    }
+    else
+    {
+        sbCustomizedNumbersOfMines->show();
+        labelCustomizedNumbersOfMines->show();
+    }
+
+    cbCustomizedMinesInPercentage->show();
 
     menuBar()->show();
 }
@@ -657,11 +749,7 @@ void LibreMinesGui::SLOT_Hard()
 void LibreMinesGui::SLOT_Customized()
 {
     vHideMainMenu();
-
-    int x = sbCustomizedX->value();
-    int y = sbCustomizedY->value();
-    int mines = static_cast<int> (round(x*y*sbCustomizednMines->value()/100));
-    vNewGame(x, y, mines);
+    vNewGame(sbCustomizedX->value(), sbCustomizedY->value(), sbCustomizedNumbersOfMines->value());
 
     difficult = CUSTOMIZED;
 
@@ -709,21 +797,49 @@ void LibreMinesGui::vShowInterfaceInGame()
 
 void LibreMinesGui::SLOT_Restart()
 {
+    if(gameEngine && gameEngine->isGameActive())
+    {
+        QMessageBox messageBox;
+
+        messageBox.setText("There is a game happening.");
+        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        messageBox.setDefaultButton(QMessageBox::No);
+        int result = messageBox.exec();
+
+        if(result == QMessageBox::No)
+            return;
+    }
+
     vResetPrincipalMatrix();
 
     labelStatisLastMatch->setText(" ");
+    labelYouWonYouLost->setText(" ");
 
-    uchar x = gameEngine->rows();
-    uchar y = gameEngine->lines();
-    ushort mines = gameEngine->mines();
+    const uchar x = gameEngine->rows();
+    const uchar y = gameEngine->lines();
+    const ushort mines = gameEngine->mines();
 
     emit SIGNAL_stopGame();
-    vResetPrincipalMatrix();
     vNewGame(x, y, mines);
 }
 
 void LibreMinesGui::SLOT_Quit()
 {
+    if(gameEngine && gameEngine->isGameActive())
+    {
+        QMessageBox messageBox;
+
+        messageBox.setText("There is a game happening.");
+        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        messageBox.setDefaultButton(QMessageBox::No);
+        int result = messageBox.exec();
+
+        if(result == QMessageBox::No)
+            return;
+    }
+
     labelStatisLastMatch->setText(" ");
 
     emit SIGNAL_stopGame();
@@ -878,15 +994,6 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                 }
             }
             LibreMinesScore::sort(scores);
-
-//            qDebug() << "\n##########################################";
-//            for(const auto& s: scores)
-//            {
-//                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$";
-//                qDebug() << s;
-//                qDebug() << "$$$$$$$$$$$$$$$$$$$$$$$$$$$\n";
-//            }
-//            qDebug() << "##########################################";
 
             int index = 0;
             for(int i=0; i<scores.size(); ++i)
@@ -1477,7 +1584,7 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
                if(terms.size() != 2)
                    continue;
 
-               sbCustomizednMines->setValue(terms.at(1).toInt());
+               sbCustomizedPercentageMines->setValue(terms.at(1).toInt());
            }
            else if(terms.at(0).compare("CustomizedX", Qt::CaseInsensitive) == 0)
            {
@@ -1514,6 +1621,13 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
                    continue;
 
                preferences->setOptionMinefieldTheme(terms.at(1));
+           }
+           else if(terms.at(0).compare("CustomizedMinesInPercentage", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               cbCustomizedMinesInPercentage->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
            }
         }
     }
@@ -1553,11 +1667,12 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
            << "ApplicationTheme" << ' ' << preferences->optionApplicationTheme() << '\n'
            << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
            << "Username" << ' ' << preferences->optionUsername() << '\n'
-           << "CustomizedPercentageOfMines" << ' ' << sbCustomizednMines->value() << '\n'
+           << "CustomizedPercentageOfMines" << ' ' << sbCustomizedPercentageMines->value() << '\n'
            << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
            << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
            << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
-           << "ApplicationTheme" << ' ' << preferences->optionMinefieldTheme() << '\n';
+           << "ApplicationTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
+           << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off");
 }
 
 void LibreMinesGui::vUpdatePreferences()
