@@ -27,6 +27,17 @@ namespace Ui {
 class LibreMinesPreferencesDialog;
 }
 
+namespace LibreMines
+{
+enum WhenCtrlIsPressedOptions : uchar
+{
+    GoToTheEdge = 0,
+    Jump3Cells = 1,
+    Jump5Cells = 2,
+    Jump10Cells = 3
+};
+}
+
 class LibreMinesPreferencesDialog : public QDialog
 {
     Q_OBJECT
@@ -40,12 +51,14 @@ public:
     QString optionApplicationTheme()const;
     QString optionMinefieldTheme()const;
     QString optionUsername()const;
+    uchar optionWhenCtrlIsPressed()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
     void setOptionApplicationTheme(const QString& theme);
     void setOptionMinefieldTheme(const QString& theme);
     void setOptionUsername(const QString& username);
+    void setOptionWhenCtrlIsPressed(const uchar option);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;
