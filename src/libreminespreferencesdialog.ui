@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>778</width>
-    <height>468</height>
+    <width>722</width>
+    <height>430</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -299,6 +299,20 @@ Clicked On Showed Cell</string>
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>When Ctrl is pressed</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxWhenCtrlIsPressed"/>
         </item>
        </layout>
       </item>

@@ -1476,10 +1476,37 @@ void LibreMinesGui::vKeyboardControllUnsetCurrentCell()
 }
 
 void LibreMinesGui::vKeyboardControllerMoveLeft()
-{
+{   
     vKeyboardControllUnsetCurrentCell();
 
-    uchar destX = (controller.ctrlPressed) ? 0 : (controller.currentX == 0) ? gameEngine->rows() - 1 : (controller.currentX - 1);
+    uchar destX = 0;
+
+    if(controller.ctrlPressed)
+    {
+        if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump3Cells &&
+           controller.currentX >= 3)
+        {
+            destX = controller.currentX - 3;
+        }
+        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump5Cells &&
+            controller.currentX >= 5)
+        {
+            destX = controller.currentX - 5;
+        }
+        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump10Cells &&
+                controller.currentX >= 10)
+        {
+            destX = controller.currentX - 10;
+        }
+//        else
+//        {
+//            destX = 0;
+//        }
+    }
+    else
+    {
+        destX = (controller.currentX == 0) ? gameEngine->rows() - 1 : controller.currentX - 1;
+    }
 
     vKeyboardControllerSetCurrentCell(destX, controller.currentY);
 }
@@ -1488,25 +1515,96 @@ void LibreMinesGui::vKeyboardControllerMoveRight()
 {
     vKeyboardControllUnsetCurrentCell();
 
-    uchar destX = (controller.ctrlPressed) ? gameEngine->rows() - 1 : (controller.currentX == gameEngine->rows() - 1) ? 0 : (controller.currentX + 1);
+    uchar destX = gameEngine->rows() - 1;
+
+    if(controller.ctrlPressed)
+    {
+        if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump3Cells &&
+            controller.currentX < gameEngine->rows() - 3)
+        {
+            destX = controller.currentX + 3;
+        }
+        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump5Cells &&
+            controller.currentX < gameEngine->rows() - 5)
+        {
+            destX = controller.currentX + 5;
+        }
+        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump10Cells &&
+                controller.currentX < gameEngine->rows() - 10)
+        {
+            destX = controller.currentX + 10;
+        }
+    }
+    else
+    {
+        destX = (controller.currentX == gameEngine->rows() - 1) ? 0 : (controller.currentX + 1);
+    }
 
     vKeyboardControllerSetCurrentCell(destX, controller.currentY);
+
 }
 
 void LibreMinesGui::vKeyboardControllerMoveDown()
 {
     vKeyboardControllUnsetCurrentCell();
 
-    uchar destY = (controller.ctrlPressed) ? gameEngine->lines() - 1 : (controller.currentY == gameEngine->lines() - 1) ? 0 : (controller.currentY + 1);
+    uchar destY = gameEngine->lines() - 1;
+
+    if(controller.ctrlPressed)
+    {
+        if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump3Cells &&
+            controller.currentY < gameEngine->lines() - 3)
+        {
+            destY = controller.currentY + 3;
+        }
+        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump5Cells &&
+            controller.currentY < gameEngine->lines() - 5)
+        {
+            destY = controller.currentY + 5;
+        }
+        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump10Cells &&
+                controller.currentY < gameEngine->lines() - 10)
+        {
+            destY = controller.currentY + 10;
+        }
+    }
+    else
+    {
+        destY = (controller.currentY == gameEngine->lines() - 1) ? 0 : (controller.currentY + 1);
+    }
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
+
 }
 
 void LibreMinesGui::vKeyboardControllerMoveUp()
 {
     vKeyboardControllUnsetCurrentCell();
 
-    uchar destY = (controller.ctrlPressed) ? 0 : (controller.currentY == 0) ? gameEngine->lines() -1 : (controller.currentY - 1);
+    uchar destY = 0;
+
+    if(controller.ctrlPressed)
+    {
+        if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump3Cells &&
+            controller.currentY >= 3)
+        {
+            destY = controller.currentY - 3;
+        }
+        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump5Cells &&
+            controller.currentY >= 5)
+        {
+            destY = controller.currentY - 5;
+        }
+        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump10Cells &&
+                controller.currentY >= 10)
+        {
+            destY = controller.currentY - 10;
+        }
+    }
+    else
+    {
+        destY = (controller.currentY == 0) ? gameEngine->lines() - 1 : controller.currentY - 1;
+    }
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
 }
@@ -1629,6 +1727,14 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                cbCustomizedMinesInPercentage->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
            }
+           else if(terms.at(0).compare("WhenCtrlIsPressed", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               preferences->setOptionWhenCtrlIsPressed(terms.at(1).toInt());
+           }
+
         }
     }
 
@@ -1672,7 +1778,8 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
            << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
            << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
            << "ApplicationTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
-           << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off");
+           << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
+           << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n';
 }
 
 void LibreMinesGui::vUpdatePreferences()

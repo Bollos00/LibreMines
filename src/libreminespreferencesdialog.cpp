@@ -30,6 +30,7 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     ui->comboBoxApplicationTheme->addItems({"Dark", "Light"});
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
+    ui->comboBoxWhenCtrlIsPressed->addItems({"Go to the Edge", "Jump 3 Cells", "Jump 5 Cells", "Jump 10 Cells"});
 
 
     // Space character is not allowed. This will remove every space character of the line edit
@@ -90,6 +91,11 @@ QString LibreMinesPreferencesDialog::optionUsername() const
     return ui->lineEditUsername->text();
 }
 
+uchar LibreMinesPreferencesDialog::optionWhenCtrlIsPressed() const
+{
+    return ui->comboBoxWhenCtrlIsPressed->currentIndex();
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -117,6 +123,12 @@ void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &theme)
 void LibreMinesPreferencesDialog::setOptionUsername(const QString &username)
 {
     ui->lineEditUsername->setText(username);
+}
+
+void LibreMinesPreferencesDialog::setOptionWhenCtrlIsPressed(const uchar option)
+{
+    if(ui->comboBoxWhenCtrlIsPressed->count() > option)
+        ui->comboBoxWhenCtrlIsPressed->setCurrentIndex(option);
 }
 
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
