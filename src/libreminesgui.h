@@ -26,6 +26,8 @@
 #include <QLCDNumber>
 #include <QCheckBox>
 #include <QMainWindow>
+#include <QGridLayout>
+#include <QScrollArea>
 
 #include "common.h"
 #include "libreminespreferencesdialog.h"
@@ -243,6 +245,10 @@ private:
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
     QPushButton *buttonRestartInGame; /**< TODO: describe */
     QPushButton *buttonQuitInGame; /**< TODO: describe */
+
+    QScrollArea* scrollAreaBoard;
+    QWidget* widgetBoardContents;
+    QGridLayout* layoutBoard;
 
     QLabel *labelYouWonYouLost; /**< TODO: describe */
     QLabel *labelStatisLastMatch; /**< TODO: describe */

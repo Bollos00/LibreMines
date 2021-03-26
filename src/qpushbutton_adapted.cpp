@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -26,5 +26,5 @@ QPushButton_adapted::QPushButton_adapted(QWidget *parent) : QPushButton(parent)
 }
 
 void QPushButton_adapted::mousePressEvent(QMouseEvent *e){
-    emit SIGNAL_Clicked(e);
+    Q_EMIT SIGNAL_Clicked(e);
 }

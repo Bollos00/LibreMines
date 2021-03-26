@@ -58,7 +58,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     maximumCellLength (thatMaximumCellLength),
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) )
-{
+{   
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
 
@@ -191,18 +191,18 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
 
                     if(cell.isHidden)
                     {
-                        emit SIGNAL_cleanCell(controller.currentX, controller.currentY);
+                        Q_EMIT SIGNAL_cleanCell(controller.currentX, controller.currentY);
                     }
                     else if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
                     {
-                        emit SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
+                        Q_EMIT SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
                     }
                     return true;
 
                 }
                 if(key == controller.keyFlagCell)
                 {
-                    emit SIGNAL_addOrRemoveFlag(controller.currentX, controller.currentY);
+                    Q_EMIT SIGNAL_addOrRemoveFlag(controller.currentX, controller.currentY);
                     return true;
                 }
                 if(key == Qt::Key_Escape)
@@ -272,6 +272,11 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel = preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
 
+    widgetBoardContents->show();
+    scrollAreaBoard->show();
+    scrollAreaBoard->setGeometry(0, 0, iLimitWidthField, iLimitHeightField);
+    widgetBoardContents->setGeometry(0, 0, _X*cellLength, _Y*cellLength);
+
     // Create each cell
     for(uchar j=0; j<_Y; j++)
     {
@@ -279,14 +284,20 @@ void LibreMinesGui::vNewGame(const uchar _X,
         {
             CellGui& cell = principalMatrix[i][j];
 
-            cell.label = new QLabel_adapted(this);
-            cell.button = new QPushButton_adapted(this);
+//            cell.label = new QLabel_adapted(this);
+//            cell.button = new QPushButton_adapted(this);
 
-            cell.label->setGeometry(i*cellLength, j*cellLength, cellLength, cellLength);
+            cell.label = new QLabel_adapted(widgetBoardContents);
+            cell.button = new QPushButton_adapted(widgetBoardContents);
+
+            layoutBoard->addWidget(cell.label, j, i);
+            layoutBoard->addWidget(cell.button, j, i);
+
+//            cell.label->setGeometry(i*cellLength, j*cellLength, cellLength, cellLength);
             cell.label->setPixmap(*pmZero);
             cell.label->show();
 
-            cell.button->setGeometry(i*cellLength, j*cellLength, cellLength, cellLength);
+//            cell.button->setGeometry(i*cellLength, j*cellLength, cellLength, cellLength);
             cell.button->setIcon(QIcon(*pmNoFlag));
             cell.button->setIconSize(QSize(cellLength, cellLength));
             cell.button->show();
@@ -469,6 +480,15 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     buttonQuitInGame = new QPushButton(centralWidget());
     labelYouWonYouLost = new QLabel(centralWidget());
     labelStatisLastMatch = new QLabel(centralWidget());
+
+    scrollAreaBoard = new QScrollArea(centralWidget());
+    widgetBoardContents = new QWidget();
+
+    layoutBoard = new QGridLayout();
+    layoutBoard->setSpacing(0);
+
+    widgetBoardContents->setLayout(layoutBoard);
+    scrollAreaBoard->setWidget(widgetBoardContents);
 
     labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
@@ -757,8 +777,8 @@ void LibreMinesGui::SLOT_Customized()
 
 void LibreMinesGui::vAjustInterfaceInGame()
 {
-    int width = this->width();
-    int height = this->height();
+    const int width = this->width();
+    const int height = this->height();
 
     labelTimerInGame->setGeometry(85*width/100, height/20,
                                   15*width/100, height/8);
@@ -783,6 +803,8 @@ void LibreMinesGui::vHideInterfaceInGame()
     buttonQuitInGame->hide();
     labelYouWonYouLost->hide();
     labelStatisLastMatch->hide();
+    widgetBoardContents->hide();
+    scrollAreaBoard->hide();
 }
 
 void LibreMinesGui::vShowInterfaceInGame()
@@ -820,7 +842,7 @@ void LibreMinesGui::SLOT_Restart()
     const uchar y = gameEngine->lines();
     const ushort mines = gameEngine->mines();
 
-    emit SIGNAL_stopGame();
+    Q_EMIT SIGNAL_stopGame();
     vNewGame(x, y, mines);
 }
 
@@ -842,7 +864,7 @@ void LibreMinesGui::SLOT_Quit()
 
     labelStatisLastMatch->setText(" ");
 
-    emit SIGNAL_stopGame();
+    Q_EMIT SIGNAL_stopGame();
 
     vResetPrincipalMatrix();
     vHideInterfaceInGame();
@@ -870,11 +892,11 @@ void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
                 switch (e->button())
                 {
                     case Qt::RightButton:
-                        emit SIGNAL_addOrRemoveFlag(i, j);
+                        Q_EMIT SIGNAL_addOrRemoveFlag(i, j);
                         return;
 
                     case Qt::LeftButton:
-                        emit SIGNAL_cleanCell(i, j);
+                        Q_EMIT SIGNAL_cleanCell(i, j);
                         return;
 
                     default:
@@ -902,7 +924,7 @@ void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
                 switch (e->button())
                 {
                     case Qt::LeftButton:
-                        emit SIGNAL_cleanNeighborCells(i, j);
+                        Q_EMIT SIGNAL_cleanNeighborCells(i, j);
                         return;
 
                     default:

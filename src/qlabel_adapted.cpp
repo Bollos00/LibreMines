@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -29,5 +29,5 @@ QLabel_adapted::QLabel_adapted(QWidget *parent):
 void QLabel_adapted::mousePressEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
-    emit SIGNAL_clicked(event);
+    Q_EMIT SIGNAL_clicked(event);
 }

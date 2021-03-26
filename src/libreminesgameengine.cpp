@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -278,7 +278,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
 
     if(bRemakingGame)
     {
-        emit SIGNAL_remakeGame();
+        Q_EMIT SIGNAL_remakeGame();
     }
 }
 
@@ -300,7 +300,7 @@ void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
     {
         // Unlock the cell
         principalMatrix[_X][_Y].isHidden = false;
-        emit SIGNAL_showCell(_X, _Y);
+        Q_EMIT SIGNAL_showCell(_X, _Y);
 
         // If the state of the cell is ZERO, unlock all neighbor cells
         if(principalMatrix[_X][_Y].state == ZERO)
@@ -461,7 +461,7 @@ void LibreMinesGameEngine::vGameLost(const uchar _X, const uchar _Y)
     bGameActive = false;
 
     timerTimeInGame.reset();
-    emit SIGNAL_gameLost(_X, _Y);
+    Q_EMIT SIGNAL_gameLost(_X, _Y);
     vGenerateEndGameScore(timeInNs);
 }
 
@@ -471,7 +471,7 @@ void LibreMinesGameEngine::vGameWon()
     bGameActive = false;
 
     timerTimeInGame.reset();
-    emit SIGNAL_gameWon();
+    Q_EMIT SIGNAL_gameWon();
     vGenerateEndGameScore(timeInNs);
 }
 
@@ -512,7 +512,7 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs)
     score.bGameCompleted = iUnlockedCells == iCellsToUnlock;
     score.dPercentageGameCompleted = dPercentageGameComplete;
 
-    emit SIGNAL_endGameScore(score, iCorrectFlags, iWrongFlags, iUnlockedCells, dFlagsPerSecond, dCellsPerSecond);
+    Q_EMIT SIGNAL_endGameScore(score, iCorrectFlags, iWrongFlags, iUnlockedCells, dFlagsPerSecond, dCellsPerSecond);
 }
 
 const std::vector<std::vector<LibreMinesGameEngine::CellGameEngine> >& LibreMinesGameEngine::getPrincipalMatrix() const
@@ -571,16 +571,16 @@ void LibreMinesGameEngine::SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y)
     {
         principalMatrix[_X][_Y].hasFlag = false;
         iMinesLeft++;
-        emit SIGNAL_unflagCell(_X, _Y);
+        Q_EMIT SIGNAL_unflagCell(_X, _Y);
     }
     else
     {
         principalMatrix[_X][_Y].hasFlag = true;
         iMinesLeft--;
-        emit SIGNAL_flagCell(_X, _Y);
+        Q_EMIT SIGNAL_flagCell(_X, _Y);
     }
 
-    emit SIGNAL_minesLeft(iMinesLeft);
+    Q_EMIT SIGNAL_minesLeft(iMinesLeft);
 }
 
 void LibreMinesGameEngine::SLOT_stop()
@@ -627,6 +627,6 @@ void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _
 void LibreMinesGameEngine::SLOT_UpdateTime()
 {
     iTimeInSeconds++;
-    emit SIGNAL_currentTime(iTimeInSeconds);
+    Q_EMIT SIGNAL_currentTime(iTimeInSeconds);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -41,13 +41,13 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     connect(ui->comboBoxApplicationTheme, &QComboBox::currentTextChanged,
             [this](const QString& text)
-    { emit SIGNAL_optionChanged("ApplicationTheme", text); });
+    { Q_EMIT SIGNAL_optionChanged("ApplicationTheme", text); });
 
     connect(ui->comboBoxMinefieldTheme, &QComboBox::currentTextChanged,
             [this](QString text)
     {
         text.remove(" ", Qt::CaseInsensitive);
-        emit SIGNAL_optionChanged("MinefieldTheme", text);
+        Q_EMIT SIGNAL_optionChanged("MinefieldTheme", text);
     });
 
     ui->keyInputMoveLeft->setKey(Qt::Key_A);
@@ -182,12 +182,12 @@ void LibreMinesPreferencesDialog::closeEvent(QCloseEvent *e)
 void LibreMinesPreferencesDialog::hideEvent(QHideEvent *e)
 {
     Q_UNUSED(e);
-    emit SIGNAL_visibilityChanged(false);
+    Q_EMIT SIGNAL_visibilityChanged(false);
 }
 
 void LibreMinesPreferencesDialog::showEvent(QShowEvent *e)
 {
     Q_UNUSED(e);
-    emit SIGNAL_visibilityChanged(true);
+    Q_EMIT SIGNAL_visibilityChanged(true);
 }
 
