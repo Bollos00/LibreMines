@@ -22,7 +22,7 @@
 #define QLABEL_ADAPTED_H
 
 #include <QLabel>
-#include <QObject>
+
 
 class QLabel_adapted : public QLabel
 {
@@ -32,10 +32,10 @@ public:
     QLabel_adapted(QWidget* parent = nullptr);
 
 protected:
-   void mousePressEvent(QMouseEvent* event);
+   void mouseReleaseEvent(QMouseEvent* e);
 
 Q_SIGNALS:
-    void SIGNAL_clicked(const QMouseEvent *const e);
+    void SIGNAL_released(const QMouseEvent *const e);
 };
 
 #endif // QLABEL_ADAPTED_H

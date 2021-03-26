@@ -74,6 +74,10 @@ int main(int argc, char *argv[])
     a.setApplicationName(LIBREMINES_PROJECT_NAME);
     a.setApplicationVersion(LIBREMINES_PROJECT_VERSION);
 
+//    a.setOverrideCursor(QCursor(QPixmap("/home/robofei/Repository/LibreMines/share/icons/libremines.svg").
+//                                scaled(100, 100, Qt::KeepAspectRatio),
+//                                50, 50));
+
     InitializeOptions ops = getOptions(a.arguments());
 
     LibreMinesGui* w = new LibreMinesGui(nullptr, ops.heightMainWindow, ops.widthMainWindow, ops.maximumCellLength);

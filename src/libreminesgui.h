@@ -173,9 +173,9 @@ private Q_SLOTS:
      *
      * @param e
      */
-    void SLOT_OnCellButtonClicked(const QMouseEvent *const e);
+    void SLOT_OnCellButtonReleased(const QMouseEvent *const e);
 
-    void SLOT_onCellLabelClicked(const QMouseEvent *const e);
+    void SLOT_onCellLabelReleased(const QMouseEvent *const e);
 
     void SLOT_showCell(const uchar _X, const uchar _Y);
     void SLOT_endGameScore(LibreMinesScore score,

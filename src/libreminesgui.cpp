@@ -303,13 +303,13 @@ void LibreMinesGui::vNewGame(const uchar _X,
             cell.button->show();
             cell.button->setEnabled(false);
 
-            connect(cell.button, &QPushButton_adapted::SIGNAL_Clicked,
-                    this, &LibreMinesGui::SLOT_OnCellButtonClicked);
+            connect(cell.button, &QPushButton_adapted::SIGNAL_released,
+                    this, &LibreMinesGui::SLOT_OnCellButtonReleased);
 
             if(bCleanNeighborCellsWhenClickedOnShowedLabel)
             {
-                connect(cell.label, &QLabel_adapted::SIGNAL_clicked,
-                        this, &LibreMinesGui::SLOT_onCellLabelClicked);
+                connect(cell.label, &QLabel_adapted::SIGNAL_released,
+                        this, &LibreMinesGui::SLOT_onCellLabelReleased);
             }
 
             qApp->processEvents();
@@ -875,7 +875,7 @@ void LibreMinesGui::SLOT_Quit()
     gameEngine.reset();
 }
 
-void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
+void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
 {
     if(!gameEngine->isGameActive() || controller.active)
         return;
@@ -907,7 +907,7 @@ void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
     }
 }
 
-void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
+void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
 {
     if(!gameEngine->isGameActive() || controller.active)
         return;
