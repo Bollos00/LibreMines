@@ -1815,7 +1815,15 @@ void LibreMinesGui::vUpdatePreferences()
     controller.keyReleaseCell= keys.at(4);
     controller.keyFlagCell = keys.at(5);
 
-    controller.valid = !keys.contains(-1);
+    controller.valid = true;
+    for (int i=0; i<keys.size()-1; ++i)
+    {
+        for(int j=i+1; j<keys.size(); ++j)
+        {
+            controller.valid &= keys[i] != keys[j];
+        }
+    }
+    controller.valid &= !keys.contains(-1);
 
     if(preferences->optionUsername().isEmpty())
     {
