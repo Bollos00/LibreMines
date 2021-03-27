@@ -18,7 +18,7 @@
  */
 
 
-#include <QtCore/QRandomGenerator>
+#include <QRandomGenerator>
 #include <QDebug>
 #include <QFont>
 #include <QMouseEvent>
@@ -367,6 +367,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_stop);
 
+    progressBarGameCompleteInGame->setRange(-gameEngine->cellsToUnlock(), 0);
+    progressBarGameCompleteInGame->setValue(-gameEngine->cellsToUnlock());
+
     // Set the initial value of mines left to the total number
     //  of mines
     SLOT_minesLeft(gameEngine->mines());
@@ -483,6 +486,7 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     this->setFont(QFont("Liberation Sans"));
     labelTimerInGame = new QLabel(centralWidget());
     lcd_numberMinesLeft = new QLCDNumber(centralWidget());
+    progressBarGameCompleteInGame = new QProgressBar(centralWidget());
     buttonRestartInGame = new QPushButton(centralWidget());
     buttonQuitInGame = new QPushButton(centralWidget());
     labelYouWonYouLost = new QLabel(centralWidget());
@@ -500,7 +504,8 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
     lcd_numberMinesLeft->setDecMode();
-    lcd_numberMinesLeft->display(0);;
+    lcd_numberMinesLeft->display(0);
+    progressBarGameCompleteInGame->setTextVisible(false);
     buttonQuitInGame->setText("Quit");
     buttonRestartInGame->setText("Restart");
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
@@ -803,8 +808,10 @@ void LibreMinesGui::vAjustInterfaceInGame()
                                   15*width/100, height/8);
     lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
                                      labelTimerInGame->width(), height/7);
-    buttonRestartInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
-                                     lcd_numberMinesLeft->width()/2, height/20);
+    progressBarGameCompleteInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
+                                     lcd_numberMinesLeft->width(), height/20);
+    buttonRestartInGame->setGeometry(progressBarGameCompleteInGame->x(), progressBarGameCompleteInGame->y()+progressBarGameCompleteInGame->height(),
+                                     progressBarGameCompleteInGame->width()/2, height/20);
     buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
                                   buttonRestartInGame->width(), buttonRestartInGame->height());
     labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+height/10,
@@ -818,6 +825,7 @@ void LibreMinesGui::vHideInterfaceInGame()
 {
     labelTimerInGame->hide();
     lcd_numberMinesLeft->hide();
+    progressBarGameCompleteInGame->hide();
     buttonRestartInGame->hide();
     buttonQuitInGame->hide();
     labelYouWonYouLost->hide();
@@ -830,6 +838,7 @@ void LibreMinesGui::vShowInterfaceInGame()
 {
     labelTimerInGame->show();
     lcd_numberMinesLeft->show();
+    progressBarGameCompleteInGame->show();
     buttonRestartInGame->show();
     buttonQuitInGame->show();
     labelYouWonYouLost->show();
@@ -964,6 +973,8 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
         vKeyboardControllUnsetCurrentCell();
         vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
     }
+
+    progressBarGameCompleteInGame->setValue(-gameEngine->hiddenCells());
 }
 
 void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,

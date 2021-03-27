@@ -28,6 +28,7 @@
 #include <QMainWindow>
 #include <QGridLayout>
 #include <QScrollArea>
+#include <QProgressBar>
 
 #include "common.h"
 #include "libreminespreferencesdialog.h"
@@ -244,6 +245,7 @@ private:
 
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
+    QProgressBar* progressBarGameCompleteInGame;
     QPushButton *buttonRestartInGame; /**< TODO: describe */
     QPushButton *buttonQuitInGame; /**< TODO: describe */
 

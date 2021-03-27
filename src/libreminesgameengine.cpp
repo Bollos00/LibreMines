@@ -535,6 +535,16 @@ ushort LibreMinesGameEngine::mines() const
     return nMines;
 }
 
+ushort LibreMinesGameEngine::cellsToUnlock() const
+{
+    return iCellsToUnlock;
+}
+
+ushort LibreMinesGameEngine::hiddenCells() const
+{
+    return iHiddenCells;
+}
+
 bool LibreMinesGameEngine::isGameActive() const
 {
     return bGameActive;
