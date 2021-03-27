@@ -1370,10 +1370,11 @@ void LibreMinesGui::SLOT_toggleFullScreen()
     if(isFullScreen())
     {
         this->showNormal();
+        this->showMaximized();
     }
     else
     {
-        this->showMaximized();
+        this->showFullScreen();
     }
 }
 
