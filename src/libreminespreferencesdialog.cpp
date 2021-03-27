@@ -28,7 +28,7 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->comboBoxApplicationTheme->addItems({"Dark", "Light"});
+    ui->comboBoxApplicationTheme->addItems({"Fusion Dark", "Fusion Light"});
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
     ui->comboBoxWhenCtrlIsPressed->addItems({"Go to the Edge", "Jump 3 Cells", "Jump 5 Cells", "Jump 10 Cells"});
 
@@ -40,8 +40,11 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     { ui->lineEditUsername->setText(text.remove(" ", Qt::CaseInsensitive)); });
 
     connect(ui->comboBoxApplicationTheme, &QComboBox::currentTextChanged,
-            [this](const QString& text)
-    { Q_EMIT SIGNAL_optionChanged("ApplicationTheme", text); });
+            [this](QString text)
+    {
+        text.remove(" ", Qt::CaseInsensitive);
+        Q_EMIT SIGNAL_optionChanged("ApplicationTheme", text);
+    });
 
     connect(ui->comboBoxMinefieldTheme, &QComboBox::currentTextChanged,
             [this](QString text)
@@ -49,6 +52,11 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
         text.remove(" ", Qt::CaseInsensitive);
         Q_EMIT SIGNAL_optionChanged("MinefieldTheme", text);
     });
+
+    connect(ui->sbMinimumCellLength, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &LibreMinesPreferencesDialog::SLOT_updateCellLengthParameters);
+    connect(ui->sbMaximumCellLength, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &LibreMinesPreferencesDialog::SLOT_updateCellLengthParameters);
 
     ui->keyInputMoveLeft->setKey(Qt::Key_A);
     ui->keyInputMoveUp->setKey(Qt::Key_W);
@@ -76,7 +84,9 @@ bool LibreMinesPreferencesDialog::optionCleanNeighborCellsWhenClickedOnShowedCel
 
 QString LibreMinesPreferencesDialog::optionApplicationTheme() const
 {
-    return ui->comboBoxApplicationTheme->currentText();
+    QString s = ui->comboBoxApplicationTheme->currentText();
+    s.remove(" ", Qt::CaseInsensitive);
+    return s;
 }
 
 QString LibreMinesPreferencesDialog::optionMinefieldTheme() const
@@ -96,6 +106,16 @@ uchar LibreMinesPreferencesDialog::optionWhenCtrlIsPressed() const
     return ui->comboBoxWhenCtrlIsPressed->currentIndex();
 }
 
+int LibreMinesPreferencesDialog::optionMinimumCellLength() const
+{
+    return ui->sbMinimumCellLength->value();
+}
+
+int LibreMinesPreferencesDialog::optionMaximumCellLength() const
+{
+    return ui->sbMaximumCellLength->value();
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -108,14 +128,18 @@ void LibreMinesPreferencesDialog::setOptionCleanNeighborCellsWhenClickedOnShowed
 
 void LibreMinesPreferencesDialog::setOptionApplicationTheme(const QString &theme)
 {
-    ui->comboBoxApplicationTheme->setCurrentText(theme);
+    QString s;
+    if(theme.compare("FusionDark", Qt::CaseInsensitive) == 0){ s = "Fusion Dark"; }
+    else if(theme.compare("FusionLight", Qt::CaseInsensitive) == 0){ s = "Fusion Light"; }
+
+    ui->comboBoxApplicationTheme->setCurrentText(s);
 }
 
 void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &theme)
 {
     QString s;
-    if(theme == "ClassicLight"){ s = "Classic Light"; }
-    else if(theme == "ClassicDark"){ s = "Classic Dark"; }
+    if(theme.compare("ClassicLight", Qt::CaseInsensitive) == 0){ s = "Classic Light"; }
+    else if(theme.compare("ClassicDark", Qt::CaseInsensitive) == 0){ s = "Classic Dark"; }
 
     ui->comboBoxMinefieldTheme->setCurrentText(s);
 }
@@ -129,6 +153,16 @@ void LibreMinesPreferencesDialog::setOptionWhenCtrlIsPressed(const uchar option)
 {
     if(ui->comboBoxWhenCtrlIsPressed->count() > option)
         ui->comboBoxWhenCtrlIsPressed->setCurrentIndex(option);
+}
+
+void LibreMinesPreferencesDialog::setOptionMinimumCellLength(const int option)
+{
+    ui->sbMinimumCellLength->setValue(option);
+}
+
+void LibreMinesPreferencesDialog::setOptionMaximumCellLength(const int option)
+{
+    ui->sbMaximumCellLength->setValue(option);
 }
 
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
@@ -189,5 +223,11 @@ void LibreMinesPreferencesDialog::showEvent(QShowEvent *e)
 {
     Q_UNUSED(e);
     Q_EMIT SIGNAL_visibilityChanged(true);
+}
+
+void LibreMinesPreferencesDialog::SLOT_updateCellLengthParameters()
+{
+    ui->sbMinimumCellLength->setMaximum(ui->sbMaximumCellLength->value());
+    ui->sbMaximumCellLength->setMinimum(ui->sbMinimumCellLength->value());
 }
 

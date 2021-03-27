@@ -52,6 +52,8 @@ public:
     QString optionMinefieldTheme()const;
     QString optionUsername()const;
     uchar optionWhenCtrlIsPressed()const;
+    int optionMinimumCellLength()const;
+    int optionMaximumCellLength()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
@@ -59,6 +61,8 @@ public:
     void setOptionMinefieldTheme(const QString& theme);
     void setOptionUsername(const QString& username);
     void setOptionWhenCtrlIsPressed(const uchar option);
+    void setOptionMinimumCellLength(const int option);
+    void setOptionMaximumCellLength(const int option);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;
@@ -71,6 +75,9 @@ protected:
 
 private:
     Ui::LibreMinesPreferencesDialog *ui;
+
+private Q_SLOTS:
+    void SLOT_updateCellLengthParameters();
 
 Q_SIGNALS:
     void SIGNAL_optionChanged(const QString& name, const QString& value);

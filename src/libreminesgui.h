@@ -60,7 +60,7 @@ public:
      *
      * @param parent
      */
-    LibreMinesGui(QWidget *parent = nullptr, const int thatWidth = -1, const int thatHeight = -1, const int thatMaximumCellLength = 999999999);
+    LibreMinesGui(QWidget *parent = nullptr, const int thatWidth = -1, const int thatHeight = -1);
     /**
      * @brief
      *
@@ -201,6 +201,8 @@ private Q_SLOTS:
 
     void SLOT_showHighScores();
 
+    void SLOT_toggleFullScreen();
+
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
     void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);
@@ -219,7 +221,6 @@ private:
     int iHeightMainWindow;
 
     int cellLength; /**< TODO: describe */
-    const int maximumCellLength;
 
     GAME_DIFFICULTY difficult; /**< TODO: describe */
 

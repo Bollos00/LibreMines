@@ -46,7 +46,7 @@ LibreMinesGui::CellGui::CellGui():
 
 }
 
-LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int thatHeight, const int thatMaximumCellLength) :
+LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int thatHeight) :
     QMainWindow(parent),
     gameEngine(),
     principalMatrix( std::vector< std::vector<CellGui> >(0) ),
@@ -55,7 +55,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     iWidthMainWindow( 0 ),
     iHeightMainWindow( 0 ),
     cellLength( 0 ),
-    maximumCellLength (thatMaximumCellLength),
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) )
 {   
@@ -63,7 +62,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
             this, &LibreMinesGui::SLOT_optionChanged);
 
     // Unable central widget when the preferences dialog is active
-    // Also update the preferences ehrn finished
+    // Also update the preferences when finished
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_visibilityChanged,
             [this](const bool visible)
     {
@@ -71,15 +70,20 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
         this->vUpdatePreferences();
     });
 
+    // Quit the application with Ctrl + Q
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this), &QShortcut::activated,
             this, &LibreMinesGui::SLOT_quitApplication);
 
+    // Toggle the fullscreen state with F11
+    connect(new QShortcut(QKeySequence(Qt::Key_F11), this), &QShortcut::activated,
+            this, &LibreMinesGui::SLOT_toggleFullScreen);
+
     // Create interface with the passed dimensions
     vCreateGUI(thatWidth, thatHeight);
+    vShowMainMenu();
 
     qApp->installEventFilter(this);
 
-//    this->setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
     this->setWindowTitle("LibreMines");
 
@@ -264,8 +268,11 @@ void LibreMinesGui::vNewGame(const uchar _X,
     else
         cellLength = iLimitHeightField/_Y;
 
-    if(cellLength > maximumCellLength)
-        cellLength = maximumCellLength;
+    if(cellLength < preferences->optionMinimumCellLength())
+        cellLength = preferences->optionMinimumCellLength();
+    else if(cellLength > preferences->optionMaximumCellLength())
+        cellLength = preferences->optionMaximumCellLength();
+
 
     // Update the pixmaps
     vSetMinefieldTheme(preferences->optionMinefieldTheme());
@@ -684,6 +691,18 @@ void LibreMinesGui::vCreateGUI(int width, int height)
             updateCustomizedNumberOfMinesMaximum);
     connect(sbCustomizedY, QOverload<int>::of(&QSpinBox::valueChanged),
             updateCustomizedNumberOfMinesMaximum);
+
+    // Tab order of application
+    setTabOrder(buttonEasy, buttonMedium);
+    setTabOrder(buttonMedium, buttonHard);
+    setTabOrder(buttonHard, buttonCustomizedNewGame);
+    setTabOrder(buttonCustomizedNewGame, sbCustomizedNumbersOfMines);
+    setTabOrder(sbCustomizedNumbersOfMines, sbCustomizedPercentageMines);
+    setTabOrder(sbCustomizedPercentageMines, cbCustomizedMinesInPercentage);
+    setTabOrder(cbCustomizedMinesInPercentage, sbCustomizedX);
+    setTabOrder(sbCustomizedX, sbCustomizedY);
+    setTabOrder(sbCustomizedY, buttonRestartInGame);
+    setTabOrder(buttonRestartInGame, buttonQuitInGame);
 }
 
 void LibreMinesGui::vHideMainMenu()
@@ -1271,12 +1290,24 @@ void LibreMinesGui::SLOT_quitApplication()
 void LibreMinesGui::SLOT_showAboutDialog()
 {
     QString text =
-            "LibreMines version " + QString(LIBREMINES_PROJECT_VERSION) + "\n"
+            "LibreMines " + QString(LIBREMINES_PROJECT_VERSION) + "\n"
+            "Copyright (C) 2020-2021  Bruno Bollos Correa\n"
             "\n"
-            "LibreMines is a free/libre and open source"
-            " Qt based Minesweeper game.\n"
+            "This program is free software: you can redistribute it and/or modify"
+            " it under the terms of the GNU General Public License as published by"
+            " the Free Software Foundation, either version 3 of the License, or"
+            " (at your option) any later version.\n"
             "\n"
-            "Get the source code on <https://github.com/Bollos00/LibreMines>";
+            "This program is distributed in the hope that it will be useful,"
+            " but WITHOUT ANY WARRANTY; without even the implied warranty of"
+            " MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the"
+            " GNU General Public License for more details.\n"
+            "\n"
+            "You should have received a copy of the GNU General Public License"
+            " along with this program.  If not, see <http://www.gnu.org/licenses/>.\n"
+            "\n"
+            "Get the source code of LibreMines on\n"
+            "<https://github.com/Bollos00/LibreMines>";
 
     QMessageBox::about(this, "LibreMines", text);
 }
@@ -1334,47 +1365,59 @@ void LibreMinesGui::SLOT_showHighScores()
     dialog.exec();
 }
 
+void LibreMinesGui::SLOT_toggleFullScreen()
+{
+    if(isFullScreen())
+    {
+        this->showNormal();
+    }
+    else
+    {
+        this->showMaximized();
+    }
+}
+
 void LibreMinesGui::vSetApplicationTheme(const QString& theme)
 {
-    if(theme.compare("Dark", Qt::CaseInsensitive) == 0)
+    if(theme.compare("FusionDark", Qt::CaseInsensitive) == 0)
     {
         qApp->setStyle (QStyleFactory::create ("Fusion"));
-        QPalette darkPalette;
-        darkPalette.setColor (QPalette::BrightText,      Qt::red);
-        darkPalette.setColor (QPalette::WindowText,      Qt::white);
-        darkPalette.setColor (QPalette::ToolTipBase,     Qt::white);
-        darkPalette.setColor (QPalette::ToolTipText,     Qt::white);
-        darkPalette.setColor (QPalette::Text,            Qt::white);
-        darkPalette.setColor (QPalette::ButtonText,      Qt::white);
-        darkPalette.setColor (QPalette::HighlightedText, Qt::black);
-        darkPalette.setColor (QPalette::Window,          QColor (53, 53, 53));
-        darkPalette.setColor (QPalette::Base,            QColor (25, 25, 25));
-        darkPalette.setColor (QPalette::AlternateBase,   QColor (53, 53, 53));
-        darkPalette.setColor (QPalette::Button,          QColor (53, 53, 53));
-        darkPalette.setColor (QPalette::Link,            QColor (42, 130, 218));
-        darkPalette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
+        QPalette palette;
+        palette.setColor (QPalette::BrightText,      Qt::red);
+        palette.setColor (QPalette::WindowText,      Qt::white);
+        palette.setColor (QPalette::ToolTipBase,     Qt::white);
+        palette.setColor (QPalette::ToolTipText,     Qt::white);
+        palette.setColor (QPalette::Text,            Qt::white);
+        palette.setColor (QPalette::ButtonText,      Qt::white);
+        palette.setColor (QPalette::HighlightedText, Qt::black);
+        palette.setColor (QPalette::Window,          QColor (53, 53, 53));
+        palette.setColor (QPalette::Base,            QColor (25, 25, 25));
+        palette.setColor (QPalette::AlternateBase,   QColor (53, 53, 53));
+        palette.setColor (QPalette::Button,          QColor (53, 53, 53));
+        palette.setColor (QPalette::Link,            QColor (42, 130, 218));
+        palette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
 
-        qApp->setPalette(darkPalette);
+        qApp->setPalette(palette);
     }
-    else if(theme.compare("Light", Qt::CaseInsensitive) == 0)
+    else if(theme.compare("FusionLight", Qt::CaseInsensitive) == 0)
     {
         qApp->setStyle (QStyleFactory::create ("Fusion"));
-        QPalette lightPalette;
-        lightPalette.setColor (QPalette::BrightText,      Qt::cyan);
-        lightPalette.setColor (QPalette::WindowText,      Qt::black);
-        lightPalette.setColor (QPalette::ToolTipBase,     Qt::black);
-        lightPalette.setColor (QPalette::ToolTipText,     Qt::black);
-        lightPalette.setColor (QPalette::Text,            Qt::black);
-        lightPalette.setColor (QPalette::ButtonText,      Qt::black);
-        lightPalette.setColor (QPalette::HighlightedText, Qt::white);
-        lightPalette.setColor (QPalette::Window,          QColor (202, 202, 202));
-        lightPalette.setColor (QPalette::Base,            QColor (228, 228, 228));
-        lightPalette.setColor (QPalette::AlternateBase,   QColor (202, 202, 202));
-        lightPalette.setColor (QPalette::Button,          QColor (202, 202, 202));
-        lightPalette.setColor (QPalette::Link,            QColor (213, 125, 37));
-        lightPalette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
+        QPalette palette;
+        palette.setColor (QPalette::BrightText,      Qt::cyan);
+        palette.setColor (QPalette::WindowText,      Qt::black);
+        palette.setColor (QPalette::ToolTipBase,     Qt::black);
+        palette.setColor (QPalette::ToolTipText,     Qt::black);
+        palette.setColor (QPalette::Text,            Qt::black);
+        palette.setColor (QPalette::ButtonText,      Qt::black);
+        palette.setColor (QPalette::HighlightedText, Qt::white);
+        palette.setColor (QPalette::Window,          QColor (202, 202, 202));
+        palette.setColor (QPalette::Base,            QColor (228, 228, 228));
+        palette.setColor (QPalette::AlternateBase,   QColor (202, 202, 202));
+        palette.setColor (QPalette::Button,          QColor (202, 202, 202));
+        palette.setColor (QPalette::Link,            QColor (213, 125, 37));
+        palette.setColor (QPalette::Highlight,       QColor (42, 130, 218));
 
-        qApp->setPalette(lightPalette);
+        qApp->setPalette(palette);
     }
 }
 
@@ -1756,6 +1799,20 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                preferences->setOptionWhenCtrlIsPressed(terms.at(1).toInt());
            }
+           else if(terms.at(0).compare("MinimumCellLength", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               preferences->setOptionMinimumCellLength(terms.at(1).toInt());
+           }
+           else if(terms.at(0).compare("MaximumCellLength", Qt::CaseInsensitive) == 0)
+           {
+               if(terms.size() != 2)
+                   continue;
+
+               preferences->setOptionMaximumCellLength(terms.at(1).toInt());
+           }
 
         }
     }
@@ -1801,7 +1858,9 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
            << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
            << "ApplicationTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
            << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
-           << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n';
+           << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
+           << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
+           << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n';
 }
 
 void LibreMinesGui::vUpdatePreferences()
