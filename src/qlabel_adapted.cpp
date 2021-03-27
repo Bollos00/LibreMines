@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -19,6 +19,7 @@
 
 
 #include "qlabel_adapted.h"
+#include <QMouseEvent>
 
 QLabel_adapted::QLabel_adapted(QWidget *parent):
     QLabel(parent)
@@ -26,8 +27,12 @@ QLabel_adapted::QLabel_adapted(QWidget *parent):
 
 }
 
-void QLabel_adapted::mousePressEvent(QMouseEvent *event)
+void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
 {
-    Q_UNUSED(event)
-    emit SIGNAL_clicked(event);
+    // emit the signal only if the cursor is inside the button when it is clicked
+    if(e->localPos().x() < width() && e->localPos().x() >= 0 &&
+       e->localPos().y() < height() && e->localPos().y() >= 0)
+    {
+        Q_EMIT SIGNAL_released(e);
+    }
 }

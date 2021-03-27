@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -19,12 +19,20 @@
 
 
 #include "qpushbutton_adapted.h"
+#include <QMouseEvent>
 
 QPushButton_adapted::QPushButton_adapted(QWidget *parent) : QPushButton(parent)
 {
 
 }
 
-void QPushButton_adapted::mousePressEvent(QMouseEvent *e){
-    emit SIGNAL_Clicked(e);
+
+void QPushButton_adapted::mouseReleaseEvent(QMouseEvent *e)
+{
+    // emit the signal only if the cursor is inside the button when it is clicked
+    if(e->localPos().x() < width() && e->localPos().x() >= 0 &&
+       e->localPos().y() < height() && e->localPos().y() >= 0)
+    {
+        Q_EMIT SIGNAL_released(e);
+    }
 }

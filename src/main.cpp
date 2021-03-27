@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020  Bruno Bollos Correa                                   *
+ * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -28,26 +28,22 @@ struct InitializeOptions
 {
     InitializeOptions():
         heightMainWindow(0),
-        widthMainWindow(0),
-        maximumCellLength(0)
+        widthMainWindow(0)
     {};
 
-    InitializeOptions(int h, int w, int l):
+    InitializeOptions(int h, int w):
         heightMainWindow(h),
-        widthMainWindow(w),
-        maximumCellLength(l)
+        widthMainWindow(w)
     {};
 
     int heightMainWindow = -1;
     int widthMainWindow = -1;
-    int maximumCellLength = 999999999;
 };
 
 InitializeOptions getOptions(const QStringList& args)
 {
     int h = -1;
     int w = -1;
-    int l = 999999999;
 
     QCommandLineParser parser;
     parser.setApplicationDescription(LIBREMINES_PROJECT_DESCRIPTION);
@@ -55,8 +51,8 @@ InitializeOptions getOptions(const QStringList& args)
     parser.addVersionOption();
     parser.addOptions({
                 {"width", "Width of the Main Widget - in pixels", "width", "-1"},
-                {"heigth", "Heigth of the Main Widget - in pixels", "heigth", "-1"},
-                {"length", "Maximum length of each Cell - in pixels", "length", "999999999"}});
+                {"heigth", "Heigth of the Main Widget - in pixels", "heigth", "-1"}
+                      });
 
     parser.process(args);
 
@@ -64,8 +60,7 @@ InitializeOptions getOptions(const QStringList& args)
 
     w = parser.value("width").toInt();
     h = parser.value("heigth").toInt();
-    l = parser.value("length").toInt();
-    return{h, w, l};
+    return{h, w};
 }
 
 int main(int argc, char *argv[])
@@ -74,9 +69,13 @@ int main(int argc, char *argv[])
     a.setApplicationName(LIBREMINES_PROJECT_NAME);
     a.setApplicationVersion(LIBREMINES_PROJECT_VERSION);
 
+//    a.setOverrideCursor(QCursor(QPixmap("/home/robofei/Repository/LibreMines/share/icons/libremines.svg").
+//                                scaled(100, 100, Qt::KeepAspectRatio),
+//                                50, 50));
+
     InitializeOptions ops = getOptions(a.arguments());
 
-    LibreMinesGui* w = new LibreMinesGui(nullptr, ops.heightMainWindow, ops.widthMainWindow, ops.maximumCellLength);
+    LibreMinesGui* w = new LibreMinesGui(nullptr, ops.heightMainWindow, ops.widthMainWindow);
 
     w->show();
     return a.exec();

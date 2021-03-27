@@ -1,7 +1,6 @@
 #############################################################################
 # LibreMines                                                                #
-# Copyright (C) 2020  Bruno Bollos Correa                                   #
-#                                                                           #
+# Copyright (C) 2020-2021  Bruno Bollos Correa                              #                                                                         #
 # This program is free software: you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
 # the Free Software Foundation, either version 3 of the License, or         #
@@ -19,18 +18,18 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.2.2"
+    VERSION "1.3.0"
     DESCRIPTION "A Qt based Minesweeper game"
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
 )
 
-# Save the variables of the project (see file `include/cmake/libreminesconfig.h.cmake`) on
+# Save the variables of the project (see file `include/cmake/libreminesconfig.h.in`) on
 #  the file ${PROJECT_BINARY_DIR}/libreminesconfig.h
 configure_file(${PROJECT_SOURCE_DIR}/include/libreminesconfig.h.in ${PROJECT_BINARY_DIR}/libreminesconfig.h)
 include_directories(${PROJECT_BINARY_DIR})
 
-if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     message(STATUS "Using default build type Release")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
@@ -92,6 +91,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DEPRECATED_WARNINGS)
 #target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 # disables all the APIs deprecated before Qt 6.0.0
 
+
+# Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
     find_package(Qt6 REQUIRED COMPONENTS Core)
@@ -99,7 +100,6 @@ if(USE_QT6)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Svg)
-
 else()
     find_package(Qt5 REQUIRED COMPONENTS Widgets)
     find_package(Qt5 REQUIRED COMPONENTS Core)
