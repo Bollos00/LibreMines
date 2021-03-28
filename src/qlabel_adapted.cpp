@@ -29,7 +29,7 @@ QLabel_adapted::QLabel_adapted(QWidget *parent):
 
 void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
 {
-    QImage img = pixmap(Qt::ReturnByValue).toImage();
+    QImage img = pixmap()->toImage();
     img.invertPixels();
     setPixmap(QPixmap::fromImage(img));
 
@@ -38,7 +38,7 @@ void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
 
 void QLabel_adapted::mousePressEvent(QMouseEvent *e)
 {
-    QImage img = pixmap(Qt::ReturnByValue).toImage();
+    QImage img = pixmap()->toImage();
     img.invertPixels();
     setPixmap(QPixmap::fromImage(img));
 
