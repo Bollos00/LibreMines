@@ -123,6 +123,7 @@ private:
 
     void vSetApplicationTheme(const QString& theme);
     void vSetMinefieldTheme(const QString& theme);
+    void vSetFacesReaction(const QString& which);
 
     void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
     void vKeyboardControllUnsetCurrentCell();

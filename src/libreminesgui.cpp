@@ -97,20 +97,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     vLastSessionLoadConfigurationFile();
     vSetApplicationTheme(preferences->optionApplicationTheme());
     vSetMinefieldTheme(preferences->optionMinefieldTheme());
-
-    {
-        QString prefix = ":/facesreaction/faces_reaction/open-emoji-color/";
-
-        const int length = labelFaceReactionInGame->width();
-
-        pmDizzyFace.reset( new QPixmap( QIcon(prefix + "dizzy_face.svg").pixmap(length, length) ));
-        pmGrimacingFace.reset( new QPixmap( QIcon(prefix + "grimacing_face.svg").pixmap(length, length) ));
-        pmGrinningFace.reset( new QPixmap( QIcon(prefix + "grinning_face.svg").pixmap(length, length) ));
-        pmOpenMouthFace.reset( new QPixmap( QIcon(prefix + "open_mouth_face.svg").pixmap(length, length) ));
-        pmSmillingFace.reset( new QPixmap( QIcon(prefix + "smilling_face.svg").pixmap(length, length) ));
-
-    }
-
+    vSetFacesReaction(preferences->optionFacesReaction());
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -290,6 +277,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     // Update the pixmaps
     vSetMinefieldTheme(preferences->optionMinefieldTheme());
+    // Update faces reaction
+    vSetFacesReaction(preferences->optionFacesReaction());
+
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel = preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
 
@@ -863,7 +853,8 @@ void LibreMinesGui::vShowInterfaceInGame()
     labelFaceReactionInGame->show();
     labelTimerInGame->show();
     lcd_numberMinesLeft->show();
-    progressBarGameCompleteInGame->show();
+    if(preferences->optionProgressBar())
+        progressBarGameCompleteInGame->show();
     buttonRestartInGame->show();
     buttonQuitInGame->show();
     labelYouWonYouLost->show();
@@ -1022,6 +1013,8 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
 
 void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
 {
+    Q_UNUSED(e)
+
     if(!gameEngine->isGameActive() || controller.active)
         return;
 
@@ -1049,6 +1042,19 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                       double dFlagsPerSecond,
                                       double dCellsPerSecond)
 {
+    QString QS_Statics =
+            "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
+            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
+            +"\nWrongFlags: " + QString::number(iWrongFlags)
+            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
+            +"\n"
+            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
+            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
+            +"\n"
+            +"\nGame Complete: " + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
+
+    labelStatisLastMatch->setText(QS_Statics);
+
     score.gameDifficulty = difficult;
     score.username = preferences->optionUsername();
     if(score.username.isEmpty())
@@ -1168,19 +1174,6 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             stream << score;
         }
     }
-
-    QString QS_Statics =
-            "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
-            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
-            +"\nWrongFlags: " + QString::number(iWrongFlags)
-            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
-            +"\n"
-            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
-            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
-            +"\n"
-            +"\nGame Complete: " + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
-
-    labelStatisLastMatch->setText(QS_Statics);
 }
 
 void LibreMinesGui::SLOT_currentTime(const ushort time)
@@ -1534,6 +1527,38 @@ void LibreMinesGui::vSetMinefieldTheme(const QString &theme)
     pmWrongFlag.reset( new QPixmap(  QIcon(prefix + "wrong_flag.svg").pixmap(cellLength, cellLength)  ) );
 }
 
+void LibreMinesGui::vSetFacesReaction(const QString &which)
+{
+    if(which.compare("Disable", Qt::CaseInsensitive) == 0)
+    {
+        pmDizzyFace.reset( new QPixmap() );
+        pmGrimacingFace.reset( new QPixmap() );
+        pmGrinningFace.reset( new QPixmap() );
+        pmOpenMouthFace.reset( new QPixmap() );
+        pmSmillingFace.reset( new QPixmap() );
+    }
+    else
+    {
+        QString prefix = ":/facesreaction/faces_reaction/open-emoji-color/";
+        if(which.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0)
+            prefix = ":/facesreaction/faces_reaction/open-emoji-black/";
+        else if(which.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0)
+            prefix = ":/facesreaction/faces_reaction/open-emoji-white/";
+        else
+        {
+            qWarning() << "Faces reaction option: \"" << qPrintable(which) << "\" will not be handled";
+        }
+
+        const int length = labelFaceReactionInGame->width();
+
+        pmDizzyFace.reset( new QPixmap( QIcon(prefix + "dizzy_face.svg").pixmap(length, length) ));
+        pmGrimacingFace.reset( new QPixmap( QIcon(prefix + "grimacing_face.svg").pixmap(length, length) ));
+        pmGrinningFace.reset( new QPixmap( QIcon(prefix + "grinning_face.svg").pixmap(length, length) ));
+        pmOpenMouthFace.reset( new QPixmap( QIcon(prefix + "open_mouth_face.svg").pixmap(length, length) ));
+        pmSmillingFace.reset( new QPixmap( QIcon(prefix + "smilling_face.svg").pixmap(length, length) ));
+    }
+}
+
 void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
 {
     controller.currentX = x;
@@ -1789,111 +1814,124 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
             if(s.at(0) == '#')
                 continue;
 
-           QStringList terms = s.split(" ");
+            QStringList terms = s.split(" ");
 
-           if(terms.size() < 2)
-               continue;
+            if(terms.size() < 2)
+                continue;
 
-           if(terms.at(0).compare("FirstCellClean", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+            if(terms.at(0).compare("FirstCellClean", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionFirstCellClean(terms.at(1));
-           }
-           else if(terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionFirstCellClean(terms.at(1));
+            }
+            else if(terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionApplicationTheme(terms.at(1));
-           }
-           else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionApplicationTheme(terms.at(1));
+            }
+            else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionCleanNeighborCellsWhenClickedOnShowedCell(terms.at(1));
-           }
-           else if(terms.at(0).compare("Username", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionCleanNeighborCellsWhenClickedOnShowedCell(terms.at(1));
+            }
+            else if(terms.at(0).compare("Username", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionUsername(terms.at(1));
-           }
-           else if(terms.at(0).compare("CustomizedPercentageOfMines", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionUsername(terms.at(1));
+            }
+            else if(terms.at(0).compare("CustomizedPercentageOfMines", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               sbCustomizedPercentageMines->setValue(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("CustomizedX", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                sbCustomizedPercentageMines->setValue(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("CustomizedX", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               sbCustomizedX->setValue(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("CustomizedY", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                sbCustomizedX->setValue(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("CustomizedY", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               sbCustomizedY->setValue(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("KeyboardControllerKeys", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 7)
-                   continue;
+                sbCustomizedY->setValue(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("KeyboardControllerKeys", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 7)
+                    continue;
 
-               preferences->setOptionKeyboardControllerKeys(
-                           {
-                               terms.at(1).toInt(nullptr, 16),
-                               terms.at(2).toInt(nullptr, 16),
-                               terms.at(3).toInt(nullptr, 16),
-                               terms.at(4).toInt(nullptr, 16),
-                               terms.at(5).toInt(nullptr, 16),
-                               terms.at(6).toInt(nullptr, 16),
-                           });
-           }
-           else if(terms.at(0).compare("MinefieldTheme", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionKeyboardControllerKeys(
+                            {
+                                terms.at(1).toInt(nullptr, 16),
+                                terms.at(2).toInt(nullptr, 16),
+                                terms.at(3).toInt(nullptr, 16),
+                                terms.at(4).toInt(nullptr, 16),
+                                terms.at(5).toInt(nullptr, 16),
+                                terms.at(6).toInt(nullptr, 16),
+                            });
+            }
+            else if(terms.at(0).compare("MinefieldTheme", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionMinefieldTheme(terms.at(1));
-           }
-           else if(terms.at(0).compare("CustomizedMinesInPercentage", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionMinefieldTheme(terms.at(1));
+            }
+            else if(terms.at(0).compare("CustomizedMinesInPercentage", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               cbCustomizedMinesInPercentage->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
-           }
-           else if(terms.at(0).compare("WhenCtrlIsPressed", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                cbCustomizedMinesInPercentage->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
+            }
+            else if(terms.at(0).compare("WhenCtrlIsPressed", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionWhenCtrlIsPressed(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("MinimumCellLength", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionWhenCtrlIsPressed(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("MinimumCellLength", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionMinimumCellLength(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("MaximumCellLength", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionMinimumCellLength(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("MaximumCellLength", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionMaximumCellLength(terms.at(1).toInt());
-           }
+                preferences->setOptionMaximumCellLength(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("FacesReaction", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
+                preferences->setOptionFacesReaction(terms.at(1));
+            }
+            else if(terms.at(0).compare("ProgressBar", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences->setOptionProgressBar(terms.at(1));
+            }
         }
     }
 
@@ -1940,7 +1978,9 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
            << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
            << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
            << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
-           << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n';
+           << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
+           << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
+           << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n';
 }
 
 void LibreMinesGui::vUpdatePreferences()

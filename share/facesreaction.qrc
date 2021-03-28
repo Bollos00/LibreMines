@@ -10,5 +10,10 @@
         <file>faces_reaction/open-emoji-black/grinning_face.svg</file>
         <file>faces_reaction/open-emoji-black/open_mouth_face.svg</file>
         <file>faces_reaction/open-emoji-black/smilling_face.svg</file>
+        <file>faces_reaction/open-emoji-white/dizzy_face.svg</file>
+        <file>faces_reaction/open-emoji-white/grimacing_face.svg</file>
+        <file>faces_reaction/open-emoji-white/grinning_face.svg</file>
+        <file>faces_reaction/open-emoji-white/open_mouth_face.svg</file>
+        <file>faces_reaction/open-emoji-white/smilling_face.svg</file>
     </qresource>
 </RCC>

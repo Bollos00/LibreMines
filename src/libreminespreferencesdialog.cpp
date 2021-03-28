@@ -30,6 +30,7 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     ui->comboBoxApplicationTheme->addItems({"Fusion Dark", "Fusion Light"});
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
+    ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White", "Disable"});
     ui->comboBoxWhenCtrlIsPressed->addItems({"Go to the Edge", "Jump 3 Cells", "Jump 5 Cells", "Jump 10 Cells"});
 
 
@@ -82,6 +83,11 @@ bool LibreMinesPreferencesDialog::optionCleanNeighborCellsWhenClickedOnShowedCel
     return ui->cbCleanNeighborCellsWhenClickedOnShowedCell->isChecked();
 }
 
+bool LibreMinesPreferencesDialog::optionProgressBar() const
+{
+    return ui->cbProgressBarInGame->isChecked();
+}
+
 QString LibreMinesPreferencesDialog::optionApplicationTheme() const
 {
     QString s = ui->comboBoxApplicationTheme->currentText();
@@ -92,6 +98,13 @@ QString LibreMinesPreferencesDialog::optionApplicationTheme() const
 QString LibreMinesPreferencesDialog::optionMinefieldTheme() const
 {
     QString s = ui->comboBoxMinefieldTheme->currentText();
+    s.remove(" ", Qt::CaseInsensitive);
+    return s;
+}
+
+QString LibreMinesPreferencesDialog::optionFacesReaction() const
+{
+    QString s = ui->comboBoxFacesReaction->currentText();
     s.remove(" ", Qt::CaseInsensitive);
     return s;
 }
@@ -126,22 +139,37 @@ void LibreMinesPreferencesDialog::setOptionCleanNeighborCellsWhenClickedOnShowed
     ui->cbCleanNeighborCellsWhenClickedOnShowedCell->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
 }
 
-void LibreMinesPreferencesDialog::setOptionApplicationTheme(const QString &theme)
+void LibreMinesPreferencesDialog::setOptionProgressBar(const QString &option)
+{
+    ui->cbProgressBarInGame->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
+}
+
+void LibreMinesPreferencesDialog::setOptionApplicationTheme(const QString &option)
 {
     QString s;
-    if(theme.compare("FusionDark", Qt::CaseInsensitive) == 0){ s = "Fusion Dark"; }
-    else if(theme.compare("FusionLight", Qt::CaseInsensitive) == 0){ s = "Fusion Light"; }
+    if(option.compare("FusionDark", Qt::CaseInsensitive) == 0){ s = "Fusion Dark"; }
+    else if(option.compare("FusionLight", Qt::CaseInsensitive) == 0){ s = "Fusion Light"; }
 
     ui->comboBoxApplicationTheme->setCurrentText(s);
 }
 
-void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &theme)
+void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &option)
 {
     QString s;
-    if(theme.compare("ClassicLight", Qt::CaseInsensitive) == 0){ s = "Classic Light"; }
-    else if(theme.compare("ClassicDark", Qt::CaseInsensitive) == 0){ s = "Classic Dark"; }
+    if(option.compare("ClassicLight", Qt::CaseInsensitive) == 0){ s = "Classic Light"; }
+    else if(option.compare("ClassicDark", Qt::CaseInsensitive) == 0){ s = "Classic Dark"; }
 
     ui->comboBoxMinefieldTheme->setCurrentText(s);
+}
+
+void LibreMinesPreferencesDialog::setOptionFacesReaction(const QString &option)
+{
+    QString s = "Disable";
+    if(option.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0){ s = "Open Emoji Colored"; }
+    else if(option.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0){ s = "Open Emoji Black"; }
+    else if(option.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0){ s = "Open Emoji White"; }
+
+    ui->comboBoxFacesReaction->setCurrentText(s);
 }
 
 void LibreMinesPreferencesDialog::setOptionUsername(const QString &username)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>678</width>
-    <height>403</height>
+    <width>767</width>
+    <height>487</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,6 +32,13 @@
         <property name="text">
          <string>Clean Neighbor Cells When
 Clicked On Showed Cell</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbProgressBarInGame">
+        <property name="text">
+         <string>Show Progress Bar</string>
         </property>
        </widget>
       </item>
@@ -355,6 +362,20 @@ Clicked On Showed Cell</string>
         </item>
         <item>
          <widget class="QComboBox" name="comboBoxMinefieldTheme"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QLabel" name="labelFacesReaction">
+          <property name="text">
+           <string>Faces Reaction:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxFacesReaction"/>
         </item>
        </layout>
       </item>
