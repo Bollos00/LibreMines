@@ -126,6 +126,13 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
         return false;
 
 
+    // Lock the cursor on the lower left of the screen while the controller is activated
+//    if(controller.active)
+//    {
+//        qApp->overrideCursor()->setPos(90*qApp->primaryScreen()->geometry().width()/100,
+//                                       90*qApp->primaryScreen()->geometry().height()/100);
+//    }
+
     switch(event->type())
     {
         case QEvent::KeyPress:
@@ -155,6 +162,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
             }
 
             // Active the controller depending on the key
+            // Additionally hide the cursor when the controller is activated
             if(!controller.active)
             {
                 if(key == controller.keyLeft ||
@@ -164,6 +172,9 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                 {
                     controller.active = true;
                     vKeyboardControllerSetCurrentCell(0, 0);
+                    qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
+                    qApp->overrideCursor()->setPos(90*qApp->primaryScreen()->geometry().width()/100,
+                                                   90*qApp->primaryScreen()->geometry().height()/100);
                     return true;
                 }
             }
@@ -197,12 +208,13 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                     if(cell.isHidden)
                     {
                         Q_EMIT SIGNAL_cleanCell(controller.currentX, controller.currentY);
+                        return true;
                     }
-                    else if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
+                    if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
                     {
                         Q_EMIT SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
+                        return true;
                     }
-                    return true;
 
                 }
                 if(key == controller.keyFlagCell)
@@ -214,6 +226,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                 {
                     controller.active = false;
                     vKeyboardControllUnsetCurrentCell();
+                    qApp->restoreOverrideCursor();
                     return true;
                 }
             }
@@ -242,6 +255,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     controller.active = false;
     controller.currentX = 0;
     controller.currentY = 0;
+    qApp->restoreOverrideCursor();
 
     if(!controller.valid)
     {
@@ -375,8 +389,14 @@ void LibreMinesGui::vNewGame(const uchar _X,
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_stop);
 
-    progressBarGameCompleteInGame->setRange(-gameEngine->cellsToUnlock(), 0);
-    progressBarGameCompleteInGame->setValue(-gameEngine->cellsToUnlock());
+    if(preferences->optionProgressBar())
+    {
+        progressBarGameCompleteInGame->setRange(-gameEngine->cellsToUnlock(), 0);
+        progressBarGameCompleteInGame->setValue(-gameEngine->cellsToUnlock());
+
+        connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_showCell,
+                [this](){ progressBarGameCompleteInGame->setValue(-gameEngine->hiddenCells()); });
+    }
 
     // Set the initial value of mines left to the total number
     //  of mines
@@ -906,6 +926,8 @@ void LibreMinesGui::SLOT_Quit()
             return;
     }
 
+    qApp->restoreOverrideCursor();
+
     labelStatisLastMatch->setText(" ");
 
     Q_EMIT SIGNAL_stopGame();
@@ -1031,8 +1053,6 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
         vKeyboardControllUnsetCurrentCell();
         vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
     }
-
-    progressBarGameCompleteInGame->setValue(-gameEngine->hiddenCells());
 }
 
 void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
@@ -1256,6 +1276,7 @@ void LibreMinesGui::SLOT_gameWon()
     if(controller.active)
     {
         controller.active = false;
+        qApp->restoreOverrideCursor();
         vKeyboardControllUnsetCurrentCell();
     }
 
@@ -1298,6 +1319,9 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
             CellGui& cellGui = principalMatrix[i][j];
             const LibreMinesGameEngine::CellGameEngine& cellGE = gameEngine->getPrincipalMatrix()[i][j];
 
+//            cellGui.button->setEnabled(false);
+//            cellGui.label->setEnabled(false);
+
             if(cellGE.isHidden)
             {
                 if(cellGE.state == MINE &&
@@ -1311,10 +1335,6 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
                     cellGui.button->hide();
                     cellGui.label->setPixmap(*pmWrongFlag);
                 }
-                else
-                {
-                    cellGui.button->setEnabled(false);
-                }
             }
         }
     }
@@ -1322,6 +1342,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
     if(controller.active)
     {
         controller.active = false;
+        qApp->restoreOverrideCursor();
         vKeyboardControllUnsetCurrentCell();
     }
 

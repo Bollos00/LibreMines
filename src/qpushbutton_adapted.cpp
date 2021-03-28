@@ -29,10 +29,18 @@ QPushButton_adapted::QPushButton_adapted(QWidget *parent) : QPushButton(parent)
 
 void QPushButton_adapted::mouseReleaseEvent(QMouseEvent *e)
 {
+    QImage img = icon().pixmap(width(), height()).toImage();
+    img.invertPixels();
+    setIcon(QIcon(QPixmap::fromImage(img)));
+
     Q_EMIT SIGNAL_released(e);
 }
 
 void QPushButton_adapted::mousePressEvent(QMouseEvent *e)
 {
+    QImage img = icon().pixmap(width(), height()).toImage();
+    img.invertPixels();
+    setIcon(QIcon(QPixmap::fromImage(img)));
+
     Q_EMIT SIGNAL_clicked(e);
 }
