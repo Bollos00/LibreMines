@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/facesreaction">
+        <file>faces_reaction/open-emoji-color/dizzy_face.svg</file>
+        <file>faces_reaction/open-emoji-color/grimacing_face.svg</file>
+        <file>faces_reaction/open-emoji-color/grinning_face.svg</file>
+        <file>faces_reaction/open-emoji-color/open_mouth_face.svg</file>
+        <file>faces_reaction/open-emoji-color/smilling_face.svg</file>
+        <file>faces_reaction/open-emoji-black/dizzy_face.svg</file>
+        <file>faces_reaction/open-emoji-black/grimacing_face.svg</file>
+        <file>faces_reaction/open-emoji-black/grinning_face.svg</file>
+        <file>faces_reaction/open-emoji-black/open_mouth_face.svg</file>
+        <file>faces_reaction/open-emoji-black/smilling_face.svg</file>
+    </qresource>
+</RCC>

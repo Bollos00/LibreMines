@@ -174,9 +174,11 @@ private Q_SLOTS:
      *
      * @param e
      */
-    void SLOT_OnCellButtonReleased(const QMouseEvent *const e);
+    void SLOT_OnCellButtonReleased(const QMouseEvent*const e);
+    void SLOT_OnCellButtonClicked(const QMouseEvent*const e);
 
-    void SLOT_onCellLabelReleased(const QMouseEvent *const e);
+    void SLOT_onCellLabelReleased(const QMouseEvent*const e);
+    void SLOT_onCellLabelClicked(const QMouseEvent*const e);
 
     void SLOT_showCell(const uchar _X, const uchar _Y);
     void SLOT_endGameScore(LibreMinesScore score,
@@ -243,6 +245,7 @@ private:
 
     QCheckBox* cbCustomizedMinesInPercentage;
 
+    QLabel* labelFaceReactionInGame;
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
     QProgressBar* progressBarGameCompleteInGame;
@@ -278,6 +281,12 @@ private:
     QScopedPointer<QPixmap> pmMine; /**< TODO: describe */
     QScopedPointer<QPixmap> pmBoom; /**< TODO: describe */
     QScopedPointer<QPixmap> pmWrongFlag; /**< TODO: describe */
+
+    QScopedPointer<QPixmap> pmDizzyFace;
+    QScopedPointer<QPixmap> pmGrimacingFace;
+    QScopedPointer<QPixmap> pmGrinningFace;
+    QScopedPointer<QPixmap> pmOpenMouthFace;
+    QScopedPointer<QPixmap> pmSmillingFace;
 
     KeyboardController controller;
 
