@@ -18,7 +18,7 @@
  */
 
 
-#include <QtCore/QRandomGenerator>
+#include <QRandomGenerator>
 #include <QDebug>
 #include <QFont>
 #include <QMouseEvent>
@@ -97,6 +97,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     vLastSessionLoadConfigurationFile();
     vSetApplicationTheme(preferences->optionApplicationTheme());
     vSetMinefieldTheme(preferences->optionMinefieldTheme());
+    vSetFacesReaction(preferences->optionFacesReaction());
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -124,6 +125,13 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
     if(!controller.valid)
         return false;
 
+
+    // Lock the cursor on the lower left of the screen while the controller is activated
+//    if(controller.active)
+//    {
+//        qApp->overrideCursor()->setPos(90*qApp->primaryScreen()->geometry().width()/100,
+//                                       90*qApp->primaryScreen()->geometry().height()/100);
+//    }
 
     switch(event->type())
     {
@@ -154,6 +162,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
             }
 
             // Active the controller depending on the key
+            // Additionally hide the cursor when the controller is activated
             if(!controller.active)
             {
                 if(key == controller.keyLeft ||
@@ -163,6 +172,9 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                 {
                     controller.active = true;
                     vKeyboardControllerSetCurrentCell(0, 0);
+                    qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
+                    qApp->overrideCursor()->setPos(90*qApp->primaryScreen()->geometry().width()/100,
+                                                   90*qApp->primaryScreen()->geometry().height()/100);
                     return true;
                 }
             }
@@ -196,12 +208,13 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                     if(cell.isHidden)
                     {
                         Q_EMIT SIGNAL_cleanCell(controller.currentX, controller.currentY);
+                        return true;
                     }
-                    else if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
+                    if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
                     {
                         Q_EMIT SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
+                        return true;
                     }
-                    return true;
 
                 }
                 if(key == controller.keyFlagCell)
@@ -213,6 +226,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                 {
                     controller.active = false;
                     vKeyboardControllUnsetCurrentCell();
+                    qApp->restoreOverrideCursor();
                     return true;
                 }
             }
@@ -241,6 +255,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     controller.active = false;
     controller.currentX = 0;
     controller.currentY = 0;
+    qApp->restoreOverrideCursor();
 
     if(!controller.valid)
     {
@@ -276,6 +291,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     // Update the pixmaps
     vSetMinefieldTheme(preferences->optionMinefieldTheme());
+    // Update faces reaction
+    vSetFacesReaction(preferences->optionFacesReaction());
+
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel = preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
 
@@ -312,11 +330,15 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
             connect(cell.button, &QPushButton_adapted::SIGNAL_released,
                     this, &LibreMinesGui::SLOT_OnCellButtonReleased);
+            connect(cell.button, &QPushButton_adapted::SIGNAL_clicked,
+                    this, &LibreMinesGui::SLOT_OnCellButtonClicked);
 
             if(bCleanNeighborCellsWhenClickedOnShowedLabel)
             {
                 connect(cell.label, &QLabel_adapted::SIGNAL_released,
                         this, &LibreMinesGui::SLOT_onCellLabelReleased);
+                connect(cell.label, &QLabel_adapted::SIGNAL_clicked,
+                        this, &LibreMinesGui::SLOT_onCellLabelClicked);
             }
 
             qApp->processEvents();
@@ -367,9 +389,20 @@ void LibreMinesGui::vNewGame(const uchar _X,
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_stop);
 
+    if(preferences->optionProgressBar())
+    {
+        progressBarGameCompleteInGame->setRange(-gameEngine->cellsToUnlock(), 0);
+        progressBarGameCompleteInGame->setValue(-gameEngine->cellsToUnlock());
+
+        connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_showCell,
+                [this](){ progressBarGameCompleteInGame->setValue(-gameEngine->hiddenCells()); });
+    }
+
     // Set the initial value of mines left to the total number
     //  of mines
     SLOT_minesLeft(gameEngine->mines());
+
+    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
 }
 
 void LibreMinesGui::vAttributeAllCells()
@@ -481,8 +514,10 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     actionAboutQt->setText("About Qt...");
 
     this->setFont(QFont("Liberation Sans"));
+    labelFaceReactionInGame = new QLabel(centralWidget());
     labelTimerInGame = new QLabel(centralWidget());
     lcd_numberMinesLeft = new QLCDNumber(centralWidget());
+    progressBarGameCompleteInGame = new QProgressBar(centralWidget());
     buttonRestartInGame = new QPushButton(centralWidget());
     buttonQuitInGame = new QPushButton(centralWidget());
     labelYouWonYouLost = new QLabel(centralWidget());
@@ -500,17 +535,18 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
     lcd_numberMinesLeft->setDecMode();
-    lcd_numberMinesLeft->display(0);;
+    lcd_numberMinesLeft->display(0);
+    progressBarGameCompleteInGame->setTextVisible(false);
     buttonQuitInGame->setText("Quit");
     buttonRestartInGame->setText("Restart");
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
-
-    vHideInterfaceInGame();
 
     this->setGeometry(0,0,iWidthMainWindow,iHeightMainWindow);
     iLimitWidthField = 8*iWidthMainWindow/10;
     iLimitHeightField = 9*iHeightMainWindow/10;
 
+    vAjustInterfaceInGame();
+    vHideInterfaceInGame();
 
     buttonEasy = new QPushButton(centralWidget());
     buttonEasy->setText("Easy\n\n8x8\n\n10 Mines");
@@ -799,15 +835,19 @@ void LibreMinesGui::vAjustInterfaceInGame()
     const int width = this->width();
     const int height = this->height();
 
-    labelTimerInGame->setGeometry(85*width/100, height/20,
-                                  15*width/100, height/8);
+    labelFaceReactionInGame->setGeometry(88*width/100, height/20,
+                                         9*width/100, 9*width/100);
+    labelTimerInGame->setGeometry(85*width/100, labelFaceReactionInGame->y() + labelFaceReactionInGame->height(),
+                                  15*width/100, height/14);
     lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
                                      labelTimerInGame->width(), height/7);
-    buttonRestartInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
-                                     lcd_numberMinesLeft->width()/2, height/20);
+    progressBarGameCompleteInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
+                                     lcd_numberMinesLeft->width(), height/20);
+    buttonRestartInGame->setGeometry(progressBarGameCompleteInGame->x(), progressBarGameCompleteInGame->y()+progressBarGameCompleteInGame->height(),
+                                     progressBarGameCompleteInGame->width()/2, height/20);
     buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
                                   buttonRestartInGame->width(), buttonRestartInGame->height());
-    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+height/10,
+    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+height/20,
                                     lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
     labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
                                       labelYouWonYouLost->width(), height/5);
@@ -816,8 +856,10 @@ void LibreMinesGui::vAjustInterfaceInGame()
 
 void LibreMinesGui::vHideInterfaceInGame()
 {
+    labelFaceReactionInGame->hide();
     labelTimerInGame->hide();
     lcd_numberMinesLeft->hide();
+    progressBarGameCompleteInGame->hide();
     buttonRestartInGame->hide();
     buttonQuitInGame->hide();
     labelYouWonYouLost->hide();
@@ -828,8 +870,11 @@ void LibreMinesGui::vHideInterfaceInGame()
 
 void LibreMinesGui::vShowInterfaceInGame()
 {
+    labelFaceReactionInGame->show();
     labelTimerInGame->show();
     lcd_numberMinesLeft->show();
+    if(preferences->optionProgressBar())
+        progressBarGameCompleteInGame->show();
     buttonRestartInGame->show();
     buttonQuitInGame->show();
     labelYouWonYouLost->show();
@@ -881,6 +926,8 @@ void LibreMinesGui::SLOT_Quit()
             return;
     }
 
+    qApp->restoreOverrideCursor();
+
     labelStatisLastMatch->setText(" ");
 
     Q_EMIT SIGNAL_stopGame();
@@ -898,6 +945,15 @@ void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
 {
     if(!gameEngine->isGameActive() || controller.active)
         return;
+
+    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+
+    // if the button is released outside its area no not treat the event
+    if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
+       e->localPos().y() >= cellLength || e->localPos().y() < 0)
+    {
+        return;
+    }
 
     QPushButton_adapted *buttonClicked = (QPushButton_adapted *) sender();
 
@@ -926,10 +982,30 @@ void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
     }
 }
 
+void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
+{
+    if(!gameEngine->isGameActive() || controller.active)
+        return;
+
+    if(e->button() != Qt::LeftButton)
+        return;
+
+    labelFaceReactionInGame->setPixmap(*pmOpenMouthFace);
+}
+
 void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
 {
     if(!gameEngine->isGameActive() || controller.active)
         return;
+
+    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+
+    // if the button is released outside its area no not treat the event
+    if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
+       e->localPos().y() >= cellLength || e->localPos().y() < 0)
+    {
+        return;
+    }
 
     QLabel_adapted *buttonClicked = (QLabel_adapted *) sender();
 
@@ -940,6 +1016,9 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
             // Find the emissor of the signal
             if(buttonClicked == principalMatrix[i][j].label)
             {
+                if(e->button() != Qt::LeftButton)
+                    return;
+
                 switch (e->button())
                 {
                     case Qt::LeftButton:
@@ -952,6 +1031,16 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
             }
         }
     }
+}
+
+void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
+{
+    Q_UNUSED(e)
+
+    if(!gameEngine->isGameActive() || controller.active)
+        return;
+
+    labelFaceReactionInGame->setPixmap(*pmGrimacingFace);
 
 }
 
@@ -973,6 +1062,19 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                       double dFlagsPerSecond,
                                       double dCellsPerSecond)
 {
+    QString QS_Statics =
+            "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
+            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
+            +"\nWrongFlags: " + QString::number(iWrongFlags)
+            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
+            +"\n"
+            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
+            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
+            +"\n"
+            +"\nGame Complete: " + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
+
+    labelStatisLastMatch->setText(QS_Statics);
+
     score.gameDifficulty = difficult;
     score.username = preferences->optionUsername();
     if(score.username.isEmpty())
@@ -1092,19 +1194,6 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             stream << score;
         }
     }
-
-    QString QS_Statics =
-            "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
-            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
-            +"\nWrongFlags: " + QString::number(iWrongFlags)
-            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
-            +"\n"
-            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
-            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
-            +"\n"
-            +"\nGame Complete: " + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
-
-    labelStatisLastMatch->setText(QS_Statics);
 }
 
 void LibreMinesGui::SLOT_currentTime(const ushort time)
@@ -1187,9 +1276,11 @@ void LibreMinesGui::SLOT_gameWon()
     if(controller.active)
     {
         controller.active = false;
+        qApp->restoreOverrideCursor();
         vKeyboardControllUnsetCurrentCell();
     }
 
+    labelFaceReactionInGame->setPixmap(*pmGrinningFace);
 }
 
 void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
@@ -1228,6 +1319,9 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
             CellGui& cellGui = principalMatrix[i][j];
             const LibreMinesGameEngine::CellGameEngine& cellGE = gameEngine->getPrincipalMatrix()[i][j];
 
+//            cellGui.button->setEnabled(false);
+//            cellGui.label->setEnabled(false);
+
             if(cellGE.isHidden)
             {
                 if(cellGE.state == MINE &&
@@ -1241,10 +1335,6 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
                     cellGui.button->hide();
                     cellGui.label->setPixmap(*pmWrongFlag);
                 }
-                else
-                {
-                    cellGui.button->setEnabled(false);
-                }
             }
         }
     }
@@ -1252,8 +1342,11 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
     if(controller.active)
     {
         controller.active = false;
+        qApp->restoreOverrideCursor();
         vKeyboardControllUnsetCurrentCell();
     }
+
+    labelFaceReactionInGame->setPixmap(*pmDizzyFace);
 }
 
 void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value)
@@ -1439,20 +1532,52 @@ void LibreMinesGui::vSetMinefieldTheme(const QString &theme)
         return;
     }
 
-    pmZero.reset( new QPixmap( QPixmap(prefix + "0.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmOne.reset( new QPixmap(  QPixmap(prefix + "1.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmTwo.reset( new QPixmap(  QPixmap(prefix + "2.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmThree.reset( new QPixmap(QPixmap(prefix + "3.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmFour.reset( new QPixmap( QPixmap(prefix + "4.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmFive.reset( new QPixmap( QPixmap(prefix + "5.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmSix.reset( new QPixmap(  QPixmap(prefix + "6.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmSeven.reset( new QPixmap(QPixmap(prefix + "7.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmEight.reset( new QPixmap(QPixmap(prefix + "8.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmFlag.reset( new QPixmap(QPixmap(prefix + "flag.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmNoFlag.reset( new QPixmap(QPixmap(prefix + "no_flag.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmMine.reset( new QPixmap(QPixmap(prefix + "mine.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmBoom.reset( new QPixmap(QPixmap(prefix + "boom.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
-    pmWrongFlag.reset( new QPixmap(QPixmap(prefix + "wrong_flag.svg").scaled(cellLength, cellLength, Qt::KeepAspectRatio)));
+    pmZero.reset( new QPixmap(  QIcon(prefix + "0.svg").pixmap(cellLength, cellLength)  ) );
+    pmOne.reset( new QPixmap(  QIcon(prefix + "1.svg").pixmap(cellLength, cellLength)  ) );
+    pmTwo.reset( new QPixmap(  QIcon(prefix + "2.svg").pixmap(cellLength, cellLength)  ) );
+    pmThree.reset( new QPixmap(  QIcon(prefix + "3.svg").pixmap(cellLength, cellLength)  ) );
+    pmFour.reset( new QPixmap(  QIcon(prefix + "4.svg").pixmap(cellLength, cellLength)  ) );
+    pmFive.reset( new QPixmap(  QIcon(prefix + "5.svg").pixmap(cellLength, cellLength)  ) );
+    pmSix.reset( new QPixmap(  QIcon(prefix + "6.svg").pixmap(cellLength, cellLength)  ) );
+    pmSeven.reset( new QPixmap(  QIcon(prefix + "7.svg").pixmap(cellLength, cellLength)  ) );
+    pmEight.reset( new QPixmap(  QIcon(prefix + "8.svg").pixmap(cellLength, cellLength)  ) );
+    pmFlag.reset( new QPixmap(  QIcon(prefix + "flag.svg").pixmap(cellLength, cellLength)  ) );
+    pmNoFlag.reset( new QPixmap(  QIcon(prefix + "no_flag.svg").pixmap(cellLength, cellLength)  ) );
+    pmMine.reset( new QPixmap(  QIcon(prefix + "mine.svg").pixmap(cellLength, cellLength)  ) );
+    pmBoom.reset( new QPixmap(  QIcon(prefix + "boom.svg").pixmap(cellLength, cellLength)  ) );
+    pmWrongFlag.reset( new QPixmap(  QIcon(prefix + "wrong_flag.svg").pixmap(cellLength, cellLength)  ) );
+}
+
+void LibreMinesGui::vSetFacesReaction(const QString &which)
+{
+    if(which.compare("Disable", Qt::CaseInsensitive) == 0)
+    {
+        pmDizzyFace.reset( new QPixmap() );
+        pmGrimacingFace.reset( new QPixmap() );
+        pmGrinningFace.reset( new QPixmap() );
+        pmOpenMouthFace.reset( new QPixmap() );
+        pmSmillingFace.reset( new QPixmap() );
+    }
+    else
+    {
+        QString prefix = ":/facesreaction/faces_reaction/open-emoji-color/";
+        if(which.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0)
+            prefix = ":/facesreaction/faces_reaction/open-emoji-black/";
+        else if(which.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0)
+            prefix = ":/facesreaction/faces_reaction/open-emoji-white/";
+        else
+        {
+            qWarning() << "Faces reaction option: \"" << qPrintable(which) << "\" will not be handled";
+        }
+
+        const int length = labelFaceReactionInGame->width();
+
+        pmDizzyFace.reset( new QPixmap( QIcon(prefix + "dizzy_face.svg").pixmap(length, length) ));
+        pmGrimacingFace.reset( new QPixmap( QIcon(prefix + "grimacing_face.svg").pixmap(length, length) ));
+        pmGrinningFace.reset( new QPixmap( QIcon(prefix + "grinning_face.svg").pixmap(length, length) ));
+        pmOpenMouthFace.reset( new QPixmap( QIcon(prefix + "open_mouth_face.svg").pixmap(length, length) ));
+        pmSmillingFace.reset( new QPixmap( QIcon(prefix + "smilling_face.svg").pixmap(length, length) ));
+    }
 }
 
 void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
@@ -1710,111 +1835,124 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
             if(s.at(0) == '#')
                 continue;
 
-           QStringList terms = s.split(" ");
+            QStringList terms = s.split(" ");
 
-           if(terms.size() < 2)
-               continue;
+            if(terms.size() < 2)
+                continue;
 
-           if(terms.at(0).compare("FirstCellClean", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+            if(terms.at(0).compare("FirstCellClean", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionFirstCellClean(terms.at(1));
-           }
-           else if(terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionFirstCellClean(terms.at(1));
+            }
+            else if(terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionApplicationTheme(terms.at(1));
-           }
-           else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionApplicationTheme(terms.at(1));
+            }
+            else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionCleanNeighborCellsWhenClickedOnShowedCell(terms.at(1));
-           }
-           else if(terms.at(0).compare("Username", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionCleanNeighborCellsWhenClickedOnShowedCell(terms.at(1));
+            }
+            else if(terms.at(0).compare("Username", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionUsername(terms.at(1));
-           }
-           else if(terms.at(0).compare("CustomizedPercentageOfMines", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionUsername(terms.at(1));
+            }
+            else if(terms.at(0).compare("CustomizedPercentageOfMines", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               sbCustomizedPercentageMines->setValue(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("CustomizedX", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                sbCustomizedPercentageMines->setValue(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("CustomizedX", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               sbCustomizedX->setValue(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("CustomizedY", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                sbCustomizedX->setValue(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("CustomizedY", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               sbCustomizedY->setValue(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("KeyboardControllerKeys", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 7)
-                   continue;
+                sbCustomizedY->setValue(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("KeyboardControllerKeys", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 7)
+                    continue;
 
-               preferences->setOptionKeyboardControllerKeys(
-                           {
-                               terms.at(1).toInt(nullptr, 16),
-                               terms.at(2).toInt(nullptr, 16),
-                               terms.at(3).toInt(nullptr, 16),
-                               terms.at(4).toInt(nullptr, 16),
-                               terms.at(5).toInt(nullptr, 16),
-                               terms.at(6).toInt(nullptr, 16),
-                           });
-           }
-           else if(terms.at(0).compare("MinefieldTheme", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionKeyboardControllerKeys(
+                            {
+                                terms.at(1).toInt(nullptr, 16),
+                                terms.at(2).toInt(nullptr, 16),
+                                terms.at(3).toInt(nullptr, 16),
+                                terms.at(4).toInt(nullptr, 16),
+                                terms.at(5).toInt(nullptr, 16),
+                                terms.at(6).toInt(nullptr, 16),
+                            });
+            }
+            else if(terms.at(0).compare("MinefieldTheme", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionMinefieldTheme(terms.at(1));
-           }
-           else if(terms.at(0).compare("CustomizedMinesInPercentage", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionMinefieldTheme(terms.at(1));
+            }
+            else if(terms.at(0).compare("CustomizedMinesInPercentage", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               cbCustomizedMinesInPercentage->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
-           }
-           else if(terms.at(0).compare("WhenCtrlIsPressed", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                cbCustomizedMinesInPercentage->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
+            }
+            else if(terms.at(0).compare("WhenCtrlIsPressed", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionWhenCtrlIsPressed(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("MinimumCellLength", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionWhenCtrlIsPressed(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("MinimumCellLength", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionMinimumCellLength(terms.at(1).toInt());
-           }
-           else if(terms.at(0).compare("MaximumCellLength", Qt::CaseInsensitive) == 0)
-           {
-               if(terms.size() != 2)
-                   continue;
+                preferences->setOptionMinimumCellLength(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("MaximumCellLength", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
-               preferences->setOptionMaximumCellLength(terms.at(1).toInt());
-           }
+                preferences->setOptionMaximumCellLength(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("FacesReaction", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
 
+                preferences->setOptionFacesReaction(terms.at(1));
+            }
+            else if(terms.at(0).compare("ProgressBar", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences->setOptionProgressBar(terms.at(1));
+            }
         }
     }
 
@@ -1861,7 +1999,9 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
            << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
            << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
            << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
-           << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n';
+           << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
+           << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
+           << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n';
 }
 
 void LibreMinesGui::vUpdatePreferences()

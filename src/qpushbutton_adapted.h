@@ -41,6 +41,7 @@ public:
 
 protected:
     void mouseReleaseEvent(QMouseEvent* e);
+    void mousePressEvent(QMouseEvent* e);
 
 Q_SIGNALS:
     /**
@@ -49,6 +50,8 @@ Q_SIGNALS:
      * @param
      */
     void SIGNAL_released(const QMouseEvent*const event);
+    void SIGNAL_clicked(const QMouseEvent*const event);
+
 };
 
 #endif // QPUSHBUTTON_ADAPTED_H

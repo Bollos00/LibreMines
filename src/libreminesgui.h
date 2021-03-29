@@ -28,6 +28,7 @@
 #include <QMainWindow>
 #include <QGridLayout>
 #include <QScrollArea>
+#include <QProgressBar>
 
 #include "common.h"
 #include "libreminespreferencesdialog.h"
@@ -122,6 +123,7 @@ private:
 
     void vSetApplicationTheme(const QString& theme);
     void vSetMinefieldTheme(const QString& theme);
+    void vSetFacesReaction(const QString& which);
 
     void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
     void vKeyboardControllUnsetCurrentCell();
@@ -173,9 +175,11 @@ private Q_SLOTS:
      *
      * @param e
      */
-    void SLOT_OnCellButtonReleased(const QMouseEvent *const e);
+    void SLOT_OnCellButtonReleased(const QMouseEvent*const e);
+    void SLOT_OnCellButtonClicked(const QMouseEvent*const e);
 
-    void SLOT_onCellLabelReleased(const QMouseEvent *const e);
+    void SLOT_onCellLabelReleased(const QMouseEvent*const e);
+    void SLOT_onCellLabelClicked(const QMouseEvent*const e);
 
     void SLOT_showCell(const uchar _X, const uchar _Y);
     void SLOT_endGameScore(LibreMinesScore score,
@@ -242,8 +246,10 @@ private:
 
     QCheckBox* cbCustomizedMinesInPercentage;
 
+    QLabel* labelFaceReactionInGame;
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
+    QProgressBar* progressBarGameCompleteInGame;
     QPushButton *buttonRestartInGame; /**< TODO: describe */
     QPushButton *buttonQuitInGame; /**< TODO: describe */
 
@@ -276,6 +282,12 @@ private:
     QScopedPointer<QPixmap> pmMine; /**< TODO: describe */
     QScopedPointer<QPixmap> pmBoom; /**< TODO: describe */
     QScopedPointer<QPixmap> pmWrongFlag; /**< TODO: describe */
+
+    QScopedPointer<QPixmap> pmDizzyFace;
+    QScopedPointer<QPixmap> pmGrimacingFace;
+    QScopedPointer<QPixmap> pmGrinningFace;
+    QScopedPointer<QPixmap> pmOpenMouthFace;
+    QScopedPointer<QPixmap> pmSmillingFace;
 
     KeyboardController controller;
 

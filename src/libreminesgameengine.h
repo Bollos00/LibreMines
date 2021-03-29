@@ -54,6 +54,8 @@ public:
     uchar rows()const;
     uchar lines()const;
     ushort mines()const;
+    ushort cellsToUnlock()const;
+    ushort hiddenCells()const;
     bool isGameActive()const;
 
     void setFirstCellClean(const bool x);

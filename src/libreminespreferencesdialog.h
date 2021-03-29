@@ -48,8 +48,10 @@ public:
 
     bool optionFirstCellClean()const;
     bool optionCleanNeighborCellsWhenClickedOnShowedCell()const;
+    bool optionProgressBar()const;
     QString optionApplicationTheme()const;
     QString optionMinefieldTheme()const;
+    QString optionFacesReaction()const;
     QString optionUsername()const;
     uchar optionWhenCtrlIsPressed()const;
     int optionMinimumCellLength()const;
@@ -57,8 +59,10 @@ public:
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
-    void setOptionApplicationTheme(const QString& theme);
-    void setOptionMinefieldTheme(const QString& theme);
+    void setOptionProgressBar(const QString& option);
+    void setOptionApplicationTheme(const QString& option);
+    void setOptionMinefieldTheme(const QString& option);
+    void setOptionFacesReaction(const QString& option);
     void setOptionUsername(const QString& username);
     void setOptionWhenCtrlIsPressed(const uchar option);
     void setOptionMinimumCellLength(const int option);

@@ -33,9 +33,11 @@ public:
 
 protected:
    void mouseReleaseEvent(QMouseEvent* e);
+   void mousePressEvent(QMouseEvent* e);
 
 Q_SIGNALS:
     void SIGNAL_released(const QMouseEvent *const e);
+    void SIGNAL_clicked(const QMouseEvent *const e);
 };
 
 #endif // QLABEL_ADAPTED_H
