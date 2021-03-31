@@ -55,7 +55,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     cellLength( 0 ),
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) )
-{   
+{
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
 
@@ -71,10 +71,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     // Quit the application with Ctrl + Q
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this), &QShortcut::activated,
             this, &LibreMinesGui::SLOT_quitApplication);
-
-    // Toggle the fullscreen state with F11
-    connect(new QShortcut(QKeySequence(Qt::Key_F11), this), &QShortcut::activated,
-            this, &LibreMinesGui::SLOT_toggleFullScreen);
 
     // Create interface with the passed dimensions
     vCreateGUI(thatWidth, thatHeight);
@@ -238,6 +234,12 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
+void LibreMinesGui::resizeEvent(QResizeEvent *e)
+{
+    QTimer::singleShot(10, [this](){ vAdjustMainMenu(); vAdjustInterfaceInGame(); });
+    QWidget::resizeEvent(e);
+}
+
 void LibreMinesGui::closeEvent(QCloseEvent *e)
 {
     SLOT_quitApplication();
@@ -248,6 +250,8 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
                              ushort i_nMines_)
 {
+    vAdjustInterfaceInGame();
+
     // Reset the controller attributes
     controller.ctrlPressed = false;
     controller.active = false;
@@ -292,13 +296,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     // Update faces reaction
     vSetFacesReaction(preferences->optionFacesReaction());
 
+    widgetBoardContents->setGeometry(0, 0, _X*cellLength, _Y*cellLength);
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel = preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
-
-    widgetBoardContents->show();
-    scrollAreaBoard->show();
-    scrollAreaBoard->setGeometry(0, 0, iLimitWidthField, iLimitHeightField);
-    widgetBoardContents->setGeometry(0, 0, _X*cellLength, _Y*cellLength);
 
     // Create each cell
     for(uchar j=0; j<_Y; j++)
@@ -343,7 +343,6 @@ void LibreMinesGui::vNewGame(const uchar _X,
         }
     }
 
-    vAjustInterfaceInGame();
     vShowInterfaceInGame();
     labelTimerInGame->setNum(0);
     labelYouWonYouLost->setText(" ");
@@ -464,7 +463,7 @@ void LibreMinesGui::vResetPrincipalMatrix()
     principalMatrix.clear();
 }
 
-void LibreMinesGui::vCreateGUI(int width, int height)
+void LibreMinesGui::vCreateGUI(const int width, const int height)
 {
     // Create the interface
 
@@ -472,8 +471,8 @@ void LibreMinesGui::vCreateGUI(int width, int height)
 
     if(width == -1 || height == -1)
     {
-        QRect rec = QGuiApplication::primaryScreen()->geometry();
-        this->resize(rec.width(), rec.height());
+        this->showNormal();
+        this->showMaximized();
     }
     else
     {
@@ -483,6 +482,7 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     // Actions and Menu Bar
     actionPreferences = new QAction(this);
     actionHighScores = new QAction(this);
+    actionToggleFullScreen = new QAction(this);
     actionAbout = new QAction(this);
     actionAboutQt = new QAction(this);
 
@@ -499,7 +499,7 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     menuBarGlobal->addAction(menuOptions->menuAction());
     menuBarGlobal->addAction(menuHelp->menuAction());
 
-    menuOptions->addActions({actionPreferences, actionHighScores});
+    menuOptions->addActions({actionPreferences, actionHighScores, actionToggleFullScreen});
     menuHelp->addActions({actionAbout, actionAboutQt});
 
     menuOptions->setTitle("Options");
@@ -507,6 +507,9 @@ void LibreMinesGui::vCreateGUI(int width, int height)
 
     actionPreferences->setText("Preferences...");
     actionHighScores->setText("High Scores...");
+    actionToggleFullScreen->setText("ToggleFullScreen");
+    actionToggleFullScreen->setShortcut(QKeySequence(Qt::Key_F11));
+
     actionAbout->setText("About...");
     actionAboutQt->setText("About Qt...");
     // Actions and Menu Bar
@@ -541,10 +544,7 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     buttonRestartInGame->setText("Restart");
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
-    iLimitWidthField = 8*this->width()/10;
-    iLimitHeightField = 9*this->height()/10;
-
-    vAjustInterfaceInGame();
+    vAdjustInterfaceInGame();
     vHideInterfaceInGame();
     // Interface In Game
 
@@ -603,76 +603,10 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     labelCustomizedNumbersOfMines->setText("Number of Mines: ");
     // Create Main Menu Widgets
 
-
-    // Resize Main Menu Widgets
-
-    // Width and Height of the main menu
-    const int w = this->width();
-    const int h = this->height() - 100; // 100 for the Menus
-
-
-    buttonEasy->setGeometry(w/20, h/20,
-                            2*w/5, 2*h/5);
-
-    buttonMedium->setGeometry(buttonEasy->x() + buttonEasy->width() + w/10, h/20,
-                              2*w/5, 2*h/5);
-
-    buttonHard->setGeometry(w/20, buttonEasy->y() + buttonEasy->height() + h/10,
-                            2*w/5, 2*h/5);
-
-    buttonCustomizedNewGame->setGeometry(buttonEasy->x() + buttonEasy->width() + w/10,
-                                         buttonEasy->y() + buttonEasy->height() + h/10,
-                                         2*w/5,
-                                         1*h/5);
-
-    labelCustomizedPercentageMines->setGeometry(buttonCustomizedNewGame->x(),
-                                                buttonCustomizedNewGame->y() + buttonCustomizedNewGame->height(),
-                                                buttonCustomizedNewGame->width()/2,
-                                                buttonCustomizedNewGame->height()/3);
-
-    labelCustomizedNumbersOfMines->setGeometry(labelCustomizedPercentageMines->geometry());
-
-    labelCustomizedX->setGeometry(labelCustomizedPercentageMines->x(),
-                                  labelCustomizedPercentageMines->y()+labelCustomizedPercentageMines->height(),
-                                  labelCustomizedPercentageMines->width(),
-                                  labelCustomizedPercentageMines->height());
-
-    labelCustomizedY->setGeometry(labelCustomizedX->x(),
-                                  labelCustomizedX->y()+labelCustomizedX->height(),
-                                  labelCustomizedX->width(),
-                                  labelCustomizedX->height());
-
-    sbCustomizedPercentageMines->setGeometry(labelCustomizedPercentageMines->x()+labelCustomizedPercentageMines->width(),
-                                             labelCustomizedPercentageMines->y(),
-                                             9*labelCustomizedPercentageMines->width()/10,
-                                             labelCustomizedPercentageMines->height());
-
-    sbCustomizedNumbersOfMines->setGeometry(sbCustomizedPercentageMines->geometry());
-
-    cbCustomizedMinesInPercentage->setGeometry(sbCustomizedNumbersOfMines->x() + sbCustomizedNumbersOfMines->width(),
-                                               sbCustomizedNumbersOfMines->y(),
-                                               labelCustomizedNumbersOfMines->width()/10,
-                                               sbCustomizedNumbersOfMines->height());
-
-    sbCustomizedX->setGeometry(labelCustomizedX->x()+labelCustomizedX->width(), labelCustomizedX->y(),
-                               labelCustomizedX->width(), labelCustomizedX->height());
-
-    sbCustomizedY->setGeometry(labelCustomizedY->x()+labelCustomizedY->width(), labelCustomizedY->y(),
-                               labelCustomizedY->width(), labelCustomizedY->height());
-    // Resize Main Menu Widgets
-
+    cbCustomizedMinesInPercentage->setChecked(true);
 
     labelCustomizedNumbersOfMines->hide();
     sbCustomizedNumbersOfMines->hide();
-
-    cbCustomizedMinesInPercentage->setStyleSheet(
-                "QCheckBox::indicator "
-                "{"
-                "    width: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
-                "    height: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
-                "}");
-
-    cbCustomizedMinesInPercentage->setChecked(true);
 
     connect(buttonEasy, &QPushButton::released,
             this, &LibreMinesGui::SLOT_Easy);
@@ -695,14 +629,18 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
 
+    connect(actionHighScores, &QAction::triggered,
+            this, &LibreMinesGui::SLOT_showHighScores);
+
+    connect(actionToggleFullScreen, &QAction::triggered,
+            this, &LibreMinesGui::SLOT_toggleFullScreen);
+
+
     connect(actionAbout, &QAction::triggered,
             this, &LibreMinesGui::SLOT_showAboutDialog);
 
     connect(actionAboutQt, &QAction::triggered,
             [this](){ QMessageBox::aboutQt(this, "LibreMines"); });
-
-    connect(actionHighScores, &QAction::triggered,
-            this, &LibreMinesGui::SLOT_showHighScores);
 
     connect(cbCustomizedMinesInPercentage, &QCheckBox::stateChanged,
             [this](const int state)
@@ -820,6 +758,70 @@ void LibreMinesGui::vShowMainMenu()
     menuBar()->show();
 }
 
+void LibreMinesGui::vAdjustMainMenu()
+{
+
+    // Width and Height of the main menu
+    const int w = centralWidget()->width();
+    const int h = centralWidget()->height();
+
+    buttonEasy->setGeometry(w/20, h/20,
+                            2*w/5, 2*h/5);
+
+    buttonMedium->setGeometry(buttonEasy->x() + buttonEasy->width() + w/10, h/20,
+                              2*w/5, 2*h/5);
+
+    buttonHard->setGeometry(w/20, buttonEasy->y() + buttonEasy->height() + h/10,
+                            2*w/5, 2*h/5);
+
+    buttonCustomizedNewGame->setGeometry(buttonEasy->x() + buttonEasy->width() + w/10,
+                                         buttonEasy->y() + buttonEasy->height() + h/10,
+                                         2*w/5,
+                                         1*h/5);
+
+    labelCustomizedPercentageMines->setGeometry(buttonCustomizedNewGame->x(),
+                                                buttonCustomizedNewGame->y() + buttonCustomizedNewGame->height(),
+                                                buttonCustomizedNewGame->width()/2,
+                                                buttonCustomizedNewGame->height()/3);
+
+    labelCustomizedNumbersOfMines->setGeometry(labelCustomizedPercentageMines->geometry());
+
+    labelCustomizedX->setGeometry(labelCustomizedPercentageMines->x(),
+                                  labelCustomizedPercentageMines->y()+labelCustomizedPercentageMines->height(),
+                                  labelCustomizedPercentageMines->width(),
+                                  labelCustomizedPercentageMines->height());
+
+    labelCustomizedY->setGeometry(labelCustomizedX->x(),
+                                  labelCustomizedX->y()+labelCustomizedX->height(),
+                                  labelCustomizedX->width(),
+                                  labelCustomizedX->height());
+
+    sbCustomizedPercentageMines->setGeometry(labelCustomizedPercentageMines->x()+labelCustomizedPercentageMines->width(),
+                                             labelCustomizedPercentageMines->y(),
+                                             9*labelCustomizedPercentageMines->width()/10,
+                                             labelCustomizedPercentageMines->height());
+
+    sbCustomizedNumbersOfMines->setGeometry(sbCustomizedPercentageMines->geometry());
+
+    cbCustomizedMinesInPercentage->setGeometry(sbCustomizedNumbersOfMines->x() + sbCustomizedNumbersOfMines->width(),
+                                               sbCustomizedNumbersOfMines->y(),
+                                               labelCustomizedNumbersOfMines->width()/10,
+                                               sbCustomizedNumbersOfMines->height());
+
+    sbCustomizedX->setGeometry(labelCustomizedX->x()+labelCustomizedX->width(), labelCustomizedX->y(),
+                               labelCustomizedX->width(), labelCustomizedX->height());
+
+    sbCustomizedY->setGeometry(labelCustomizedY->x()+labelCustomizedY->width(), labelCustomizedY->y(),
+                               labelCustomizedY->width(), labelCustomizedY->height());
+
+    cbCustomizedMinesInPercentage->setStyleSheet(
+                "QCheckBox::indicator "
+                "{"
+                "    width: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
+                "    height: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
+                "}");
+}
+
 void LibreMinesGui::SLOT_Easy()
 {
     vHideMainMenu();
@@ -855,27 +857,33 @@ void LibreMinesGui::SLOT_Customized()
 
 }
 
-void LibreMinesGui::vAjustInterfaceInGame()
+void LibreMinesGui::vAdjustInterfaceInGame()
 {
-    const int width = this->width();
-    const int height = this->height();
+    const int w = centralWidget()->width();
+    const int h = centralWidget()->height();
 
-    labelFaceReactionInGame->setGeometry(88*width/100, height/20,
-                                         9*width/100, 9*width/100);
-    labelTimerInGame->setGeometry(85*width/100, labelFaceReactionInGame->y() + labelFaceReactionInGame->height(),
-                                  15*width/100, height/14);
+
+    iLimitWidthField = 8*w/10;
+    iLimitHeightField = h;
+
+    scrollAreaBoard->setGeometry(0, 0, iLimitWidthField, iLimitHeightField);
+
+    labelFaceReactionInGame->setGeometry(88*w /100, h /20,
+                                         9*w /100, 9*w /100);
+    labelTimerInGame->setGeometry(85*w /100, labelFaceReactionInGame->y() + labelFaceReactionInGame->height(),
+                                  15*w /100, h /14);
     lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
-                                     labelTimerInGame->width(), height/7);
+                                     labelTimerInGame->width(), h /7);
     progressBarGameCompleteInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
-                                     lcd_numberMinesLeft->width(), height/20);
+                                     lcd_numberMinesLeft->width(), h /20);
     buttonRestartInGame->setGeometry(progressBarGameCompleteInGame->x(), progressBarGameCompleteInGame->y()+progressBarGameCompleteInGame->height(),
-                                     progressBarGameCompleteInGame->width()/2, height/20);
+                                     progressBarGameCompleteInGame->width()/2, h /20);
     buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
                                   buttonRestartInGame->width(), buttonRestartInGame->height());
-    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+height/20,
+    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+h /20,
                                     lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
     labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
-                                      labelYouWonYouLost->width(), height/5);
+                                      labelYouWonYouLost->width(), h /5);
 }
 
 
@@ -904,6 +912,8 @@ void LibreMinesGui::vShowInterfaceInGame()
     buttonQuitInGame->show();
     labelYouWonYouLost->show();
     labelStatisLastMatch->show();
+    widgetBoardContents->show();
+    scrollAreaBoard->show();
 }
 
 void LibreMinesGui::SLOT_Restart()
