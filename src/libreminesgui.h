@@ -81,8 +81,9 @@ public:
 protected:
     bool eventFilter(QObject* object, QEvent* event);
 
-    void closeEvent(QCloseEvent* e);
+    void resizeEvent(QResizeEvent* e);
 
+    void closeEvent(QCloseEvent* e);
 private:
     void vNewGame(const uchar _X,
                   const uchar _Y,
@@ -94,7 +95,7 @@ private:
      * @brief
      *
      */
-    void vCreateGUI(int width, int height);
+    void vCreateGUI(const int width, const int height);
     /**
      * @brief
      *
@@ -109,7 +110,8 @@ private:
      * @brief
      *
      */
-    void vAjustInterfaceInGame();
+    void vAdjustMainMenu();
+    void vAdjustInterfaceInGame();
     /**
      * @brief
      *
@@ -221,9 +223,6 @@ private:
     int iLimitHeightField; /**< TODO: describe */
     int iLimitWidthField; /**< TODO: describe */
 
-    int iWidthMainWindow;
-    int iHeightMainWindow;
-
     int cellLength; /**< TODO: describe */
 
     GAME_DIFFICULTY difficult; /**< TODO: describe */
@@ -263,6 +262,7 @@ private:
     QMenu* menuOptions;
     QAction* actionPreferences;
     QAction* actionHighScores;
+    QAction* actionToggleFullScreen;
 
     QMenu* menuHelp;
     QAction* actionAbout;
