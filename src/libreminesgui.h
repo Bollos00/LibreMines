@@ -221,9 +221,6 @@ private:
     int iLimitHeightField; /**< TODO: describe */
     int iLimitWidthField; /**< TODO: describe */
 
-    int iWidthMainWindow;
-    int iHeightMainWindow;
-
     int cellLength; /**< TODO: describe */
 
     GAME_DIFFICULTY difficult; /**< TODO: describe */

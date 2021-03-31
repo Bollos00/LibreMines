@@ -52,8 +52,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     principalMatrix( std::vector< std::vector<CellGui> >(0) ),
     iLimitHeightField( 0 ),
     iLimitWidthField( 0 ),
-    iWidthMainWindow( 0 ),
-    iHeightMainWindow( 0 ),
     cellLength( 0 ),
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) )
@@ -475,15 +473,14 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     if(width == -1 || height == -1)
     {
         QRect rec = QGuiApplication::primaryScreen()->geometry();
-        iHeightMainWindow  = rec.height();
-        iWidthMainWindow = rec.width();
+        this->resize(rec.width(), rec.height());
     }
     else
     {
-        iWidthMainWindow = width;
-        iHeightMainWindow = height;
+        resize(width, height);
     }
 
+    // Actions and Menu Bar
     actionPreferences = new QAction(this);
     actionHighScores = new QAction(this);
     actionAbout = new QAction(this);
@@ -491,7 +488,7 @@ void LibreMinesGui::vCreateGUI(int width, int height)
 
     QMenuBar* menuBarGlobal = new QMenuBar(this);
 
-    menuBarGlobal->setGeometry(0, 0, iWidthMainWindow, 100);
+    menuBarGlobal->setGeometry(0, 0, this->width(), 100);
 
     menuOptions = new QMenu(menuBarGlobal);
     menuHelp = new QMenu(menuBarGlobal);
@@ -512,7 +509,10 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     actionHighScores->setText("High Scores...");
     actionAbout->setText("About...");
     actionAboutQt->setText("About Qt...");
+    // Actions and Menu Bar
 
+
+    // Interface In Game
     this->setFont(QFont("Liberation Sans"));
     labelFaceReactionInGame = new QLabel(centralWidget());
     labelTimerInGame = new QLabel(centralWidget());
@@ -541,29 +541,31 @@ void LibreMinesGui::vCreateGUI(int width, int height)
     buttonRestartInGame->setText("Restart");
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
-    this->setGeometry(0,0,iWidthMainWindow,iHeightMainWindow);
-    iLimitWidthField = 8*iWidthMainWindow/10;
-    iLimitHeightField = 9*iHeightMainWindow/10;
+    iLimitWidthField = 8*this->width()/10;
+    iLimitHeightField = 9*this->height()/10;
 
     vAjustInterfaceInGame();
     vHideInterfaceInGame();
+    // Interface In Game
 
+
+    // Create Main Menu Widgets
     buttonEasy = new QPushButton(centralWidget());
     buttonEasy->setText("Easy\n\n8x8\n\n10 Mines");
     buttonEasy->setFont(QFont("Liberation Sans",20));
 
     buttonMedium= new QPushButton(centralWidget());
     buttonMedium->setText("Medium\n\n16x16\n\n40 Mines");
-    buttonMedium->setFont(QFont("Liberation Sans",20));
+    buttonMedium->setFont(QFont("Liberation Sans", 20));
 
 
     buttonHard = new QPushButton(centralWidget());
     buttonHard->setText("Hard\n\n30x16\n\n99 Mines");
-    buttonHard->setFont(QFont("Liberation Sans",20));
+    buttonHard->setFont(QFont("Liberation Sans", 20));
 
     buttonCustomizedNewGame = new QPushButton(centralWidget());
     buttonCustomizedNewGame->setText("Customized New Game");
-    buttonCustomizedNewGame->setFont(QFont("Liberation Sans",20));
+    buttonCustomizedNewGame->setFont(QFont("Liberation Sans", 20));
 
     sbCustomizedX = new QSpinBox(centralWidget());
     sbCustomizedX->setMinimum(10);
@@ -599,43 +601,66 @@ void LibreMinesGui::vCreateGUI(int width, int height)
 
     labelCustomizedNumbersOfMines = new QLabel(centralWidget());
     labelCustomizedNumbersOfMines->setText("Number of Mines: ");
+    // Create Main Menu Widgets
 
-    buttonEasy->setGeometry(iWidthMainWindow/20, iHeightMainWindow/20,
-                            iWidthMainWindow/2 - 2*iWidthMainWindow/20, 4*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
 
-    buttonMedium->setGeometry(buttonEasy->x() + buttonEasy->width() + iWidthMainWindow/20, iHeightMainWindow/20,
-                              iWidthMainWindow/2 - 2*iWidthMainWindow/20, 4*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
+    // Resize Main Menu Widgets
 
-    buttonHard->setGeometry(iWidthMainWindow/20, buttonEasy->y() + buttonEasy->height() + iHeightMainWindow/20,
-                            iWidthMainWindow/2 - 2*iWidthMainWindow/20,  4*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
+    // Width and Height of the main menu
+    const int w = this->width();
+    const int h = this->height() - 100; // 100 for the Menus
 
-    buttonCustomizedNewGame->setGeometry(buttonEasy->x() + buttonEasy->width() + iWidthMainWindow/20, buttonEasy->y() + buttonEasy->height() + iHeightMainWindow/20,
-                                         iWidthMainWindow/2 - 2*iWidthMainWindow/20, 2*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/5 );
 
-    labelCustomizedPercentageMines->setGeometry(buttonCustomizedNewGame->x(), buttonCustomizedNewGame->y()+buttonCustomizedNewGame->height(),
-                                        buttonCustomizedNewGame->width()/2,2*(iHeightMainWindow/2 - 2*iHeightMainWindow/20)/(3*5));
+    buttonEasy->setGeometry(w/20, h/20,
+                            2*w/5, 2*h/5);
+
+    buttonMedium->setGeometry(buttonEasy->x() + buttonEasy->width() + w/10, h/20,
+                              2*w/5, 2*h/5);
+
+    buttonHard->setGeometry(w/20, buttonEasy->y() + buttonEasy->height() + h/10,
+                            2*w/5, 2*h/5);
+
+    buttonCustomizedNewGame->setGeometry(buttonEasy->x() + buttonEasy->width() + w/10,
+                                         buttonEasy->y() + buttonEasy->height() + h/10,
+                                         2*w/5,
+                                         1*h/5);
+
+    labelCustomizedPercentageMines->setGeometry(buttonCustomizedNewGame->x(),
+                                                buttonCustomizedNewGame->y() + buttonCustomizedNewGame->height(),
+                                                buttonCustomizedNewGame->width()/2,
+                                                buttonCustomizedNewGame->height()/3);
 
     labelCustomizedNumbersOfMines->setGeometry(labelCustomizedPercentageMines->geometry());
 
-    labelCustomizedX->setGeometry(labelCustomizedPercentageMines->x(), labelCustomizedPercentageMines->y()+labelCustomizedPercentageMines->height(),
-                                  labelCustomizedPercentageMines->width(),labelCustomizedPercentageMines->height());
+    labelCustomizedX->setGeometry(labelCustomizedPercentageMines->x(),
+                                  labelCustomizedPercentageMines->y()+labelCustomizedPercentageMines->height(),
+                                  labelCustomizedPercentageMines->width(),
+                                  labelCustomizedPercentageMines->height());
 
-    labelCustomizedY->setGeometry(labelCustomizedX->x(), labelCustomizedX->y()+labelCustomizedX->height(),
-                                  labelCustomizedX->width(),labelCustomizedX->height());
+    labelCustomizedY->setGeometry(labelCustomizedX->x(),
+                                  labelCustomizedX->y()+labelCustomizedX->height(),
+                                  labelCustomizedX->width(),
+                                  labelCustomizedX->height());
 
-    sbCustomizedPercentageMines->setGeometry(labelCustomizedPercentageMines->x()+labelCustomizedPercentageMines->width(), labelCustomizedPercentageMines->y(),
-                                    9*labelCustomizedPercentageMines->width()/10, labelCustomizedPercentageMines->height());
+    sbCustomizedPercentageMines->setGeometry(labelCustomizedPercentageMines->x()+labelCustomizedPercentageMines->width(),
+                                             labelCustomizedPercentageMines->y(),
+                                             9*labelCustomizedPercentageMines->width()/10,
+                                             labelCustomizedPercentageMines->height());
 
     sbCustomizedNumbersOfMines->setGeometry(sbCustomizedPercentageMines->geometry());
 
-    cbCustomizedMinesInPercentage->setGeometry(sbCustomizedNumbersOfMines->x() + sbCustomizedNumbersOfMines->width(), sbCustomizedNumbersOfMines->y(),
-                                               labelCustomizedNumbersOfMines->width()/10, sbCustomizedNumbersOfMines->height());
+    cbCustomizedMinesInPercentage->setGeometry(sbCustomizedNumbersOfMines->x() + sbCustomizedNumbersOfMines->width(),
+                                               sbCustomizedNumbersOfMines->y(),
+                                               labelCustomizedNumbersOfMines->width()/10,
+                                               sbCustomizedNumbersOfMines->height());
 
     sbCustomizedX->setGeometry(labelCustomizedX->x()+labelCustomizedX->width(), labelCustomizedX->y(),
                                labelCustomizedX->width(), labelCustomizedX->height());
 
     sbCustomizedY->setGeometry(labelCustomizedY->x()+labelCustomizedY->width(), labelCustomizedY->y(),
                                labelCustomizedY->width(), labelCustomizedY->height());
+    // Resize Main Menu Widgets
+
 
     labelCustomizedNumbersOfMines->hide();
     sbCustomizedNumbersOfMines->hide();
@@ -1285,8 +1310,6 @@ void LibreMinesGui::SLOT_gameWon()
 
 void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
 {
-    qDebug()<<"You Lost";
-
     switch (difficult)
     {
         case NONE:
@@ -1400,7 +1423,7 @@ void LibreMinesGui::SLOT_showAboutDialog()
             " along with this program.  If not, see <http://www.gnu.org/licenses/>.\n"
             "\n"
             "Get the source code of LibreMines on\n"
-            "<https://github.com/Bollos00/LibreMines>";
+            "<" + QString(LIBREMINES_PROJECT_HOMEPAGE_URL) + ">";
 
     QMessageBox::about(this, "LibreMines", text);
 }
@@ -1561,7 +1584,9 @@ void LibreMinesGui::vSetFacesReaction(const QString &which)
     else
     {
         QString prefix = ":/facesreaction/faces_reaction/open-emoji-color/";
-        if(which.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0)
+        if(which.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0)
+            prefix = ":/facesreaction/faces_reaction/open-emoji-color/";
+        else if(which.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0)
             prefix = ":/facesreaction/faces_reaction/open-emoji-black/";
         else if(which.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0)
             prefix = ":/facesreaction/faces_reaction/open-emoji-white/";
