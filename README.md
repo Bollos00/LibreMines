@@ -8,7 +8,15 @@ LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [O
 
 The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory.
 
-## Installation
+## Installing from Package Manager
+
+[LibreMines is available on the Arch User Repository](https://aur.archlinux.org/packages/libremines/). With `yay` it can be installed with:
+
+```sh
+yay -S libremines
+```
+
+## Installing from the source code
 
 ### Installation Dependencies
 
@@ -105,3 +113,15 @@ For activate the keyboard controller mode, press one of the following keys: **A|
 If you do not feel comfortable with those keys, you can edit them going to the main menu, then Options > Preferences.
 
 Tip: hold the **Control Key** while moving to move faster.
+
+
+## Contributing
+
+All kinds of contributions are welcome on this project. You can help:
+
+* Making artworks (SVG) for minefield themes and new faces reaction;
+* Documenting the source code and making tutorials of the game;
+* Sharing the game in order to attract more users;
+* Adapting the software for other Operational Systems;
+* Packaging the software for other distributions;
+* Increasing the playability and adding new features by making changes on the source code.
