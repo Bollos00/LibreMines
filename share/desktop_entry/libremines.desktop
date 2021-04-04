@@ -2,7 +2,7 @@
 Name=LibreMines
 Comment=A Qt5 based Minesweeper game
 Icon=libremines
-Terminal=False
+Terminal=false
 Type=Application
 Categories=Game;LogicGame
 Keywords=Minesweeper;mines
