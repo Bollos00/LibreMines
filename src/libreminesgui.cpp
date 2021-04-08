@@ -1113,7 +1113,15 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
     score.gameDifficulty = difficult;
     score.username = preferences->optionUsername();
     if(score.username.isEmpty())
+#ifdef Q_OS_WINDOWS
+    {
+        score.username = qgetenv("USERNAME");
+    }
+#else
+    {
         score.username = qgetenv("USER");
+    }
+#endif
 
     // Save the score of the current game on the file scoresLibreMines on
     //  the "~/.local/share/libremines/" directory. If the file does not
@@ -2061,7 +2069,13 @@ void LibreMinesGui::vUpdatePreferences()
     controller.valid &= !keys.contains(-1);
 
     if(preferences->optionUsername().isEmpty())
+#ifdef Q_OS_WINDOWS
+    {
+        preferences->setOptionUsername(qgetenv("USERNAME"));
+    }
+#else
     {
         preferences->setOptionUsername(qgetenv("USER"));
     }
+#endif
 }
