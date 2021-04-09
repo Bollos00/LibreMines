@@ -18,7 +18,7 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.4.0"
+    VERSION "1.4.2"
     DESCRIPTION "A Qt based Minesweeper game"
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
@@ -74,6 +74,7 @@ add_executable(${PROJECT_NAME}
     src/qpushbutton_adapted.h
     share/facesreaction.qrc
     share/icons.qrc
+    share/icons.rc
     share/minefield_icons.qrc
 )
 
@@ -110,19 +111,25 @@ else()
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Svg)
 endif()
 
-# create install target
-include(GNUInstallDirs)
+# Set the install settings for Unix environments
+if(UNIX)
+    # create install target
+    include(GNUInstallDirs)
 
-# Install the executable
-install(
-    TARGETS
-    ${PROJECT_NAME}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # set include path for installed library target
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+    # Install the executable
+    install(
+        TARGETS
+        ${PROJECT_NAME}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # set include path for installed library target
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
 
-# Install the desktop entry and the icon
-install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
-install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
+    # Install the desktop entry and the icon
+    install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
+    install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
+
+elseif(WIN32)
+
+endif()

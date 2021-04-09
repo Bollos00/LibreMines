@@ -4,7 +4,7 @@
 
 ## Introduction
 
-LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [Open Source](https://en.wikipedia.org/wiki/Open-source_software) software Minesweeper clone available for GNU/Linux and FreeBSD systems.
+LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [Open Source](https://en.wikipedia.org/wiki/Open-source_software) software Qt based Minesweeper clone available for GNU/Linux, FreeBSD and Windows systems.
 
 The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory.
 
@@ -15,6 +15,15 @@ The source code is licensed under the [GNU General Public License at version 3](
 ```sh
 yay -S libremines
 ```
+
+## Binary installation for Windows
+
+For windows systems, if you do not want to install LibreMines from the source code, you can just get one of the releases [here](https://github.com/Bollos00/LibreMines/releases). And follow those steps:
+
+* Download the file `libremines_vX.X.X_windows_release.zip` of the last version available;
+* Extract it on your preferred location;
+
+The executable `libremines.exe` will be inside the folder extracted. You can also add a Desktop shortcut or put it on the taskbar.
 
 ## Installing from the source code
 
@@ -67,7 +76,7 @@ The executable `libremines` will be generated in the build directory, now it is 
 ./libremines
 ```
 
-### Installing on the system
+### Installing on the system (Unix only)
 
 At least, if you want install LibreMines on your system, use the following command:
 ```sh

@@ -29,7 +29,12 @@ QLabel_adapted::QLabel_adapted(QWidget *parent):
 
 void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
 {
+
+#if QT_VERSION > QT_VERSION_CHECK(5, 15, 0)
+    QImage img = pixmap(Qt::ReturnByValue).toImage();
+#else
     QImage img = pixmap()->toImage();
+#endif
     img.invertPixels();
     setPixmap(QPixmap::fromImage(img));
 
@@ -38,7 +43,11 @@ void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
 
 void QLabel_adapted::mousePressEvent(QMouseEvent *e)
 {
+#if QT_VERSION > QT_VERSION_CHECK(5, 15, 0)
+    QImage img = pixmap(Qt::ReturnByValue).toImage();
+#else
     QImage img = pixmap()->toImage();
+#endif
     img.invertPixels();
     setPixmap(QPixmap::fromImage(img));
 
