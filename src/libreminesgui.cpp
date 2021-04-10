@@ -1608,6 +1608,8 @@ void LibreMinesGui::vSetFacesReaction(const QString &which)
             prefix = ":/facesreaction/faces_reaction/open-emoji-black/";
         else if(which.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0)
             prefix = ":/facesreaction/faces_reaction/open-emoji-white/";
+        else if(which.compare("TwEmojiColored", Qt::CaseInsensitive) == 0)
+            prefix = ":/facesreaction/faces_reaction/twemoji-color/";
         else
         {
             qWarning() << "Faces reaction option: \"" << qPrintable(which) << "\" will not be handled";

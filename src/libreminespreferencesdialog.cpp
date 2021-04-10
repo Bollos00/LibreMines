@@ -30,7 +30,8 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     ui->comboBoxApplicationTheme->addItems({"Fusion Dark", "Fusion Light"});
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
-    ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White", "Disable"});
+    ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White",
+                                         "TwEmoji Colored", "Disable"});
     ui->comboBoxWhenCtrlIsPressed->addItems({"Go to the Edge", "Jump 3 Cells", "Jump 5 Cells", "Jump 10 Cells"});
 
 
@@ -168,6 +169,7 @@ void LibreMinesPreferencesDialog::setOptionFacesReaction(const QString &option)
     if(option.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0){ s = "Open Emoji Colored"; }
     else if(option.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0){ s = "Open Emoji Black"; }
     else if(option.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0){ s = "Open Emoji White"; }
+    else if(option.compare("TwEmojiColored", Qt::CaseInsensitive) == 0){ s = "TwEmoji Colored"; }
 
     ui->comboBoxFacesReaction->setCurrentText(s);
 }
