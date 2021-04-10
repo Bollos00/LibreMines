@@ -18,7 +18,7 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.4.2"
+    VERSION "1.5.0"
     DESCRIPTION "A Qt based Minesweeper game"
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
@@ -72,6 +72,10 @@ add_executable(${PROJECT_NAME}
     src/qlabel_adapted.h
     src/qpushbutton_adapted.cpp
     src/qpushbutton_adapted.h
+    share/application_stylesheets/breeze/breeze.qrc
+    share/application_stylesheets/qdarkstyle/dark/qdarkstyle_dark.qrc
+    share/application_stylesheets/qdarkstyle/light/qdarkstyle_light.qrc
+    share/application_stylesheets/qss/qss.qrc
     share/facesreaction.qrc
     share/icons.qrc
     share/icons.rc
