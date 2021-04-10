@@ -6,7 +6,7 @@
 
 LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [Open Source](https://en.wikipedia.org/wiki/Open-source_software) software Qt based Minesweeper clone available for GNU/Linux, FreeBSD and Windows systems.
 
-The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory.
+The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory, except the files on `share/application_stylesheets` directory, which licenses are indicated with the `LICENSE` files inside subdirectories.
 
 ## Installing from Package Manager
 
@@ -134,3 +134,10 @@ All kinds of contributions are welcome on this project. You can help:
 * Adapting the software for other Operational Systems;
 * Packaging the software for other distributions;
 * Increasing the playability and adding new features by making changes on the source code.
+
+# Third party Repositories
+* [BreezeStyleSheets](https://github.com/Alexhuszagh/BreezeStyleSheets)
+* [GTRONICK/QSS](https://github.com/GTRONICK/QSS)
+* [QDarkStyleSheet](https://github.com/ColinDuquesnoy/QDarkStyleSheet)
+* [TwEmoji](https://github.com/twitter/twemoji)
+* [OpenEmoji](https://github.com/hfg-gmuend/openmoji)

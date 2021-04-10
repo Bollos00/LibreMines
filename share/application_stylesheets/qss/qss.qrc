@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/qss">
+        <file>ConsoleStyle.qss</file>
+        <file>NeonButtons.qss</file>
+    </qresource>
+</RCC>
