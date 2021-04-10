@@ -21,6 +21,7 @@
 #include "libreminespreferencesdialog.h"
 #include "ui_libreminespreferencesdialog.h"
 
+#include <QStyleFactory>
 
 LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     QDialog(parent),
@@ -28,7 +29,21 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Dark and light fusion
     ui->comboBoxApplicationTheme->addItems({"Fusion Dark", "Fusion Light"});
+
+    // Styles from system
+    ui->comboBoxApplicationTheme->addItems(QStyleFactory::keys());
+
+    // QSS
+    ui->comboBoxApplicationTheme->addItems({"ConsoleStyle", "NeonButtons"});
+
+    // QDarkStyle
+    ui->comboBoxApplicationTheme->addItems({"QDarkStyle", "QDarkStyle Light"});
+
+    // Breeze
+    ui->comboBoxApplicationTheme->addItems({"Breeze Dark", "Breeze Light"});
+
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light", "TwEmoji"});
     ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White",
                                          "TwEmoji Colored", "Disable"});
@@ -147,16 +162,19 @@ void LibreMinesPreferencesDialog::setOptionProgressBar(const QString &option)
 
 void LibreMinesPreferencesDialog::setOptionApplicationTheme(const QString &option)
 {
-    QString s;
+    QString s = option;
     if(option.compare("FusionDark", Qt::CaseInsensitive) == 0){ s = "Fusion Dark"; }
     else if(option.compare("FusionLight", Qt::CaseInsensitive) == 0){ s = "Fusion Light"; }
+    else if(option.compare("QDarkStyleLight", Qt::CaseInsensitive) == 0){ s = "QDarkStyle Light"; }
+    else if(option.compare("BreezeDark", Qt::CaseInsensitive) == 0){ s = "BreezeDark"; }
+    else if(option.compare("BreezeLight", Qt::CaseInsensitive) == 0){ s = "Breeze Light"; }
 
     ui->comboBoxApplicationTheme->setCurrentText(s);
 }
 
 void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &option)
 {
-    QString s;
+    QString s = option;
     if(option.compare("ClassicLight", Qt::CaseInsensitive) == 0){ s = "Classic Light"; }
     else if(option.compare("ClassicDark", Qt::CaseInsensitive) == 0){ s = "Classic Dark"; }
     else if(option.compare("TwEmoji", Qt::CaseInsensitive) == 0){ s = "TwEmoji"; }
