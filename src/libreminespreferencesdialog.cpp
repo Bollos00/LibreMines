@@ -166,7 +166,7 @@ void LibreMinesPreferencesDialog::setOptionApplicationTheme(const QString &optio
     if(option.compare("FusionDark", Qt::CaseInsensitive) == 0){ s = "Fusion Dark"; }
     else if(option.compare("FusionLight", Qt::CaseInsensitive) == 0){ s = "Fusion Light"; }
     else if(option.compare("QDarkStyleLight", Qt::CaseInsensitive) == 0){ s = "QDarkStyle Light"; }
-    else if(option.compare("BreezeDark", Qt::CaseInsensitive) == 0){ s = "BreezeDark"; }
+    else if(option.compare("BreezeDark", Qt::CaseInsensitive) == 0){ s = "Breeze Dark"; }
     else if(option.compare("BreezeLight", Qt::CaseInsensitive) == 0){ s = "Breeze Light"; }
 
     ui->comboBoxApplicationTheme->setCurrentText(s);
