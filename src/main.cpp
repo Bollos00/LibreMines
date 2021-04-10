@@ -24,10 +24,6 @@
 #include "libreminesgui.h"
 #include "libreminesconfig.h"
 
-#ifdef QT_NO_DEBUG_OUTPUT
-#undef QT_NO_DEBUG_OUTPUT
-#endif
-
 struct InitializeOptions
 {
     InitializeOptions():
