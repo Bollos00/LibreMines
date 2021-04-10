@@ -1561,11 +1561,15 @@ void LibreMinesGui::vSetMinefieldTheme(const QString &theme)
     QString prefix;
     if(theme.compare("ClassicLight", Qt::CaseInsensitive) == 0)
     {
-        prefix = ":/minefield_icons/classic_light/Minesweeper_";
+        prefix = ":/minefield_icons/classic_light/";
     }
     else if(theme.compare("ClassicDark", Qt::CaseInsensitive) == 0)
     {
-        prefix = ":/minefield_icons/classic_dark/Minesweeper_";
+        prefix = ":/minefield_icons/classic_dark/";
+    }
+    else if(theme.compare("TwEmoji", Qt::CaseInsensitive) == 0)
+    {
+        prefix = ":/minefield_icons/twemoji/";
     }
     else
     {
@@ -2040,7 +2044,7 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
            << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
            << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
            << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
-           << "ApplicationTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
+           << "MinefieldTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
            << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
            << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
            << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
