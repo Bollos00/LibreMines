@@ -266,10 +266,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     if(!controller.valid)
     {
-        QMessageBox::warning(this, "Keyboard Controller is invalid",
-                             "Dear user, unfortunately your Keyboard Controller preferences"
+        QMessageBox::warning(this, tr("Keyboard Controller is invalid"),
+                             tr("Dear user, unfortunately your Keyboard Controller preferences"
                              " are invalid. Therefore you will not be able to play with the keyboard.\n"
-                             "To fix it go to (Main Meun > Options > Preferences) and edit your preferences.");
+                             "To fix it go to (Main Meun > Options > Preferences) and edit your preferences."));
     }
 
     // Create a new matrix
@@ -506,16 +506,16 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     menuOptions->addActions({actionPreferences, actionHighScores, actionToggleFullScreen});
     menuHelp->addActions({actionAbout, actionAboutQt});
 
-    menuOptions->setTitle("Options");
-    menuHelp->setTitle("Help");
+    menuOptions->setTitle(tr("Options"));
+    menuHelp->setTitle(tr("Help"));
 
-    actionPreferences->setText("Preferences...");
-    actionHighScores->setText("High Scores...");
-    actionToggleFullScreen->setText("ToggleFullScreen");
+    actionPreferences->setText(tr("Preferences..."));
+    actionHighScores->setText(tr("High Scores..."));
+    actionToggleFullScreen->setText(tr("ToggleFullScreen"));
     actionToggleFullScreen->setShortcut(QKeySequence(Qt::Key_F11));
 
-    actionAbout->setText("About...");
-    actionAboutQt->setText("About Qt...");
+    actionAbout->setText(tr("About..."));
+    actionAboutQt->setText(tr("About Qt..."));
     // Actions and Menu Bar
 
 
@@ -544,8 +544,8 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     lcd_numberMinesLeft->setDecMode();
     lcd_numberMinesLeft->display(0);
     progressBarGameCompleteInGame->setTextVisible(false);
-    buttonQuitInGame->setText("Quit");
-    buttonRestartInGame->setText("Restart");
+    buttonQuitInGame->setText(tr("Quit"));
+    buttonRestartInGame->setText(tr("Restart"));
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
     vAdjustInterfaceInGame();
@@ -555,20 +555,20 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     // Create Main Menu Widgets
     buttonEasy = new QPushButton(centralWidget());
-    buttonEasy->setText("Easy\n\n8x8\n\n10 Mines");
+    buttonEasy->setText(tr("Easy") + "\n\n8x8\n\n" + tr("10 Mines"));
     buttonEasy->setFont(QFont("Liberation Sans",20));
 
     buttonMedium= new QPushButton(centralWidget());
-    buttonMedium->setText("Medium\n\n16x16\n\n40 Mines");
+    buttonMedium->setText(tr("Medium") + "\n\n16x16\n\n" + tr("40 Mines"));
     buttonMedium->setFont(QFont("Liberation Sans", 20));
 
 
     buttonHard = new QPushButton(centralWidget());
-    buttonHard->setText("Hard\n\n30x16\n\n99 Mines");
+    buttonHard->setText(tr("Hard") + "\n\n30x16\n\n" + tr("99 Mines"));
     buttonHard->setFont(QFont("Liberation Sans", 20));
 
     buttonCustomizedNewGame = new QPushButton(centralWidget());
-    buttonCustomizedNewGame->setText("Customized New Game");
+    buttonCustomizedNewGame->setText(tr("Customized New Game"));
     buttonCustomizedNewGame->setFont(QFont("Liberation Sans", 20));
 
     sbCustomizedX = new QSpinBox(centralWidget());
@@ -595,16 +595,16 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     cbCustomizedMinesInPercentage = new QCheckBox(centralWidget());
 
     labelCustomizedX = new QLabel(centralWidget());
-    labelCustomizedX->setText("Width: ");
+    labelCustomizedX->setText(tr("Width: "));
 
     labelCustomizedY = new QLabel(centralWidget());
-    labelCustomizedY->setText("Height: ");
+    labelCustomizedY->setText(tr("Height: "));
 
     labelCustomizedPercentageMines = new QLabel(centralWidget());
-    labelCustomizedPercentageMines->setText("Percent of Mines: ");
+    labelCustomizedPercentageMines->setText(tr("Percent of Mines: "));
 
     labelCustomizedNumbersOfMines = new QLabel(centralWidget());
-    labelCustomizedNumbersOfMines->setText("Number of Mines: ");
+    labelCustomizedNumbersOfMines->setText(tr("Number of Mines: "));
     // Create Main Menu Widgets
 
     cbCustomizedMinesInPercentage->setChecked(true);
@@ -926,8 +926,8 @@ void LibreMinesGui::SLOT_Restart()
     {
         QMessageBox messageBox;
 
-        messageBox.setText("There is a game happening.");
-        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setText(tr("There is a game happening."));
+        messageBox.setInformativeText(tr("Are you sure you want to quit?"));
         messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         messageBox.setDefaultButton(QMessageBox::No);
         int result = messageBox.exec();
@@ -955,8 +955,8 @@ void LibreMinesGui::SLOT_Quit()
     {
         QMessageBox messageBox;
 
-        messageBox.setText("There is a game happening.");
-        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setText(tr("There is a game happening."));
+        messageBox.setInformativeText(tr("Are you sure you want to quit?"));
         messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         messageBox.setDefaultButton(QMessageBox::No);
         int result = messageBox.exec();
@@ -1102,15 +1102,15 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                       double dCellsPerSecond)
 {
     QString QS_Statics =
-            "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
-            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
-            +"\nWrongFlags: " + QString::number(iWrongFlags)
-            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
-            +"\n"
-            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
-            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
-            +"\n"
-            +"\nGame Complete: " + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
+            tr("Total time: ") + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs" + '\n'
+            + tr("Correct Flags: ") + QString::number(iCorrectFlags) + '\n'
+            + tr("WrongFlags: ") + QString::number(iWrongFlags) + '\n'
+            + tr("Unlocked Cells: ") + QString::number(iUnlockedCells) + '\n'
+            + '\n'
+            + tr("Flags/s: ") + QString::number(dFlagsPerSecond, 'f', 3)  + '\n'
+            + tr("Cells/s: ") + QString::number(dCellsPerSecond, 'f', 3) + '\n'
+            + '\n'
+            + tr("Game Complete: ") + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
 
     labelStatisLastMatch->setText(QS_Statics);
 
@@ -1196,14 +1196,14 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
 
             QString strGameDiffuclty;
             if(score.gameDifficulty == EASY)
-                strGameDiffuclty = "Easy";
+                strGameDiffuclty = tr("Easy");
             else if(score.gameDifficulty == MEDIUM)
-                strGameDiffuclty = "Medium";
+                strGameDiffuclty = tr("Medium");
             else if(score.gameDifficulty == HARD)
-                strGameDiffuclty = "Hard";
+                strGameDiffuclty = tr("Hard");
             else if(score.gameDifficulty == CUSTOMIZED)
             {
-                strGameDiffuclty = "Customized " + QString::number(score.width) +
+                strGameDiffuclty = tr("Customized ") + QString::number(score.width) +
                                    " x " + QString::number(score.heigth) + " : " +
                                    QString::number(score.mines);
             }
@@ -1297,19 +1297,19 @@ void LibreMinesGui::SLOT_gameWon()
         case NONE:
             break;
         case EASY:
-            labelYouWonYouLost->setText("You Won\nDifficulty: EASY");
+            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: EASY"));
             break;
         case MEDIUM:
-            labelYouWonYouLost->setText("You Won\nDifficulty: MEDIUM");
+            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: MEDIUM"));
             break;
         case HARD:
-            labelYouWonYouLost->setText("You Won\nDifficulty: HARD");
+            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: HARD"));
             break;
         case CUSTOMIZED:
-            labelYouWonYouLost->setText("You Won\nDifficulty: CUSTOM\n" +
+            labelYouWonYouLost->setText(tr("You Won") +'\n' + tr("Difficulty: CUSTOM\n") +
                                         QString::number(gameEngine->rows()) +
                                         "x" + QString::number(gameEngine->lines()) +
-                                        " : " + QString::number(gameEngine->mines()) + " Mines");
+                                        " : " + QString::number(gameEngine->mines()) + tr(" Mines"));
     }
 
     for(uchar j=0; j<gameEngine->lines(); j++)
@@ -1337,22 +1337,22 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
         case NONE:
             break;
         case EASY:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: EASY");
+            labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: EASY"));
             break;
         case MEDIUM:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: MEDIUM");
+            labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: MEDIUM"));
             break;
         case HARD:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: HARD");
+            labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: HARD"));
             break;
         case CUSTOMIZED:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: CUSTOM\n" +
+            labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: CUSTOM\n") +
                                         QString::number(gameEngine->rows()) +
                                         "x" +
                                         QString::number(gameEngine->lines()) +
                                         " : " +
                                         QString::number(gameEngine->mines()) +
-                                        " Mines");
+                                        tr(" Mines"));
     }
     principalMatrix[_X][_Y].label->setPixmap(*pmBoom);
 
@@ -1412,8 +1412,8 @@ void LibreMinesGui::SLOT_quitApplication()
     {
         QMessageBox messageBox;
 
-        messageBox.setText("There is a game happening.");
-        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setText(tr("There is a game happening."));
+        messageBox.setInformativeText(tr("Are you sure you want to quit?"));
         messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         messageBox.setDefaultButton(QMessageBox::No);
         int result = messageBox.exec();
@@ -1428,8 +1428,8 @@ void LibreMinesGui::SLOT_quitApplication()
 void LibreMinesGui::SLOT_showAboutDialog()
 {
     QString text =
-            "LibreMines " + QString(LIBREMINES_PROJECT_VERSION) + "\n"
-            "Copyright (C) 2020-2021  Bruno Bollos Correa\n"
+            "LibreMines " + QString(LIBREMINES_PROJECT_VERSION) + "\n" +
+            tr("Copyright (C) 2020-2021  Bruno Bollos Correa\n"
             "\n"
             "This program is free software: you can redistribute it and/or modify"
             " it under the terms of the GNU General Public License as published by"
@@ -1444,7 +1444,7 @@ void LibreMinesGui::SLOT_showAboutDialog()
             "You should have received a copy of the GNU General Public License"
             " along with this program.  If not, see <http://www.gnu.org/licenses/>.\n"
             "\n"
-            "Get the source code of LibreMines on\n"
+            "Get the source code of LibreMines on\n") +
             "<" + QString(LIBREMINES_PROJECT_HOMEPAGE_URL) + ">";
 
     QMessageBox::about(this, "LibreMines", text);

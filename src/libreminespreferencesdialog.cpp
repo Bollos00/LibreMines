@@ -47,7 +47,7 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light", "TwEmoji"});
     ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White",
                                          "TwEmoji Colored", "Disable"});
-    ui->comboBoxWhenCtrlIsPressed->addItems({"Go to the Edge", "Jump 3 Cells", "Jump 5 Cells", "Jump 10 Cells"});
+    ui->comboBoxWhenCtrlIsPressed->addItems({tr("Go to the Edge"), tr("Jump 3 Cells"), tr("Jump 5 Cells"), tr("Jump 10 Cells")});
 
 
     // Space character is not allowed. This will remove every space character of the line edit
