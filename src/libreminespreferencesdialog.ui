@@ -340,14 +340,14 @@ Clicked On Showed Cell</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="labelApplicationTheme">
+         <widget class="QLabel" name="labelApplicationStyle">
           <property name="text">
-           <string>Application Theme:</string>
+           <string>Application Style:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBoxApplicationTheme"/>
+         <widget class="QComboBox" name="comboBoxApplicationStyle"/>
         </item>
        </layout>
       </item>

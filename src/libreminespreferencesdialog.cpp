@@ -30,19 +30,20 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     ui->setupUi(this);
 
     // Dark and light fusion
-    ui->comboBoxApplicationTheme->addItems({"Fusion Dark", "Fusion Light"});
+    ui->comboBoxApplicationStyle->addItems({"Fusion Dark", "Fusion Light"});
 
-    // Styles from system
-    ui->comboBoxApplicationTheme->addItems(QStyleFactory::keys());
 
     // QSS
-    ui->comboBoxApplicationTheme->addItems({"ConsoleStyle", "NeonButtons"});
+    ui->comboBoxApplicationStyle->addItems({"ConsoleStyle", "NeonButtons"});
 
     // QDarkStyle
-    ui->comboBoxApplicationTheme->addItems({"QDarkStyle", "QDarkStyle Light"});
+    ui->comboBoxApplicationStyle->addItems({"QDarkStyle", "QDarkStyle Light"});
 
     // Breeze
-    ui->comboBoxApplicationTheme->addItems({"Breeze Dark", "Breeze Light"});
+    ui->comboBoxApplicationStyle->addItems({"Breeze Dark", "Breeze Light"});
+
+    // Styles from system
+    ui->comboBoxApplicationStyle->addItems(QStyleFactory::keys());
 
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light", "TwEmoji"});
     ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White",
@@ -56,7 +57,7 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
             [this](QString text)
     { ui->lineEditUsername->setText(text.remove(" ", Qt::CaseInsensitive)); });
 
-    connect(ui->comboBoxApplicationTheme, &QComboBox::currentTextChanged,
+    connect(ui->comboBoxApplicationStyle, &QComboBox::currentTextChanged,
             [this](QString text)
     {
         text.remove(" ", Qt::CaseInsensitive);
@@ -104,9 +105,9 @@ bool LibreMinesPreferencesDialog::optionProgressBar() const
     return ui->cbProgressBarInGame->isChecked();
 }
 
-QString LibreMinesPreferencesDialog::optionApplicationTheme() const
+QString LibreMinesPreferencesDialog::optionApplicationStyle() const
 {
-    QString s = ui->comboBoxApplicationTheme->currentText();
+    QString s = ui->comboBoxApplicationStyle->currentText();
     s.remove(" ", Qt::CaseInsensitive);
     return s;
 }
@@ -160,7 +161,7 @@ void LibreMinesPreferencesDialog::setOptionProgressBar(const QString &option)
     ui->cbProgressBarInGame->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
 }
 
-void LibreMinesPreferencesDialog::setOptionApplicationTheme(const QString &option)
+void LibreMinesPreferencesDialog::setOptionApplicationStyle(const QString &option)
 {
     QString s = option;
     if(option.compare("FusionDark", Qt::CaseInsensitive) == 0){ s = "Fusion Dark"; }
@@ -169,7 +170,7 @@ void LibreMinesPreferencesDialog::setOptionApplicationTheme(const QString &optio
     else if(option.compare("BreezeDark", Qt::CaseInsensitive) == 0){ s = "Breeze Dark"; }
     else if(option.compare("BreezeLight", Qt::CaseInsensitive) == 0){ s = "Breeze Light"; }
 
-    ui->comboBoxApplicationTheme->setCurrentText(s);
+    ui->comboBoxApplicationStyle->setCurrentText(s);
 }
 
 void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &option)
