@@ -100,7 +100,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     vSetFacesReaction(preferences->optionFacesReaction());
 
     // Necessary for some reason
-    QTimer::singleShot(100, [this](){ vSetApplicationTheme(preferences->optionApplicationTheme()); });
+    QTimer::singleShot(100, [this](){ vSetApplicationTheme(preferences->optionApplicationStyle()); });
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -1949,12 +1949,13 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                 preferences->setOptionFirstCellClean(terms.at(1));
             }
-            else if(terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
+            else if(terms.at(0).compare("ApplicationStyle", Qt::CaseInsensitive) == 0 ||
+                    terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
             {
                 if(terms.size() != 2)
                     continue;
 
-                preferences->setOptionApplicationTheme(terms.at(1));
+                preferences->setOptionApplicationStyle(terms.at(1));
             }
             else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
             {
@@ -2090,7 +2091,7 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
     QTextStream stream(fileLastSession.get());
 
     stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
-           << "ApplicationTheme" << ' ' << preferences->optionApplicationTheme() << '\n'
+           << "ApplicationStyle" << ' ' << preferences->optionApplicationStyle() << '\n'
            << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
            << "Username" << ' ' << preferences->optionUsername() << '\n'
            << "CustomizedPercentageOfMines" << ' ' << sbCustomizedPercentageMines->value() << '\n'
