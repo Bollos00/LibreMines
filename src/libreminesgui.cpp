@@ -33,6 +33,7 @@
 #include <QStatusBar>
 #include <QShortcut>
 #include <QMessageBox>
+#include <QTranslator>
 
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
@@ -56,6 +57,12 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) )
 {
+    QTranslator* trans = new QTranslator(this);
+
+    Q_ASSERT(trans->load("libremines_pt_BR.qm"));
+    Q_ASSERT(trans->load(":/translations/libremines_pt_BR.qm"));
+    qApp->installTranslator(trans);
+
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
 
@@ -511,7 +518,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     actionPreferences->setText(tr("Preferences..."));
     actionHighScores->setText(tr("High Scores..."));
-    actionToggleFullScreen->setText(tr("ToggleFullScreen"));
+    actionToggleFullScreen->setText(tr("Toggle Full Screen"));
     actionToggleFullScreen->setShortcut(QKeySequence(Qt::Key_F11));
 
     actionAbout->setText(tr("About..."));
@@ -1102,7 +1109,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                       double dCellsPerSecond)
 {
     QString QS_Statics =
-            tr("Total time: ") + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs" + '\n'
+            tr("Total time: ") + QString::number(score.iTimeInNs*1e-9, 'f', 3) + tr(" secs") + '\n'
             + tr("Correct Flags: ") + QString::number(iCorrectFlags) + '\n'
             + tr("WrongFlags: ") + QString::number(iWrongFlags) + '\n'
             + tr("Unlocked Cells: ") + QString::number(iUnlockedCells) + '\n'

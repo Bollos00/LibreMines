@@ -24,10 +24,30 @@ project(libremines
     LANGUAGES "CXX"
 )
 
+if(USE_QT6)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets)
+    find_package(Qt6 REQUIRED COMPONENTS Core)
+    find_package(Qt6 REQUIRED COMPONENTS Svg)
+else()
+    find_package(Qt5 REQUIRED COMPONENTS Widgets)
+    find_package(Qt5 REQUIRED COMPONENTS Core)
+    find_package(Qt5 REQUIRED COMPONENTS Svg)
+    find_package(Qt5 REQUIRED COMPONENTS LinguistTools)
+endif()
+
 # Save the variables of the project (see file `include/cmake/libreminesconfig.h.in`) on
 #  the file ${PROJECT_BINARY_DIR}/libreminesconfig.h
 configure_file(${PROJECT_SOURCE_DIR}/include/libreminesconfig.h.in ${PROJECT_BINARY_DIR}/libreminesconfig.h)
 include_directories(${PROJECT_BINARY_DIR})
+
+# Create the translation files (QM File Format) from the ts files
+qt5_add_translation(QM_FILES
+    etc/translations/${PROJECT_NAME}_es.ts
+    etc/translations/${PROJECT_NAME}_pt_BR.ts
+)
+
+# Copy the resource file to ${CMAKE_BINARY_DIR}, where the qm files will be located
+configure_file(etc/translations/libremines_translations_qm.qrc ${CMAKE_BINARY_DIR} COPYONLY)
 
 if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     message(STATUS "Using default build type Release")
@@ -50,6 +70,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 add_executable(${PROJECT_NAME}
+    ${CMAKE_BINARY_DIR}/libremines_translations_qm.qrc
+    ${QM_FILES}
     src/common.cpp
     src/common.h
     src/main.cpp
@@ -100,16 +122,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DEPRECATED_WARNINGS)
 
 # Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
-    find_package(Qt6 REQUIRED COMPONENTS Widgets)
-    find_package(Qt6 REQUIRED COMPONENTS Core)
-    find_package(Qt6 REQUIRED COMPONENTS Svg)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Svg)
 else()
-    find_package(Qt5 REQUIRED COMPONENTS Widgets)
-    find_package(Qt5 REQUIRED COMPONENTS Core)
-    find_package(Qt5 REQUIRED COMPONENTS Svg)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Svg)
