@@ -22,6 +22,7 @@
 #define LIBREMINESPREFERENCESDIALOG_H
 
 #include <QDialog>
+#include <QtCore>
 
 namespace Ui {
 class LibreMinesPreferencesDialog;
@@ -56,6 +57,7 @@ public:
     uchar optionWhenCtrlIsPressed()const;
     int optionMinimumCellLength()const;
     int optionMaximumCellLength()const;
+    QString optionsLanguage()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
@@ -67,6 +69,7 @@ public:
     void setOptionWhenCtrlIsPressed(const uchar option);
     void setOptionMinimumCellLength(const int option);
     void setOptionMaximumCellLength(const int option);
+    void setOptionLanguage(const QString& option);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;
@@ -79,9 +82,11 @@ protected:
 
 private:
     Ui::LibreMinesPreferencesDialog *ui;
+    bool updateLanguageDialog;
 
 private Q_SLOTS:
     void SLOT_updateCellLengthParameters();
+    void SLOT_updateLanguage();
 
 Q_SIGNALS:
     void SIGNAL_optionChanged(const QString& name, const QString& value);

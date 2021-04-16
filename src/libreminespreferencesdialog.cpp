@@ -22,10 +22,12 @@
 #include "ui_libreminespreferencesdialog.h"
 
 #include <QStyleFactory>
+#include <QMessageBox>
 
 LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::LibreMinesPreferencesDialog)
+    ui(new Ui::LibreMinesPreferencesDialog),
+    updateLanguageDialog(true)
 {
     ui->setupUi(this);
 
@@ -49,6 +51,8 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White",
                                          "TwEmoji Colored", "Disable"});
     ui->comboBoxWhenCtrlIsPressed->addItems({tr("Go to the Edge"), tr("Jump 3 Cells"), tr("Jump 5 Cells"), tr("Jump 10 Cells")});
+
+    ui->comboBoxLanguage->addItems({"English", "Português do Brasil"});
 
 
     // Space character is not allowed. This will remove every space character of the line edit
@@ -76,13 +80,15 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     connect(ui->sbMaximumCellLength, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &LibreMinesPreferencesDialog::SLOT_updateCellLengthParameters);
 
+    connect(ui->comboBoxLanguage, &QComboBox::currentTextChanged,
+            this, &LibreMinesPreferencesDialog::SLOT_updateLanguage);
+
     ui->keyInputMoveLeft->setKey(Qt::Key_A);
     ui->keyInputMoveUp->setKey(Qt::Key_W);
     ui->keyInputMoveRight->setKey(Qt::Key_D);
     ui->keyInputMoveDown->setKey(Qt::Key_S);
     ui->keyInputReleaseCell->setKey(Qt::Key_O);
     ui->keyInputFlagCell->setKey(Qt::Key_P);
-
 }
 
 LibreMinesPreferencesDialog::~LibreMinesPreferencesDialog()
@@ -144,6 +150,15 @@ int LibreMinesPreferencesDialog::optionMinimumCellLength() const
 int LibreMinesPreferencesDialog::optionMaximumCellLength() const
 {
     return ui->sbMaximumCellLength->value();
+}
+
+QString LibreMinesPreferencesDialog::optionsLanguage() const
+{
+    if(ui->comboBoxLanguage->currentText().compare("English", Qt::CaseInsensitive) == 0)
+        return "en";
+    if(ui->comboBoxLanguage->currentText().compare("Português do Brasil", Qt::CaseInsensitive) == 0)
+        return "pt_BR";
+    return "";
 }
 
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
@@ -215,6 +230,18 @@ void LibreMinesPreferencesDialog::setOptionMaximumCellLength(const int option)
     ui->sbMaximumCellLength->setValue(option);
 }
 
+void LibreMinesPreferencesDialog::setOptionLanguage(const QString &option)
+{
+    QString s = "English";
+    if(option.compare("pt_BR", Qt::CaseInsensitive) == 0)
+        s = "Português do Brasil";
+
+    // Ugly way to avoid the creation of the dialog when this function is called
+    updateLanguageDialog = false;
+    ui->comboBoxLanguage->setCurrentText(s);
+    QTimer::singleShot(10, [this](){ updateLanguageDialog = true; });
+}
+
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
 {
     return
@@ -279,5 +306,14 @@ void LibreMinesPreferencesDialog::SLOT_updateCellLengthParameters()
 {
     ui->sbMinimumCellLength->setMaximum(ui->sbMaximumCellLength->value());
     ui->sbMaximumCellLength->setMinimum(ui->sbMinimumCellLength->value());
+}
+
+void LibreMinesPreferencesDialog::SLOT_updateLanguage()
+{
+    if(updateLanguageDialog)
+    {
+        QMessageBox::information(this, tr("Restart LibreMines to apply this preference!"),
+                                 tr("Please restart the application to redefine your language"));
+    }
 }
 

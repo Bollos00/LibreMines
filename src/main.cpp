@@ -20,6 +20,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QTranslator>
 
 #include "libreminesgui.h"
 #include "libreminesconfig.h"
@@ -63,6 +64,44 @@ InitializeOptions getOptions(const QStringList& args)
     return{h, w};
 }
 
+void loadLanguagePreference()
+{
+    QDir destDir = QDir::home();
+
+    destDir.setFilter(QDir::AllDirs);
+
+    if(!destDir.cd(".local"))
+    {
+        Q_ASSERT(destDir.mkdir(".local"));
+        Q_ASSERT(destDir.cd(".local"));
+    }
+    if(!destDir.cd("share"))
+    {
+        Q_ASSERT(destDir.mkdir("share"));
+        Q_ASSERT(destDir.cd("share"));
+    }
+    if(!destDir.cd("libremines"))
+    {
+        Q_ASSERT(destDir.mkdir("libremines"));
+        Q_ASSERT(destDir.cd("libremines"));
+    }
+
+    QScopedPointer<QFile> fileLanguage( new QFile(destDir.absoluteFilePath("libreminesDefaultLanguage.txt")) );
+
+    fileLanguage->open(QIODevice::ReadOnly);
+
+    QTextStream stream(fileLanguage.get());
+    QString language;
+    stream >> language;
+
+    QTranslator* translator = new QTranslator();
+
+    if(!language.isNull() && translator->load(":/translations/libremines_" + language + ".qm"))
+        qApp->installTranslator(translator);
+    else
+        delete translator;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -74,6 +113,8 @@ int main(int argc, char *argv[])
 //                                50, 50));
 
     InitializeOptions ops = getOptions(a.arguments());
+
+    loadLanguagePreference();
 
     LibreMinesGui* w = new LibreMinesGui(nullptr, ops.heightMainWindow, ops.widthMainWindow);
 

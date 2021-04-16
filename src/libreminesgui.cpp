@@ -57,12 +57,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) )
 {
-    QTranslator* trans = new QTranslator(this);
-
-    Q_ASSERT(trans->load("libremines_pt_BR.qm"));
-    Q_ASSERT(trans->load(":/translations/libremines_pt_BR.qm"));
-    qApp->installTranslator(trans);
-
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
 
@@ -480,16 +474,6 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     setCentralWidget(new QWidget(this));
 
-    if(width == -1 || height == -1)
-    {
-        this->showNormal();
-        this->showMaximized();
-    }
-    else
-    {
-        resize(width, height);
-    }
-
     // Actions and Menu Bar
     actionPreferences = new QAction(this);
     actionHighScores = new QAction(this);
@@ -575,7 +559,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     buttonHard->setFont(QFont("Liberation Sans", 20));
 
     buttonCustomizedNewGame = new QPushButton(centralWidget());
-    buttonCustomizedNewGame->setText(tr("Customized New Game"));
+    buttonCustomizedNewGame->setText(tr("Customized Game"));
     buttonCustomizedNewGame->setFont(QFont("Liberation Sans", 20));
 
     sbCustomizedX = new QSpinBox(centralWidget());
@@ -713,6 +697,17 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     setTabOrder(sbCustomizedX, sbCustomizedY);
     setTabOrder(sbCustomizedY, buttonRestartInGame);
     setTabOrder(buttonRestartInGame, buttonQuitInGame);
+
+    if(width == -1 || height == -1)
+    {
+        this->showNormal();
+        this->showMaximized();
+    }
+    else
+    {
+        resize(width, height);
+    }
+
 }
 
 void LibreMinesGui::vHideMainMenu()
@@ -737,6 +732,7 @@ void LibreMinesGui::vHideMainMenu()
 
     // Hide de menu bar too
     menuBar()->hide();
+
 }
 
 void LibreMinesGui::vShowMainMenu()
@@ -2059,6 +2055,17 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
         }
     }
 
+
+    QScopedPointer<QFile> fileLanguage( new QFile(destDir.absoluteFilePath("libreminesDefaultLanguage.txt")) );
+
+    fileLanguage->open(QIODevice::ReadOnly);
+
+    QTextStream stream(fileLanguage.get());
+    QString language;
+    stream >> language;
+
+    preferences->setOptionLanguage(language);
+
     vUpdatePreferences();
 }
 
@@ -2087,24 +2094,33 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
     QScopedPointer<QFile> fileLastSession( new QFile(destDir.absoluteFilePath("libreminesLastSession.txt")) );
 
     fileLastSession->open(QIODevice::WriteOnly);
+    {
+        QTextStream stream(fileLastSession.get());
 
-    QTextStream stream(fileLastSession.get());
+        stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
+               << "ApplicationStyle" << ' ' << preferences->optionApplicationStyle() << '\n'
+               << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
+               << "Username" << ' ' << preferences->optionUsername() << '\n'
+               << "CustomizedPercentageOfMines" << ' ' << sbCustomizedPercentageMines->value() << '\n'
+               << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
+               << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
+               << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
+               << "MinefieldTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
+               << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
+               << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
+               << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
+               << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
+               << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
+               << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n';
+    }
 
-    stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
-           << "ApplicationStyle" << ' ' << preferences->optionApplicationStyle() << '\n'
-           << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
-           << "Username" << ' ' << preferences->optionUsername() << '\n'
-           << "CustomizedPercentageOfMines" << ' ' << sbCustomizedPercentageMines->value() << '\n'
-           << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
-           << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
-           << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
-           << "MinefieldTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
-           << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
-           << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
-           << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
-           << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
-           << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
-           << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n';
+    {
+        QScopedPointer<QFile> fileLanguage( new QFile(destDir.absoluteFilePath("libreminesDefaultLanguage.txt")) );
+        fileLanguage->open(QIODevice::WriteOnly);
+
+        QTextStream stream(fileLanguage.get());
+        stream << preferences-> optionsLanguage();
+    }
 }
 
 void LibreMinesGui::vUpdatePreferences()
