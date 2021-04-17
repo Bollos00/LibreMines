@@ -18,36 +18,49 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.5.0"
+    VERSION "1.6.0"
     DESCRIPTION "A Qt based Minesweeper game"
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
-)
+    )
 
+# Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
     find_package(Qt6 REQUIRED COMPONENTS Core)
     find_package(Qt6 REQUIRED COMPONENTS Svg)
+    # If the option UPDATE_TRANSLATIONS is passed, the Qt5LinguistTools is needed
+    #  to generate the QM Files
+    if(UPDATE_TRANSLATIONS)
+        find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+    endif()
 else()
     find_package(Qt5 REQUIRED COMPONENTS Widgets)
     find_package(Qt5 REQUIRED COMPONENTS Core)
     find_package(Qt5 REQUIRED COMPONENTS Svg)
-    find_package(Qt5 REQUIRED COMPONENTS LinguistTools)
+    if(UPDATE_TRANSLATIONS)
+        find_package(Qt5 REQUIRED COMPONENTS LinguistTools)
+    endif()
 endif()
 
 # Save the variables of the project (see file `include/cmake/libreminesconfig.h.in`) on
 #  the file ${PROJECT_BINARY_DIR}/libreminesconfig.h
 configure_file(${PROJECT_SOURCE_DIR}/include/libreminesconfig.h.in ${PROJECT_BINARY_DIR}/libreminesconfig.h)
-include_directories(${PROJECT_BINARY_DIR})
 
 # Create the translation files (QM File Format) from the ts files
-qt5_add_translation(QM_FILES
-    etc/translations/${PROJECT_NAME}_es.ts
-    etc/translations/${PROJECT_NAME}_pt_BR.ts
-)
-
-# Copy the resource file to ${CMAKE_BINARY_DIR}, where the qm files will be located
-configure_file(etc/translations/libremines_translations_qm.qrc ${CMAKE_BINARY_DIR} COPYONLY)
+if(UPDATE_TRANSLATIONS)
+    set(TS_FILES
+        etc/translations/${PROJECT_NAME}_es.ts
+        etc/translations/${PROJECT_NAME}_pt_BR.ts
+        )
+    # Put the QM Files on `etc/translations`
+    set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR}/etc/translations)
+    if(USE_QT6)
+        qt6_add_translation(QM_FILES ${TS_FILES})
+    else()
+        qt5_add_translation(QM_FILES ${TS_FILES})
+    endif()
+endif()
 
 if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     message(STATUS "Using default build type Release")
@@ -70,8 +83,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 add_executable(${PROJECT_NAME}
-    ${CMAKE_BINARY_DIR}/libremines_translations_qm.qrc
-    ${QM_FILES}
+    etc/translations/libremines_translations_qm.qrc
     src/common.cpp
     src/common.h
     src/main.cpp
@@ -102,10 +114,12 @@ add_executable(${PROJECT_NAME}
     share/icons.qrc
     share/icons.rc
     share/minefield_icons.qrc
-)
+    )
 
 include_directories(src)
 include_directories(include)
+include_directories(${PROJECT_BINARY_DIR})
+
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -120,7 +134,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE QT_DEPRECATED_WARNINGS)
 # disables all the APIs deprecated before Qt 6.0.0
 
 
-# Add the Qt dependencies according to the option `USE_QT6`
+# Link the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
