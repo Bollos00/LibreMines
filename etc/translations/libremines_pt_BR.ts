@@ -445,7 +445,101 @@ clicar numa célula vizinha</translation>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="316"/>
         <source>Please restart the application to redefine your language</source>
-        <translation type="unfinished">Por favor reinicie a aplicação para redefinir o idioma</translation>
+        <translation>Por favor reinicie a aplicação para redefinir o idioma</translation>
+    </message>
+</context>
+<context>
+    <name>LibreMinesScoresDialog</name>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
+        <source>User</source>
+        <translation>Usuário</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
+        <source>Game Completed (%)</source>
+        <translation>Jogo Completo (%)</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
+        <source>Time (secs)</source>
+        <translation>Tempo (segs)</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="49"/>
+        <source>1st</source>
+        <translation>1º</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="52"/>
+        <source>2nd</source>
+        <translation>2º</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="54"/>
+        <source>3rd</source>
+        <translation>3º</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="58"/>
+        <source>th</source>
+        <translation>º</translation>
+    </message>
+</context>
+<context>
+    <name>LibreMinesViewScoresDialog</name>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="45"/>
+        <source>Easy</source>
+        <translation>Fácil</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="49"/>
+        <source>Medium</source>
+        <translation>Médio</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="53"/>
+        <source>Hard</source>
+        <translation>Difícil</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
+        <source>User</source>
+        <translation>Usuário</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
+        <source>Game Completed (%)</source>
+        <translation>Jogo Completo (%)</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
+        <source>Time (secs)</source>
+        <translation>Tempo (segs)</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="88"/>
+        <source>1st</source>
+        <translation>1º</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="91"/>
+        <source>2nd</source>
+        <translation>2º</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="93"/>
+        <source>3rd</source>
+        <translation>3º</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="97"/>
+        <source>th</source>
+        <translation>º</translation>
     </message>
 </context>
 </TS>

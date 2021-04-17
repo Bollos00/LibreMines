@@ -387,4 +387,98 @@ clicked on showed cell</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>LibreMinesScoresDialog</name>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
+        <source>User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
+        <source>Game Completed (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
+        <source>Time (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="49"/>
+        <source>1st</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="52"/>
+        <source>2nd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="54"/>
+        <source>3rd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesscoresdialog.cpp" line="58"/>
+        <source>th</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LibreMinesViewScoresDialog</name>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="45"/>
+        <source>Easy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="49"/>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="53"/>
+        <source>Hard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
+        <source>User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
+        <source>Game Completed (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
+        <source>Time (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="88"/>
+        <source>1st</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="91"/>
+        <source>2nd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="93"/>
+        <source>3rd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesviewscoresdialog.cpp" line="97"/>
+        <source>th</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

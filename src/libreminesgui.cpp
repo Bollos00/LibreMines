@@ -38,7 +38,7 @@
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
 #include "libreminesconfig.h"
-#include "libreminesviewscores.h"
+#include "libreminesviewscoresdialog.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -1500,7 +1500,7 @@ void LibreMinesGui::SLOT_showHighScores()
     }
 
     // open the dialog
-    LibreMinesViewScores dialog(this);
+    LibreMinesViewScoresDialog dialog(this);
     dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
     dialog.setScores(scores);
     dialog.exec();
