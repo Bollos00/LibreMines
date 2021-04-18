@@ -112,6 +112,11 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
 {
     Q_UNUSED(object)
 
+    // Just handle those two events
+    if(event->type() != QEvent::KeyPress &&
+       event->type() != QEvent::KeyRelease)
+        return false;
+
     // If the game is not running, do not deal woth the event
     if(!gameEngine || !gameEngine->isGameActive())
         return false;
@@ -965,7 +970,10 @@ void LibreMinesGui::SLOT_RestartGame()
 
 void LibreMinesGui::SLOT_QuitGame()
 {
-    if(gameEngine && gameEngine->isGameActive())
+    // Check if there is a game happening. If there is one, create a dialog asking
+    //  if the user want to quit the game
+    if(gameEngine && gameEngine->isGameActive() &&
+       progressBarGameCompleteInGame->value() != progressBarGameCompleteInGame->minimum())
     {
         QMessageBox messageBox;
 
