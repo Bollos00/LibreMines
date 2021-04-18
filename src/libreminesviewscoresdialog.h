@@ -18,8 +18,8 @@
  */
 
 
-#ifndef LIBREMINESVIEWSCORES_H
-#define LIBREMINESVIEWSCORES_H
+#ifndef LIBREMINESVIEWSCORESDIALOG_H
+#define LIBREMINESVIEWSCORESDIALOG_H
 
 #include <QDialog>
 #include <QTabWidget>
@@ -29,11 +29,11 @@
 
 #include "libreminesscore.h"
 
-class LibreMinesViewScores : public QDialog
+class LibreMinesViewScoresDialog : public QDialog
 {
     Q_OBJECT
 public:
-    LibreMinesViewScores(QWidget *parent);
+    LibreMinesViewScoresDialog(QWidget *parent);
 
     void setScores(const QList<LibreMinesScore>& scores);
 
@@ -50,4 +50,4 @@ private:
 
 };
 
-#endif // LIBREMINESVIEWSCORES_H
+#endif // LIBREMINESVIEWSCORESDIALOG_H

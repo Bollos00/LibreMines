@@ -42,20 +42,20 @@ LibreMinesScoresDialog::LibreMinesScoresDialog(QWidget* parent, int rowsCount):
     table->setColumnCount(3);
 
     QStringList tableHorizontalHeader;
-    tableHorizontalHeader << "User" << "Game Completed (%)" << "Time (secs)";
+    tableHorizontalHeader << tr("User") << tr("Game Completed (%)") << tr("Time (secs)");
     table->setHorizontalHeaderLabels(tableHorizontalHeader);
 
     QStringList tableVerticalHeader;
-    tableVerticalHeader.append("1st");
+    tableVerticalHeader.append(tr("1st"));
 
     if(rowsCount >= 2)
-        tableVerticalHeader.append("2nd");
+        tableVerticalHeader.append(tr("2nd"));
     if(rowsCount >= 3)
-        tableVerticalHeader.append("3rd");
+        tableVerticalHeader.append(tr("3rd"));
 
     for(int i=4; i<=rowsCount; ++i)
     {
-        tableVerticalHeader.append(QString::number(i) + "th");
+        tableVerticalHeader.append(QString::number(i) + tr("th"));
     }
     table->setVerticalHeaderLabels(tableVerticalHeader);
 

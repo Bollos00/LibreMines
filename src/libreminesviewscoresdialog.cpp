@@ -18,10 +18,10 @@
  */
 
 
-#include "libreminesviewscores.h"
+#include "libreminesviewscoresdialog.h"
 
 
-LibreMinesViewScores::LibreMinesViewScores(QWidget *parent):
+LibreMinesViewScoresDialog::LibreMinesViewScoresDialog(QWidget *parent):
     QDialog(parent)
 {
     this->setWindowTitle("High Scores");
@@ -30,27 +30,27 @@ LibreMinesViewScores::LibreMinesViewScores(QWidget *parent):
     layoutGlobal = new QVBoxLayout(this);
     tabWidget = new QTabWidget(this);
 
-    for(QString n : {"Easy", "Medium", "Hard"})
+    for(QString n : {tr("Easy"), tr("Medium"), tr("Hard")})
         vCreateTab(n);
 
     layoutGlobal->addWidget(tabWidget);
 }
 
-void LibreMinesViewScores::setScores(const QList<LibreMinesScore>& scores)
+void LibreMinesViewScoresDialog::setScores(const QList<LibreMinesScore>& scores)
 {
     for(const LibreMinesScore& s : scores)
     {
         if(s.gameDifficulty == EASY)
         {
-            tabs["Easy"].scores.append(s);
+            tabs[tr("Easy")].scores.append(s);
         }
         else if(s.gameDifficulty == MEDIUM)
         {
-            tabs["Medium"].scores.append(s);
+            tabs[tr("Medium")].scores.append(s);
         }
         else if(s.gameDifficulty == HARD)
         {
-            tabs["Hard"].scores.append(s);
+            tabs[tr("Hard")].scores.append(s);
         }
         else
         {
@@ -69,7 +69,7 @@ void LibreMinesViewScores::setScores(const QList<LibreMinesScore>& scores)
     }
 
     QStringList tableHorizontalHeader;
-    tableHorizontalHeader << "User" << "Game Completed (%)" << "Time (secs)";
+    tableHorizontalHeader << tr("User") << tr("Game Completed (%)") << tr("Time (secs)");
 
     for(const QString& key : tabs.keys())
     {
@@ -85,16 +85,16 @@ void LibreMinesViewScores::setScores(const QList<LibreMinesScore>& scores)
 
 
         QStringList tableVerticalHeader;
-        tableVerticalHeader.append("1st");
+        tableVerticalHeader.append(tr("1st"));
 
         if(tab.scores.size() >= 2)
-            tableVerticalHeader.append("2nd");
+            tableVerticalHeader.append(tr("2nd"));
         if(tab.scores.size() >= 3)
-            tableVerticalHeader.append("3rd");
+            tableVerticalHeader.append(tr("3rd"));
 
         for(int i=4; i<=tab.scores.size(); ++i)
         {
-            tableVerticalHeader.append(QString::number(i) + "th");
+            tableVerticalHeader.append(QString::number(i) + tr("th"));
         }
         tab.table->setVerticalHeaderLabels(tableVerticalHeader);
 
@@ -115,7 +115,7 @@ void LibreMinesViewScores::setScores(const QList<LibreMinesScore>& scores)
     }
 }
 
-void LibreMinesViewScores::vCreateTab(const QString &tabName)
+void LibreMinesViewScoresDialog::vCreateTab(const QString &tabName)
 {
     tabs[tabName] = {new QWidget(), nullptr, {}};
     tabs[tabName].table = new QTableWidget(tabs[tabName].widget);

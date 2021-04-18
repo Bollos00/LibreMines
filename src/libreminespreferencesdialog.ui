@@ -14,31 +14,31 @@
    <string>Preferences</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" rowspan="2">
+   <item row="0" column="0" rowspan="3">
     <widget class="QGroupBox" name="gbCheckBoxes">
      <property name="title">
-      <string>On Game Options</string>
+      <string>Game Options</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QCheckBox" name="cbFirstCellClean">
         <property name="text">
-         <string>First Cell Clean</string>
+         <string>First cell clean</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbCleanNeighborCellsWhenClickedOnShowedCell">
         <property name="text">
-         <string>Clean Neighbor Cells When
-Clicked On Showed Cell</string>
+         <string>Clean neighbor cells when
+clicked on showed cell</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbProgressBarInGame">
         <property name="text">
-         <string>Show Progress Bar</string>
+         <string>Show progress bar</string>
         </property>
        </widget>
       </item>
@@ -47,7 +47,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="labelMinimumCellLength">
           <property name="text">
-           <string>Minimum Cell Length</string>
+           <string>Minimum cell length</string>
           </property>
          </widget>
         </item>
@@ -65,7 +65,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="labelMaximumCellLength">
           <property name="text">
-           <string>Maximum Cell Length</string>
+           <string>Maximum cell length</string>
           </property>
          </widget>
         </item>
@@ -87,7 +87,7 @@ Clicked On Showed Cell</string>
      </layout>
     </widget>
    </item>
-   <item row="0" column="1" colspan="2">
+   <item row="0" column="1">
     <widget class="QGroupBox" name="gbLineEdits">
      <property name="title">
       <string>User Information</string>
@@ -110,7 +110,30 @@ Clicked On Showed Cell</string>
      </layout>
     </widget>
    </item>
-   <item row="1" column="2" rowspan="2">
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="gbSettings">
+     <property name="title">
+      <string>Language Settings</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <item>
+         <widget class="QLabel" name="labelLanguage">
+          <property name="text">
+           <string>Language</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxLanguage"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="1" rowspan="2">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Keyboard Controller</string>
@@ -121,7 +144,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Move Current Cell Left</string>
+           <string>Move left</string>
           </property>
          </widget>
         </item>
@@ -154,7 +177,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>Move Current Cell Upwards</string>
+           <string>Move upwards</string>
           </property>
          </widget>
         </item>
@@ -187,7 +210,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Move Current Cell Right</string>
+           <string>Move right</string>
           </property>
          </widget>
         </item>
@@ -220,7 +243,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Move Current Cell Downwards</string>
+           <string>Move downwards</string>
           </property>
          </widget>
         </item>
@@ -253,7 +276,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Release Current Cell</string>
+           <string>Clean cell</string>
           </property>
          </widget>
         </item>
@@ -286,7 +309,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>(Un)flag Current Cell</string>
+           <string>(Un)flag cell</string>
           </property>
          </widget>
         </item>
@@ -319,7 +342,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>When Ctrl is pressed</string>
+           <string>When CTRL is pressed</string>
           </property>
          </widget>
         </item>
@@ -331,7 +354,7 @@ Clicked On Showed Cell</string>
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0">
     <widget class="QGroupBox" name="gbAppearance">
      <property name="title">
       <string>Appearance</string>
@@ -340,14 +363,14 @@ Clicked On Showed Cell</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="labelApplicationTheme">
+         <widget class="QLabel" name="labelApplicationStyle">
           <property name="text">
-           <string>Application Theme:</string>
+           <string>Application style:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBoxApplicationTheme"/>
+         <widget class="QComboBox" name="comboBoxApplicationStyle"/>
         </item>
        </layout>
       </item>
@@ -356,7 +379,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="labelMinefieldTheme">
           <property name="text">
-           <string>Minefield Theme:</string>
+           <string>Minefield theme:</string>
           </property>
          </widget>
         </item>
@@ -370,7 +393,7 @@ Clicked On Showed Cell</string>
         <item>
          <widget class="QLabel" name="labelFacesReaction">
           <property name="text">
-           <string>Faces Reaction:</string>
+           <string>Faces reaction:</string>
           </property>
          </widget>
         </item>

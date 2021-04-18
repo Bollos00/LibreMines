@@ -33,11 +33,12 @@
 #include <QStatusBar>
 #include <QShortcut>
 #include <QMessageBox>
+#include <QTranslator>
 
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
 #include "libreminesconfig.h"
-#include "libreminesviewscores.h"
+#include "libreminesviewscoresdialog.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -72,6 +73,10 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this), &QShortcut::activated,
             this, &LibreMinesGui::SLOT_quitApplication);
 
+    // Restart the game with Ctrl + R
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated,
+            this, &LibreMinesGui::SLOT_RestartGame);
+
     // Create interface with the passed dimensions
     vCreateGUI(thatWidth, thatHeight);
     vShowMainMenu();
@@ -93,7 +98,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     vSetFacesReaction(preferences->optionFacesReaction());
 
     // Necessary for some reason
-    QTimer::singleShot(100, [this](){ vSetApplicationTheme(preferences->optionApplicationTheme()); });
+    QTimer::singleShot(100, [this](){ vSetApplicationTheme(preferences->optionApplicationStyle()); });
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -106,6 +111,11 @@ LibreMinesGui::~LibreMinesGui()
 bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
 {
     Q_UNUSED(object)
+
+    // Just handle those two events
+    if(event->type() != QEvent::KeyPress &&
+       event->type() != QEvent::KeyRelease)
+        return false;
 
     // If the game is not running, do not deal woth the event
     if(!gameEngine || !gameEngine->isGameActive())
@@ -266,10 +276,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     if(!controller.valid)
     {
-        QMessageBox::warning(this, "Keyboard Controller is invalid",
-                             "Dear user, unfortunately your Keyboard Controller preferences"
+        QMessageBox::warning(this, tr("Keyboard Controller is invalid"),
+                             tr("Dear user, unfortunately your Keyboard Controller preferences"
                              " are invalid. Therefore you will not be able to play with the keyboard.\n"
-                             "To fix it go to (Main Meun > Options > Preferences) and edit your preferences.");
+                             "To fix it go to (Main Meun > Options > Preferences) and edit your preferences."));
     }
 
     // Create a new matrix
@@ -473,16 +483,6 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     setCentralWidget(new QWidget(this));
 
-    if(width == -1 || height == -1)
-    {
-        this->showNormal();
-        this->showMaximized();
-    }
-    else
-    {
-        resize(width, height);
-    }
-
     // Actions and Menu Bar
     actionPreferences = new QAction(this);
     actionHighScores = new QAction(this);
@@ -506,16 +506,16 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     menuOptions->addActions({actionPreferences, actionHighScores, actionToggleFullScreen});
     menuHelp->addActions({actionAbout, actionAboutQt});
 
-    menuOptions->setTitle("Options");
-    menuHelp->setTitle("Help");
+    menuOptions->setTitle(tr("Options"));
+    menuHelp->setTitle(tr("Help"));
 
-    actionPreferences->setText("Preferences...");
-    actionHighScores->setText("High Scores...");
-    actionToggleFullScreen->setText("ToggleFullScreen");
+    actionPreferences->setText(tr("Preferences..."));
+    actionHighScores->setText(tr("High Scores..."));
+    actionToggleFullScreen->setText(tr("Toggle Full Screen"));
     actionToggleFullScreen->setShortcut(QKeySequence(Qt::Key_F11));
 
-    actionAbout->setText("About...");
-    actionAboutQt->setText("About Qt...");
+    actionAbout->setText(tr("About..."));
+    actionAboutQt->setText(tr("About Qt..."));
     // Actions and Menu Bar
 
 
@@ -544,8 +544,8 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     lcd_numberMinesLeft->setDecMode();
     lcd_numberMinesLeft->display(0);
     progressBarGameCompleteInGame->setTextVisible(false);
-    buttonQuitInGame->setText("Quit");
-    buttonRestartInGame->setText("Restart");
+    buttonQuitInGame->setText(tr("Quit"));
+    buttonRestartInGame->setText(tr("Restart"));
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
     vAdjustInterfaceInGame();
@@ -555,20 +555,20 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     // Create Main Menu Widgets
     buttonEasy = new QPushButton(centralWidget());
-    buttonEasy->setText("Easy\n\n8x8\n\n10 Mines");
+    buttonEasy->setText(tr("Easy") + "\n\n8x8\n\n" + tr("10 Mines"));
     buttonEasy->setFont(QFont("Liberation Sans",20));
 
     buttonMedium= new QPushButton(centralWidget());
-    buttonMedium->setText("Medium\n\n16x16\n\n40 Mines");
+    buttonMedium->setText(tr("Medium") + "\n\n16x16\n\n" + tr("40 Mines"));
     buttonMedium->setFont(QFont("Liberation Sans", 20));
 
 
     buttonHard = new QPushButton(centralWidget());
-    buttonHard->setText("Hard\n\n30x16\n\n99 Mines");
+    buttonHard->setText(tr("Hard") + "\n\n30x16\n\n" + tr("99 Mines"));
     buttonHard->setFont(QFont("Liberation Sans", 20));
 
     buttonCustomizedNewGame = new QPushButton(centralWidget());
-    buttonCustomizedNewGame->setText("Customized New Game");
+    buttonCustomizedNewGame->setText(tr("Customized Game"));
     buttonCustomizedNewGame->setFont(QFont("Liberation Sans", 20));
 
     sbCustomizedX = new QSpinBox(centralWidget());
@@ -595,16 +595,16 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     cbCustomizedMinesInPercentage = new QCheckBox(centralWidget());
 
     labelCustomizedX = new QLabel(centralWidget());
-    labelCustomizedX->setText("Width: ");
+    labelCustomizedX->setText(tr("Width: "));
 
     labelCustomizedY = new QLabel(centralWidget());
-    labelCustomizedY->setText("Height: ");
+    labelCustomizedY->setText(tr("Height: "));
 
     labelCustomizedPercentageMines = new QLabel(centralWidget());
-    labelCustomizedPercentageMines->setText("Percent of Mines: ");
+    labelCustomizedPercentageMines->setText(tr("Percent of Mines: "));
 
     labelCustomizedNumbersOfMines = new QLabel(centralWidget());
-    labelCustomizedNumbersOfMines->setText("Number of Mines: ");
+    labelCustomizedNumbersOfMines->setText(tr("Number of Mines: "));
     // Create Main Menu Widgets
 
     cbCustomizedMinesInPercentage->setChecked(true);
@@ -625,10 +625,10 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
             this, &LibreMinesGui::SLOT_Customized);
 
     connect(buttonRestartInGame, &QPushButton::released,
-            this, &LibreMinesGui::SLOT_Restart);
+            this, &LibreMinesGui::SLOT_RestartGame);
 
     connect(buttonQuitInGame, &QPushButton::released,
-            this, &LibreMinesGui::SLOT_Quit);
+            this, &LibreMinesGui::SLOT_QuitGame);
 
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
@@ -706,6 +706,17 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     setTabOrder(sbCustomizedX, sbCustomizedY);
     setTabOrder(sbCustomizedY, buttonRestartInGame);
     setTabOrder(buttonRestartInGame, buttonQuitInGame);
+
+    if(width == -1 || height == -1)
+    {
+        this->showNormal();
+        this->showMaximized();
+    }
+    else
+    {
+        resize(width, height);
+    }
+
 }
 
 void LibreMinesGui::vHideMainMenu()
@@ -730,6 +741,7 @@ void LibreMinesGui::vHideMainMenu()
 
     // Hide de menu bar too
     menuBar()->hide();
+
 }
 
 void LibreMinesGui::vShowMainMenu()
@@ -920,14 +932,21 @@ void LibreMinesGui::vShowInterfaceInGame()
     scrollAreaBoard->show();
 }
 
-void LibreMinesGui::SLOT_Restart()
+void LibreMinesGui::SLOT_RestartGame()
 {
-    if(gameEngine && gameEngine->isGameActive())
+    // If the Interface in Game is hidden or not enable, return
+    if(!buttonRestartInGame->isVisible() || !buttonRestartInGame->isEnabled())
+        return;
+
+    // Check if there is a game happening. If there is one, create a dialog asking
+    //  if the user want to quit the game
+    if(gameEngine && gameEngine->isGameActive() &&
+       progressBarGameCompleteInGame->value() != progressBarGameCompleteInGame->minimum())
     {
         QMessageBox messageBox;
 
-        messageBox.setText("There is a game happening.");
-        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setText(tr("There is a game happening."));
+        messageBox.setInformativeText(tr("Are you sure you want to quit?"));
         messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         messageBox.setDefaultButton(QMessageBox::No);
         int result = messageBox.exec();
@@ -949,14 +968,17 @@ void LibreMinesGui::SLOT_Restart()
     vNewGame(x, y, mines);
 }
 
-void LibreMinesGui::SLOT_Quit()
+void LibreMinesGui::SLOT_QuitGame()
 {
-    if(gameEngine && gameEngine->isGameActive())
+    // Check if there is a game happening. If there is one, create a dialog asking
+    //  if the user want to quit the game
+    if(gameEngine && gameEngine->isGameActive() &&
+       progressBarGameCompleteInGame->value() != progressBarGameCompleteInGame->minimum())
     {
         QMessageBox messageBox;
 
-        messageBox.setText("There is a game happening.");
-        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setText(tr("There is a game happening."));
+        messageBox.setInformativeText(tr("Are you sure you want to quit?"));
         messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         messageBox.setDefaultButton(QMessageBox::No);
         int result = messageBox.exec();
@@ -1102,15 +1124,15 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                       double dCellsPerSecond)
 {
     QString QS_Statics =
-            "Total time: " + QString::number(score.iTimeInNs*1e-9, 'f', 3) + " secs"
-            +"\nCorrect Flags: " + QString::number(iCorrectFlags)
-            +"\nWrongFlags: " + QString::number(iWrongFlags)
-            +"\nUnlocked Cells: " + QString::number(iUnlockedCells)
-            +"\n"
-            +"\nFlags/s: " + QString::number(dFlagsPerSecond, 'f', 3)
-            +"\nCells/s: " + QString::number(dCellsPerSecond, 'f', 3)
-            +"\n"
-            +"\nGame Complete: " + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
+            tr("Total time: ") + QString::number(score.iTimeInNs*1e-9, 'f', 3) + tr(" secs") + '\n'
+            + tr("Correct Flags: ") + QString::number(iCorrectFlags) + '\n'
+            + tr("WrongFlags: ") + QString::number(iWrongFlags) + '\n'
+            + tr("Unlocked Cells: ") + QString::number(iUnlockedCells) + '\n'
+            + '\n'
+            + tr("Flags/s: ") + QString::number(dFlagsPerSecond, 'f', 3)  + '\n'
+            + tr("Cells/s: ") + QString::number(dCellsPerSecond, 'f', 3) + '\n'
+            + '\n'
+            + tr("Game Complete: ") + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
 
     labelStatisLastMatch->setText(QS_Statics);
 
@@ -1196,14 +1218,14 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
 
             QString strGameDiffuclty;
             if(score.gameDifficulty == EASY)
-                strGameDiffuclty = "Easy";
+                strGameDiffuclty = tr("Easy");
             else if(score.gameDifficulty == MEDIUM)
-                strGameDiffuclty = "Medium";
+                strGameDiffuclty = tr("Medium");
             else if(score.gameDifficulty == HARD)
-                strGameDiffuclty = "Hard";
+                strGameDiffuclty = tr("Hard");
             else if(score.gameDifficulty == CUSTOMIZED)
             {
-                strGameDiffuclty = "Customized " + QString::number(score.width) +
+                strGameDiffuclty = tr("Customized ") + QString::number(score.width) +
                                    " x " + QString::number(score.heigth) + " : " +
                                    QString::number(score.mines);
             }
@@ -1297,19 +1319,19 @@ void LibreMinesGui::SLOT_gameWon()
         case NONE:
             break;
         case EASY:
-            labelYouWonYouLost->setText("You Won\nDifficulty: EASY");
+            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: EASY"));
             break;
         case MEDIUM:
-            labelYouWonYouLost->setText("You Won\nDifficulty: MEDIUM");
+            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: MEDIUM"));
             break;
         case HARD:
-            labelYouWonYouLost->setText("You Won\nDifficulty: HARD");
+            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: HARD"));
             break;
         case CUSTOMIZED:
-            labelYouWonYouLost->setText("You Won\nDifficulty: CUSTOM\n" +
+            labelYouWonYouLost->setText(tr("You Won") +'\n' + tr("Difficulty: CUSTOM\n") +
                                         QString::number(gameEngine->rows()) +
                                         "x" + QString::number(gameEngine->lines()) +
-                                        " : " + QString::number(gameEngine->mines()) + " Mines");
+                                        " : " + QString::number(gameEngine->mines()) + tr(" Mines"));
     }
 
     for(uchar j=0; j<gameEngine->lines(); j++)
@@ -1337,22 +1359,22 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
         case NONE:
             break;
         case EASY:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: EASY");
+            labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: EASY"));
             break;
         case MEDIUM:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: MEDIUM");
+            labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: MEDIUM"));
             break;
         case HARD:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: HARD");
+            labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: HARD"));
             break;
         case CUSTOMIZED:
-            labelYouWonYouLost->setText("You Lost\nDifficulty: CUSTOM\n" +
+            labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: CUSTOM\n") +
                                         QString::number(gameEngine->rows()) +
                                         "x" +
                                         QString::number(gameEngine->lines()) +
                                         " : " +
                                         QString::number(gameEngine->mines()) +
-                                        " Mines");
+                                        tr(" Mines"));
     }
     principalMatrix[_X][_Y].label->setPixmap(*pmBoom);
 
@@ -1412,8 +1434,8 @@ void LibreMinesGui::SLOT_quitApplication()
     {
         QMessageBox messageBox;
 
-        messageBox.setText("There is a game happening.");
-        messageBox.setInformativeText("Are you sure you want to quit?");
+        messageBox.setText(tr("There is a game happening."));
+        messageBox.setInformativeText(tr("Are you sure you want to quit?"));
         messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         messageBox.setDefaultButton(QMessageBox::No);
         int result = messageBox.exec();
@@ -1428,8 +1450,8 @@ void LibreMinesGui::SLOT_quitApplication()
 void LibreMinesGui::SLOT_showAboutDialog()
 {
     QString text =
-            "LibreMines " + QString(LIBREMINES_PROJECT_VERSION) + "\n"
-            "Copyright (C) 2020-2021  Bruno Bollos Correa\n"
+            "LibreMines " + QString(LIBREMINES_PROJECT_VERSION) + "\n" +
+            tr("Copyright (C) 2020-2021  Bruno Bollos Correa\n"
             "\n"
             "This program is free software: you can redistribute it and/or modify"
             " it under the terms of the GNU General Public License as published by"
@@ -1444,7 +1466,7 @@ void LibreMinesGui::SLOT_showAboutDialog()
             "You should have received a copy of the GNU General Public License"
             " along with this program.  If not, see <http://www.gnu.org/licenses/>.\n"
             "\n"
-            "Get the source code of LibreMines on\n"
+            "Get the source code of LibreMines on\n") +
             "<" + QString(LIBREMINES_PROJECT_HOMEPAGE_URL) + ">";
 
     QMessageBox::about(this, "LibreMines", text);
@@ -1497,7 +1519,7 @@ void LibreMinesGui::SLOT_showHighScores()
     }
 
     // open the dialog
-    LibreMinesViewScores dialog(this);
+    LibreMinesViewScoresDialog dialog(this);
     dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
     dialog.setScores(scores);
     dialog.exec();
@@ -1942,12 +1964,13 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                 preferences->setOptionFirstCellClean(terms.at(1));
             }
-            else if(terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
+            else if(terms.at(0).compare("ApplicationStyle", Qt::CaseInsensitive) == 0 ||
+                    terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
             {
                 if(terms.size() != 2)
                     continue;
 
-                preferences->setOptionApplicationTheme(terms.at(1));
+                preferences->setOptionApplicationStyle(terms.at(1));
             }
             else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
             {
@@ -2051,6 +2074,17 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
         }
     }
 
+
+    QScopedPointer<QFile> fileLanguage( new QFile(destDir.absoluteFilePath("libreminesDefaultLanguage.txt")) );
+
+    fileLanguage->open(QIODevice::ReadOnly);
+
+    QTextStream stream(fileLanguage.get());
+    QString language;
+    stream >> language;
+
+    preferences->setOptionLanguage(language);
+
     vUpdatePreferences();
 }
 
@@ -2079,24 +2113,33 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
     QScopedPointer<QFile> fileLastSession( new QFile(destDir.absoluteFilePath("libreminesLastSession.txt")) );
 
     fileLastSession->open(QIODevice::WriteOnly);
+    {
+        QTextStream stream(fileLastSession.get());
 
-    QTextStream stream(fileLastSession.get());
+        stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
+               << "ApplicationStyle" << ' ' << preferences->optionApplicationStyle() << '\n'
+               << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
+               << "Username" << ' ' << preferences->optionUsername() << '\n'
+               << "CustomizedPercentageOfMines" << ' ' << sbCustomizedPercentageMines->value() << '\n'
+               << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
+               << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
+               << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
+               << "MinefieldTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
+               << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
+               << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
+               << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
+               << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
+               << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
+               << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n';
+    }
 
-    stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
-           << "ApplicationTheme" << ' ' << preferences->optionApplicationTheme() << '\n'
-           << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
-           << "Username" << ' ' << preferences->optionUsername() << '\n'
-           << "CustomizedPercentageOfMines" << ' ' << sbCustomizedPercentageMines->value() << '\n'
-           << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
-           << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
-           << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
-           << "MinefieldTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
-           << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
-           << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
-           << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
-           << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
-           << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
-           << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n';
+    {
+        QScopedPointer<QFile> fileLanguage( new QFile(destDir.absoluteFilePath("libreminesDefaultLanguage.txt")) );
+        fileLanguage->open(QIODevice::WriteOnly);
+
+        QTextStream stream(fileLanguage.get());
+        stream << preferences-> optionsLanguage();
+    }
 }
 
 void LibreMinesGui::vUpdatePreferences()

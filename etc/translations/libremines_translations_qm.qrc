@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/translations">
+        <file>libremines_pt_BR.qm</file>
+        <file>libremines_es.qm</file>
+    </qresource>
+</RCC>
+
