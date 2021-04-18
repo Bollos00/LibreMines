@@ -73,6 +73,10 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this), &QShortcut::activated,
             this, &LibreMinesGui::SLOT_quitApplication);
 
+    // Restart the game with Ctrl + R
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated,
+            this, &LibreMinesGui::SLOT_RestartGame);
+
     // Create interface with the passed dimensions
     vCreateGUI(thatWidth, thatHeight);
     vShowMainMenu();
@@ -616,10 +620,10 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
             this, &LibreMinesGui::SLOT_Customized);
 
     connect(buttonRestartInGame, &QPushButton::released,
-            this, &LibreMinesGui::SLOT_Restart);
+            this, &LibreMinesGui::SLOT_RestartGame);
 
     connect(buttonQuitInGame, &QPushButton::released,
-            this, &LibreMinesGui::SLOT_Quit);
+            this, &LibreMinesGui::SLOT_QuitGame);
 
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
@@ -923,9 +927,16 @@ void LibreMinesGui::vShowInterfaceInGame()
     scrollAreaBoard->show();
 }
 
-void LibreMinesGui::SLOT_Restart()
+void LibreMinesGui::SLOT_RestartGame()
 {
-    if(gameEngine && gameEngine->isGameActive())
+    // If the Interface in Game is hidden or not enable, return
+    if(!buttonRestartInGame->isVisible() || !buttonRestartInGame->isEnabled())
+        return;
+
+    // Check if there is a game happening. If there is one, create a dialog asking
+    //  if the user want to quit the game
+    if(gameEngine && gameEngine->isGameActive() &&
+       progressBarGameCompleteInGame->value() != progressBarGameCompleteInGame->minimum())
     {
         QMessageBox messageBox;
 
@@ -952,7 +963,7 @@ void LibreMinesGui::SLOT_Restart()
     vNewGame(x, y, mines);
 }
 
-void LibreMinesGui::SLOT_Quit()
+void LibreMinesGui::SLOT_QuitGame()
 {
     if(gameEngine && gameEngine->isGameActive())
     {

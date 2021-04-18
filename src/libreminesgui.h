@@ -165,12 +165,12 @@ private Q_SLOTS:
      * @brief
      *
      */
-    void SLOT_Quit();
+    void SLOT_QuitGame();
     /**
      * @brief
      *
      */
-    void SLOT_Restart();
+    void SLOT_RestartGame();
 
     /**
      * @brief
