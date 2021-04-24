@@ -34,6 +34,7 @@
 #include <QShortcut>
 #include <QMessageBox>
 #include <QTranslator>
+#include <QStandardPaths>
 
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
@@ -72,10 +73,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     // Quit the application with Ctrl + Q
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this), &QShortcut::activated,
             this, &LibreMinesGui::SLOT_quitApplication);
-
-    // Restart the game with Ctrl + R
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated,
-            this, &LibreMinesGui::SLOT_RestartGame);
 
     // Create interface with the passed dimensions
     vCreateGUI(thatWidth, thatHeight);
@@ -292,6 +289,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
+    buttonSaveMinefieldAsImage->setEnabled(false);
 
     // Create the game engine instance
     gameEngine.reset(new LibreMinesGameEngine());
@@ -368,6 +366,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     buttonQuitInGame->setEnabled(true);
     buttonRestartInGame->setEnabled(true);
+    buttonSaveMinefieldAsImage->setEnabled(true);
 
     // Set the correct state of each cell
     vAttributeAllCells();
@@ -532,6 +531,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     progressBarGameCompleteInGame = new QProgressBar(centralWidget());
     buttonRestartInGame = new QPushButton(centralWidget());
     buttonQuitInGame = new QPushButton(centralWidget());
+    buttonSaveMinefieldAsImage = new QPushButton(centralWidget());
     labelYouWonYouLost = new QLabel(centralWidget());
     labelStatisLastMatch = new QLabel(centralWidget());
 
@@ -549,9 +549,13 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     lcd_numberMinesLeft->setDecMode();
     lcd_numberMinesLeft->display(0);
     progressBarGameCompleteInGame->setTextVisible(false);
-    buttonQuitInGame->setText(tr("Quit"));
     buttonRestartInGame->setText(tr("Restart"));
+    buttonQuitInGame->setText(tr("Quit"));
+    buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
+
+    buttonSaveMinefieldAsImage->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
+    buttonRestartInGame->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
     vAdjustInterfaceInGame();
     vHideInterfaceInGame();
@@ -635,6 +639,9 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     connect(buttonQuitInGame, &QPushButton::released,
             this, &LibreMinesGui::SLOT_QuitGame);
 
+    connect(buttonSaveMinefieldAsImage, &QPushButton::released,
+            this, &LibreMinesGui::SLOT_saveMinefieldAsImage);
+
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
 
@@ -711,6 +718,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     setTabOrder(sbCustomizedX, sbCustomizedY);
     setTabOrder(sbCustomizedY, buttonRestartInGame);
     setTabOrder(buttonRestartInGame, buttonQuitInGame);
+    setTabOrder(buttonQuitInGame, buttonSaveMinefieldAsImage);
 
     if(width == -1 || height == -1)
     {
@@ -901,6 +909,8 @@ void LibreMinesGui::vAdjustInterfaceInGame()
                                      progressBarGameCompleteInGame->width()/2, h /20);
     buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
                                   buttonRestartInGame->width(), buttonRestartInGame->height());
+    buttonSaveMinefieldAsImage->setGeometry(buttonRestartInGame->x(), buttonRestartInGame->y() + buttonRestartInGame->height()*1.1,
+                                            progressBarGameCompleteInGame->width(), progressBarGameCompleteInGame->height());
     labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+h /20,
                                     lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
     labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
@@ -916,6 +926,7 @@ void LibreMinesGui::vHideInterfaceInGame()
     progressBarGameCompleteInGame->hide();
     buttonRestartInGame->hide();
     buttonQuitInGame->hide();
+    buttonSaveMinefieldAsImage->hide();
     labelYouWonYouLost->hide();
     labelStatisLastMatch->hide();
     widgetBoardContents->hide();
@@ -931,6 +942,7 @@ void LibreMinesGui::vShowInterfaceInGame()
         progressBarGameCompleteInGame->show();
     buttonRestartInGame->show();
     buttonQuitInGame->show();
+    buttonSaveMinefieldAsImage->show();
     labelYouWonYouLost->show();
     labelStatisLastMatch->show();
     widgetBoardContents->show();
@@ -1435,7 +1447,8 @@ void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value
 
 void LibreMinesGui::SLOT_quitApplication()
 {
-    if(gameEngine && gameEngine->isGameActive())
+    if(gameEngine && gameEngine->isGameActive() &&
+       progressBarGameCompleteInGame->value() != progressBarGameCompleteInGame->minimum())
     {
         QMessageBox messageBox;
 
@@ -1541,6 +1554,33 @@ void LibreMinesGui::SLOT_toggleFullScreen()
     {
         this->showFullScreen();
     }
+}
+
+void LibreMinesGui::SLOT_saveMinefieldAsImage()
+{
+    if(controller.active)
+        qApp->restoreOverrideCursor();
+
+    QString picturesDirPAth = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+    if(picturesDirPAth.isEmpty())
+        picturesDirPAth = QDir::currentPath();
+
+    QString fileName = QFileDialog::getSaveFileName(
+                           this,
+                           tr("Save Minefield as image"),
+                           picturesDirPAth + "/libremines_screeshoot" + QDateTime::currentDateTime().toString(Qt::ISODate) + ".png",
+                           tr("Image (*.bmp *.jpg *png *.jpeg *.gif)"));
+
+    if(fileName.isEmpty())
+        return;
+
+    QImage image(widgetBoardContents->size(), QImage::Format_RGBA64);
+    QPainter painter(&image);
+    widgetBoardContents->render(&painter);
+    image.save(fileName);
+
+    if(controller.active)
+        qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 }
 
 void LibreMinesGui::vSetApplicationTheme(const QString& theme)

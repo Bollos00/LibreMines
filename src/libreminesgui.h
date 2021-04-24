@@ -210,6 +210,8 @@ private Q_SLOTS:
 
     void SLOT_toggleFullScreen();
 
+    void SLOT_saveMinefieldAsImage();
+
 Q_SIGNALS:
     void SIGNAL_cleanCell(const uchar _X, const uchar _Y);
     void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);
@@ -252,6 +254,7 @@ private:
     QProgressBar* progressBarGameCompleteInGame;
     QPushButton *buttonRestartInGame; /**< TODO: describe */
     QPushButton *buttonQuitInGame; /**< TODO: describe */
+    QPushButton* buttonSaveMinefieldAsImage;
 
     QScrollArea* scrollAreaBoard;
     QWidget* widgetBoardContents;
