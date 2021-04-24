@@ -23,7 +23,7 @@
 
 QPushButton_adapted::QPushButton_adapted(QWidget *parent) : QPushButton(parent)
 {
-
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 
