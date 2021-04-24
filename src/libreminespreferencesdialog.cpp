@@ -89,6 +89,7 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     ui->keyInputMoveDown->setKey(Qt::Key_S);
     ui->keyInputReleaseCell->setKey(Qt::Key_O);
     ui->keyInputFlagCell->setKey(Qt::Key_P);
+    ui->keyInputCenterCell->setKey(Qt::Key_Space);
 }
 
 LibreMinesPreferencesDialog::~LibreMinesPreferencesDialog()
@@ -251,7 +252,8 @@ QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
         ui->keyInputMoveRight->currentKey(),
         ui->keyInputMoveDown->currentKey(),
         ui->keyInputReleaseCell->currentKey(),
-        ui->keyInputFlagCell->currentKey()
+        ui->keyInputFlagCell->currentKey(),
+        ui->keyInputCenterCell->currentKey()
     };
 }
 
@@ -270,6 +272,8 @@ QString LibreMinesPreferencesDialog::optionKeyboardControllerKeysString() const
     s += QString::number(ui->keyInputReleaseCell->currentKey(), 16);
     s += ' ';
     s += QString::number(ui->keyInputFlagCell->currentKey(), 16);
+    s += ' ';
+    s += QString::number(ui->keyInputCenterCell->currentKey(), 16);
 
     return s;
 }
@@ -282,6 +286,10 @@ void LibreMinesPreferencesDialog::setOptionKeyboardControllerKeys(const QList<in
     ui->keyInputMoveDown->setKey(keys.at(3));
     ui->keyInputReleaseCell->setKey(keys.at(4));
     ui->keyInputFlagCell->setKey(keys.at(5));
+    if(keys.size() == 7)
+    {
+        ui->keyInputCenterCell->setKey(keys.at(6));
+    }
 }
 
 void LibreMinesPreferencesDialog::closeEvent(QCloseEvent *e)

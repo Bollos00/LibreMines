@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>767</width>
-    <height>487</height>
+    <width>687</width>
+    <height>562</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -315,6 +315,39 @@ clicked on showed cell</string>
         </item>
         <item>
          <widget class="QKeyInput" name="keyInputFlagCell">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>100</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_15">
+        <item>
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Center cell on the scroll area</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QKeyInput" name="keyInputCenterCell">
           <property name="minimumSize">
            <size>
             <width>100</width>

@@ -81,6 +81,8 @@ struct KeyboardController
     int keyUp;
     int keyReleaseCell;
     int keyFlagCell;
+    int keyCenterCell;
+
     bool valid;
 };
 

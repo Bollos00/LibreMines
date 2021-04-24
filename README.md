@@ -127,9 +127,15 @@ For activate the keyboard controller mode, press one of the following keys: **A|
 
 * **P**: Flag/Unflag Current Cell;
 
+* **Space**: Locate current cell on middle of the scroll bar;
+
+* **CTRL + R**: Retart the game;
+
+* **CTRL + SHIFT + P**: Save minefield as image;
+
 If you do not feel comfortable with those keys, you can edit them going to the main menu, then Options > Preferences.
 
-Tip: hold the **Control Key** while moving to move faster.
+Tip: hold the **CTRL** modifier while moving in order to move faster.
 
 
 ## Contributing
@@ -143,7 +149,7 @@ All kinds of contributions are welcome on this project. You can help:
 * Packaging the software for other distributions;
 * Increasing the playability and adding new features by making changes on the source code.
 
-# Third party Repositories
+# Third party Repositories used in this software
 * [BreezeStyleSheets](https://github.com/Alexhuszagh/BreezeStyleSheets)
 * [GTRONICK/QSS](https://github.com/GTRONICK/QSS)
 * [QDarkStyleSheet](https://github.com/ColinDuquesnoy/QDarkStyleSheet)

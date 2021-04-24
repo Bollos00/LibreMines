@@ -24,7 +24,7 @@
 QLabel_adapted::QLabel_adapted(QWidget *parent):
     QLabel(parent)
 {
-
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)

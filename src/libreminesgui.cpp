@@ -34,6 +34,7 @@
 #include <QShortcut>
 #include <QMessageBox>
 #include <QTranslator>
+#include <QStandardPaths>
 
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
@@ -57,6 +58,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) )
 {
+    this->resize(800, 600);
+
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
 
@@ -70,12 +73,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     });
 
     // Quit the application with Ctrl + Q
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this), &QShortcut::activated,
+    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q), this), &QShortcut::activated,
             this, &LibreMinesGui::SLOT_quitApplication);
-
-    // Restart the game with Ctrl + R
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated,
-            this, &LibreMinesGui::SLOT_RestartGame);
 
     // Create interface with the passed dimensions
     vCreateGUI(thatWidth, thatHeight);
@@ -228,6 +227,11 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                     Q_EMIT SIGNAL_addOrRemoveFlag(controller.currentX, controller.currentY);
                     return true;
                 }
+                if(key == Qt::Key_Space)
+                {
+                    vKeyboardControllerCenterCurrentCell();
+                    return true;
+                }
                 if(key == Qt::Key_Escape)
                 {
                     controller.active = false;
@@ -287,6 +291,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
+    buttonSaveMinefieldAsImage->setEnabled(false);
 
     // Create the game engine instance
     gameEngine.reset(new LibreMinesGameEngine());
@@ -363,6 +368,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     buttonQuitInGame->setEnabled(true);
     buttonRestartInGame->setEnabled(true);
+    buttonSaveMinefieldAsImage->setEnabled(true);
 
     // Set the correct state of each cell
     vAttributeAllCells();
@@ -527,6 +533,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     progressBarGameCompleteInGame = new QProgressBar(centralWidget());
     buttonRestartInGame = new QPushButton(centralWidget());
     buttonQuitInGame = new QPushButton(centralWidget());
+    buttonSaveMinefieldAsImage = new QPushButton(centralWidget());
     labelYouWonYouLost = new QLabel(centralWidget());
     labelStatisLastMatch = new QLabel(centralWidget());
 
@@ -537,16 +544,22 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     layoutBoard->setSpacing(0);
 
     widgetBoardContents->setLayout(layoutBoard);
+    widgetBoardContents->setFocusPolicy(Qt::NoFocus);
     scrollAreaBoard->setWidget(widgetBoardContents);
+    scrollAreaBoard->setFocusPolicy(Qt::NoFocus);
 
     labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
     lcd_numberMinesLeft->setDecMode();
     lcd_numberMinesLeft->display(0);
     progressBarGameCompleteInGame->setTextVisible(false);
-    buttonQuitInGame->setText(tr("Quit"));
     buttonRestartInGame->setText(tr("Restart"));
+    buttonQuitInGame->setText(tr("Quit"));
+    buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
+
+    buttonSaveMinefieldAsImage->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P));
+    buttonRestartInGame->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_R));
 
     vAdjustInterfaceInGame();
     vHideInterfaceInGame();
@@ -630,6 +643,9 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     connect(buttonQuitInGame, &QPushButton::released,
             this, &LibreMinesGui::SLOT_QuitGame);
 
+    connect(buttonSaveMinefieldAsImage, &QPushButton::released,
+            this, &LibreMinesGui::SLOT_saveMinefieldAsImage);
+
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
 
@@ -706,6 +722,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     setTabOrder(sbCustomizedX, sbCustomizedY);
     setTabOrder(sbCustomizedY, buttonRestartInGame);
     setTabOrder(buttonRestartInGame, buttonQuitInGame);
+    setTabOrder(buttonQuitInGame, buttonSaveMinefieldAsImage);
 
     if(width == -1 || height == -1)
     {
@@ -896,6 +913,8 @@ void LibreMinesGui::vAdjustInterfaceInGame()
                                      progressBarGameCompleteInGame->width()/2, h /20);
     buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
                                   buttonRestartInGame->width(), buttonRestartInGame->height());
+    buttonSaveMinefieldAsImage->setGeometry(buttonRestartInGame->x(), buttonRestartInGame->y() + buttonRestartInGame->height()*1.1,
+                                            progressBarGameCompleteInGame->width(), progressBarGameCompleteInGame->height());
     labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+h /20,
                                     lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
     labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
@@ -911,6 +930,7 @@ void LibreMinesGui::vHideInterfaceInGame()
     progressBarGameCompleteInGame->hide();
     buttonRestartInGame->hide();
     buttonQuitInGame->hide();
+    buttonSaveMinefieldAsImage->hide();
     labelYouWonYouLost->hide();
     labelStatisLastMatch->hide();
     widgetBoardContents->hide();
@@ -926,6 +946,7 @@ void LibreMinesGui::vShowInterfaceInGame()
         progressBarGameCompleteInGame->show();
     buttonRestartInGame->show();
     buttonQuitInGame->show();
+    buttonSaveMinefieldAsImage->show();
     labelYouWonYouLost->show();
     labelStatisLastMatch->show();
     widgetBoardContents->show();
@@ -1430,7 +1451,8 @@ void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value
 
 void LibreMinesGui::SLOT_quitApplication()
 {
-    if(gameEngine && gameEngine->isGameActive())
+    if(gameEngine && gameEngine->isGameActive() &&
+       progressBarGameCompleteInGame->value() != progressBarGameCompleteInGame->minimum())
     {
         QMessageBox messageBox;
 
@@ -1536,6 +1558,35 @@ void LibreMinesGui::SLOT_toggleFullScreen()
     {
         this->showFullScreen();
     }
+}
+
+void LibreMinesGui::SLOT_saveMinefieldAsImage()
+{
+    if(controller.active)
+        qApp->restoreOverrideCursor();
+
+    QString picturesDirPAth = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+    if(picturesDirPAth.isEmpty())
+        picturesDirPAth = QDir::currentPath();
+
+    QString fileName = "libremines_screeshoot" + QDateTime::currentDateTime().toString(Qt::ISODate).replace(':', '_') + ".png";
+
+    QString fullFileName = QFileDialog::getSaveFileName(
+                           this,
+                           tr("Save Minefield as image"),
+                           picturesDirPAth + '/' + fileName,
+                           tr("Image (*.bmp *.jpg *png *.jpeg)"));
+
+    if(fullFileName.isEmpty())
+        return;
+
+    QImage image(widgetBoardContents->size(), QImage::Format_RGBA64);
+    QPainter painter(&image);
+    widgetBoardContents->render(&painter);
+    image.save(fullFileName);
+
+    if(controller.active)
+        qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 }
 
 void LibreMinesGui::vSetApplicationTheme(const QString& theme)
@@ -1742,6 +1793,9 @@ void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar
 
         cellGui.label->setPixmap(QPixmap::fromImage(img));
     }
+
+    scrollAreaBoard->ensureVisible(x*cellLength + cellLength/2, y*cellLength + cellLength/2,
+                                   cellLength/2 + 1, cellLength/2 + 1);
 }
 
 void LibreMinesGui::vKeyboardControllUnsetCurrentCell()
@@ -1917,6 +1971,15 @@ void LibreMinesGui::vKeyboardControllerMoveUp()
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
 }
 
+void LibreMinesGui::vKeyboardControllerCenterCurrentCell()
+{
+    const uchar x = controller.currentX;
+    const uchar y = controller.currentY;
+    scrollAreaBoard->ensureVisible(x*cellLength + cellLength/2, y*cellLength + cellLength/2,
+                                   cellLength/2 + scrollAreaBoard->width()/2, cellLength/2 + scrollAreaBoard->height()/2);
+
+}
+
 void LibreMinesGui::vLastSessionLoadConfigurationFile()
 {
     QDir destDir = QDir::home();
@@ -2009,18 +2072,31 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
             }
             else if(terms.at(0).compare("KeyboardControllerKeys", Qt::CaseInsensitive) == 0)
             {
-                if(terms.size() != 7)
-                    continue;
-
-                preferences->setOptionKeyboardControllerKeys(
-                            {
-                                terms.at(1).toInt(nullptr, 16),
-                                terms.at(2).toInt(nullptr, 16),
-                                terms.at(3).toInt(nullptr, 16),
-                                terms.at(4).toInt(nullptr, 16),
-                                terms.at(5).toInt(nullptr, 16),
-                                terms.at(6).toInt(nullptr, 16),
-                            });
+                if(terms.size() == 7)
+                {
+                    preferences->setOptionKeyboardControllerKeys(
+                                {
+                                    terms.at(1).toInt(nullptr, 16),
+                                    terms.at(2).toInt(nullptr, 16),
+                                    terms.at(3).toInt(nullptr, 16),
+                                    terms.at(4).toInt(nullptr, 16),
+                                    terms.at(5).toInt(nullptr, 16),
+                                    terms.at(6).toInt(nullptr, 16)
+                                });
+                }
+                else if(terms.size() == 8)
+                {
+                    preferences->setOptionKeyboardControllerKeys(
+                                {
+                                    terms.at(1).toInt(nullptr, 16),
+                                    terms.at(2).toInt(nullptr, 16),
+                                    terms.at(3).toInt(nullptr, 16),
+                                    terms.at(4).toInt(nullptr, 16),
+                                    terms.at(5).toInt(nullptr, 16),
+                                    terms.at(6).toInt(nullptr, 16),
+                                    terms.at(7).toInt(nullptr, 16)
+                                });
+                }
             }
             else if(terms.at(0).compare("MinefieldTheme", Qt::CaseInsensitive) == 0)
             {
@@ -2152,6 +2228,7 @@ void LibreMinesGui::vUpdatePreferences()
     controller.keyDown = keys.at(3);
     controller.keyReleaseCell= keys.at(4);
     controller.keyFlagCell = keys.at(5);
+    controller.keyCenterCell = keys.at(6);
 
     controller.valid = true;
     for (int i=0; i<keys.size()-1; ++i)

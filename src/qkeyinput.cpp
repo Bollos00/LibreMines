@@ -77,8 +77,10 @@ QString QKeyInput::getTextFromKey(const int k)
         case Qt::Key_N: return "N";
         case Qt::Key_O: return "O";
         case Qt::Key_P: return "P";
-        case Qt::Key_Q: return "Q";
-        case Qt::Key_R: return "R";
+        // Those two are invalid key, for they are used in specific
+        //  shortcur with the 'ctrl' modifier
+//        case Qt::Key_Q: return "Q";
+//        case Qt::Key_R: return "R";
         case Qt::Key_S: return "S";
         case Qt::Key_T: return "T";
         case Qt::Key_U: return "U";
