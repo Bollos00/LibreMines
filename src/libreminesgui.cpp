@@ -228,6 +228,11 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                     Q_EMIT SIGNAL_addOrRemoveFlag(controller.currentX, controller.currentY);
                     return true;
                 }
+                if(key == Qt::Key_Space)
+                {
+                    vKeyboardControllerCenterCurrentCell();
+                    return true;
+                }
                 if(key == Qt::Key_Escape)
                 {
                     controller.active = false;
@@ -1742,6 +1747,9 @@ void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar
 
         cellGui.label->setPixmap(QPixmap::fromImage(img));
     }
+
+    scrollAreaBoard->ensureVisible(x*cellLength + cellLength/2, y*cellLength + cellLength/2,
+                                   cellLength/2 + 1, cellLength/2 + 1);
 }
 
 void LibreMinesGui::vKeyboardControllUnsetCurrentCell()
@@ -1915,6 +1923,15 @@ void LibreMinesGui::vKeyboardControllerMoveUp()
     }
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
+}
+
+void LibreMinesGui::vKeyboardControllerCenterCurrentCell()
+{
+    const uchar x = controller.currentX;
+    const uchar y = controller.currentY;
+    scrollAreaBoard->ensureVisible(x*cellLength + cellLength/2, y*cellLength + cellLength/2,
+                                   cellLength/2 + scrollAreaBoard->width()/2, cellLength/2 + scrollAreaBoard->height()/2);
+
 }
 
 void LibreMinesGui::vLastSessionLoadConfigurationFile()

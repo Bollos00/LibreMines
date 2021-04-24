@@ -133,6 +133,7 @@ private:
     void vKeyboardControllerMoveRight();
     void vKeyboardControllerMoveDown();
     void vKeyboardControllerMoveUp();
+    void vKeyboardControllerCenterCurrentCell();
 
     void vLastSessionLoadConfigurationFile();
     void vLastSessionSaveConfigurationFile();
