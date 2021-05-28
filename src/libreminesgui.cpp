@@ -144,14 +144,23 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
         {
             Qt::Key key = (Qt::Key)((QKeyEvent*)event)->key();
 
-            switch(key)
+            if(key == Qt::Key_Control)
             {
-                case Qt::Key_Control:
-                    controller.ctrlPressed = true;
+                controller.ctrlPressed = true;
+                return true;
+            }
+            if(controller.active)
+            {
+                if(key == controller.keyLeft ||
+                   key == controller.keyUp ||
+                   key == controller.keyDown ||
+                   key == controller.keyRight ||
+                   key == controller.keyCenterCell ||
+                   key == controller.keyFlagCell ||
+                   key == controller.keyReleaseCell)
+                {
                     return true;
-
-                default:
-                    break;
+                }
             }
 
         }break;
@@ -180,11 +189,26 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                     qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
                     qApp->overrideCursor()->setPos(90*qApp->primaryScreen()->geometry().width()/100,
                                                    90*qApp->primaryScreen()->geometry().height()/100);
+
+                    this->setFocus();
+
                     return true;
                 }
             }
             else
             {
+                if(key == controller.keyLeft ||
+                   key == controller.keyUp ||
+                   key == controller.keyDown ||
+                   key == controller.keyRight ||
+                   key == controller.keyCenterCell ||
+                   key == controller.keyFlagCell ||
+                   key == controller.keyReleaseCell)
+                {
+                    this->setFocus();
+                }
+
+
                 if(key == controller.keyLeft)
                 {
                     vKeyboardControllerMoveLeft();
