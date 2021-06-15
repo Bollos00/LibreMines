@@ -383,7 +383,12 @@ void LibreMinesGui::vNewGame(const uchar _X,
                         this, &LibreMinesGui::SLOT_onCellLabelClicked);
             }
 
-            qApp->processEvents();
+            if(preferences->optionMinefieldGenerationAnimation() == LibreMines::AnimationOn ||
+               (preferences->optionMinefieldGenerationAnimation() == LibreMines::AnimationLimited &&
+                                   i == _X - 1))
+            {
+                qApp->processEvents();
+            }
         }
     }
 
@@ -2171,6 +2176,14 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                 preferences->setOptionProgressBar(terms.at(1));
             }
+            else if(terms.at(0).compare("MinefieldGenerationAnimation", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences->setOptionMinefieldGenerationAnimation(terms.at(1));
+            }
+
         }
     }
 
@@ -2230,7 +2243,8 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
                << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
                << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
                << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
-               << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n';
+               << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n'
+               << "MinefieldGenerationAnimation" << ' ' << preferences->optionMinefieldGenerationAnimationString() << '\n';
     }
 
     {

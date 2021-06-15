@@ -54,6 +54,8 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     ui->comboBoxLanguage->addItems({"English", "Português do Brasil"});
 
+    ui->comboBoxMinefieldGenerationAnimation->addItems({tr("On"), tr("Limited"), tr("Off")});
+
 
     // Space character is not allowed. This will remove every space character of the line edit
 //    ui->lineEditUsername->setValidator(new QRegExpValidator(QRegExp("^(?i)[a-z][a-z0-9]*$")));
@@ -162,6 +164,16 @@ QString LibreMinesPreferencesDialog::optionsLanguage() const
     return "";
 }
 
+uchar LibreMinesPreferencesDialog::optionMinefieldGenerationAnimation() const
+{
+    return ui->comboBoxMinefieldGenerationAnimation->currentIndex();
+}
+
+QString LibreMinesPreferencesDialog::optionMinefieldGenerationAnimationString() const
+{
+    return ui->comboBoxMinefieldGenerationAnimation->currentText();
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -241,6 +253,17 @@ void LibreMinesPreferencesDialog::setOptionLanguage(const QString &option)
     updateLanguageDialog = false;
     ui->comboBoxLanguage->setCurrentText(s);
     QTimer::singleShot(10, [this](){ updateLanguageDialog = true; });
+}
+
+void LibreMinesPreferencesDialog::setOptionMinefieldGenerationAnimation(const uchar option)
+{
+    if(ui->comboBoxMinefieldGenerationAnimation->count() > option)
+        ui->comboBoxMinefieldGenerationAnimation->setCurrentIndex(option);
+}
+
+void LibreMinesPreferencesDialog::setOptionMinefieldGenerationAnimation(const QString &option)
+{
+    ui->comboBoxMinefieldGenerationAnimation->setCurrentText(option);
 }
 
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const

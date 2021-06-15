@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>562</height>
+    <width>680</width>
+    <height>522</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,6 +81,21 @@ clicked on showed cell</string>
            <number>10</number>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_16">
+        <item>
+         <widget class="QLabel" name="labelMinefieldGenerationAnimation">
+          <property name="text">
+           <string>Minefield Generation
+Animation</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxMinefieldGenerationAnimation"/>
         </item>
        </layout>
       </item>

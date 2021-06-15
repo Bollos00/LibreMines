@@ -37,6 +37,13 @@ enum WhenCtrlIsPressedOptions : uchar
     Jump5Cells = 2,
     Jump10Cells = 3
 };
+
+enum MinefieldGenerationAnimation : uchar
+{
+    AnimationOn = 0,
+    AnimationLimited = 1,
+    AnimationOff = 2
+};
 }
 
 class LibreMinesPreferencesDialog : public QDialog
@@ -58,6 +65,8 @@ public:
     int optionMinimumCellLength()const;
     int optionMaximumCellLength()const;
     QString optionsLanguage()const;
+    uchar optionMinefieldGenerationAnimation()const;
+    QString optionMinefieldGenerationAnimationString()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
@@ -70,6 +79,8 @@ public:
     void setOptionMinimumCellLength(const int option);
     void setOptionMaximumCellLength(const int option);
     void setOptionLanguage(const QString& option);
+    void setOptionMinefieldGenerationAnimation(const uchar option);
+    void setOptionMinefieldGenerationAnimation(const QString& option);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;
