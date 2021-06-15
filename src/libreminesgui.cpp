@@ -524,6 +524,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     actionToggleFullScreen = new QAction(this);
     actionAbout = new QAction(this);
     actionAboutQt = new QAction(this);
+    actionGitHubHomePage = new QAction(this);
 
     QMenuBar* menuBarGlobal = new QMenuBar(this);
 
@@ -539,7 +540,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     menuBarGlobal->addAction(menuHelp->menuAction());
 
     menuOptions->addActions({actionPreferences, actionHighScores, actionToggleFullScreen});
-    menuHelp->addActions({actionAbout, actionAboutQt});
+    menuHelp->addActions({actionAbout, actionAboutQt, actionGitHubHomePage});
 
     menuOptions->setTitle(tr("Options"));
     menuHelp->setTitle(tr("Help"));
@@ -551,6 +552,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     actionAbout->setText(tr("About..."));
     actionAboutQt->setText(tr("About Qt..."));
+    actionGitHubHomePage->setText(tr("GitHub Homepage..."));
     // Actions and Menu Bar
 
 
@@ -690,6 +692,9 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     connect(actionAboutQt, &QAction::triggered,
             [this](){ QMessageBox::aboutQt(this, "LibreMines"); });
+
+    connect(actionGitHubHomePage, &QAction::triggered,
+            [](){ QDesktopServices::openUrl(QUrl("https://github.com/Bollos00/LibreMines")); });
 
     connect(cbCustomizedMinesInPercentage, &QCheckBox::stateChanged,
             [this](const int state)

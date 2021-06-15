@@ -271,6 +271,7 @@ private:
     QMenu* menuHelp;
     QAction* actionAbout;
     QAction* actionAboutQt;
+    QAction* actionGitHubHomePage;
 
     QScopedPointer<QPixmap> pmZero; /**< TODO: describe */
     QScopedPointer<QPixmap> pmOne; /**< TODO: describe */
