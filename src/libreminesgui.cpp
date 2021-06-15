@@ -144,14 +144,23 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
         {
             Qt::Key key = (Qt::Key)((QKeyEvent*)event)->key();
 
-            switch(key)
+            if(key == Qt::Key_Control)
             {
-                case Qt::Key_Control:
-                    controller.ctrlPressed = true;
+                controller.ctrlPressed = true;
+                return true;
+            }
+            if(controller.active)
+            {
+                if(key == controller.keyLeft ||
+                   key == controller.keyUp ||
+                   key == controller.keyDown ||
+                   key == controller.keyRight ||
+                   key == controller.keyCenterCell ||
+                   key == controller.keyFlagCell ||
+                   key == controller.keyReleaseCell)
+                {
                     return true;
-
-                default:
-                    break;
+                }
             }
 
         }break;
@@ -180,11 +189,26 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
                     qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
                     qApp->overrideCursor()->setPos(90*qApp->primaryScreen()->geometry().width()/100,
                                                    90*qApp->primaryScreen()->geometry().height()/100);
+
+                    this->setFocus();
+
                     return true;
                 }
             }
             else
             {
+                if(key == controller.keyLeft ||
+                   key == controller.keyUp ||
+                   key == controller.keyDown ||
+                   key == controller.keyRight ||
+                   key == controller.keyCenterCell ||
+                   key == controller.keyFlagCell ||
+                   key == controller.keyReleaseCell)
+                {
+                    this->setFocus();
+                }
+
+
                 if(key == controller.keyLeft)
                 {
                     vKeyboardControllerMoveLeft();
@@ -359,7 +383,12 @@ void LibreMinesGui::vNewGame(const uchar _X,
                         this, &LibreMinesGui::SLOT_onCellLabelClicked);
             }
 
-            qApp->processEvents();
+            if(preferences->optionMinefieldGenerationAnimation() == LibreMines::AnimationOn ||
+               (preferences->optionMinefieldGenerationAnimation() == LibreMines::AnimationLimited &&
+                                   i == _X - 1))
+            {
+                qApp->processEvents();
+            }
         }
     }
 
@@ -495,6 +524,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     actionToggleFullScreen = new QAction(this);
     actionAbout = new QAction(this);
     actionAboutQt = new QAction(this);
+    actionGitHubHomePage = new QAction(this);
 
     QMenuBar* menuBarGlobal = new QMenuBar(this);
 
@@ -510,7 +540,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     menuBarGlobal->addAction(menuHelp->menuAction());
 
     menuOptions->addActions({actionPreferences, actionHighScores, actionToggleFullScreen});
-    menuHelp->addActions({actionAbout, actionAboutQt});
+    menuHelp->addActions({actionAbout, actionAboutQt, actionGitHubHomePage});
 
     menuOptions->setTitle(tr("Options"));
     menuHelp->setTitle(tr("Help"));
@@ -522,6 +552,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     actionAbout->setText(tr("About..."));
     actionAboutQt->setText(tr("About Qt..."));
+    actionGitHubHomePage->setText(tr("GitHub Homepage..."));
     // Actions and Menu Bar
 
 
@@ -661,6 +692,9 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     connect(actionAboutQt, &QAction::triggered,
             [this](){ QMessageBox::aboutQt(this, "LibreMines"); });
+
+    connect(actionGitHubHomePage, &QAction::triggered,
+            [](){ QDesktopServices::openUrl(QUrl("https://github.com/Bollos00/LibreMines")); });
 
     connect(cbCustomizedMinesInPercentage, &QCheckBox::stateChanged,
             [this](const int state)
@@ -2147,6 +2181,14 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                 preferences->setOptionProgressBar(terms.at(1));
             }
+            else if(terms.at(0).compare("MinefieldGenerationAnimation", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences->setOptionMinefieldGenerationAnimation(terms.at(1));
+            }
+
         }
     }
 
@@ -2206,7 +2248,8 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
                << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
                << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
                << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
-               << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n';
+               << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n'
+               << "MinefieldGenerationAnimation" << ' ' << preferences->optionMinefieldGenerationAnimationString() << '\n';
     }
 
     {

@@ -147,7 +147,9 @@ All kinds of contributions are welcome on this project. You can help:
 * Sharing the game in order to attract more users;
 * Adapting the software for other Operational Systems;
 * Packaging the software for other distributions;
-* Increasing the playability and adding new features by making changes on the source code.
+* Increasing the playability and adding new features by making changes on the source code;
+* Reporting new [issues](https://github.com/Bollos00/LibreMines/issues) or solving existing ones;
+* Adding or improve the [translations](https://github.com/Bollos00/LibreMines/blob/master/etc/translations/README.md).
 
 # Third party Repositories used in this software
 * [BreezeStyleSheets](https://github.com/Alexhuszagh/BreezeStyleSheets)
