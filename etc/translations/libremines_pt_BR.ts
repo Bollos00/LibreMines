@@ -53,7 +53,7 @@ Para resolver o problema vá para (Menu Principal &gt; Opções &gt; Preferênci
     <message>
         <location filename="../../src/libreminesgui.cpp" line="555"/>
         <source>GitHub Homepage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Página principal do GitHub...</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="588"/>
@@ -168,7 +168,7 @@ Para resolver o problema vá para (Menu Principal &gt; Opções &gt; Preferênci
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1184"/>
         <source>Wrong Flags: </source>
-        <translation type="unfinished"></translation>
+        <translation>Bandeiras Incorretas: </translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1185"/>
