@@ -1181,7 +1181,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
     QString QS_Statics =
             tr("Total time: ") + QString::number(score.iTimeInNs*1e-9, 'f', 3) + tr(" secs") + '\n'
             + tr("Correct Flags: ") + QString::number(iCorrectFlags) + '\n'
-            + tr("WrongFlags: ") + QString::number(iWrongFlags) + '\n'
+            + tr("Wrong Flags: ") + QString::number(iWrongFlags) + '\n'
             + tr("Unlocked Cells: ") + QString::number(iUnlockedCells) + '\n'
             + '\n'
             + tr("Flags/s: ") + QString::number(dFlagsPerSecond, 'f', 3)  + '\n'
