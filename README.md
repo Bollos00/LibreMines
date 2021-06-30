@@ -47,6 +47,12 @@ For Ubuntu you can install the dependencies with the following command:
 sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev
 ```
 
+On Fedora, install the dependencies with:
+```sh
+sudo dnf install @development-tools
+sudo dnf install qt-devel qt5-qtbase-devel qt5-qtsvg-devel cmake
+```
+
 On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/)
 
 ```sh
