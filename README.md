@@ -53,11 +53,11 @@ sudo dnf install @development-tools
 sudo dnf install qt-devel qt5-qtbase-devel qt5-qtsvg-devel cmake
 ```
 
-On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/)
+On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [qt5-buildtools](https://www.freshports.org/devel/qt5-buildtools/), [qt5-qmake](https://www.freshports.org/devel/qt5-qmake/) [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/). 
 
 ```sh
 su -
-pkg install qt5-core qt5-widgets qt5-svg git cmake
+pkg install qt5-core qt5-widgets qt5-svg git cmake qt5-buildtools qt5-qmake
 ```
 
 For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/) or your preferred package manager.
