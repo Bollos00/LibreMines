@@ -57,8 +57,8 @@ jobs:
           setup-python: 'false'
 
       - name: "Create build directory and run CMake"
-        run: "mkdir build && cd build && cmake .."
+        run: "mkdir build && cd build && cmake --configure .."
       
       - name: "Build"
-        run: "cmake --build . --config Release"
+        run: "cd build && cmake --build . --config Release"
 
