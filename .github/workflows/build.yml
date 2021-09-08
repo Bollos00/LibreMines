@@ -37,5 +37,5 @@ jobs:
         run: "mkdir build && cd build && cmake .."
       
       - name: "Building"
-        run: "make"
+        run: "cd build && make"
         
