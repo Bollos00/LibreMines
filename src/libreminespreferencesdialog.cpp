@@ -31,9 +31,11 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Default system theme
+    ui->comboBoxApplicationStyle->addItem("default");
+
     // Dark and light fusion
     ui->comboBoxApplicationStyle->addItems({"Fusion Dark", "Fusion Light"});
-
 
     // QSS
     ui->comboBoxApplicationStyle->addItems({"ConsoleStyle", "NeonButtons"});
@@ -60,18 +62,18 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     // Space character is not allowed. This will remove every space character of the line edit
 //    ui->lineEditUsername->setValidator(new QRegExpValidator(QRegExp("^(?i)[a-z][a-z0-9]*$")));
     connect(ui->lineEditUsername, &QLineEdit::textChanged,
-            [this](QString text)
+            this, [this](QString text)
     { ui->lineEditUsername->setText(text.remove(" ", Qt::CaseInsensitive)); });
 
     connect(ui->comboBoxApplicationStyle, &QComboBox::currentTextChanged,
-            [this](QString text)
+            this, [this](QString text)
     {
         text.remove(" ", Qt::CaseInsensitive);
         Q_EMIT SIGNAL_optionChanged("ApplicationTheme", text);
     });
 
     connect(ui->comboBoxMinefieldTheme, &QComboBox::currentTextChanged,
-            [this](QString text)
+            this, [this](QString text)
     {
         text.remove(" ", Qt::CaseInsensitive);
         Q_EMIT SIGNAL_optionChanged("MinefieldTheme", text);
@@ -252,7 +254,7 @@ void LibreMinesPreferencesDialog::setOptionLanguage(const QString &option)
     // Ugly way to avoid the creation of the dialog when this function is called
     updateLanguageDialog = false;
     ui->comboBoxLanguage->setCurrentText(s);
-    QTimer::singleShot(10, [this](){ updateLanguageDialog = true; });
+    QTimer::singleShot(10, this, [this](){ updateLanguageDialog = true; });
 }
 
 void LibreMinesPreferencesDialog::setOptionMinefieldGenerationAnimation(const uchar option)
