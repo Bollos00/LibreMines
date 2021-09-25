@@ -163,3 +163,4 @@ All kinds of contributions are welcome on this project. You can help:
 * [QDarkStyleSheet](https://github.com/ColinDuquesnoy/QDarkStyleSheet)
 * [TwEmoji](https://github.com/twitter/twemoji)
 * [OpenEmoji](https://github.com/hfg-gmuend/openmoji)
+* [socialify](https://github.com/wei/socialify)
