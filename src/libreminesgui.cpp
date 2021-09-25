@@ -1625,7 +1625,17 @@ void LibreMinesGui::SLOT_saveMinefieldAsImage()
 
 void LibreMinesGui::vSetApplicationTheme(const QString& theme)
 {
-    if(theme.compare("FusionDark", Qt::CaseInsensitive) == 0)
+    static bool firstTimeHere = true;
+
+    if(theme.compare("default", Qt::CaseInsensitive) == 0)
+    {
+        if(!firstTimeHere)
+        {
+            QMessageBox::information(this, "LibreMines",
+                                     "Please reset the application to apply this change");
+        }
+    }
+    else if(theme.compare("FusionDark", Qt::CaseInsensitive) == 0)
     {
         qApp->setStyleSheet("");
         qApp->setStyle(QStyleFactory::create ("Fusion"));
@@ -1707,6 +1717,8 @@ void LibreMinesGui::vSetApplicationTheme(const QString& theme)
             qApp->setStyleSheet(ts.readAll());
         }
     }
+
+    firstTimeHere = false;
 }
 
 void LibreMinesGui::vSetMinefieldTheme(const QString &theme)
