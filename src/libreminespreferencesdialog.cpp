@@ -254,7 +254,7 @@ void LibreMinesPreferencesDialog::setOptionLanguage(const QString &option)
     // Ugly way to avoid the creation of the dialog when this function is called
     updateLanguageDialog = false;
     ui->comboBoxLanguage->setCurrentText(s);
-    QTimer::singleShot(10, [this](){ updateLanguageDialog = true; });
+    QTimer::singleShot(10, this, [this](){ updateLanguageDialog = true; });
 }
 
 void LibreMinesPreferencesDialog::setOptionMinefieldGenerationAnimation(const uchar option)
