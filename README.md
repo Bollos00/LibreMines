@@ -31,6 +31,7 @@ The executable `libremines.exe` will be inside the folder extracted. You can als
 
 The following dependencies are required for building and running LibreMines:
 * [Qt5 Core](https://doc.qt.io/qt-5/qtcore-index.html) >= 5.12
+* [Qt5 Gui](https://doc.qt.io/qt-5/qtgui-index.html) >= 5.12
 * [Qt5 Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
 * [Qt5 SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
 * [CMake](https://cmake.org/) >= 3.1
