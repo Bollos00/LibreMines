@@ -1285,18 +1285,25 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                    QString::number(score.mines);
             }
 
-            // open the dialog
-            LibreMinesScoresDialog dialog(this, scores.size() + 1);
-            dialog.setWindowTitle(strGameDiffuclty);
-            dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
+            AskToSaveMatchScore behaviour = preferences->optionAskToSaveMatchScoreBehaviour();
 
-            dialog.setScores(scores, &score, index);
-            int result = dialog.exec(); Q_UNUSED(result);
-
-            if(dialog.bSaveEditableScore())
+            if(behaviour == LibreMines::SaveAlways ||
+               ((behaviour & LibreMines::SaveWhenGameCompleted) && score.bGameCompleted) ||
+               ((behaviour & LibreMines::SaveWhenNewHighScore) && index == 0))
             {
-                score.username = dialog.stringUserName();
-                saveScore = true;
+                // open the dialog
+                LibreMinesScoresDialog dialog(this, scores.size() + 1);
+                dialog.setWindowTitle(strGameDiffuclty);
+                dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
+
+                dialog.setScores(scores, &score, index);
+                int result = dialog.exec(); Q_UNUSED(result);
+
+                if(dialog.bSaveEditableScore())
+                {
+                    score.username = dialog.stringUserName();
+                    saveScore = true;
+                }
             }
         }
 
@@ -2200,6 +2207,13 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
 
                 preferences->setOptionMinefieldGenerationAnimation(terms.at(1));
             }
+            else if(terms.at(0).compare("AskToSaveMatchScoreBehaviour", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences->setOptionAskToSaveMatchScoreBehaviour(terms.at(1).toUInt());
+            }
 
         }
     }
@@ -2261,7 +2275,8 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
                << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
                << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
                << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n'
-               << "MinefieldGenerationAnimation" << ' ' << preferences->optionMinefieldGenerationAnimationString() << '\n';
+               << "MinefieldGenerationAnimation" << ' ' << preferences->optionMinefieldGenerationAnimationString() << '\n'
+               << "AskToSaveMatchScoreBehaviour" << ' ' << (uchar)preferences->optionAskToSaveMatchScoreBehaviour() << '\n';
     }
 
     {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>680</width>
-    <height>522</height>
+    <width>757</width>
+    <height>679</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -148,8 +148,8 @@ Animation</string>
      </layout>
     </widget>
    </item>
-   <item row="2" column="1" rowspan="2">
-    <widget class="QGroupBox" name="groupBox">
+   <item row="2" column="1" rowspan="3">
+    <widget class="QGroupBox" name="gbKeyboardController">
      <property name="title">
       <string>Keyboard Controller</string>
      </property>
@@ -403,6 +403,81 @@ Animation</string>
     </widget>
    </item>
    <item row="3" column="0">
+    <widget class="QGroupBox" name="gbScores">
+     <property name="title">
+      <string>Scores</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>609</width>
+           <height>213</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QGroupBox" name="gbSaveScores">
+            <property name="title">
+             <string>Ask to save the match score:</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreAlways">
+               <property name="text">
+                <string>Always</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreWhenHighScoreAndGameCompleted">
+               <property name="text">
+                <string>When a new high score is achieved or when the game is completed</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreWhenHighScore">
+               <property name="text">
+                <string>When a new high score is achieved</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreWhenGameCompleted">
+               <property name="text">
+                <string>When the game is completed</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreNever">
+               <property name="text">
+                <string>Never</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0">
     <widget class="QGroupBox" name="gbAppearance">
      <property name="title">
       <string>Appearance</string>
