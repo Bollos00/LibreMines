@@ -190,7 +190,8 @@ private Q_SLOTS:
                            int iWrongFlags,
                            int iUnlockedCells,
                            double dFlagsPerSecond,
-                           double dCellsPerSecond);
+                           double dCellsPerSecond,
+                           bool ignorePreferences=false);
     void SLOT_currentTime(const ushort time);
     void SLOT_minesLeft(const ushort minesLeft);
     void SLOT_flagCell(const uchar _X, const uchar _Y);
@@ -255,6 +256,7 @@ private:
     QPushButton *buttonRestartInGame; /**< TODO: describe */
     QPushButton *buttonQuitInGame; /**< TODO: describe */
     QPushButton* buttonSaveMinefieldAsImage;
+    QPushButton* buttonSaveScore;
 
     QScrollArea* scrollAreaBoard;
     QWidget* widgetBoardContents;

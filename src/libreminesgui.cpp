@@ -316,6 +316,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     buttonQuitInGame->setEnabled(false);
     buttonRestartInGame->setEnabled(false);
     buttonSaveMinefieldAsImage->setEnabled(false);
+    buttonSaveScore->hide();
 
     // Create the game engine instance
     gameEngine.reset(new LibreMinesGameEngine());
@@ -434,6 +435,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_addOrRemoveFlag);
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_stop);
+
+    connect(buttonSaveScore, &QPushButton::released,
+            gameEngine.get(), &LibreMinesGameEngine::SLOT_generateEndGameScoreAgain);
+
 
     if(preferences->optionProgressBar())
     {
@@ -565,6 +570,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     buttonRestartInGame = new QPushButton(centralWidget());
     buttonQuitInGame = new QPushButton(centralWidget());
     buttonSaveMinefieldAsImage = new QPushButton(centralWidget());
+    buttonSaveScore = new QPushButton(centralWidget());
     labelYouWonYouLost = new QLabel(centralWidget());
     labelStatisLastMatch = new QLabel(centralWidget());
 
@@ -587,6 +593,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     buttonRestartInGame->setText(tr("Restart"));
     buttonQuitInGame->setText(tr("Quit"));
     buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
+    buttonSaveScore->setText(tr("Save Score"));
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
     buttonSaveMinefieldAsImage->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P));
@@ -757,6 +764,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     setTabOrder(sbCustomizedY, buttonRestartInGame);
     setTabOrder(buttonRestartInGame, buttonQuitInGame);
     setTabOrder(buttonQuitInGame, buttonSaveMinefieldAsImage);
+    setTabOrder(buttonSaveMinefieldAsImage, buttonSaveScore);
 
     if(width == -1 || height == -1)
     {
@@ -949,7 +957,9 @@ void LibreMinesGui::vAdjustInterfaceInGame()
                                   buttonRestartInGame->width(), buttonRestartInGame->height());
     buttonSaveMinefieldAsImage->setGeometry(buttonRestartInGame->x(), buttonRestartInGame->y() + buttonRestartInGame->height()*1.1,
                                             progressBarGameCompleteInGame->width(), progressBarGameCompleteInGame->height());
-    labelYouWonYouLost->setGeometry(lcd_numberMinesLeft->x(), buttonRestartInGame->y()+buttonRestartInGame->height()+h /20,
+    buttonSaveScore->setGeometry(buttonSaveMinefieldAsImage->x(), buttonSaveMinefieldAsImage->y() + buttonSaveMinefieldAsImage->height()*1.1,
+                                 buttonSaveMinefieldAsImage->width(), buttonSaveMinefieldAsImage->height());
+    labelYouWonYouLost->setGeometry(buttonSaveScore->x(), buttonSaveScore->y()+buttonSaveScore->height()*1.1,
                                     lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
     labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
                                       labelYouWonYouLost->width(), h /5);
@@ -965,6 +975,7 @@ void LibreMinesGui::vHideInterfaceInGame()
     buttonRestartInGame->hide();
     buttonQuitInGame->hide();
     buttonSaveMinefieldAsImage->hide();
+    buttonSaveScore->hide();
     labelYouWonYouLost->hide();
     labelStatisLastMatch->hide();
     widgetBoardContents->hide();
@@ -1176,7 +1187,8 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                                       int iWrongFlags,
                                       int iUnlockedCells,
                                       double dFlagsPerSecond,
-                                      double dCellsPerSecond)
+                                      double dCellsPerSecond,
+                                      bool ignorePreferences)
 {
     QString QS_Statics =
             tr("Total time: ") + QString::number(score.iTimeInNs*1e-9, 'f', 3) + tr(" secs") + '\n'
@@ -1287,7 +1299,8 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
 
             AskToSaveMatchScore behaviour = preferences->optionAskToSaveMatchScoreBehaviour();
 
-            if(behaviour == LibreMines::SaveAlways ||
+            if(ignorePreferences ||
+               behaviour == LibreMines::SaveAlways ||
                ((behaviour & LibreMines::SaveWhenGameCompleted) && score.bGameCompleted) ||
                ((behaviour & LibreMines::SaveWhenNewHighScore) && index == 0))
             {
@@ -1324,7 +1337,10 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
 
             stream << score;
         }
+
+        buttonSaveScore->setVisible(!saveScore);
     }
+
 }
 
 void LibreMinesGui::SLOT_currentTime(const ushort time)

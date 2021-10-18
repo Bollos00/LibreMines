@@ -287,15 +287,17 @@ void LibreMinesGameEngine::vResetPrincipalMatrix()
     principalMatrix.clear();
 }
 
-void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
+bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
 {
     if(!principalMatrix[_X][_Y].hasFlag &&
        principalMatrix[_X][_Y].state == MINE)
     {
         // If the user tried to unlock an unflaged mined cell, (s)he lose
         vGameLost(_X, _Y);
+        return false;
     }
-    else if(principalMatrix[_X][_Y].isHidden &&
+
+    if(principalMatrix[_X][_Y].isHidden &&
             !principalMatrix[_X][_Y].hasFlag)
     {
         // Unlock the cell
@@ -309,140 +311,140 @@ void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
                _Y == 0)
             {
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
+                    bCleanCell(_X+1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
+                    bCleanCell(_X, _Y+1);
                 if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCleanCell(_X+1, _Y+1);
+                    bCleanCell(_X+1, _Y+1);
             }
             else if(_X == 0 &&
                     _Y == iY-1)
             {
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
+                    bCleanCell(_X+1, _Y);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
+                    bCleanCell(_X, _Y-1);
                 if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCleanCell(_X+1, _Y-1);
+                    bCleanCell(_X+1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y == 0)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
+                    bCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
+                    bCleanCell(_X, _Y+1);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
+                    bCleanCell(_X-1, _Y+1);
             }
             else if(_X == iX-1 &&
                     _Y == iY-1)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
+                    bCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
+                    bCleanCell(_X, _Y-1);
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
+                    bCleanCell(_X-1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y == 0)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
+                    bCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
+                    bCleanCell(_X, _Y+1);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
+                    bCleanCell(_X-1, _Y+1);
             }
             else if(_X == iX-1 &&
                     _Y == iY-1)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
+                    bCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
+                    bCleanCell(_X, _Y-1);
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
+                    bCleanCell(_X-1, _Y-1);
             }
             else if(_X == 0 &&
                     _Y > 0 &&
                     _Y < iY-1)
             {
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
+                    bCleanCell(_X+1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
+                    bCleanCell(_X, _Y+1);
                 if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCleanCell(_X+1, _Y+1);
+                    bCleanCell(_X+1, _Y+1);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
+                    bCleanCell(_X, _Y-1);
                 if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCleanCell(_X+1, _Y-1);
+                    bCleanCell(_X+1, _Y-1);
             }
             else if(_X == iX-1 &&
                     _Y > 0 &&
                     _Y < iY-1)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
+                    bCleanCell(_X-1, _Y);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
+                    bCleanCell(_X, _Y+1);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
+                    bCleanCell(_X-1, _Y+1);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
+                    bCleanCell(_X, _Y-1);
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
+                    bCleanCell(_X-1, _Y-1);
             }
             else if(_X > 0 &&
                     _X < iX-1 &&
                     _Y == 0)
             {
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
+                    bCleanCell(_X-1, _Y);
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
+                    bCleanCell(_X+1, _Y);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
+                    bCleanCell(_X-1, _Y+1);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
+                    bCleanCell(_X, _Y+1);
                 if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCleanCell(_X+1, _Y+1);
+                    bCleanCell(_X+1, _Y+1);
             }
             else if(_X > 0 &&
                     _X < iX-1 &&
                     _Y == iY-1)
             {
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
+                    bCleanCell(_X+1, _Y);
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
+                    bCleanCell(_X-1, _Y);
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
+                    bCleanCell(_X-1, _Y-1);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
+                    bCleanCell(_X, _Y-1);
                 if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCleanCell(_X+1, _Y-1);
+                    bCleanCell(_X+1, _Y-1);
             }
             else
             {
                 if(principalMatrix[_X-1][_Y-1].isHidden)
-                    vCleanCell(_X-1, _Y-1);
+                    bCleanCell(_X-1, _Y-1);
                 if(principalMatrix[_X-1][_Y].isHidden)
-                    vCleanCell(_X-1, _Y);
+                    bCleanCell(_X-1, _Y);
                 if(principalMatrix[_X-1][_Y+1].isHidden)
-                    vCleanCell(_X-1, _Y+1);
+                    bCleanCell(_X-1, _Y+1);
                 if(principalMatrix[_X][_Y-1].isHidden)
-                    vCleanCell(_X, _Y-1);
+                    bCleanCell(_X, _Y-1);
                 if(principalMatrix[_X][_Y+1].isHidden)
-                    vCleanCell(_X, _Y+1);
+                    bCleanCell(_X, _Y+1);
                 if(principalMatrix[_X+1][_Y-1].isHidden)
-                    vCleanCell(_X+1, _Y-1);
+                    bCleanCell(_X+1, _Y-1);
                 if(principalMatrix[_X+1][_Y].isHidden)
-                    vCleanCell(_X+1, _Y);
+                    bCleanCell(_X+1, _Y);
                 if(principalMatrix[_X+1][_Y+1].isHidden)
-                    vCleanCell(_X+1, _Y+1);
+                    bCleanCell(_X+1, _Y+1);
             }
         }
 
@@ -453,6 +455,8 @@ void LibreMinesGameEngine::vCleanCell(const uchar _X, const uchar _Y)
             vGameWon();
         }
     }
+
+    return true;
 }
 
 void LibreMinesGameEngine::vGameLost(const uchar _X, const uchar _Y)
@@ -476,8 +480,12 @@ void LibreMinesGameEngine::vGameWon()
 }
 
 
-void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs)
+void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs, bool ignorePreferences)
 {
+    static qint64 timeLastGame = -1;
+
+    if(iTimeInNs != -1)
+        timeLastGame = iTimeInNs;
 
     int iCorrectFlags = 0,
             iWrongFlags = 0,
@@ -497,14 +505,14 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs)
         }
     }
 
-    double timeInSecs = (double)iTimeInNs*1e-9;
+    double timeInSecs = (double)timeLastGame*1e-9;
 
     double dFlagsPerSecond = (double)iCorrectFlags/timeInSecs,
             dCellsPerSecond = (double)iUnlockedCells/timeInSecs,
             dPercentageGameComplete = (double)100*iUnlockedCells/iCellsToUnlock;
 
     LibreMinesScore score;
-    score.iTimeInNs = iTimeInNs;
+    score.iTimeInNs = timeLastGame;
     score.gameDifficulty = NONE;
     score.width = iX;
     score.heigth = iY;
@@ -512,7 +520,8 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs)
     score.bGameCompleted = iUnlockedCells == iCellsToUnlock;
     score.dPercentageGameCompleted = dPercentageGameComplete;
 
-    Q_EMIT SIGNAL_endGameScore(score, iCorrectFlags, iWrongFlags, iUnlockedCells, dFlagsPerSecond, dCellsPerSecond);
+    Q_EMIT SIGNAL_endGameScore(score, iCorrectFlags, iWrongFlags, iUnlockedCells,
+                               dFlagsPerSecond, dCellsPerSecond, ignorePreferences);
 }
 
 const std::vector<std::vector<LibreMinesGameEngine::CellGameEngine> >& LibreMinesGameEngine::getPrincipalMatrix() const
@@ -569,7 +578,7 @@ void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
         SLOT_startTimer();
         bFirst = false;
     }
-    vCleanCell(_X, _Y);
+    bCleanCell(_X, _Y);
 }
 
 void LibreMinesGameEngine::SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y)
@@ -628,10 +637,16 @@ void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _
 
             if(cell.isHidden && !cell.hasFlag)
             {
-                vCleanCell(i, j);
+                if(!bCleanCell(i, j))
+                    return;
             }
         }
     }
+}
+
+void LibreMinesGameEngine::SLOT_generateEndGameScoreAgain()
+{
+    vGenerateEndGameScore(-1, true);
 }
 
 void LibreMinesGameEngine::SLOT_UpdateTime()
