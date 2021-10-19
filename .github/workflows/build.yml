@@ -47,17 +47,17 @@ jobs:
     container:
       image: archlinux:latest
       options: --privileged
+    steps:
+      - uses: actions/checkout@v2
 
-    - uses: actions/checkout@v2
+      - name: "Install dependencies"
+        run: "sudo pacman -Syu base-devel qt6-base qt6-svg cmake"
 
-    - name: "Install dependencies"
-      run: "sudo pacman -Syu base-devel qt6-base qt6-svg cmake"
+      - name: "Create build directory and run CMake"
+        run: "mkdir build && cd build && cmake -DUSE_QT6='YES' .."
 
-    - name: "Create build directory and run CMake"
-      run: "mkdir build && cd build && cmake -DUSE_QT6='YES' .."
-    
-    - name: "Build"
-      run: "cd build && make"
+      - name: "Build"
+        run: "cd build && make"
       
   build-windows:
     runs-on: windows-2019
