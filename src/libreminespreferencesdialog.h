@@ -44,7 +44,18 @@ enum MinefieldGenerationAnimation : uchar
     AnimationLimited = 1,
     AnimationOff = 2
 };
+
+enum AskToSaveMatchScore : uchar
+{
+    SaveNever              = 0x00,
+    SaveWhenNewHighScore   = 0x01,
+    SaveWhenGameCompleted  = 0x02,
+    SaveAlways             = 0x04
+};
+
 }
+Q_DECLARE_FLAGS(AskToSaveMatchScore, LibreMines::AskToSaveMatchScore)
+Q_DECLARE_OPERATORS_FOR_FLAGS(AskToSaveMatchScore)
 
 class LibreMinesPreferencesDialog : public QDialog
 {
@@ -67,6 +78,7 @@ public:
     QString optionsLanguage()const;
     uchar optionMinefieldGenerationAnimation()const;
     QString optionMinefieldGenerationAnimationString()const;
+    AskToSaveMatchScore optionAskToSaveMatchScoreBehaviour()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
@@ -81,6 +93,7 @@ public:
     void setOptionLanguage(const QString& option);
     void setOptionMinefieldGenerationAnimation(const uchar option);
     void setOptionMinefieldGenerationAnimation(const QString& option);
+    void setOptionAskToSaveMatchScoreBehaviour(const uchar option);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;

@@ -61,11 +61,11 @@ public:
     void setFirstCellClean(const bool x);
 private:
     void vResetPrincipalMatrix();
-    void vCleanCell(const uchar _X, const uchar _Y);
+    bool bCleanCell(const uchar _X, const uchar _Y);
     void vGameLost(const uchar _X, const uchar _Y);
     void vGameWon();
 
-    void vGenerateEndGameScore(qint64 iTimeInNs);
+    void vGenerateEndGameScore(qint64 iTimeInNs = -1, bool ignorePreferences=false);
 
     std::vector< std::vector<CellGameEngine> > principalMatrix; /**< TODO: describe */
 
@@ -93,7 +93,8 @@ Q_SIGNALS:
                              int iWrongFlags,
                              int iUnlockedCells,
                              double dFlagsPerSecond,
-                             double dCellsPerSecond);
+                             double dCellsPerSecond,
+                             bool ignorePreferences=false);
     void SIGNAL_currentTime(const ushort);
     void SIGNAL_minesLeft(const ushort);
     void SIGNAL_flagCell(const uchar _X, const uchar _Y);
@@ -108,6 +109,7 @@ public Q_SLOTS:
     void SLOT_stop();
     void SLOT_startTimer();
     void SLOT_cleanNeighborCells(const uchar _X, const uchar _Y);
+    void SLOT_generateEndGameScoreAgain();
 
 private Q_SLOTS:
     void SLOT_UpdateTime();

@@ -176,6 +176,21 @@ QString LibreMinesPreferencesDialog::optionMinefieldGenerationAnimationString() 
     return ui->comboBoxMinefieldGenerationAnimation->currentText();
 }
 
+AskToSaveMatchScore LibreMinesPreferencesDialog::optionAskToSaveMatchScoreBehaviour() const
+{
+    if(ui->rbSaveScoreNever->isChecked())
+        return LibreMines::SaveNever;
+    if(ui->rbSaveScoreAlways->isChecked())
+        return LibreMines::SaveAlways;
+    if(ui->rbSaveScoreWhenHighScore->isChecked())
+        return LibreMines::SaveWhenNewHighScore;
+    if(ui->rbSaveScoreWhenGameCompleted->isChecked())
+        return LibreMines::SaveWhenGameCompleted;
+    if(ui->rbSaveScoreWhenHighScoreAndGameCompleted->isChecked())
+        return LibreMines::SaveWhenGameCompleted | LibreMines::SaveWhenNewHighScore;
+    return LibreMines::SaveNever;
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -266,6 +281,25 @@ void LibreMinesPreferencesDialog::setOptionMinefieldGenerationAnimation(const uc
 void LibreMinesPreferencesDialog::setOptionMinefieldGenerationAnimation(const QString &option)
 {
     ui->comboBoxMinefieldGenerationAnimation->setCurrentText(option);
+}
+
+void LibreMinesPreferencesDialog::setOptionAskToSaveMatchScoreBehaviour(const uchar option)
+{
+    switch(option)
+    {
+        case LibreMines::SaveNever:
+            return ui->rbSaveScoreNever->setChecked(true);
+        case LibreMines::SaveWhenNewHighScore:
+            return ui->rbSaveScoreWhenHighScore->setChecked(true);
+        case LibreMines::SaveWhenGameCompleted:
+            return ui->rbSaveScoreWhenGameCompleted->setChecked(true);
+        case LibreMines::SaveWhenGameCompleted | LibreMines::SaveWhenNewHighScore:
+            return ui->rbSaveScoreWhenHighScoreAndGameCompleted->setChecked(true);
+        case LibreMines::SaveAlways:
+            return ui->rbSaveScoreAlways->setChecked(true);
+    }
+
+    return ui->rbSaveScoreNever->setChecked(true);
 }
 
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const

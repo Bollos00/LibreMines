@@ -21,7 +21,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build-linux:
+  build-linux-qt5:
     # The type of runner that the job will run on
     runs-on: ubuntu-20.04
 
@@ -29,6 +29,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+
+      - name: "Apt update"
+        run: "sudo apt-get update"
 
       - name: "Install dependencies"
         run: "sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev"
@@ -38,7 +41,24 @@ jobs:
       
       - name: "Build"
         run: "cd build && make"
-        
+
+  build-linux-qt6:
+    runs-on: ubuntu-20.04
+    container:
+      image: archlinux:latest
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Install dependencies"
+        run: "pacman -Syu --noconfirm base-devel qt6-base qt6-svg cmake"
+
+      - name: "Create build directory and run CMake"
+        run: "mkdir build && cd build && cmake -DUSE_QT6='YES' .."
+
+      - name: "Build"
+        run: "cd build && make"
+      
   build-windows:
     runs-on: windows-2019
     steps:
