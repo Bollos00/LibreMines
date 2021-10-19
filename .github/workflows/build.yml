@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: "Install dependencies"
-        run: "pacman -Syu base-devel qt6-base qt6-svg cmake"
+        run: "pacman -Syu --noconfirm base-devel qt6-base qt6-svg cmake"
 
       - name: "Create build directory and run CMake"
         run: "mkdir build && cd build && cmake -DUSE_QT6='YES' .."
