@@ -66,40 +66,30 @@ InitializeOptions getOptions(const QStringList& args)
 
 void loadLanguagePreference()
 {
-    QDir destDir = QDir::home();
+    QDir destDir = QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 
-    destDir.setFilter(QDir::AllDirs);
-
-    if(!destDir.cd(".local"))
+    // Create the app data directory in case it does not exist
+    if(!destDir.exists())
     {
-        Q_ASSERT(destDir.mkdir(".local"));
-        Q_ASSERT(destDir.cd(".local"));
-    }
-    if(!destDir.cd("share"))
-    {
-        Q_ASSERT(destDir.mkdir("share"));
-        Q_ASSERT(destDir.cd("share"));
-    }
-    if(!destDir.cd("libremines"))
-    {
-        Q_ASSERT(destDir.mkdir("libremines"));
-        Q_ASSERT(destDir.cd("libremines"));
+        QDir().mkpath(destDir.path());
+        return;
     }
 
     QScopedPointer<QFile> fileLanguage( new QFile(destDir.absoluteFilePath("libreminesDefaultLanguage.txt")) );
 
-    fileLanguage->open(QIODevice::ReadOnly);
+    if(fileLanguage->open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(fileLanguage.get());
+        QString language;
+        stream >> language;
 
-    QTextStream stream(fileLanguage.get());
-    QString language;
-    stream >> language;
+        QTranslator* translator = new QTranslator();
 
-    QTranslator* translator = new QTranslator();
-
-    if(!language.isNull() && translator->load(":/translations/libremines_" + language + ".qm"))
-        qApp->installTranslator(translator);
-    else
-        delete translator;
+        if(!language.isNull() && translator->load(":/translations/libremines_" + language + ".qm"))
+            qApp->installTranslator(translator);
+        else
+            delete translator;
+    }
 }
 
 int main(int argc, char *argv[])
@@ -107,10 +97,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName(LIBREMINES_PROJECT_NAME);
     a.setApplicationVersion(LIBREMINES_PROJECT_VERSION);
-
-//    a.setOverrideCursor(QCursor(QPixmap("/home/robofei/Repository/LibreMines/share/icons/libremines.svg").
-//                                scaled(100, 100, Qt::KeepAspectRatio),
-//                                50, 50));
 
     InitializeOptions ops = getOptions(a.arguments());
 

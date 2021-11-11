@@ -56,7 +56,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     iLimitWidthField( 0 ),
     cellLength( 0 ),
     difficult( NONE ),
-    preferences( new LibreMinesPreferencesDialog(this) )
+    preferences( new LibreMinesPreferencesDialog(this) ),
+    dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) )
 {
     this->resize(800, 600);
 
@@ -1221,27 +1222,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
     //  exist, a new one will be created.
     if(score.dPercentageGameCompleted != 0)
     {
-        QDir destDir = QDir::home();
-
-        destDir.setFilter(QDir::AllDirs);
-
-        if(!destDir.cd(".local"))
-        {
-            Q_ASSERT(destDir.mkdir(".local"));
-            Q_ASSERT(destDir.cd(".local"));
-        }
-        if(!destDir.cd("share"))
-        {
-            Q_ASSERT(destDir.mkdir("share"));
-            Q_ASSERT(destDir.cd("share"));
-        }
-        if(!destDir.cd("libremines"))
-        {
-            Q_ASSERT(destDir.mkdir("libremines"));
-            Q_ASSERT(destDir.cd("libremines"));
-        }
-
-        QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
+        QScopedPointer<QFile> fileScores( new QFile(dirAppData.absoluteFilePath("scoresLibreMines")) );
 
         if(!fileScores->exists())
         {
@@ -1324,7 +1305,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
         {
             qDebug() << "Saving score";
 
-            fileScores.reset( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
+            fileScores.reset( new QFile(dirAppData.absoluteFilePath("scoresLibreMines")) );
 
             if(fileScores->exists())
                 fileScores->open(QIODevice::Append);
@@ -1553,28 +1534,7 @@ void LibreMinesGui::SLOT_showAboutDialog()
 
 void LibreMinesGui::SLOT_showHighScores()
 {
-
-    QDir destDir = QDir::home();
-
-    destDir.setFilter(QDir::AllDirs);
-
-    if(!destDir.cd(".local"))
-    {
-        Q_ASSERT(destDir.mkdir(".local"));
-        Q_ASSERT(destDir.cd(".local"));
-    }
-    if(!destDir.cd("share"))
-    {
-        Q_ASSERT(destDir.mkdir("share"));
-        Q_ASSERT(destDir.cd("share"));
-    }
-    if(!destDir.cd("libremines"))
-    {
-        Q_ASSERT(destDir.mkdir("libremines"));
-        Q_ASSERT(destDir.cd("libremines"));
-    }
-
-    QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("scoresLibreMines")) );
+    QScopedPointer<QFile> fileScores( new QFile(dirAppData.absoluteFilePath("scoresLibreMines")) );
 
     if(!fileScores->exists())
     {
@@ -2051,27 +2011,7 @@ void LibreMinesGui::vKeyboardControllerCenterCurrentCell()
 
 void LibreMinesGui::vLastSessionLoadConfigurationFile()
 {
-    QDir destDir = QDir::home();
-
-    destDir.setFilter(QDir::AllDirs);
-
-    if(!destDir.cd(".local"))
-    {
-        Q_ASSERT(destDir.mkdir(".local"));
-        Q_ASSERT(destDir.cd(".local"));
-    }
-    if(!destDir.cd("share"))
-    {
-        Q_ASSERT(destDir.mkdir("share"));
-        Q_ASSERT(destDir.cd("share"));
-    }
-    if(!destDir.cd("libremines"))
-    {
-        Q_ASSERT(destDir.mkdir("libremines"));
-        Q_ASSERT(destDir.cd("libremines"));
-    }
-
-    QScopedPointer<QFile> fileScores( new QFile(destDir.absoluteFilePath("libreminesLastSession.txt")) );
+    QScopedPointer<QFile> fileScores( new QFile(dirAppData.absoluteFilePath("libreminesLastSession.txt")) );
 
     if(fileScores->open(QIODevice::ReadOnly))
     {
@@ -2235,42 +2175,23 @@ void LibreMinesGui::vLastSessionLoadConfigurationFile()
     }
 
 
-    QScopedPointer<QFile> fileLanguage( new QFile(destDir.absoluteFilePath("libreminesDefaultLanguage.txt")) );
+    QScopedPointer<QFile> fileLanguage( new QFile(dirAppData.absoluteFilePath("libreminesDefaultLanguage.txt")) );
 
-    fileLanguage->open(QIODevice::ReadOnly);
+    if(fileLanguage->open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(fileLanguage.get());
+        QString language;
+        stream >> language;
 
-    QTextStream stream(fileLanguage.get());
-    QString language;
-    stream >> language;
-
-    preferences->setOptionLanguage(language);
+        preferences->setOptionLanguage(language);
+    }
 
     vUpdatePreferences();
 }
 
 void LibreMinesGui::vLastSessionSaveConfigurationFile()
 {
-    QDir destDir = QDir::home();
-
-    destDir.setFilter(QDir::AllDirs);
-
-    if(!destDir.cd(".local"))
-    {
-        Q_ASSERT(destDir.mkdir(".local"));
-        Q_ASSERT(destDir.cd(".local"));
-    }
-    if(!destDir.cd("share"))
-    {
-        Q_ASSERT(destDir.mkdir("share"));
-        Q_ASSERT(destDir.cd("share"));
-    }
-    if(!destDir.cd("libremines"))
-    {
-        Q_ASSERT(destDir.mkdir("libremines"));
-        Q_ASSERT(destDir.cd("libremines"));
-    }
-
-    QScopedPointer<QFile> fileLastSession( new QFile(destDir.absoluteFilePath("libreminesLastSession.txt")) );
+    QScopedPointer<QFile> fileLastSession( new QFile(dirAppData.absoluteFilePath("libreminesLastSession.txt")) );
 
     fileLastSession->open(QIODevice::WriteOnly);
     {
@@ -2296,7 +2217,7 @@ void LibreMinesGui::vLastSessionSaveConfigurationFile()
     }
 
     {
-        QScopedPointer<QFile> fileLanguage( new QFile(destDir.absoluteFilePath("libreminesDefaultLanguage.txt")) );
+        QScopedPointer<QFile> fileLanguage( new QFile(dirAppData.absoluteFilePath("libreminesDefaultLanguage.txt")) );
         fileLanguage->open(QIODevice::WriteOnly);
 
         QTextStream stream(fileLanguage.get());
