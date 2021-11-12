@@ -299,5 +299,7 @@ private:
     KeyboardController controller;
 
     LibreMinesPreferencesDialog* preferences;
+
+    QDir dirAppData;
 };
 #endif // LIBREMINESGUI_H

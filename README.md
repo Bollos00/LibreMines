@@ -6,6 +6,8 @@
 
 LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [Open Source](https://en.wikipedia.org/wiki/Open-source_software) software Qt based Minesweeper clone available for GNU/Linux, FreeBSD and Windows systems.
 
+The game has dark and light themes, is widely customizable, has options to create customizable fields, allows the user to play with the keyboard, among other things.
+
 The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory, except the files on `share/application_stylesheets` directory, which licenses are indicated with the `LICENSE` files inside subdirectories.
 
 ## Installing from Package Manager
@@ -54,7 +56,7 @@ sudo dnf install @development-tools
 sudo dnf install qt-devel qt5-qtbase-devel qt5-qtsvg-devel cmake
 ```
 
-On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [qt5-buildtools](https://www.freshports.org/devel/qt5-buildtools/), [qt5-qmake](https://www.freshports.org/devel/qt5-qmake/) [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/). 
+On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [qt5-buildtools](https://www.freshports.org/devel/qt5-buildtools/), [qt5-qmake](https://www.freshports.org/devel/qt5-qmake/) [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/).
 
 ```sh
 su -
