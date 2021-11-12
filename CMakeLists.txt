@@ -82,7 +82,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
     etc/translations/libremines_translations_qm.qrc
     src/common.cpp
     src/common.h
