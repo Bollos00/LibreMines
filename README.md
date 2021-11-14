@@ -12,10 +12,19 @@ The source code is licensed under the [GNU General Public License at version 3](
 
 ## Installing from Package Manager
 
+### Arch User Repository
+
 [LibreMines is available on the Arch User Repository](https://aur.archlinux.org/packages/libremines/). With `yay` it can be installed with:
 
 ```sh
 yay -S libremines
+```
+### Flatpak
+
+There is a [package for LibreMines available on FlatHub](https://flathub.org/apps/details/io.github.Bollos00.LibreMines). The package can be installed, via command line, with:
+
+```sh
+flatpak install flathub io.github.Bollos00.LibreMines
 ```
 
 ## Binary installation for Windows
@@ -40,12 +49,12 @@ The following dependencies are required for building and running LibreMines:
 
 Note: Qt6 is also supported
 
-On Arch Linux and derivatives systems the dependencies can be installed with `pacman`:
+On Arch Linux and derivatives systems, the dependencies can be installed with `pacman`:
 ```sh
 sudo pacman -S base-devel qt5-base qt5-svg cmake
 ```
 
-For Ubuntu you can install the dependencies with the following command:
+For Ubuntu, you can install the dependencies with the following command:
 ```sh
 sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev
 ```
