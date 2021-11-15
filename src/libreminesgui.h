@@ -29,6 +29,7 @@
 #include <QGridLayout>
 #include <QScrollArea>
 #include <QProgressBar>
+#include <QSvgWidget>
 
 #include "common.h"
 #include "libreminespreferencesdialog.h"
@@ -249,7 +250,7 @@ private:
 
     QCheckBox* cbCustomizedMinesInPercentage;
 
-    QLabel* labelFaceReactionInGame;
+    QSvgWidget* svgFaceReactionInGame;
     QLabel *labelTimerInGame; /**< TODO: describe */
     QLCDNumber *lcd_numberMinesLeft; /**< TODO: describe */
     QProgressBar* progressBarGameCompleteInGame;
@@ -290,12 +291,19 @@ private:
     QScopedPointer<QPixmap> pmBoom; /**< TODO: describe */
     QScopedPointer<QPixmap> pmWrongFlag; /**< TODO: describe */
 
-    QScopedPointer<QPixmap> pmDizzyFace;
-    QScopedPointer<QPixmap> pmGrimacingFace;
-    QScopedPointer<QPixmap> pmGrinningFace;
-    QScopedPointer<QPixmap> pmOpenMouthFace;
-    QScopedPointer<QPixmap> pmSleepingFace;
-    QScopedPointer<QPixmap> pmSmillingFace;
+//    QScopedPointer<QPixmap> pmDizzyFace;
+//    QScopedPointer<QPixmap> pmGrimacingFace;
+//    QScopedPointer<QPixmap> pmGrinningFace;
+//    QScopedPointer<QPixmap> pmOpenMouthFace;
+//    QScopedPointer<QPixmap> pmSleepingFace;
+//    QScopedPointer<QPixmap> pmSmillingFace;
+
+    QString strDizzyFace;
+    QString strGrimacingFace;
+    QString strGrinningFace;
+    QString strOpenMouthFace;
+    QString strSleepingFace;
+    QString strSmillingFace;
 
     KeyboardController controller;
 

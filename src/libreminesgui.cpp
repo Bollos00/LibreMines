@@ -344,7 +344,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     widgetBoardContents->setGeometry(0, 0, _X*cellLength, _Y*cellLength);
 
-    labelFaceReactionInGame->setPixmap(*pmSleepingFace);
+    svgFaceReactionInGame->load(strSleepingFace);
 
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
@@ -460,7 +460,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     //  of mines
     SLOT_minesLeft(gameEngine->mines());
 
-    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+    svgFaceReactionInGame->load(strSmillingFace);
 }
 
 void LibreMinesGui::vAttributeAllCells()
@@ -570,7 +570,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     // Interface In Game
     this->setFont(QFont("Liberation Sans"));
-    labelFaceReactionInGame = new QLabel(centralWidget());
+    svgFaceReactionInGame = new QSvgWidget(centralWidget());
     labelTimerInGame = new QLabel(centralWidget());
     lcd_numberMinesLeft = new QLCDNumber(centralWidget());
     progressBarGameCompleteInGame = new QProgressBar(centralWidget());
@@ -950,9 +950,9 @@ void LibreMinesGui::vAdjustInterfaceInGame()
 
     scrollAreaBoard->setGeometry(0, 0, iLimitWidthField, iLimitHeightField);
 
-    labelFaceReactionInGame->setGeometry(88*w /100, h /20,
+    svgFaceReactionInGame->setGeometry(88*w /100, h /20,
                                          9*w /100, 9*w /100);
-    labelTimerInGame->setGeometry(85*w /100, labelFaceReactionInGame->y() + labelFaceReactionInGame->height(),
+    labelTimerInGame->setGeometry(85*w /100, svgFaceReactionInGame->y() + svgFaceReactionInGame->height(),
                                   15*w /100, h /14);
     lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
                                      labelTimerInGame->width(), h /7);
@@ -975,7 +975,7 @@ void LibreMinesGui::vAdjustInterfaceInGame()
 
 void LibreMinesGui::vHideInterfaceInGame()
 {
-    labelFaceReactionInGame->hide();
+    svgFaceReactionInGame->hide();
     labelTimerInGame->hide();
     lcd_numberMinesLeft->hide();
     progressBarGameCompleteInGame->hide();
@@ -991,7 +991,7 @@ void LibreMinesGui::vHideInterfaceInGame()
 
 void LibreMinesGui::vShowInterfaceInGame()
 {
-    labelFaceReactionInGame->show();
+    svgFaceReactionInGame->show();
     labelTimerInGame->show();
     lcd_numberMinesLeft->show();
     if(preferences->optionProgressBar())
@@ -1080,7 +1080,7 @@ void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
     if(!gameEngine->isGameActive() || controller.active)
         return;
 
-    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+    svgFaceReactionInGame->load(strSmillingFace);
 
     // if the button is released outside its area no not treat the event
     if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
@@ -1124,7 +1124,7 @@ void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
     if(e->button() != Qt::LeftButton)
         return;
 
-    labelFaceReactionInGame->setPixmap(*pmOpenMouthFace);
+    svgFaceReactionInGame->load(strOpenMouthFace);
 }
 
 void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
@@ -1132,7 +1132,7 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
     if(!gameEngine->isGameActive() || controller.active)
         return;
 
-    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+    svgFaceReactionInGame->load(strSmillingFace);
 
     // if the button is released outside its area no not treat the event
     if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
@@ -1174,7 +1174,7 @@ void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
     if(!gameEngine->isGameActive() || controller.active)
         return;
 
-    labelFaceReactionInGame->setPixmap(*pmGrimacingFace);
+    svgFaceReactionInGame->load(strGrimacingFace);
 
 }
 
@@ -1414,7 +1414,7 @@ void LibreMinesGui::SLOT_gameWon()
         vKeyboardControllUnsetCurrentCell();
     }
 
-    labelFaceReactionInGame->setPixmap(*pmGrinningFace);
+    svgFaceReactionInGame->load(strGrinningFace);
 }
 
 void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
@@ -1478,7 +1478,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
         vKeyboardControllUnsetCurrentCell();
     }
 
-    labelFaceReactionInGame->setPixmap(*pmDizzyFace);
+    svgFaceReactionInGame->load(strDizzyFace);
 }
 
 void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value)
@@ -1751,12 +1751,12 @@ void LibreMinesGui::vSetFacesReaction(const QString &which)
 {
     if(which.compare("Disable", Qt::CaseInsensitive) == 0)
     {
-        pmDizzyFace.reset( new QPixmap() );
-        pmGrimacingFace.reset( new QPixmap() );
-        pmGrinningFace.reset( new QPixmap() );
-        pmOpenMouthFace.reset( new QPixmap() );
-        pmSleepingFace.reset( new QPixmap() );
-        pmSmillingFace.reset( new QPixmap() );
+        strDizzyFace = QString();
+        strGrimacingFace = QString();
+        strGrinningFace = QString();
+        strOpenMouthFace = QString();
+        strSleepingFace = QString();
+        strSmillingFace = QString();
     }
     else
     {
@@ -1774,14 +1774,14 @@ void LibreMinesGui::vSetFacesReaction(const QString &which)
             qWarning() << "Faces reaction option: \"" << qPrintable(which) << "\" will not be handled";
         }
 
-        const int length = labelFaceReactionInGame->width();
+        const int length = svgFaceReactionInGame->width();
 
-        pmDizzyFace.reset( new QPixmap( QIcon(prefix + "dizzy_face.svg").pixmap(length, length) ));
-        pmGrimacingFace.reset( new QPixmap( QIcon(prefix + "grimacing_face.svg").pixmap(length, length) ));
-        pmGrinningFace.reset( new QPixmap( QIcon(prefix + "grinning_face.svg").pixmap(length, length) ));
-        pmOpenMouthFace.reset( new QPixmap( QIcon(prefix + "open_mouth_face.svg").pixmap(length, length) ));
-        pmSleepingFace.reset( new QPixmap( QIcon(prefix + "sleeping_face.svg").pixmap(length, length) ));
-        pmSmillingFace.reset( new QPixmap( QIcon(prefix + "smilling_face.svg").pixmap(length, length) ));
+        strDizzyFace = prefix + "dizzy_face.svg";
+        strGrimacingFace = prefix + "grimacing_face.svg";
+        strGrinningFace = prefix + "grinning_face.svg";
+        strOpenMouthFace = prefix + "open_mouth_face.svg";
+        strSleepingFace = prefix + "sleeping_face.svg";
+        strSmillingFace = prefix + "smilling_face.svg";
     }
 }
 
