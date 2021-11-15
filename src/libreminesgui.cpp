@@ -344,7 +344,13 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     widgetBoardContents->setGeometry(0, 0, _X*cellLength, _Y*cellLength);
 
-    const bool bCleanNeighborCellsWhenClickedOnShowedLabel = preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
+    labelFaceReactionInGame->setPixmap(*pmSleepingFace);
+
+
+    const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
+            preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
+
+    qApp->processEvents();
 
     // Create each cell
     for(uchar j=0; j<_Y; j++)
@@ -1749,6 +1755,7 @@ void LibreMinesGui::vSetFacesReaction(const QString &which)
         pmGrimacingFace.reset( new QPixmap() );
         pmGrinningFace.reset( new QPixmap() );
         pmOpenMouthFace.reset( new QPixmap() );
+        pmSleepingFace.reset( new QPixmap() );
         pmSmillingFace.reset( new QPixmap() );
     }
     else
@@ -1773,6 +1780,7 @@ void LibreMinesGui::vSetFacesReaction(const QString &which)
         pmGrimacingFace.reset( new QPixmap( QIcon(prefix + "grimacing_face.svg").pixmap(length, length) ));
         pmGrinningFace.reset( new QPixmap( QIcon(prefix + "grinning_face.svg").pixmap(length, length) ));
         pmOpenMouthFace.reset( new QPixmap( QIcon(prefix + "open_mouth_face.svg").pixmap(length, length) ));
+        pmSleepingFace.reset( new QPixmap( QIcon(prefix + "sleeping_face.svg").pixmap(length, length) ));
         pmSmillingFace.reset( new QPixmap( QIcon(prefix + "smilling_face.svg").pixmap(length, length) ));
     }
 }

@@ -294,6 +294,7 @@ private:
     QScopedPointer<QPixmap> pmGrimacingFace;
     QScopedPointer<QPixmap> pmGrinningFace;
     QScopedPointer<QPixmap> pmOpenMouthFace;
+    QScopedPointer<QPixmap> pmSleepingFace;
     QScopedPointer<QPixmap> pmSmillingFace;
 
     KeyboardController controller;
