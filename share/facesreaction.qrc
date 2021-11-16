@@ -4,21 +4,25 @@
         <file>faces_reaction/open-emoji-color/grimacing_face.svg</file>
         <file>faces_reaction/open-emoji-color/grinning_face.svg</file>
         <file>faces_reaction/open-emoji-color/open_mouth_face.svg</file>
+        <file>faces_reaction/open-emoji-color/sleeping_face.svg</file>
         <file>faces_reaction/open-emoji-color/smilling_face.svg</file>
         <file>faces_reaction/open-emoji-black/dizzy_face.svg</file>
         <file>faces_reaction/open-emoji-black/grimacing_face.svg</file>
         <file>faces_reaction/open-emoji-black/grinning_face.svg</file>
         <file>faces_reaction/open-emoji-black/open_mouth_face.svg</file>
+        <file>faces_reaction/open-emoji-black/sleeping_face.svg</file>
         <file>faces_reaction/open-emoji-black/smilling_face.svg</file>
         <file>faces_reaction/open-emoji-white/dizzy_face.svg</file>
         <file>faces_reaction/open-emoji-white/grimacing_face.svg</file>
         <file>faces_reaction/open-emoji-white/grinning_face.svg</file>
         <file>faces_reaction/open-emoji-white/open_mouth_face.svg</file>
+        <file>faces_reaction/open-emoji-white/sleeping_face.svg</file>
         <file>faces_reaction/open-emoji-white/smilling_face.svg</file>
-        <file>faces_reaction/twemoji-color/smilling_face.svg</file>
-        <file>faces_reaction/twemoji-color/open_mouth_face.svg</file>
-        <file>faces_reaction/twemoji-color/grimacing_face.svg</file>
         <file>faces_reaction/twemoji-color/dizzy_face.svg</file>
+        <file>faces_reaction/twemoji-color/grimacing_face.svg</file>
         <file>faces_reaction/twemoji-color/grinning_face.svg</file>
+        <file>faces_reaction/twemoji-color/open_mouth_face.svg</file>
+        <file>faces_reaction/twemoji-color/sleeping_face.svg</file>
+        <file>faces_reaction/twemoji-color/smilling_face.svg</file>
     </qresource>
 </RCC>
