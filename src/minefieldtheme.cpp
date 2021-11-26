@@ -3,12 +3,14 @@
 #include <QDebug>
 #include <QIcon>
 
-MineFieldTheme::MineFieldTheme()
+#include "minefieldextratheme.h"
+
+MinefieldTheme::MinefieldTheme()
 {
 
 }
 
-void MineFieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLength)
+void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLength)
 {
     QString prefix;
     if(theme.compare("ClassicLight", Qt::CaseInsensitive) == 0)
@@ -23,10 +25,32 @@ void MineFieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
     {
         prefix = ":/minefield_icons/twemoji/";
     }
+    // If it is not one of the defaults themes, try to find it on the system.
     else
     {
-        qWarning() << "Minefield selected " << theme << " does not exist";
-        return;
+        for(const QString& path :
+            QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation))
+        {
+            QDir pathDir(path);
+
+            // Continue if the directory does not exist
+            if(!pathDir.exists() || !pathDir.cd("minefield_extra_themes") || !pathDir.cd(theme))
+                continue;
+
+            if(MinefieldExtraTheme::isValidTheme(pathDir.path()))
+            {
+                prefix = pathDir.path() + '/';
+                break;
+            }
+        }
+
+        if(prefix.isNull())
+        {
+            qWarning() << "Minefield selected " << theme << " does not exist.\n"
+                       << "Using the default Classic Dark instead";
+
+            prefix = ":/minefield_icons/classic_dark/";
+        }
     }
 
     pmMine.reset( new QPixmap(  QIcon(prefix + "mine.svg").pixmap(cellLength, cellLength)  ) );
@@ -46,7 +70,7 @@ void MineFieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
     pmWrongFlag.reset( new QPixmap(  QIcon(prefix + "wrong_flag.svg").pixmap(cellLength, cellLength)  ) );
 }
 
-const QPixmap& MineFieldTheme::getPixmapFromCellState(const CELL_STATE state) const
+const QPixmap& MinefieldTheme::getPixmapFromCellState(const CELL_STATE state) const
 {
     switch(state)
     {
@@ -75,17 +99,17 @@ const QPixmap& MineFieldTheme::getPixmapFromCellState(const CELL_STATE state) co
     return *pmZero.get();
 }
 
-const QPixmap& MineFieldTheme::getPixmapButton(const bool flag)
+const QPixmap& MinefieldTheme::getPixmapButton(const bool flag)
 {
     return flag ? *pmFlag.get() : *pmNoFlag.get();
 }
 
-const QPixmap& MineFieldTheme::getPixmapWrongFlag()
+const QPixmap& MinefieldTheme::getPixmapWrongFlag()
 {
     return *pmWrongFlag.get();
 }
 
-const QPixmap& MineFieldTheme::getPixmapBoom()
+const QPixmap& MinefieldTheme::getPixmapBoom()
 {
     return *pmBoom.get();
 }

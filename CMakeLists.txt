@@ -18,8 +18,8 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.7.1"
-    DESCRIPTION "A Qt based Minesweeper game"
+    VERSION "1.8.0"
+    DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
     )
@@ -100,6 +100,8 @@ add_executable(${PROJECT_NAME} WIN32
     src/libreminesscoresdialog.h
     src/libreminesviewscoresdialog.cpp
     src/libreminesviewscoresdialog.h
+    src/minefieldextratheme.cpp
+    src/minefieldextratheme.h
     src/minefieldtheme.cpp
     src/minefieldtheme.h
     src/qkeyinput.cpp

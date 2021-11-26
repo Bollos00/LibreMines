@@ -6,10 +6,10 @@
 
 #include "common.h"
 
-class MineFieldTheme
+class MinefieldTheme
 {
 public:
-    MineFieldTheme();
+    MinefieldTheme();
 
     void vSetMinefieldTheme(const QString &theme, const int cellLength);
 

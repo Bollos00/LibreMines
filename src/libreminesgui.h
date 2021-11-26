@@ -274,7 +274,7 @@ private:
     QAction* actionAboutQt;
     QAction* actionGitHubHomePage;
 
-    MineFieldTheme fieldTheme;
+    MinefieldTheme fieldTheme;
 
     QScopedPointer<QPixmap> pmDizzyFace;
     QScopedPointer<QPixmap> pmGrimacingFace;
