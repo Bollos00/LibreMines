@@ -35,7 +35,7 @@
 #include "libreminesgameengine.h"
 #include "qlabel_adapted.h"
 #include "qpushbutton_adapted.h"
-
+#include "minefieldtheme.h"
 
 /**
  * @brief
@@ -124,7 +124,6 @@ private:
     void vShowInterfaceInGame();
 
     void vSetApplicationTheme(const QString& theme);
-    void vSetMinefieldTheme(const QString& theme);
     void vSetFacesReaction(const QString& which);
 
     void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
@@ -275,20 +274,7 @@ private:
     QAction* actionAboutQt;
     QAction* actionGitHubHomePage;
 
-    QScopedPointer<QPixmap> pmZero; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmOne; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmTwo; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmThree; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmFour; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmFive; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmSix; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmSeven; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmEight; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmFlag; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmNoFlag; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmMine; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmBoom; /**< TODO: describe */
-    QScopedPointer<QPixmap> pmWrongFlag; /**< TODO: describe */
+    MineFieldTheme fieldTheme;
 
     QScopedPointer<QPixmap> pmDizzyFace;
     QScopedPointer<QPixmap> pmGrimacingFace;

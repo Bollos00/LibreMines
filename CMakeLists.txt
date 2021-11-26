@@ -100,6 +100,8 @@ add_executable(${PROJECT_NAME} WIN32
     src/libreminesscoresdialog.h
     src/libreminesviewscoresdialog.cpp
     src/libreminesviewscoresdialog.h
+    src/minefieldtheme.cpp
+    src/minefieldtheme.h
     src/qkeyinput.cpp
     src/qkeyinput.h
     src/qlabel_adapted.cpp
