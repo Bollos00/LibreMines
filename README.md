@@ -160,7 +160,7 @@ Tip: hold the **CTRL** modifier while moving in order to move faster.
 
 All kinds of contributions are welcome on this project. You can help:
 
-* Making artworks (SVG) for minefield themes and new faces reaction;
+* Making artworks (SVG) for [minefield themes](https://github.com/Bollos00/LibreMines/blob/master/share/minefield_icons/README.md) and new faces reaction;
 * Documenting the source code and making tutorials of the game;
 * Sharing the game in order to attract more users;
 * Adapting the software for other Operational Systems;

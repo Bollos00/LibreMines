@@ -158,7 +158,7 @@ if(UNIX)
     install(
         TARGETS
         ${PROJECT_NAME}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # set include path for installed library target
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -167,6 +167,20 @@ if(UNIX)
     # Install the desktop entry and the icon
     install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
     install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
+
+    # Install the extra minefield themes on
+    #  ${CMAKE_INSTALL_PREFIX}/share/libremines/minefield_extra_themes
+    if(INSTALL_EXTRA_MINEFIELD_THEMES)
+        install(
+            DIRECTORY share/minefield_icons/alternative_light
+            DESTINATION share/libremines/minefield_extra_themes
+            )
+        install(
+            DIRECTORY share/minefield_icons/alternative_dark
+            DESTINATION share/libremines/minefield_extra_themes
+            )
+
+    endif()
 
 elseif(WIN32)
 
