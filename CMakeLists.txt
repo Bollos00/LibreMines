@@ -117,7 +117,7 @@ add_executable(${PROJECT_NAME} WIN32
     share/facesreaction.qrc
     share/icons.qrc
     share/icons.rc
-    share/minefield_icons.qrc
+    share/minefield_themes.qrc
     )
 
 include_directories(src)
@@ -172,11 +172,11 @@ if(UNIX)
     #  ${CMAKE_INSTALL_PREFIX}/share/libremines/minefield_extra_themes
     if(INSTALL_EXTRA_MINEFIELD_THEMES)
         install(
-            DIRECTORY share/minefield_icons/alternative_light
+            DIRECTORY share/minefield_themes/alternative_light
             DESTINATION share/libremines/minefield_extra_themes
             )
         install(
-            DIRECTORY share/minefield_icons/alternative_dark
+            DIRECTORY share/minefield_themes/alternative_dark
             DESTINATION share/libremines/minefield_extra_themes
             )
 

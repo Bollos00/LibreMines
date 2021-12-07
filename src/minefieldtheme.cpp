@@ -15,15 +15,15 @@ void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
     QString prefix;
     if(theme.compare("ClassicLight", Qt::CaseInsensitive) == 0)
     {
-        prefix = ":/minefield_icons/classic_light/";
+        prefix = ":/minefield_themes/classic_light/";
     }
     else if(theme.compare("ClassicDark", Qt::CaseInsensitive) == 0)
     {
-        prefix = ":/minefield_icons/classic_dark/";
+        prefix = ":/minefield_themes/classic_dark/";
     }
     else if(theme.compare("TwEmoji", Qt::CaseInsensitive) == 0)
     {
-        prefix = ":/minefield_icons/twemoji/";
+        prefix = ":/minefield_themes/twemoji/";
     }
     // If it is not one of the defaults themes, try to find it on the system.
     else
@@ -49,7 +49,7 @@ void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
             qWarning() << "Minefield selected " << theme << " does not exist.\n"
                        << "Using the default Classic Dark instead";
 
-            prefix = ":/minefield_icons/classic_dark/";
+            prefix = ":/minefield_themes/classic_dark/";
         }
     }
 

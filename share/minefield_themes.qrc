@@ -1,0 +1,46 @@
+<RCC>
+    <qresource prefix="/">
+        <file>minefield_themes/classic_light/wrong_flag.svg</file>
+        <file>minefield_themes/classic_light/no_flag.svg</file>
+        <file>minefield_themes/classic_light/mine.svg</file>
+        <file>minefield_themes/classic_light/flag.svg</file>
+        <file>minefield_themes/classic_light/boom.svg</file>
+        <file>minefield_themes/classic_light/8.svg</file>
+        <file>minefield_themes/classic_light/7.svg</file>
+        <file>minefield_themes/classic_light/6.svg</file>
+        <file>minefield_themes/classic_light/5.svg</file>
+        <file>minefield_themes/classic_light/4.svg</file>
+        <file>minefield_themes/classic_light/3.svg</file>
+        <file>minefield_themes/classic_light/2.svg</file>
+        <file>minefield_themes/classic_light/1.svg</file>
+        <file>minefield_themes/classic_light/0.svg</file>
+        <file>minefield_themes/classic_dark/wrong_flag.svg</file>
+        <file>minefield_themes/classic_dark/no_flag.svg</file>
+        <file>minefield_themes/classic_dark/mine.svg</file>
+        <file>minefield_themes/classic_dark/flag.svg</file>
+        <file>minefield_themes/classic_dark/boom.svg</file>
+        <file>minefield_themes/classic_dark/8.svg</file>
+        <file>minefield_themes/classic_dark/7.svg</file>
+        <file>minefield_themes/classic_dark/6.svg</file>
+        <file>minefield_themes/classic_dark/5.svg</file>
+        <file>minefield_themes/classic_dark/4.svg</file>
+        <file>minefield_themes/classic_dark/3.svg</file>
+        <file>minefield_themes/classic_dark/2.svg</file>
+        <file>minefield_themes/classic_dark/1.svg</file>
+        <file>minefield_themes/classic_dark/0.svg</file>
+        <file>minefield_themes/twemoji/wrong_flag.svg</file>
+        <file>minefield_themes/twemoji/mine.svg</file>
+        <file>minefield_themes/twemoji/8.svg</file>
+        <file>minefield_themes/twemoji/7.svg</file>
+        <file>minefield_themes/twemoji/6.svg</file>
+        <file>minefield_themes/twemoji/5.svg</file>
+        <file>minefield_themes/twemoji/4.svg</file>
+        <file>minefield_themes/twemoji/3.svg</file>
+        <file>minefield_themes/twemoji/2.svg</file>
+        <file>minefield_themes/twemoji/1.svg</file>
+        <file>minefield_themes/twemoji/0.svg</file>
+        <file>minefield_themes/twemoji/flag.svg</file>
+        <file>minefield_themes/twemoji/boom.svg</file>
+        <file>minefield_themes/twemoji/no_flag.svg</file>
+    </qresource>
+</RCC>
