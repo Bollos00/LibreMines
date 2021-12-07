@@ -155,7 +155,6 @@ If you do not feel comfortable with those keys, you can edit them going to the m
 
 Tip: hold the **CTRL** modifier while moving in order to move faster.
 
-
 ## Contributing
 
 All kinds of contributions are welcome on this project. You can help:
