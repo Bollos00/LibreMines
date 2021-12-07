@@ -18,8 +18,8 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.7.1"
-    DESCRIPTION "A Qt based Minesweeper game"
+    VERSION "1.8.0"
+    DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
     )
@@ -100,6 +100,10 @@ add_executable(${PROJECT_NAME} WIN32
     src/libreminesscoresdialog.h
     src/libreminesviewscoresdialog.cpp
     src/libreminesviewscoresdialog.h
+    src/minefieldextratheme.cpp
+    src/minefieldextratheme.h
+    src/minefieldtheme.cpp
+    src/minefieldtheme.h
     src/qkeyinput.cpp
     src/qkeyinput.h
     src/qlabel_adapted.cpp
@@ -113,7 +117,7 @@ add_executable(${PROJECT_NAME} WIN32
     share/facesreaction.qrc
     share/icons.qrc
     share/icons.rc
-    share/minefield_icons.qrc
+    share/minefield_themes.qrc
     )
 
 include_directories(src)
@@ -154,7 +158,7 @@ if(UNIX)
     install(
         TARGETS
         ${PROJECT_NAME}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # set include path for installed library target
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -163,6 +167,20 @@ if(UNIX)
     # Install the desktop entry and the icon
     install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
     install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
+
+    # Install the extra minefield themes on
+    #  ${CMAKE_INSTALL_PREFIX}/share/libremines/minefield_extra_themes
+    if(INSTALL_EXTRA_MINEFIELD_THEMES)
+        install(
+            DIRECTORY share/minefield_themes/alternative_light
+            DESTINATION share/libremines/minefield_extra_themes
+            )
+        install(
+            DIRECTORY share/minefield_themes/alternative_dark
+            DESTINATION share/libremines/minefield_extra_themes
+            )
+
+    endif()
 
 elseif(WIN32)
 

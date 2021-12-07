@@ -87,7 +87,7 @@ make
 
 You can also get a stable release from [here](https://github.com/Bollos00/LibreMines/releases).
 
-Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines using Qt6 libraries, additionally pass the argument `-DUSE_QT6="YES"` on the fourth step (the `cmake` part).
+Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines using Qt6 libraries, additionally pass the argument `-DUSE_QT6="YES"` on the fourth step (the `cmake` part). Also, in order to install _alternative\_dark_ and _alternative\_light_ [minefield_themes](https://github.com/Bollos00/LibreMines/blob/master/share/minefield_themes/README.md), pass the argument `-DINSTALL_EXTRA_MINEFIELD_THEMES="YES"`.
 
 The executable `libremines` will be generated in the build directory, now it is possible to run it with:
 ```sh
@@ -155,12 +155,11 @@ If you do not feel comfortable with those keys, you can edit them going to the m
 
 Tip: hold the **CTRL** modifier while moving in order to move faster.
 
-
 ## Contributing
 
 All kinds of contributions are welcome on this project. You can help:
 
-* Making artworks (SVG) for minefield themes and new faces reaction;
+* Making artworks (SVG) for [minefield themes](https://github.com/Bollos00/LibreMines/blob/master/share/minefield_themes/README.md) and new faces reaction;
 * Documenting the source code and making tutorials of the game;
 * Sharing the game in order to attract more users;
 * Adapting the software for other Operational Systems;
