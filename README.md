@@ -1,6 +1,6 @@
 # [LibreMines](https://github.com/Bollos00/LibreMines)
 
-![](./share/Screenshots/Screenshot2.png)
+![](./share/Screenshots/Screenshot4.png)
 
 ## Introduction
 
