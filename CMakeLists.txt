@@ -96,6 +96,8 @@ add_executable(${PROJECT_NAME} WIN32
     src/libreminespreferencesdialog.cpp
     src/libreminespreferencesdialog.h
     src/libreminespreferencesdialog.ui
+    src/libreminespreferencessaver.cpp
+    src/libreminespreferencessaver.h
     src/libreminesscore.cpp
     src/libreminesscore.h
     src/libreminesscoresdialog.cpp

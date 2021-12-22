@@ -41,6 +41,7 @@
 #include "libreminesconfig.h"
 #include "libreminesviewscoresdialog.h"
 #include "libreminesapptheme.h"
+#include "libreminespreferencessaver.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -94,7 +95,13 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     controller.currentY = 0;
 
     // Load configuration file and set the theme
-    vLastSessionLoadConfigurationFile();
+    LibreMinesPreferencesSaver::vLastSessionLoadConfigurationFile
+    (
+        *preferences, dirAppData,
+        *sbCustomizedPercentageMines, *sbCustomizedX, *sbCustomizedY,
+        *cbCustomizedMinesInPercentage
+    );
+    vUpdatePreferences();
     fieldTheme.vSetMinefieldTheme(preferences->optionMinefieldTheme(), cellLength);
     vSetFacesReaction(preferences->optionFacesReaction());
 
@@ -107,7 +114,13 @@ LibreMinesGui::~LibreMinesGui()
 {
     vResetPrincipalMatrix();
 
-    vLastSessionSaveConfigurationFile();
+    // save the current user preferences into a specific file
+    LibreMinesPreferencesSaver::vLastSessionSaveConfigurationFile
+    (
+        *preferences, dirAppData,
+        *sbCustomizedPercentageMines, *sbCustomizedX, *sbCustomizedY,
+        *cbCustomizedMinesInPercentage
+    );
 }
 
 bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
@@ -1818,222 +1831,6 @@ void LibreMinesGui::vKeyboardControllerCenterCurrentCell()
 
 }
 
-void LibreMinesGui::vLastSessionLoadConfigurationFile()
-{
-    QScopedPointer<QFile> fileScores( new QFile(dirAppData.absoluteFilePath("libreminesLastSession.txt")) );
-
-    if(fileScores->open(QIODevice::ReadOnly))
-    {
-        QTextStream stream(fileScores.get());
-
-        while(!stream.atEnd())
-        {
-            QString s = stream.readLine();
-
-            if(s.at(0) == '#')
-                continue;
-
-            QStringList terms = s.split(" ");
-
-            if(terms.size() < 2)
-                continue;
-
-            if(terms.at(0).compare("FirstCellClean", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionFirstCellClean(terms.at(1));
-            }
-            else if(terms.at(0).compare("ApplicationStyle", Qt::CaseInsensitive) == 0 ||
-                    terms.at(0).compare("ApplicationTheme", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionApplicationStyle(terms.at(1));
-            }
-            else if(terms.at(0).compare("ClearNeighborCellsWhenClickedOnShowedCell", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionCleanNeighborCellsWhenClickedOnShowedCell(terms.at(1));
-            }
-            else if(terms.at(0).compare("Username", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionUsername(terms.at(1));
-            }
-            else if(terms.at(0).compare("CustomizedPercentageOfMines", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                sbCustomizedPercentageMines->setValue(terms.at(1).toInt());
-            }
-            else if(terms.at(0).compare("CustomizedX", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                sbCustomizedX->setValue(terms.at(1).toInt());
-            }
-            else if(terms.at(0).compare("CustomizedY", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                sbCustomizedY->setValue(terms.at(1).toInt());
-            }
-            else if(terms.at(0).compare("KeyboardControllerKeys", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() == 7)
-                {
-                    preferences->setOptionKeyboardControllerKeys(
-                                {
-                                    terms.at(1).toInt(nullptr, 16),
-                                    terms.at(2).toInt(nullptr, 16),
-                                    terms.at(3).toInt(nullptr, 16),
-                                    terms.at(4).toInt(nullptr, 16),
-                                    terms.at(5).toInt(nullptr, 16),
-                                    terms.at(6).toInt(nullptr, 16)
-                                });
-                }
-                else if(terms.size() == 8)
-                {
-                    preferences->setOptionKeyboardControllerKeys(
-                                {
-                                    terms.at(1).toInt(nullptr, 16),
-                                    terms.at(2).toInt(nullptr, 16),
-                                    terms.at(3).toInt(nullptr, 16),
-                                    terms.at(4).toInt(nullptr, 16),
-                                    terms.at(5).toInt(nullptr, 16),
-                                    terms.at(6).toInt(nullptr, 16),
-                                    terms.at(7).toInt(nullptr, 16)
-                                });
-                }
-            }
-            else if(terms.at(0).compare("MinefieldTheme", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionMinefieldTheme(terms.at(1));
-            }
-            else if(terms.at(0).compare("CustomizedMinesInPercentage", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                cbCustomizedMinesInPercentage->setChecked(terms.at(1).compare("On", Qt::CaseInsensitive) == 0);
-            }
-            else if(terms.at(0).compare("WhenCtrlIsPressed", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionWhenCtrlIsPressed(terms.at(1).toInt());
-            }
-            else if(terms.at(0).compare("MinimumCellLength", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionMinimumCellLength(terms.at(1).toInt());
-            }
-            else if(terms.at(0).compare("MaximumCellLength", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionMaximumCellLength(terms.at(1).toInt());
-            }
-            else if(terms.at(0).compare("FacesReaction", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionFacesReaction(terms.at(1));
-            }
-            else if(terms.at(0).compare("ProgressBar", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionProgressBar(terms.at(1));
-            }
-            else if(terms.at(0).compare("MinefieldGenerationAnimation", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionMinefieldGenerationAnimation(terms.at(1));
-            }
-            else if(terms.at(0).compare("AskToSaveMatchScoreBehaviour", Qt::CaseInsensitive) == 0)
-            {
-                if(terms.size() != 2)
-                    continue;
-
-                preferences->setOptionAskToSaveMatchScoreBehaviour(terms.at(1).toUInt());
-            }
-
-        }
-    }
-
-
-    QScopedPointer<QFile> fileLanguage( new QFile(dirAppData.absoluteFilePath("libreminesDefaultLanguage.txt")) );
-
-    if(fileLanguage->open(QIODevice::ReadOnly))
-    {
-        QTextStream stream(fileLanguage.get());
-        QString language;
-        stream >> language;
-
-        preferences->setOptionLanguage(language);
-    }
-
-    vUpdatePreferences();
-}
-
-void LibreMinesGui::vLastSessionSaveConfigurationFile()
-{
-    QScopedPointer<QFile> fileLastSession( new QFile(dirAppData.absoluteFilePath("libreminesLastSession.txt")) );
-
-    fileLastSession->open(QIODevice::WriteOnly);
-    {
-        QTextStream stream(fileLastSession.get());
-
-        stream << "FirstCellClean" << ' ' << (preferences->optionFirstCellClean() ? "On" : "Off") << '\n'
-               << "ApplicationStyle" << ' ' << preferences->optionApplicationStyle() << '\n'
-               << "ClearNeighborCellsWhenClickedOnShowedCell" << ' ' << (preferences->optionCleanNeighborCellsWhenClickedOnShowedCell() ? "On" : "Off") << '\n'
-               << "Username" << ' ' << preferences->optionUsername() << '\n'
-               << "CustomizedPercentageOfMines" << ' ' << sbCustomizedPercentageMines->value() << '\n'
-               << "CustomizedX" << ' ' << sbCustomizedX->value() << '\n'
-               << "CustomizedY" << ' ' << sbCustomizedY->value() << '\n'
-               << "KeyboardControllerKeys" << ' ' << preferences->optionKeyboardControllerKeysString() << '\n'
-               << "MinefieldTheme" << ' ' << preferences->optionMinefieldTheme() << '\n'
-               << "CustomizedMinesInPercentage" << ' ' << (cbCustomizedMinesInPercentage->isChecked() ? "On" : "Off") << '\n'
-               << "WhenCtrlIsPressed" << ' ' << preferences->optionWhenCtrlIsPressed() << '\n'
-               << "MinimumCellLength" << ' ' << preferences->optionMinimumCellLength() << '\n'
-               << "MaximumCellLength" << ' ' << preferences->optionMaximumCellLength() << '\n'
-               << "FacesReaction" << ' ' << preferences->optionFacesReaction() << '\n'
-               << "ProgressBar" << ' ' << (preferences->optionProgressBar() ? "On" : "Off") << '\n'
-               << "MinefieldGenerationAnimation" << ' ' << preferences->optionMinefieldGenerationAnimationString() << '\n'
-               << "AskToSaveMatchScoreBehaviour" << ' ' << (uchar)preferences->optionAskToSaveMatchScoreBehaviour() << '\n';
-    }
-
-    {
-        QScopedPointer<QFile> fileLanguage( new QFile(dirAppData.absoluteFilePath("libreminesDefaultLanguage.txt")) );
-        fileLanguage->open(QIODevice::WriteOnly);
-
-        QTextStream stream(fileLanguage.get());
-        stream << preferences-> optionsLanguage();
-    }
-}
-
 void LibreMinesGui::vUpdatePreferences()
 {
     const QList<int> keys = preferences->optionKeyboardControllerKeys();
@@ -2057,13 +1854,11 @@ void LibreMinesGui::vUpdatePreferences()
     controller.valid &= !keys.contains(-1);
 
     if(preferences->optionUsername().isEmpty())
+    {
 #ifdef Q_OS_WINDOWS
-    {
         preferences->setOptionUsername(qgetenv("USERNAME"));
-    }
 #else
-    {
         preferences->setOptionUsername(qgetenv("USER"));
-    }
 #endif
+    }
 }
