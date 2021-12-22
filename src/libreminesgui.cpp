@@ -40,6 +40,7 @@
 #include "libreminesscoresdialog.h"
 #include "libreminesconfig.h"
 #include "libreminesviewscoresdialog.h"
+#include "libreminesapptheme.h"
 
 LibreMinesGui::CellGui::CellGui():
     button(nullptr),
@@ -98,7 +99,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     vSetFacesReaction(preferences->optionFacesReaction());
 
     // Necessary for some reason
-    QTimer::singleShot(100, [this](){ vSetApplicationTheme(preferences->optionApplicationStyle()); });
+    QTimer::singleShot(100, [this]()
+    { vSetApplicationTheme(preferences->optionApplicationStyle()); });
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -978,6 +980,16 @@ void LibreMinesGui::vShowInterfaceInGame()
     scrollAreaBoard->show();
 }
 
+void LibreMinesGui::vSetApplicationTheme(const QString& theme)
+{
+    if(LibreMinesAppTheme::bSetApplicationTheme(theme))
+    {
+        // Create a message if a restart is needed
+        QMessageBox::information(this, "LibreMines",
+                                 "Please reset the application to apply this change");
+    }
+}
+
 void LibreMinesGui::SLOT_RestartGame()
 {
     // If the Interface in Game is hidden or not enable, return
@@ -1055,7 +1067,7 @@ void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
 
     labelFaceReactionInGame->setPixmap(*pmSmillingFace);
 
-    // if the button is released outside its area no not treat the event
+    // if the button is released outside its area do not treat the event
     if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
        e->localPos().y() >= cellLength || e->localPos().y() < 0)
     {
@@ -1107,7 +1119,7 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
 
     labelFaceReactionInGame->setPixmap(*pmSmillingFace);
 
-    // if the button is released outside its area no not treat the event
+    // if the button is released outside its area do not treat the event
     if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
        e->localPos().y() >= cellLength || e->localPos().y() < 0)
     {
@@ -1186,15 +1198,13 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
     score.gameDifficulty = difficult;
     score.username = preferences->optionUsername();
     if(score.username.isEmpty())
+    {
 #ifdef Q_OS_WINDOWS
-    {
         score.username = qgetenv("USERNAME");
-    }
 #else
-    {
         score.username = qgetenv("USER");
-    }
 #endif
+    }
 
     // Save the score of the current game on the file scoresLibreMines on
     //  the "~/.local/share/libremines/" directory. If the file does not
@@ -1584,105 +1594,6 @@ void LibreMinesGui::SLOT_saveMinefieldAsImage()
     if(controller.active)
         qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 }
-
-void LibreMinesGui::vSetApplicationTheme(const QString& theme)
-{
-    static bool firstTimeHere = true;
-
-    if(theme.compare("default", Qt::CaseInsensitive) == 0)
-    {
-        if(!firstTimeHere)
-        {
-            QMessageBox::information(this, "LibreMines",
-                                     "Please reset the application to apply this change");
-        }
-    }
-    else if(theme.compare("FusionDark", Qt::CaseInsensitive) == 0)
-    {
-        qApp->setStyleSheet("");
-        qApp->setStyle(QStyleFactory::create ("Fusion"));
-        QPalette palette;
-        palette.setColor(QPalette::BrightText,      Qt::red);
-        palette.setColor(QPalette::WindowText,      Qt::white);
-        palette.setColor(QPalette::ToolTipBase,     Qt::white);
-        palette.setColor(QPalette::ToolTipText,     Qt::white);
-        palette.setColor(QPalette::Text,            Qt::white);
-        palette.setColor(QPalette::ButtonText,      Qt::white);
-        palette.setColor(QPalette::HighlightedText, Qt::black);
-        palette.setColor(QPalette::Window,          QColor (53, 53, 53));
-        palette.setColor(QPalette::Base,            QColor (25, 25, 25));
-        palette.setColor(QPalette::AlternateBase,   QColor (53, 53, 53));
-        palette.setColor(QPalette::Button,          QColor (53, 53, 53));
-        palette.setColor(QPalette::Link,            QColor (42, 130, 218));
-        palette.setColor(QPalette::Highlight,       QColor (42, 130, 218));
-
-        qApp->setPalette(palette);
-    }
-    else if(theme.compare("FusionLight", Qt::CaseInsensitive) == 0)
-    {
-        qApp->setStyleSheet("");
-        qApp->setStyle(QStyleFactory::create ("Fusion"));
-        QPalette palette;
-        palette.setColor(QPalette::BrightText,      Qt::cyan);
-        palette.setColor(QPalette::WindowText,      Qt::black);
-        palette.setColor(QPalette::ToolTipBase,     Qt::black);
-        palette.setColor(QPalette::ToolTipText,     Qt::black);
-        palette.setColor(QPalette::Text,            Qt::black);
-        palette.setColor(QPalette::ButtonText,      Qt::black);
-        palette.setColor(QPalette::HighlightedText, Qt::white);
-        palette.setColor(QPalette::Window,          QColor (202, 202, 202));
-        palette.setColor(QPalette::Base,            QColor (228, 228, 228));
-        palette.setColor(QPalette::AlternateBase,   QColor (202, 202, 202));
-        palette.setColor(QPalette::Button,          QColor (202, 202, 202));
-        palette.setColor(QPalette::Link,            QColor (213, 125, 37));
-        palette.setColor(QPalette::Highlight,       QColor (42, 130, 218));
-
-        qApp->setPalette(palette);
-    }
-    else if(QStyleFactory::keys().contains(theme))
-    {
-        qApp->setStyleSheet("");
-        qApp->setPalette(QPalette());
-        qApp->setStyle(QStyleFactory::create(theme));
-    }
-    else
-    {
-        qApp->setPalette(QPalette());
-        qApp->setStyle("");
-
-        QString prefix;
-
-        if(theme.compare("ConsoleStyle", Qt::CaseInsensitive) == 0)
-            prefix = ":/qss/ConsoleStyle.qss";
-        else if(theme.compare("NeonButtons", Qt::CaseInsensitive) == 0)
-            prefix = ":/qss/NeonButtons.qss";
-        else if(theme.compare("QDarkStyle", Qt::CaseInsensitive) == 0)
-            prefix = ":/qdarkstyle/dark/style.qss";
-        else if(theme.compare("QDarkStyleLight", Qt::CaseInsensitive) == 0)
-            prefix = ":/qdarkstyle/light/style.qss";
-        else if(theme.compare("BreezeDark", Qt::CaseInsensitive) == 0)
-            prefix = ":/breeze/dark.qss";
-        else if(theme.compare("BreezeLight", Qt::CaseInsensitive) == 0)
-            prefix = ":/breeze/light.qss";
-
-
-        QFile fileQSS(prefix);
-
-        if (!fileQSS.exists())
-        {
-            qWarning() << "Unable to set stylesheet, file not found";
-        }
-        else
-        {
-            fileQSS.open(QFile::ReadOnly | QFile::Text);
-            QTextStream ts(&fileQSS);
-            qApp->setStyleSheet(ts.readAll());
-        }
-    }
-
-    firstTimeHere = false;
-}
-
 
 void LibreMinesGui::vSetFacesReaction(const QString &which)
 {
