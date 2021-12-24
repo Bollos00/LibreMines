@@ -56,7 +56,7 @@ sudo pacman -S base-devel qt5-base qt5-svg cmake
 
 For Ubuntu, you can install the dependencies with the following command:
 ```sh
-sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev
+sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev git
 ```
 
 On Fedora, install the dependencies with:
