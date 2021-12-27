@@ -87,13 +87,17 @@ add_executable(${PROJECT_NAME} WIN32
     src/common.cpp
     src/common.h
     src/main.cpp
-    src/libreminespreferencesdialog.cpp
-    src/libreminespreferencesdialog.h
-    src/libreminespreferencesdialog.ui
+    src/libreminesapptheme.cpp
+    src/libreminesapptheme.h
     src/libreminesgameengine.cpp
     src/libreminesgameengine.h
     src/libreminesgui.cpp
     src/libreminesgui.h
+    src/libreminespreferencesdialog.cpp
+    src/libreminespreferencesdialog.h
+    src/libreminespreferencesdialog.ui
+    src/libreminespreferencessaver.cpp
+    src/libreminespreferencessaver.h
     src/libreminesscore.cpp
     src/libreminesscore.h
     src/libreminesscoresdialog.cpp

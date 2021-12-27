@@ -134,9 +134,6 @@ private:
     void vKeyboardControllerMoveUp();
     void vKeyboardControllerCenterCurrentCell();
 
-    void vLastSessionLoadConfigurationFile();
-    void vLastSessionSaveConfigurationFile();
-
     void vUpdatePreferences();
 
 private Q_SLOTS:
