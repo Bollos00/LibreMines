@@ -59,7 +59,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     cellLength( 0 ),
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) ),
-    dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) )
+    dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
+    sound( new SoundEffects() )
 {
     this->resize(800, 600);
 
@@ -108,6 +109,14 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     // Necessary for some reason
     QTimer::singleShot(100, [this]()
     { vSetApplicationTheme(preferences->optionApplicationStyle()); });
+
+    QThread* soundThread = new QThread();
+
+    sound->setVolume(50);
+    sound->setMuted(false);
+
+    sound->moveToThread(soundThread);
+    soundThread->start();
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -1185,6 +1194,10 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
         vKeyboardControllUnsetCurrentCell();
         vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
     }
+
+
+    Q_EMIT(sound->SIGNAL_releaseCell());
+//    sound->releaseCell();
 }
 
 void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
@@ -1329,6 +1342,8 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
 void LibreMinesGui::SLOT_currentTime(const ushort time)
 {
     labelTimerInGame->setNum(time);
+
+//    Q_EMIT(sound->SIGNAL_clockTick());
 }
 
 void LibreMinesGui::SLOT_minesLeft(const ushort minesLeft)
@@ -1350,6 +1365,8 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
     {
         vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
     }
+
+    Q_EMIT(sound->SIGNAL_flagCell());
 }
 
 void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
@@ -1366,6 +1383,8 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
     {
         vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
     }
+
+    Q_EMIT(sound->SIGNAL_flagCell());
 }
 
 void LibreMinesGui::SLOT_remakeGame()
@@ -1411,6 +1430,8 @@ void LibreMinesGui::SLOT_gameWon()
     }
 
     labelFaceReactionInGame->setPixmap(*pmGrinningFace);
+
+    Q_EMIT(sound->SIGNAL_gameWon());
 }
 
 void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
@@ -1475,6 +1496,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
     }
 
     labelFaceReactionInGame->setPixmap(*pmDizzyFace);
+    Q_EMIT(sound->SIGNAL_gameLost());
 }
 
 void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value)

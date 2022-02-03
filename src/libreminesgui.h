@@ -36,6 +36,7 @@
 #include "qlabel_adapted.h"
 #include "qpushbutton_adapted.h"
 #include "minefieldtheme.h"
+#include "soundeffects.h"
 
 /**
  * @brief
@@ -285,5 +286,7 @@ private:
     LibreMinesPreferencesDialog* preferences;
 
     QDir dirAppData;
+
+    QScopedPointer<SoundEffects> sound;
 };
 #endif // LIBREMINESGUI_H

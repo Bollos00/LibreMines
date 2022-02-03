@@ -4,21 +4,38 @@
 #include <QMediaPlayer>
 #include <QScopedPointer>
 
-class SoundEffects
+class SoundEffects : public QObject
 {
+    Q_OBJECT
+
 public:
-    SoundEffects();
+    SoundEffects(QObject* parent = nullptr);
+
 
     void setVolume(const int vol);
+    void setMuted(const bool mute);
 
-    void gameBegin();
-    void gameWon();
-    void gameLost();
-    void clockTick();
+public Q_SLOTS:
 
-    void keyboardControllerMove();
-    void releaseCell();
-    void flagCell();
+    void SLOT_gameBegin();
+    void SLOT_gameWon();
+    void SLOT_gameLost();
+    void SLOT_clockTick();
+
+    void SLOT_keyboardControllerMove();
+    void SLOT_releaseCell();
+    void SLOT_flagCell();
+
+Q_SIGNALS:
+
+    void SIGNAL_gameBegin();
+    void SIGNAL_gameWon();
+    void SIGNAL_gameLost();
+    void SIGNAL_clockTick();
+
+    void SIGNAL_keyboardControllerMove();
+    void SIGNAL_releaseCell();
+    void SIGNAL_flagCell();
 
 private:
     void play(const QString& file_path);

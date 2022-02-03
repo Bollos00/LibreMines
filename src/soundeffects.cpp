@@ -1,11 +1,31 @@
 #include "soundeffects.h"
 
+#include <QFileInfo>
 
-
-SoundEffects::SoundEffects() :
+SoundEffects::SoundEffects(QObject* parent) :
+    QObject(parent),
     player( new QMediaPlayer() )
 {
+    connect(this, &SoundEffects::SIGNAL_gameBegin,
+            this, &SoundEffects::SLOT_gameBegin);
 
+    connect(this, &SoundEffects::SIGNAL_gameWon,
+            this, &SoundEffects::SLOT_gameWon);
+
+    connect(this, &SoundEffects::SIGNAL_gameLost,
+            this, &SoundEffects::SLOT_gameLost);
+
+    connect(this, &SoundEffects::SIGNAL_clockTick,
+            this, &SoundEffects::SLOT_clockTick);
+
+    connect(this, &SoundEffects::SIGNAL_keyboardControllerMove,
+            this, &SoundEffects::SLOT_keyboardControllerMove);
+
+    connect(this, &SoundEffects::SIGNAL_releaseCell,
+            this, &SoundEffects::SLOT_releaseCell);
+
+    connect(this, &SoundEffects::SIGNAL_flagCell,
+            this, &SoundEffects::SLOT_flagCell);
 }
 
 void SoundEffects::setVolume(const int vol)
@@ -13,44 +33,52 @@ void SoundEffects::setVolume(const int vol)
     player->setVolume(vol);
 }
 
-void SoundEffects::gameBegin()
+void SoundEffects::setMuted(const bool mute)
 {
-    play(":/sound_effects/game_begin.wav");
+    player->setMuted(mute);
 }
 
-void SoundEffects::gameWon()
+void SoundEffects::SLOT_gameBegin()
 {
-    play(":/sound_effects/game_won.wav");
+    play("qrc:/sound_effects/game_begin.wav");
 }
 
-void SoundEffects::gameLost()
+void SoundEffects::SLOT_gameWon()
 {
-
-    play(":/sound_effects/game_lost.wav");
+    play("qrc:/sound_effects/game_won.wav");
 }
 
-void SoundEffects::clockTick()
+void SoundEffects::SLOT_gameLost()
 {
-    play(":/sound_effects/clock_tick.wav");
+
+    play("qrc:/sound_effects/game_lost.wav");
 }
 
-void SoundEffects::keyboardControllerMove()
+void SoundEffects::SLOT_clockTick()
 {
-    play(":/sound_effects/keyboard_controller_move.wav");
+    play("qrc:/sound_effects/clock_tick.wav");
 }
 
-void SoundEffects::releaseCell()
+void SoundEffects::SLOT_keyboardControllerMove()
 {
-    play(":/sound_effects/release_cell.wav");
+    play("qrc:/sound_effects/keyboard_controller_move.wav");
 }
 
-void SoundEffects::flagCell()
+void SoundEffects::SLOT_releaseCell()
 {
-    play(":/sound_effects/flag_cell.wav");
+    play("qrc:/sound_effects/release_cell.wav");
+}
+
+void SoundEffects::SLOT_flagCell()
+{
+    play("qrc:/sound_effects/flag_cell.wav");
 }
 
 void SoundEffects::play(const QString& file_path)
 {
-    player->setMedia(QUrl::fromLocalFile(file_path));
+    if(player->isMuted())
+        return;
+
+    player->setMedia(QUrl(file_path));
     player->play();
 }
