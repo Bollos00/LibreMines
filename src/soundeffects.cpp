@@ -13,12 +13,9 @@ SoundEffects::SoundEffects(QObject* parent) :
     soundGameLost.setSource(QUrl("qrc:/sound_effects/game_lost.wav"));
     soundClockTick.setSource(QUrl("qrc:/sound_effects/clock_tick.wav"));
 
-    soundKeyboardControllMove.setSource(QUrl("qrc:/sound_effects/clock_tick.wav"));
+    soundKeyboardControllMove.setSource(QUrl("qrc:/sound_effects/move.wav"));
     soundReleaseCell.setSource(QUrl("qrc:/sound_effects/release_cell.wav"));
     soundFlagCell.setSource(QUrl("qrc:/sound_effects/flag_cell.wav"));
-
-    connect(this, &SoundEffects::SIGNAL_gameBegin,
-            &soundGameBegin, &QSoundEffect::play);
 
     connect(this, &SoundEffects::SIGNAL_gameWon,
             &soundGameWon, &QSoundEffect::play);

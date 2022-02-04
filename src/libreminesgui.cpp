@@ -1197,7 +1197,6 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
 
 
     Q_EMIT(sound->SIGNAL_releaseCell());
-//    sound->releaseCell();
 }
 
 void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
@@ -1744,6 +1743,8 @@ void LibreMinesGui::vKeyboardControllerMoveLeft()
     }
 
     vKeyboardControllerSetCurrentCell(destX, controller.currentY);
+
+    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
 }
 
 void LibreMinesGui::vKeyboardControllerMoveRight()
@@ -1777,6 +1778,7 @@ void LibreMinesGui::vKeyboardControllerMoveRight()
 
     vKeyboardControllerSetCurrentCell(destX, controller.currentY);
 
+    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
 }
 
 void LibreMinesGui::vKeyboardControllerMoveDown()
@@ -1810,6 +1812,7 @@ void LibreMinesGui::vKeyboardControllerMoveDown()
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
 
+    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
 }
 
 void LibreMinesGui::vKeyboardControllerMoveUp()
@@ -1842,6 +1845,8 @@ void LibreMinesGui::vKeyboardControllerMoveUp()
     }
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
+
+    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
 }
 
 void LibreMinesGui::vKeyboardControllerCenterCurrentCell()
