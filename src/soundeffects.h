@@ -1,7 +1,7 @@
 #ifndef SOUNDEFFECTS_H
 #define SOUNDEFFECTS_H
 
-#include <QMediaPlayer>
+#include <QSoundEffect>
 #include <QScopedPointer>
 
 class SoundEffects : public QObject
@@ -11,20 +11,8 @@ class SoundEffects : public QObject
 public:
     SoundEffects(QObject* parent = nullptr);
 
-
     void setVolume(const int vol);
     void setMuted(const bool mute);
-
-public Q_SLOTS:
-
-    void SLOT_gameBegin();
-    void SLOT_gameWon();
-    void SLOT_gameLost();
-    void SLOT_clockTick();
-
-    void SLOT_keyboardControllerMove();
-    void SLOT_releaseCell();
-    void SLOT_flagCell();
 
 Q_SIGNALS:
 
@@ -38,9 +26,16 @@ Q_SIGNALS:
     void SIGNAL_flagCell();
 
 private:
-    void play(const QString& file_path);
+    QSoundEffect soundGameBegin;
+    QSoundEffect soundGameWon;
+    QSoundEffect soundGameLost;
+    QSoundEffect soundClockTick;
 
-    QScopedPointer<QMediaPlayer> player;
+    QSoundEffect soundKeyboardControllMove;
+    QSoundEffect soundReleaseCell;
+    QSoundEffect soundFlagCell;
+
+    QList<QSoundEffect*> soundEffects;
 };
 
 #endif // SOUNDEFFECTS_H

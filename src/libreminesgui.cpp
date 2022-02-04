@@ -110,13 +110,13 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     QTimer::singleShot(100, [this]()
     { vSetApplicationTheme(preferences->optionApplicationStyle()); });
 
-    QThread* soundThread = new QThread();
+//    QThread* soundThread = new QThread();
 
     sound->setVolume(50);
     sound->setMuted(false);
 
-    sound->moveToThread(soundThread);
-    soundThread->start();
+//    sound->moveToThread(soundThread);
+//    soundThread->start();
 }
 
 LibreMinesGui::~LibreMinesGui()
