@@ -23,6 +23,7 @@
 
 #include <QStyleFactory>
 #include <QMessageBox>
+#include <QSoundEffect>
 
 #include "minefieldextratheme.h"
 
@@ -450,6 +451,18 @@ void LibreMinesPreferencesDialog::on_cbSoundMute_stateChanged(int arg1)
 
 void LibreMinesPreferencesDialog::on_sliderSoundVolume_valueChanged(int value)
 {
+    static bool firstTime = true;
+
     ui->labelSoundVolume->setText(QString::number(value));
+
+    if(value != 0 && !firstTime)
+    {
+        static QSoundEffect sound;
+        sound.setSource(QUrl("qrc:/sound_effects/move.wav"));
+        sound.setVolume(value/100.f);
+        sound.play();
+    }
+
+    firstTime = false;
 }
 
