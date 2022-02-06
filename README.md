@@ -51,20 +51,20 @@ Note: Qt6 is also supported
 
 On Arch Linux and derivatives systems, the dependencies can be installed with `pacman`:
 ```sh
-sudo pacman -S base-devel qt5-base qt5-svg cmake
+sudo pacman -S base-devel qt5-base qt5-svg qt5-multimedia cmake
 ```
 
 For Ubuntu, you can install the dependencies with the following command:
 ```sh
-sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev git
+sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev qtmultimedia5-dev git
 ```
 
 On Fedora, install the dependencies with:
 ```sh
-sudo dnf install qt5-qtbase-devel qt5-qtsvg-devel cmake git
+sudo dnf install qt5-qtbase-devel qt5-qtsvg-devel cmake qt5-qtmultimedia-devel git
 ```
 
-On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [qt5-buildtools](https://www.freshports.org/devel/qt5-buildtools/), [qt5-qmake](https://www.freshports.org/devel/qt5-qmake/) [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/).
+On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [qt5-buildtools](https://www.freshports.org/devel/qt5-buildtools/), [qt5-qmake](https://www.freshports.org/devel/qt5-qmake/), [qt5-multimedia](https://www.freshports.org/multimedia/qt5-multimedia/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/).
 
 ```sh
 su -
