@@ -109,14 +109,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     // Necessary for some reason
     QTimer::singleShot(100, [this]()
     { vSetApplicationTheme(preferences->optionApplicationStyle()); });
-
-//    QThread* soundThread = new QThread();
-
-    sound->setVolume(50);
-    sound->setMuted(false);
-
-//    sound->moveToThread(soundThread);
-//    soundThread->start();
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -1888,4 +1880,7 @@ void LibreMinesGui::vUpdatePreferences()
         preferences->setOptionUsername(qgetenv("USER"));
 #endif
     }
+
+    sound->setVolume(preferences->optionSoundVolume());
+    sound->setMuted(preferences->optionSoundVolume() == 0);
 }

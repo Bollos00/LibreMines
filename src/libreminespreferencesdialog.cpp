@@ -225,6 +225,11 @@ AskToSaveMatchScore LibreMinesPreferencesDialog::optionAskToSaveMatchScoreBehavi
     return LibreMines::SaveNever;
 }
 
+int LibreMinesPreferencesDialog::optionSoundVolume() const
+{
+    return ui->sliderSoundVolume->value();
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -336,6 +341,14 @@ void LibreMinesPreferencesDialog::setOptionAskToSaveMatchScoreBehaviour(const uc
     return ui->rbSaveScoreNever->setChecked(true);
 }
 
+void LibreMinesPreferencesDialog::setOptionSoundVolume(const int option)
+{
+    ui->sliderSoundVolume->setValue(option);
+    ui->labelSoundVolume->setText(QString::number(option));
+
+    ui->cbSoundMute->setChecked(option == 0);
+}
+
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
 {
     return
@@ -416,5 +429,27 @@ void LibreMinesPreferencesDialog::SLOT_updateLanguage()
         QMessageBox::information(this, tr("Restart LibreMines to apply this preference!"),
                                  tr("Please restart the application to redefine your language"));
     }
+}
+
+
+void LibreMinesPreferencesDialog::on_cbSoundMute_stateChanged(int arg1)
+{
+    // If muted, the volume goes to zero and become unchaged until it is unmuted again
+    if(arg1 == Qt::Checked)
+    {
+        ui->sliderSoundVolume->setValue(0);
+        ui->labelSoundVolume->setText(QString::number(0));
+        ui->sliderSoundVolume->setEnabled(false);
+    }
+    else
+    {
+        ui->sliderSoundVolume->setEnabled(true);
+    }
+}
+
+
+void LibreMinesPreferencesDialog::on_sliderSoundVolume_valueChanged(int value)
+{
+    ui->labelSoundVolume->setText(QString::number(value));
 }
 

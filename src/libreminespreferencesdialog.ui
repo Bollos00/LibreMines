@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>757</width>
-    <height>679</height>
+    <width>974</width>
+    <height>787</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Preferences</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" rowspan="3">
+   <item row="0" column="0" rowspan="5">
     <widget class="QGroupBox" name="gbCheckBoxes">
      <property name="title">
       <string>Game Options</string>
@@ -102,6 +102,57 @@ Animation</string>
      </layout>
     </widget>
    </item>
+   <item row="6" column="0">
+    <widget class="QGroupBox" name="gbAppearance">
+     <property name="title">
+      <string>Appearance</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="labelApplicationStyle">
+          <property name="text">
+           <string>Application style:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxApplicationStyle"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="labelMinefieldTheme">
+          <property name="text">
+           <string>Minefield theme:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxMinefieldTheme"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QLabel" name="labelFacesReaction">
+          <property name="text">
+           <string>Faces reaction:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxFacesReaction"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item row="0" column="1">
     <widget class="QGroupBox" name="gbLineEdits">
      <property name="title">
@@ -121,6 +172,81 @@ Animation</string>
          <widget class="QLineEdit" name="lineEditUsername"/>
         </item>
        </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QGroupBox" name="gbScores">
+     <property name="title">
+      <string>Scores</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>570</width>
+           <height>240</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QGroupBox" name="gbSaveScores">
+            <property name="title">
+             <string>Ask to save the match score:</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreAlways">
+               <property name="text">
+                <string>Always</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreWhenHighScoreAndGameCompleted">
+               <property name="text">
+                <string>When a new high score is achieved or when the game is completed</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreWhenHighScore">
+               <property name="text">
+                <string>When a new high score is achieved</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreWhenGameCompleted">
+               <property name="text">
+                <string>When the game is completed</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbSaveScoreNever">
+               <property name="text">
+                <string>Never</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -148,7 +274,54 @@ Animation</string>
      </layout>
     </widget>
    </item>
-   <item row="2" column="1" rowspan="3">
+   <item row="2" column="1">
+    <widget class="QGroupBox" name="gbSoundEffects">
+     <property name="title">
+      <string>Sound effects</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_9">
+      <item>
+       <widget class="QCheckBox" name="cbSoundMute">
+        <property name="text">
+         <string>Mute</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_17">
+        <item>
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Volume: </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="sliderSoundVolume">
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelSoundVolume">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="1" rowspan="3">
     <widget class="QGroupBox" name="gbKeyboardController">
      <property name="title">
       <string>Keyboard Controller</string>
@@ -396,132 +569,6 @@ Animation</string>
         </item>
         <item>
          <widget class="QComboBox" name="comboBoxWhenCtrlIsPressed"/>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QGroupBox" name="gbScores">
-     <property name="title">
-      <string>Scores</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_6">
-      <item>
-       <widget class="QScrollArea" name="scrollArea">
-        <property name="widgetResizable">
-         <bool>true</bool>
-        </property>
-        <widget class="QWidget" name="scrollAreaWidgetContents">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>609</width>
-           <height>213</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <item>
-           <widget class="QGroupBox" name="gbSaveScores">
-            <property name="title">
-             <string>Ask to save the match score:</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
-             <item>
-              <widget class="QRadioButton" name="rbSaveScoreAlways">
-               <property name="text">
-                <string>Always</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="rbSaveScoreWhenHighScoreAndGameCompleted">
-               <property name="text">
-                <string>When a new high score is achieved or when the game is completed</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="rbSaveScoreWhenHighScore">
-               <property name="text">
-                <string>When a new high score is achieved</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="rbSaveScoreWhenGameCompleted">
-               <property name="text">
-                <string>When the game is completed</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="rbSaveScoreNever">
-               <property name="text">
-                <string>Never</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QGroupBox" name="gbAppearance">
-     <property name="title">
-      <string>Appearance</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="labelApplicationStyle">
-          <property name="text">
-           <string>Application style:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBoxApplicationStyle"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_9">
-        <item>
-         <widget class="QLabel" name="labelMinefieldTheme">
-          <property name="text">
-           <string>Minefield theme:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBoxMinefieldTheme"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_13">
-        <item>
-         <widget class="QLabel" name="labelFacesReaction">
-          <property name="text">
-           <string>Faces reaction:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBoxFacesReaction"/>
         </item>
        </layout>
       </item>
