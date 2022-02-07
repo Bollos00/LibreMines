@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -1526,7 +1526,7 @@ void LibreMinesGui::SLOT_showAboutDialog()
 {
     QString text =
             "LibreMines " + QString(LIBREMINES_PROJECT_VERSION) + "\n" +
-            tr("Copyright (C) 2020-2021  Bruno Bollos Correa\n"
+            tr("Copyright (C) 2020-2022  Bruno Bollos Correa\n"
             "\n"
             "This program is free software: you can redistribute it and/or modify"
             " it under the terms of the GNU General Public License as published by"
