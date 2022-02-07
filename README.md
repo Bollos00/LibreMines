@@ -45,6 +45,7 @@ The following dependencies are required for building and running LibreMines:
 * [Qt5 Gui](https://doc.qt.io/qt-5/qtgui-index.html) >= 5.12
 * [Qt5 Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
 * [Qt5 SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
+* [Qt5 Multimedia](https://doc.qt.io/qt-5/qtmultimedia-index.html) >= 5.12
 * [CMake](https://cmake.org/) >= 3.1
 
 Note: Qt6 is also supported
