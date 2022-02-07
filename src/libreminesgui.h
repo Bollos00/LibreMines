@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -36,6 +36,7 @@
 #include "qlabel_adapted.h"
 #include "qpushbutton_adapted.h"
 #include "minefieldtheme.h"
+#include "soundeffects.h"
 
 /**
  * @brief
@@ -285,5 +286,7 @@ private:
     LibreMinesPreferencesDialog* preferences;
 
     QDir dirAppData;
+
+    QScopedPointer<SoundEffects> sound;
 };
 #endif // LIBREMINESGUI_H

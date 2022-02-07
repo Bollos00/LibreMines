@@ -1,6 +1,6 @@
 #############################################################################
 # LibreMines                                                                #
-# Copyright (C) 2020-2021  Bruno Bollos Correa                              #                                                                         #
+# Copyright (C) 2020-2022  Bruno Bollos Correa                              #                                                                         #
 # This program is free software: you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
 # the Free Software Foundation, either version 3 of the License, or         #
@@ -18,7 +18,7 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.8.0"
+    VERSION "1.9.0"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
@@ -29,6 +29,7 @@ if(USE_QT6)
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
     find_package(Qt6 REQUIRED COMPONENTS Core)
     find_package(Qt6 REQUIRED COMPONENTS Svg)
+    find_package(Qt6 REQUIRED COMPONENTS Multimedia)
     # If the option UPDATE_TRANSLATIONS is passed, the Qt5LinguistTools is needed
     #  to generate the QM Files
     if(UPDATE_TRANSLATIONS)
@@ -38,6 +39,7 @@ else()
     find_package(Qt5 REQUIRED COMPONENTS Widgets)
     find_package(Qt5 REQUIRED COMPONENTS Core)
     find_package(Qt5 REQUIRED COMPONENTS Svg)
+    find_package(Qt5 REQUIRED COMPONENTS Multimedia)
     if(UPDATE_TRANSLATIONS)
         find_package(Qt5 REQUIRED COMPONENTS LinguistTools)
     endif()
@@ -114,6 +116,8 @@ add_executable(${PROJECT_NAME} WIN32
     src/qlabel_adapted.h
     src/qpushbutton_adapted.cpp
     src/qpushbutton_adapted.h
+    src/soundeffects.cpp
+    src/soundeffects.h
     share/application_stylesheets/breeze/breeze.qrc
     share/application_stylesheets/qdarkstyle/dark/qdarkstyle_dark.qrc
     share/application_stylesheets/qdarkstyle/light/qdarkstyle_light.qrc
@@ -122,6 +126,7 @@ add_executable(${PROJECT_NAME} WIN32
     share/icons.qrc
     share/icons.rc
     share/minefield_themes.qrc
+    share/sound_effects.qrc
     )
 
 include_directories(src)
@@ -147,10 +152,12 @@ if(USE_QT6)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Svg)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Multimedia)
 else()
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Svg)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia)
 endif()
 
 # Set the install settings for Unix environments

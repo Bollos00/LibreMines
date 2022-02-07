@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -59,7 +59,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     cellLength( 0 ),
     difficult( NONE ),
     preferences( new LibreMinesPreferencesDialog(this) ),
-    dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) )
+    dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
+    sound( new SoundEffects() )
 {
     this->resize(800, 600);
 
@@ -1185,6 +1186,9 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
         vKeyboardControllUnsetCurrentCell();
         vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
     }
+
+
+    Q_EMIT(sound->SIGNAL_releaseCell());
 }
 
 void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
@@ -1329,6 +1333,8 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
 void LibreMinesGui::SLOT_currentTime(const ushort time)
 {
     labelTimerInGame->setNum(time);
+
+//    Q_EMIT(sound->SIGNAL_clockTick());
 }
 
 void LibreMinesGui::SLOT_minesLeft(const ushort minesLeft)
@@ -1350,6 +1356,8 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
     {
         vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
     }
+
+    Q_EMIT(sound->SIGNAL_flagCell());
 }
 
 void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
@@ -1366,6 +1374,8 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
     {
         vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
     }
+
+    Q_EMIT(sound->SIGNAL_flagCell());
 }
 
 void LibreMinesGui::SLOT_remakeGame()
@@ -1411,6 +1421,8 @@ void LibreMinesGui::SLOT_gameWon()
     }
 
     labelFaceReactionInGame->setPixmap(*pmGrinningFace);
+
+    Q_EMIT(sound->SIGNAL_gameWon());
 }
 
 void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
@@ -1475,6 +1487,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
     }
 
     labelFaceReactionInGame->setPixmap(*pmDizzyFace);
+    Q_EMIT(sound->SIGNAL_gameLost());
 }
 
 void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value)
@@ -1513,7 +1526,7 @@ void LibreMinesGui::SLOT_showAboutDialog()
 {
     QString text =
             "LibreMines " + QString(LIBREMINES_PROJECT_VERSION) + "\n" +
-            tr("Copyright (C) 2020-2021  Bruno Bollos Correa\n"
+            tr("Copyright (C) 2020-2022  Bruno Bollos Correa\n"
             "\n"
             "This program is free software: you can redistribute it and/or modify"
             " it under the terms of the GNU General Public License as published by"
@@ -1722,6 +1735,8 @@ void LibreMinesGui::vKeyboardControllerMoveLeft()
     }
 
     vKeyboardControllerSetCurrentCell(destX, controller.currentY);
+
+    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
 }
 
 void LibreMinesGui::vKeyboardControllerMoveRight()
@@ -1755,6 +1770,7 @@ void LibreMinesGui::vKeyboardControllerMoveRight()
 
     vKeyboardControllerSetCurrentCell(destX, controller.currentY);
 
+    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
 }
 
 void LibreMinesGui::vKeyboardControllerMoveDown()
@@ -1788,6 +1804,7 @@ void LibreMinesGui::vKeyboardControllerMoveDown()
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
 
+    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
 }
 
 void LibreMinesGui::vKeyboardControllerMoveUp()
@@ -1820,6 +1837,8 @@ void LibreMinesGui::vKeyboardControllerMoveUp()
     }
 
     vKeyboardControllerSetCurrentCell(controller.currentX, destY);
+
+    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
 }
 
 void LibreMinesGui::vKeyboardControllerCenterCurrentCell()
@@ -1861,4 +1880,7 @@ void LibreMinesGui::vUpdatePreferences()
         preferences->setOptionUsername(qgetenv("USER"));
 #endif
     }
+
+    sound->setVolume(preferences->optionSoundVolume());
+    sound->setMuted(preferences->optionSoundVolume() == 0);
 }

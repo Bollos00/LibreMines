@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2021  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -23,6 +23,7 @@
 
 #include <QStyleFactory>
 #include <QMessageBox>
+#include <QSoundEffect>
 
 #include "minefieldextratheme.h"
 
@@ -225,6 +226,11 @@ AskToSaveMatchScore LibreMinesPreferencesDialog::optionAskToSaveMatchScoreBehavi
     return LibreMines::SaveNever;
 }
 
+int LibreMinesPreferencesDialog::optionSoundVolume() const
+{
+    return ui->sliderSoundVolume->value();
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -336,6 +342,14 @@ void LibreMinesPreferencesDialog::setOptionAskToSaveMatchScoreBehaviour(const uc
     return ui->rbSaveScoreNever->setChecked(true);
 }
 
+void LibreMinesPreferencesDialog::setOptionSoundVolume(const int option)
+{
+    ui->sliderSoundVolume->setValue(option);
+    ui->labelSoundVolume->setText(QString::number(option));
+
+    ui->cbSoundMute->setChecked(option == 0);
+}
+
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
 {
     return
@@ -416,5 +430,39 @@ void LibreMinesPreferencesDialog::SLOT_updateLanguage()
         QMessageBox::information(this, tr("Restart LibreMines to apply this preference!"),
                                  tr("Please restart the application to redefine your language"));
     }
+}
+
+
+void LibreMinesPreferencesDialog::on_cbSoundMute_stateChanged(int arg1)
+{
+    // If muted, the volume goes to zero and become unchaged until it is unmuted again
+    if(arg1 == Qt::Checked)
+    {
+        ui->sliderSoundVolume->setValue(0);
+        ui->labelSoundVolume->setText(QString::number(0));
+        ui->sliderSoundVolume->setEnabled(false);
+    }
+    else
+    {
+        ui->sliderSoundVolume->setEnabled(true);
+    }
+}
+
+
+void LibreMinesPreferencesDialog::on_sliderSoundVolume_valueChanged(int value)
+{
+    static bool firstTime = true;
+
+    ui->labelSoundVolume->setText(QString::number(value));
+
+    if(value != 0 && !firstTime)
+    {
+        static QSoundEffect sound;
+        sound.setSource(QUrl("qrc:/sound_effects/move.wav"));
+        sound.setVolume(value/100.f);
+        sound.play();
+    }
+
+    firstTime = false;
 }
 

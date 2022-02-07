@@ -171,6 +171,13 @@ void LibreMinesPreferencesSaver::vLastSessionLoadConfigurationFile(
 
                 preferences.setOptionAskToSaveMatchScoreBehaviour(terms.at(1).toUInt());
             }
+            else if(terms.at(0).compare("SoundVolume", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionSoundVolume(terms.at(1).toInt());
+            }
         }
     }
 
@@ -226,7 +233,8 @@ void LibreMinesPreferencesSaver::vLastSessionSaveConfigurationFile(
                << "MinefieldGenerationAnimation" << ' '
                << preferences.optionMinefieldGenerationAnimationString() << '\n'
                << "AskToSaveMatchScoreBehaviour" << ' '
-               << (uchar)preferences.optionAskToSaveMatchScoreBehaviour() << '\n';
+               << (uchar)preferences.optionAskToSaveMatchScoreBehaviour() << '\n'
+               << "SoundVolume" << ' ' << preferences.optionSoundVolume() << '\n';
     }
 
     QScopedPointer<QFile> fileLanguage
