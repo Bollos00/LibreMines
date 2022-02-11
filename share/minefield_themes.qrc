@@ -42,5 +42,19 @@
         <file>minefield_themes/twemoji/flag.svg</file>
         <file>minefield_themes/twemoji/boom.svg</file>
         <file>minefield_themes/twemoji/no_flag.svg</file>
+        <file>minefield_themes/flowerfield/wrong_flag.svg</file>
+        <file>minefield_themes/flowerfield/mine.svg</file>
+        <file>minefield_themes/flowerfield/8.svg</file>
+        <file>minefield_themes/flowerfield/7.svg</file>
+        <file>minefield_themes/flowerfield/6.svg</file>
+        <file>minefield_themes/flowerfield/5.svg</file>
+        <file>minefield_themes/flowerfield/4.svg</file>
+        <file>minefield_themes/flowerfield/3.svg</file>
+        <file>minefield_themes/flowerfield/2.svg</file>
+        <file>minefield_themes/flowerfield/1.svg</file>
+        <file>minefield_themes/flowerfield/0.svg</file>
+        <file>minefield_themes/flowerfield/flag.svg</file>
+        <file>minefield_themes/flowerfield/boom.svg</file>
+        <file>minefield_themes/flowerfield/no_flag.svg</file>
     </qresource>
 </RCC>
