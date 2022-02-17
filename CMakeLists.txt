@@ -190,6 +190,10 @@ if(UNIX)
             DIRECTORY share/minefield_themes/alternative_dark
             DESTINATION share/libremines/minefield_extra_themes
             )
+        install(
+            DIRECTORY share/minefield_themes/flowerfield
+            DESTINATION share/libremines/minefield_extra_themes
+            )
 
     endif()
 
