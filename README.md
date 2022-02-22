@@ -19,6 +19,15 @@ The source code is licensed under the [GNU General Public License at version 3](
 ```sh
 yay -S libremines
 ```
+
+### FreeBSD
+
+[LibreMines is available in FreeBSD ports tree](https://www.freshports.org/games/LibreMines). With `pkg` it can be installed with:
+
+```sh
+pkg install libremines
+```
+
 ### Flatpak
 
 There is a [package for LibreMines available on FlatHub](https://flathub.org/apps/details/io.github.Bollos00.LibreMines). The package can be installed, via command line, with:
