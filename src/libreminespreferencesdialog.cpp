@@ -86,8 +86,9 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     }
 
     ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White",
-                                         "TwEmoji Colored", "Disable"});
-    ui->comboBoxWhenCtrlIsPressed->addItems({tr("Go to the Edge"), tr("Jump 3 Cells"), tr("Jump 5 Cells"), tr("Jump 10 Cells")});
+                                         "TwEmoji Colored", "SecularSteve Custom", "Disable"});
+    ui->comboBoxWhenCtrlIsPressed->addItems({tr("Go to the Edge"), tr("Jump 3 Cells"),
+                                             tr("Jump 5 Cells"), tr("Jump 10 Cells")});
 
     ui->comboBoxLanguage->addItems({"English", "Português do Brasil"});
 
@@ -275,6 +276,7 @@ void LibreMinesPreferencesDialog::setOptionFacesReaction(const QString &option)
     else if(option.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0){ s = "Open Emoji Black"; }
     else if(option.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0){ s = "Open Emoji White"; }
     else if(option.compare("TwEmojiColored", Qt::CaseInsensitive) == 0){ s = "TwEmoji Colored"; }
+    else if(option.compare("SecularSteveCustom", Qt::CaseInsensitive) == 0){ s = "SecularSteve Custom"; }
 
     ui->comboBoxFacesReaction->setCurrentText(s);
 }

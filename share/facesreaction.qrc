@@ -24,5 +24,11 @@
         <file>faces_reaction/twemoji-color/open_mouth_face.svg</file>
         <file>faces_reaction/twemoji-color/sleeping_face.svg</file>
         <file>faces_reaction/twemoji-color/smilling_face.svg</file>
+        <file>faces_reaction/SecularSteve_custom/dizzy_face.svg</file>
+        <file>faces_reaction/SecularSteve_custom/grimacing_face.svg</file>
+        <file>faces_reaction/SecularSteve_custom/grinning_face.svg</file>
+        <file>faces_reaction/SecularSteve_custom/open_mouth_face.svg</file>
+        <file>faces_reaction/SecularSteve_custom/sleeping_face.svg</file>
+        <file>faces_reaction/SecularSteve_custom/smilling_face.svg</file>
     </qresource>
 </RCC>
