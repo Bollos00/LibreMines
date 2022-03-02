@@ -83,11 +83,6 @@ bool LibreMinesAppTheme::bSetApplicationTheme(const QString& theme)
             prefix = ":/qdarkstyle/dark/style.qss";
         else if(theme.compare("QDarkStyleLight", Qt::CaseInsensitive) == 0)
             prefix = ":/qdarkstyle/light/style.qss";
-        else if(theme.compare("BreezeDark", Qt::CaseInsensitive) == 0)
-            prefix = ":/breeze/dark.qss";
-        else if(theme.compare("BreezeLight", Qt::CaseInsensitive) == 0)
-            prefix = ":/breeze/light.qss";
-
 
         QFile fileQSS(prefix);
 
