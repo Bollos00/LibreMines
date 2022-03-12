@@ -694,7 +694,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
             this, &LibreMinesGui::SLOT_showAboutDialog);
 
     connect(actionAboutQt, &QAction::triggered,
-            [this](){ QMessageBox::aboutQt(this, "LibreMines"); });
+            [this](){ QMessageBox::aboutQt(this, "About Qt"); });
 
     connect(actionGitHubHomePage, &QAction::triggered,
             [](){ QDesktopServices::openUrl(QUrl("https://github.com/Bollos00/LibreMines")); });
@@ -1544,7 +1544,7 @@ void LibreMinesGui::SLOT_showAboutDialog()
             "Get the source code of LibreMines on\n") +
             "<" + QString(LIBREMINES_PROJECT_HOMEPAGE_URL) + ">";
 
-    QMessageBox::about(this, "LibreMines", text);
+    QMessageBox::about(this, "About LibreMines", text);
 }
 
 void LibreMinesGui::SLOT_showHighScores()
