@@ -495,7 +495,7 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs, bool ignorePr
     {
         for (int j=0; j<iY; j++)
         {
-            if(principalMatrix[i][j].FlagType)
+            if(principalMatrix[i][j].FlagType > 0)
             {
                 if (principalMatrix[i][j].state == MINE)
                     iCorrectFlags++;
