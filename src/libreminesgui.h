@@ -192,6 +192,7 @@ private Q_SLOTS:
     void SLOT_currentTime(const ushort time);
     void SLOT_minesLeft(const ushort minesLeft);
     void SLOT_flagCell(const uchar _X, const uchar _Y);
+    void SLOT_QuestionCell(const uchar _X, const uchar _Y);
     void SLOT_unflagCell(const uchar _X, const uchar _Y);
 
     void SLOT_remakeGame();

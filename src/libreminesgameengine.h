@@ -39,7 +39,7 @@ public:
 
         CELL_STATE state;
         bool isHidden;
-        bool hasFlag;
+        int FlagType;
     };
 
 public:
@@ -98,6 +98,7 @@ Q_SIGNALS:
     void SIGNAL_currentTime(const ushort);
     void SIGNAL_minesLeft(const ushort);
     void SIGNAL_flagCell(const uchar _X, const uchar _Y);
+    void SIGNAL_questionCell(const uchar _X, const uchar _Y);
     void SIGNAL_unflagCell(const uchar _X, const uchar _Y);
     void SIGNAL_gameWon();
     void SIGNAL_gameLost(const uchar _X, const uchar _Y);

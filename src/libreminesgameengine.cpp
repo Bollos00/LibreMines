@@ -26,7 +26,7 @@
 LibreMinesGameEngine::CellGameEngine::CellGameEngine():
     state(ZERO),
     isHidden(true),
-    hasFlag(false)
+    FlagType(0)
 {
 
 }
@@ -81,7 +81,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
 
                 cell.state = ZERO;
                 cell.isHidden = true;
-                cell.hasFlag = false;
+                cell.FlagType = 0;
 
 //                qApp->processEvents();
             }
@@ -289,7 +289,7 @@ void LibreMinesGameEngine::vResetPrincipalMatrix()
 
 bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
 {
-    if(!principalMatrix[_X][_Y].hasFlag &&
+    if(principalMatrix[_X][_Y].FlagType == 0 &&
        principalMatrix[_X][_Y].state == MINE)
     {
         // If the user tried to unlock an unflaged mined cell, (s)he lose
@@ -298,7 +298,7 @@ bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
     }
 
     if(principalMatrix[_X][_Y].isHidden &&
-            !principalMatrix[_X][_Y].hasFlag)
+            principalMatrix[_X][_Y].FlagType == 0)
     {
         // Unlock the cell
         principalMatrix[_X][_Y].isHidden = false;
@@ -495,7 +495,7 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs, bool ignorePr
     {
         for (int j=0; j<iY; j++)
         {
-            if(principalMatrix[i][j].hasFlag)
+            if(principalMatrix[i][j].FlagType)
             {
                 if (principalMatrix[i][j].state == MINE)
                     iCorrectFlags++;
@@ -586,15 +586,20 @@ void LibreMinesGameEngine::SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y)
     if(!principalMatrix[_X][_Y].isHidden)
         return;
 
-    if(principalMatrix[_X][_Y].hasFlag)
+    if(principalMatrix[_X][_Y].FlagType == 2)
     {
-        principalMatrix[_X][_Y].hasFlag = false;
-        iMinesLeft++;
+        principalMatrix[_X][_Y].FlagType = 0;
         Q_EMIT SIGNAL_unflagCell(_X, _Y);
+    }
+    else if (principalMatrix[_X][_Y].FlagType == 1)
+    {
+        principalMatrix[_X][_Y].FlagType = 2;
+        iMinesLeft++;
+        Q_EMIT SIGNAL_questionCell(_X, _Y);
     }
     else
     {
-        principalMatrix[_X][_Y].hasFlag = true;
+        principalMatrix[_X][_Y].FlagType = 1;
         iMinesLeft--;
         Q_EMIT SIGNAL_flagCell(_X, _Y);
     }
@@ -635,7 +640,7 @@ void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _
 
             const CellGameEngine& cell = principalMatrix[i][j];
 
-            if(cell.isHidden && !cell.hasFlag)
+            if(cell.isHidden && cell.FlagType == 0)
             {
                 if(!bCleanCell(i, j))
                     return;

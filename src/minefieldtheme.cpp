@@ -66,6 +66,7 @@ void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
 
     pmFlag.reset( new QPixmap(  QIcon(prefix + "flag.svg").pixmap(cellLength, cellLength)  ) );
     pmNoFlag.reset( new QPixmap(  QIcon(prefix + "no_flag.svg").pixmap(cellLength, cellLength)  ) );
+	pmQuestionFlag.reset( new QPixmap(  QIcon(prefix + "question_flag.svg").pixmap(cellLength, cellLength)  ) );
     pmBoom.reset( new QPixmap(  QIcon(prefix + "boom.svg").pixmap(cellLength, cellLength)  ) );
     pmWrongFlag.reset( new QPixmap(  QIcon(prefix + "wrong_flag.svg").pixmap(cellLength, cellLength)  ) );
 }
@@ -102,6 +103,11 @@ const QPixmap& MinefieldTheme::getPixmapFromCellState(const CELL_STATE state) co
 const QPixmap& MinefieldTheme::getPixmapButton(const bool flag)
 {
     return flag ? *pmFlag.get() : *pmNoFlag.get();
+}
+
+const QPixmap& MinefieldTheme::getPixmapQuestion()
+{
+	return *pmQuestionFlag.get();
 }
 
 const QPixmap& MinefieldTheme::getPixmapWrongFlag()
