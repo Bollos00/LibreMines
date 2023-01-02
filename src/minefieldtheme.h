@@ -15,6 +15,7 @@ public:
 
     const QPixmap& getPixmapFromCellState(const CELL_STATE state)const;
     const QPixmap& getPixmapButton(const bool flag);
+    const QPixmap& getPixmapQuestion();
     const QPixmap& getPixmapWrongFlag();
     const QPixmap& getPixmapBoom();
 private:
@@ -30,6 +31,7 @@ private:
     QScopedPointer<QPixmap> pmEight;
 
     QScopedPointer<QPixmap> pmFlag;
+    QScopedPointer<QPixmap> pmQuestionFlag;
     QScopedPointer<QPixmap> pmNoFlag;
     QScopedPointer<QPixmap> pmBoom;
     QScopedPointer<QPixmap> pmWrongFlag;

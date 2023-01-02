@@ -4,6 +4,7 @@
         <file>minefield_themes/classic_light/no_flag.svg</file>
         <file>minefield_themes/classic_light/mine.svg</file>
         <file>minefield_themes/classic_light/flag.svg</file>
+        <file>minefield_themes/classic_light/question_flag.svg</file>
         <file>minefield_themes/classic_light/boom.svg</file>
         <file>minefield_themes/classic_light/8.svg</file>
         <file>minefield_themes/classic_light/7.svg</file>
@@ -16,6 +17,7 @@
         <file>minefield_themes/classic_light/0.svg</file>
         <file>minefield_themes/classic_dark/wrong_flag.svg</file>
         <file>minefield_themes/classic_dark/no_flag.svg</file>
+        <file>minefield_themes/classic_dark/question_flag.svg</file>
         <file>minefield_themes/classic_dark/mine.svg</file>
         <file>minefield_themes/classic_dark/flag.svg</file>
         <file>minefield_themes/classic_dark/boom.svg</file>
@@ -42,5 +44,6 @@
         <file>minefield_themes/twemoji/flag.svg</file>
         <file>minefield_themes/twemoji/boom.svg</file>
         <file>minefield_themes/twemoji/no_flag.svg</file>
+        <file>minefield_themes/twemoji/question_flag.svg</file>
     </qresource>
 </RCC>

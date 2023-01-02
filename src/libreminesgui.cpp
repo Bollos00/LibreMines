@@ -437,6 +437,8 @@ void LibreMinesGui::vNewGame(const uchar _X,
             this, &LibreMinesGui::SLOT_minesLeft);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_flagCell,
             this, &LibreMinesGui::SLOT_flagCell);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_questionCell,
+            this, &LibreMinesGui::SLOT_QuestionCell);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_unflagCell,
             this, &LibreMinesGui::SLOT_unflagCell);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_gameWon,
@@ -1360,6 +1362,25 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
     Q_EMIT(sound->SIGNAL_flagCell());
 }
 
+
+void LibreMinesGui::SLOT_QuestionCell(const uchar _X, const uchar _Y)
+{
+    if(principalMatrix[_X][_Y].button->isHidden())
+        qDebug(Q_FUNC_INFO);
+    else
+    {
+        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapQuestion()));
+        principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
+    }
+
+    if(controller.active && controller.currentX == _X && controller.currentY == _Y)
+    {
+        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
+    }
+
+    Q_EMIT(sound->SIGNAL_flagCell());
+}
+
 void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
 {
     if(principalMatrix[_X][_Y].button->isHidden())
@@ -1465,12 +1486,12 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
             if(cellGE.isHidden)
             {
                 if(cellGE.state == MINE &&
-                   !cellGE.hasFlag)
+                   cellGE.FlagType == 0)
                 {
                     cellGui.button->hide();
                 }
                 else if (cellGE.state != MINE &&
-                         cellGE.hasFlag)
+                         cellGE.FlagType > 0)
                 {
                     cellGui.button->hide();
                     cellGui.label->setPixmap(fieldTheme.getPixmapWrongFlag());
@@ -1671,8 +1692,11 @@ void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar
 
     if(cellGE.isHidden)
     {
-
-        QImage img = fieldTheme.getPixmapButton(cellGE.hasFlag).toImage();
+		QImage img;
+		if (cellGE.FlagType == 2)
+			img = fieldTheme.getPixmapQuestion().toImage();
+		else
+        	img = fieldTheme.getPixmapButton(cellGE.FlagType == 1).toImage();
         img.invertPixels();
         cellGui.button->setIcon(QIcon(QPixmap::fromImage(img)));
     }
@@ -1695,7 +1719,10 @@ void LibreMinesGui::vKeyboardControllUnsetCurrentCell()
 
     if(cellGE.isHidden)
     {
-        cellGui.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.hasFlag)));
+		if (cellGE.FlagType == 2)
+        	cellGui.button->setIcon(QIcon(fieldTheme.getPixmapQuestion()));
+		else
+        	cellGui.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.FlagType == 1)));
     }
     else
     {
