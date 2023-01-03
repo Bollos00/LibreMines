@@ -71,38 +71,47 @@ void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
     pmWrongFlag.reset( new QPixmap(  QIcon(prefix + "wrong_flag.svg").pixmap(cellLength, cellLength)  ) );
 }
 
-const QPixmap& MinefieldTheme::getPixmapFromCellState(const CELL_STATE state) const
+const QPixmap& MinefieldTheme::getPixmapFromCellValue(const CellValue value) const
 {
-    switch(state)
+    switch(value)
     {
-        case ZERO:
+        case CellValue::ZERO:
             return *pmZero.get();
-        case MINE:
+        case CellValue::MINE:
             return *pmMine.get();
-        case ONE:
+        case CellValue::ONE:
             return *pmOne.get();
-        case TWO:
+        case CellValue::TWO:
             return *pmTwo.get();
-        case THREE:
+        case CellValue::THREE:
             return *pmThree.get();
-        case FOUR:
+        case CellValue::FOUR:
             return *pmFour.get();
-        case FIVE:
+        case CellValue::FIVE:
             return *pmFive.get();
-        case SIX:
+        case CellValue::SIX:
             return *pmSix.get();
-        case SEVEN:
+        case CellValue::SEVEN:
             return *pmSeven.get();
-        case EIGHT:
+        case CellValue::EIGHT:
             return *pmEight.get();
     }
 
     return *pmZero.get();
 }
 
-const QPixmap& MinefieldTheme::getPixmapButton(const bool flag)
+const QPixmap& MinefieldTheme::getPixmapButton(const FlagState state)
 {
-    return flag ? *pmFlag.get() : *pmNoFlag.get();
+    switch (state) {
+        case FlagState::NoFlag:
+        return *pmNoFlag.get();
+        case FlagState::HasFlag:
+        return *pmFlag.get();
+        case FlagState::Question:
+        return *pmQuestionFlag.get();
+
+    }
+    return *pmNoFlag.get();
 }
 
 const QPixmap& MinefieldTheme::getPixmapQuestion()

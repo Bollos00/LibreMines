@@ -229,6 +229,11 @@ int LibreMinesPreferencesDialog::optionSoundVolume() const
     return ui->sliderSoundVolume->value();
 }
 
+bool LibreMinesPreferencesDialog::optionUseQuestionMark() const
+{
+    return ui->cbUseQuestionMark->isChecked();
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -345,6 +350,11 @@ void LibreMinesPreferencesDialog::setOptionSoundVolume(const int option)
     ui->labelSoundVolume->setText(QString::number(option));
 
     ui->cbSoundMute->setChecked(option == 0);
+}
+
+void LibreMinesPreferencesDialog::setOptionUseQuestionMark(const QString& option)
+{
+    ui->cbProgressBarInGame->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
 }
 
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const

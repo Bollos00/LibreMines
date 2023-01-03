@@ -31,7 +31,7 @@ public:
     operator QString() const;
 
     qint64 iTimeInNs;
-    GAME_DIFFICULTY gameDifficulty;
+    GameDifficulty gameDifficulty;
     uchar width;
     uchar heigth;
     ushort mines;

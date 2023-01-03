@@ -35,11 +35,12 @@ public:
     class CellGameEngine
     {
     public:
+
         CellGameEngine();
 
-        CELL_STATE state;
+        CellValue value;
         bool isHidden;
-        int FlagType;
+        FlagState flagState;
     };
 
 public:
@@ -59,6 +60,8 @@ public:
     bool isGameActive()const;
 
     void setFirstCellClean(const bool x);
+    void setUseQuestionMark(const bool x);
+
 private:
     void vResetPrincipalMatrix();
     bool bCleanCell(const uchar _X, const uchar _Y);
@@ -84,6 +87,8 @@ private:
     bool bFirst; /**< TODO: describe */
     bool bFirstCellClean; /**< TODO: describe */
 
+    bool bUseQuestionMark;
+
     bool bGameActive;
 
 Q_SIGNALS:
@@ -106,7 +111,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void SLOT_cleanCell(const uchar _X, const uchar _Y);
-    void SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y);
+    void SLOT_changeFlagState(const uchar _X, const uchar _Y);
     void SLOT_stop();
     void SLOT_startTimer();
     void SLOT_cleanNeighborCells(const uchar _X, const uchar _Y);

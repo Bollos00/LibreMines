@@ -227,7 +227,7 @@ private:
 
     int cellLength; /**< TODO: describe */
 
-    GAME_DIFFICULTY difficult; /**< TODO: describe */
+    GameDifficulty difficult; /**< TODO: describe */
 
     QPushButton *buttonEasy; /**< TODO: describe */
     QPushButton *buttonMedium; /**< TODO: describe */

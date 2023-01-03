@@ -57,7 +57,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     iLimitHeightField( 0 ),
     iLimitWidthField( 0 ),
     cellLength( 0 ),
-    difficult( NONE ),
+    difficult(GameDifficulty::NONE ),
     preferences( new LibreMinesPreferencesDialog(this) ),
     dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
     sound( new SoundEffects() )
@@ -339,6 +339,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     gameEngine.reset(new LibreMinesGameEngine());
 
     gameEngine->setFirstCellClean(preferences->optionFirstCellClean());
+    gameEngine->setUseQuestionMark(preferences->optionUseQuestionMark());
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
     // Set the length of each cell
@@ -385,11 +386,11 @@ void LibreMinesGui::vNewGame(const uchar _X,
             layoutBoard->addWidget(cell.button, j, i);
 
             cell.label->resize(cellLength, cellLength);
-            cell.label->setPixmap(fieldTheme.getPixmapFromCellState(ZERO));
+            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(CellValue::ZERO));
             cell.label->show();
 
             cell.button->resize(cellLength, cellLength);
-            cell.button->setIcon(QIcon(fieldTheme.getPixmapButton(false)));
+            cell.button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
             cell.button->setIconSize(QSize(cellLength, cellLength));
             cell.button->show();
             cell.button->setEnabled(false);
@@ -457,7 +458,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
                 gameEngine.get(), &LibreMinesGameEngine::SLOT_cleanNeighborCells);
     }
     connect(this, &LibreMinesGui::SIGNAL_addOrRemoveFlag,
-            gameEngine.get(), &LibreMinesGameEngine::SLOT_addOrRemoveFlag);
+            gameEngine.get(), &LibreMinesGameEngine::SLOT_changeFlagState);
     connect(this, &LibreMinesGui::SIGNAL_stopGame,
             gameEngine.get(), &LibreMinesGameEngine::SLOT_stop);
 
@@ -491,12 +492,8 @@ void LibreMinesGui::vAttributeAllCells()
 
             cell.button->setEnabled(true);
 
-            cell.label->setPixmap
-                    (
-                        fieldTheme.getPixmapFromCellState(
-                            gameEngine->getPrincipalMatrix()[i][j].state
-                            )
-                        );
+            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue
+                                  (gameEngine->getPrincipalMatrix()[i][j].value));
 
         }
     }
@@ -900,7 +897,7 @@ void LibreMinesGui::SLOT_Easy()
     vHideMainMenu();
     vNewGame(8, 8, 10);
 
-    difficult = EASY;
+    difficult = GameDifficulty::EASY;
 }
 
 void LibreMinesGui::SLOT_Medium()
@@ -908,7 +905,7 @@ void LibreMinesGui::SLOT_Medium()
     vHideMainMenu();
     vNewGame(16, 16, 40);
 
-    difficult = MEDIUM;
+    difficult = GameDifficulty::MEDIUM;
 
 }
 
@@ -917,7 +914,7 @@ void LibreMinesGui::SLOT_Hard()
     vHideMainMenu();
     vNewGame(30, 16, 99);
 
-    difficult = HARD;
+    difficult = GameDifficulty::HARD;
 
 }
 
@@ -926,7 +923,7 @@ void LibreMinesGui::SLOT_Customized()
     vHideMainMenu();
     vNewGame(sbCustomizedX->value(), sbCustomizedY->value(), sbCustomizedNumbersOfMines->value());
 
-    difficult = CUSTOMIZED;
+    difficult = GameDifficulty::CUSTOMIZED;
 
 }
 
@@ -1071,7 +1068,7 @@ void LibreMinesGui::SLOT_QuitGame()
     vHideInterfaceInGame();
     vShowMainMenu();
 
-    difficult = NONE;
+    difficult = GameDifficulty::NONE;
 
     gameEngine.reset();
 }
@@ -1273,13 +1270,13 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             }
 
             QString strGameDiffuclty;
-            if(score.gameDifficulty == EASY)
+            if(score.gameDifficulty == GameDifficulty::EASY)
                 strGameDiffuclty = tr("Easy");
-            else if(score.gameDifficulty == MEDIUM)
+            else if(score.gameDifficulty == GameDifficulty::MEDIUM)
                 strGameDiffuclty = tr("Medium");
-            else if(score.gameDifficulty == HARD)
+            else if(score.gameDifficulty == GameDifficulty::HARD)
                 strGameDiffuclty = tr("Hard");
-            else if(score.gameDifficulty == CUSTOMIZED)
+            else if(score.gameDifficulty == GameDifficulty::CUSTOMIZED)
             {
                 strGameDiffuclty = tr("Customized ") + QString::number(score.width) +
                                    " x " + QString::number(score.heigth) + " : " +
@@ -1350,7 +1347,7 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapButton(true)));
+        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::HasFlag)));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1387,7 +1384,7 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapButton(false)));
+        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1408,18 +1405,18 @@ void LibreMinesGui::SLOT_gameWon()
 {
     switch (difficult)
     {
-        case NONE:
+        case GameDifficulty::NONE:
             break;
-        case EASY:
+        case GameDifficulty::EASY:
             labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: EASY"));
             break;
-        case MEDIUM:
+        case GameDifficulty::MEDIUM:
             labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: MEDIUM"));
             break;
-        case HARD:
+        case GameDifficulty::HARD:
             labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: HARD"));
             break;
-        case CUSTOMIZED:
+        case GameDifficulty::CUSTOMIZED:
             labelYouWonYouLost->setText(tr("You Won") +'\n' + tr("Difficulty: CUSTOM\n") +
                                         QString::number(gameEngine->rows()) +
                                         "x" + QString::number(gameEngine->lines()) +
@@ -1450,18 +1447,18 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
 {
     switch (difficult)
     {
-        case NONE:
+        case GameDifficulty::NONE:
             break;
-        case EASY:
+        case GameDifficulty::EASY:
             labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: EASY"));
             break;
-        case MEDIUM:
+        case GameDifficulty::MEDIUM:
             labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: MEDIUM"));
             break;
-        case HARD:
+        case GameDifficulty::HARD:
             labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: HARD"));
             break;
-        case CUSTOMIZED:
+        case GameDifficulty::CUSTOMIZED:
             labelYouWonYouLost->setText(tr("You Lost") + '\n' + tr("Difficulty: CUSTOM\n") +
                                         QString::number(gameEngine->rows()) +
                                         "x" +
@@ -1485,13 +1482,13 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
 
             if(cellGE.isHidden)
             {
-                if(cellGE.state == MINE &&
-                   cellGE.FlagType == 0)
+                if(cellGE.value == CellValue::MINE &&
+                   cellGE.flagState == FlagState::NoFlag)
                 {
                     cellGui.button->hide();
                 }
-                else if (cellGE.state != MINE &&
-                         cellGE.FlagType > 0)
+                else if (cellGE.value != CellValue::MINE &&
+                         cellGE.flagState != FlagState::NoFlag)
                 {
                     cellGui.button->hide();
                     cellGui.label->setPixmap(fieldTheme.getPixmapWrongFlag());
@@ -1692,17 +1689,13 @@ void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar
 
     if(cellGE.isHidden)
     {
-		QImage img;
-		if (cellGE.FlagType == 2)
-			img = fieldTheme.getPixmapQuestion().toImage();
-		else
-        	img = fieldTheme.getPixmapButton(cellGE.FlagType == 1).toImage();
+        QImage img = fieldTheme.getPixmapButton(cellGE.flagState).toImage();
         img.invertPixels();
         cellGui.button->setIcon(QIcon(QPixmap::fromImage(img)));
     }
     else
     {
-        QImage img = fieldTheme.getPixmapFromCellState(cellGE.state).toImage();
+        QImage img = fieldTheme.getPixmapFromCellValue(cellGE.value).toImage();
         img.invertPixels();
 
         cellGui.label->setPixmap(QPixmap::fromImage(img));
@@ -1719,14 +1712,11 @@ void LibreMinesGui::vKeyboardControllUnsetCurrentCell()
 
     if(cellGE.isHidden)
     {
-		if (cellGE.FlagType == 2)
-        	cellGui.button->setIcon(QIcon(fieldTheme.getPixmapQuestion()));
-		else
-        	cellGui.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.FlagType == 1)));
+        cellGui.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
     }
     else
     {
-        cellGui.label->setPixmap(fieldTheme.getPixmapFromCellState(cellGE.state));
+        cellGui.label->setPixmap(fieldTheme.getPixmapFromCellValue(cellGE.value));
     }
 }
 
