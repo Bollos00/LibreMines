@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -24,9 +24,9 @@
 #include <QTimer>
 
 LibreMinesGameEngine::CellGameEngine::CellGameEngine():
-    state(ZERO),
+    value(CellValue::ZERO),
     isHidden(true),
-    hasFlag(false)
+    flagState(FlagState::NoFlag)
 {
 
 }
@@ -67,7 +67,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
         {
             for(CellGameEngine& j: i)
             {
-                j.state = ZERO;
+                j.value = CellValue::ZERO;
             }
         }
     }
@@ -79,9 +79,9 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
             {
                 CellGameEngine& cell = principalMatrix[i][j];
 
-                cell.state = ZERO;
+                cell.value = CellValue::ZERO;
                 cell.isHidden = true;
-                cell.hasFlag = false;
+                cell.flagState = FlagState::NoFlag;
 
 //                qApp->processEvents();
             }
@@ -130,10 +130,10 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
 
         CellGameEngine& cell = principalMatrix[i][j];
 
-        if(cell.state == ZERO)
+        if(cell.value == CellValue::ZERO)
         {
             i_nMines_--;
-            cell.state = MINE;
+            cell.value = CellValue::MINE;
         }
     }
 
@@ -144,7 +144,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
         {
             CellGameEngine& cell = principalMatrix[i][j];
 
-            if(cell.state == ZERO)
+            if(cell.value == CellValue::ZERO)
             {
                 iHiddenCells++;
 
@@ -153,123 +153,123 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                 if(i == 0 &&
                    j == 0)
                 {
-                    if(principalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].state == MINE)
+                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
                 else if(i == 0 &&
                         j == iY-1)
                 {
-                    if(principalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].state == MINE)
+                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
                 else if(i == iX-1 &&
                         j==0)
                 {
-                    if(principalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].state == MINE)
+                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
                 else if(i == iX-1 &&
                         j == iY-1)
                 {
-                    if(principalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].state == MINE)
+                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
                 else if(i == 0 &&
                         j > 0 &&
                         j < iY-1)
                 {
-                    if(principalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].state == MINE)
+                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].state == MINE)
+                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
                 else if(i == iX-1 &&
                         j >0 &&
                         j < iY-1)
                 {
-                    if(principalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].state == MINE)
+                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].state == MINE)
+                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
                 else if(i > 0 &&
                         i < iX-1 &&
                         j == 0){
-                    if(principalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].state == MINE)
+                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].state == MINE)
+                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
                 else if(i > 0 &&
                         i < iX-1 &&
                         j == iY-1)
                 {
-                    if(principalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].state == MINE)
+                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].state == MINE)
+                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
                 else
                 {
-                    if(principalMatrix[i-1][j-1].state == MINE)
+                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j].state == MINE)
+                    if(principalMatrix[i-1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].state == MINE)
+                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j-1].state == MINE)
+                    if(principalMatrix[i][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i][j+1].state == MINE)
+                    if(principalMatrix[i][j+1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].state == MINE)
+                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j].state == MINE)
+                    if(principalMatrix[i+1][j].value == CellValue::MINE)
                         minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].state == MINE)
+                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
                         minesNeighbors++;
                 }
 
-                cell.state = (CELL_STATE)minesNeighbors;
+                cell.value = (CellValue)minesNeighbors;
             }
         }
     }
@@ -289,8 +289,8 @@ void LibreMinesGameEngine::vResetPrincipalMatrix()
 
 bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
 {
-    if(!principalMatrix[_X][_Y].hasFlag &&
-       principalMatrix[_X][_Y].state == MINE)
+    if(principalMatrix[_X][_Y].flagState == FlagState::NoFlag &&
+       principalMatrix[_X][_Y].value == CellValue::MINE)
     {
         // If the user tried to unlock an unflaged mined cell, (s)he lose
         vGameLost(_X, _Y);
@@ -298,14 +298,14 @@ bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
     }
 
     if(principalMatrix[_X][_Y].isHidden &&
-            !principalMatrix[_X][_Y].hasFlag)
+       principalMatrix[_X][_Y].flagState == FlagState::NoFlag)
     {
         // Unlock the cell
         principalMatrix[_X][_Y].isHidden = false;
         Q_EMIT SIGNAL_showCell(_X, _Y);
 
-        // If the state of the cell is ZERO, unlock all neighbor cells
-        if(principalMatrix[_X][_Y].state == ZERO)
+        // If the state of the cell is CellValue::ZERO, unlock all neighbor cells
+        if(principalMatrix[_X][_Y].value == CellValue::ZERO)
         {
             if(_X == 0 &&
                _Y == 0)
@@ -495,9 +495,9 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs, bool ignorePr
     {
         for (int j=0; j<iY; j++)
         {
-            if(principalMatrix[i][j].hasFlag)
+            if(principalMatrix[i][j].flagState == FlagState::HasFlag)
             {
-                if (principalMatrix[i][j].state == MINE)
+                if (principalMatrix[i][j].value == CellValue::MINE)
                     iCorrectFlags++;
                 else
                     iWrongFlags++;
@@ -513,7 +513,7 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs, bool ignorePr
 
     LibreMinesScore score;
     score.iTimeInNs = timeLastGame;
-    score.gameDifficulty = NONE;
+    score.gameDifficulty = GameDifficulty::NONE;
     score.width = iX;
     score.heigth = iY;
     score.mines = nMines;
@@ -564,10 +564,15 @@ void LibreMinesGameEngine::setFirstCellClean(const bool x)
     bFirstCellClean = x;
 }
 
+void LibreMinesGameEngine::setUseQuestionMark(const bool x)
+{
+    bUseQuestionMark = x;
+}
+
 
 void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 {
-    if(bFirst && bFirstCellClean && principalMatrix[_X][_Y].state != ZERO)
+    if(bFirst && bFirstCellClean && principalMatrix[_X][_Y].value != CellValue::ZERO)
     {
         vNewGame(iX, iY, nMines, _X, _Y);
         SLOT_startTimer();
@@ -581,22 +586,37 @@ void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
     bCleanCell(_X, _Y);
 }
 
-void LibreMinesGameEngine::SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y)
+void LibreMinesGameEngine::SLOT_changeFlagState(const uchar _X, const uchar _Y)
 {
     if(!principalMatrix[_X][_Y].isHidden)
         return;
 
-    if(principalMatrix[_X][_Y].hasFlag)
-    {
-        principalMatrix[_X][_Y].hasFlag = false;
-        iMinesLeft++;
-        Q_EMIT SIGNAL_unflagCell(_X, _Y);
-    }
-    else
-    {
-        principalMatrix[_X][_Y].hasFlag = true;
-        iMinesLeft--;
-        Q_EMIT SIGNAL_flagCell(_X, _Y);
+    switch(principalMatrix[_X][_Y].flagState) {
+        case FlagState::NoFlag:
+        {
+            principalMatrix[_X][_Y].flagState = FlagState::HasFlag;
+            iMinesLeft--;
+            Q_EMIT SIGNAL_flagCell(_X, _Y);
+        }break;
+        case FlagState::HasFlag:
+        {
+            iMinesLeft++;
+            if(bUseQuestionMark)
+            {
+                principalMatrix[_X][_Y].flagState = FlagState::Question;
+                Q_EMIT SIGNAL_questionCell(_X, _Y);
+            }
+            else
+            {
+                principalMatrix[_X][_Y].flagState = FlagState::NoFlag;
+                Q_EMIT SIGNAL_unflagCell(_X, _Y);
+            }
+        }break;
+        case FlagState::Question:
+        {
+            principalMatrix[_X][_Y].flagState = FlagState::NoFlag;
+            Q_EMIT SIGNAL_unflagCell(_X, _Y);
+        }break;
     }
 
     Q_EMIT SIGNAL_minesLeft(iMinesLeft);
@@ -635,7 +655,7 @@ void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _
 
             const CellGameEngine& cell = principalMatrix[i][j];
 
-            if(cell.isHidden && !cell.hasFlag)
+            if(cell.isHidden && cell.flagState == FlagState::NoFlag)
             {
                 if(!bCleanCell(i, j))
                     return;

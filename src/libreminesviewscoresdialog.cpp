@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -40,15 +40,15 @@ void LibreMinesViewScoresDialog::setScores(const QList<LibreMinesScore>& scores)
 {
     for(const LibreMinesScore& s : scores)
     {
-        if(s.gameDifficulty == EASY)
+        if(s.gameDifficulty == GameDifficulty::EASY)
         {
             tabs[tr("Easy")].scores.append(s);
         }
-        else if(s.gameDifficulty == MEDIUM)
+        else if(s.gameDifficulty == GameDifficulty::MEDIUM)
         {
             tabs[tr("Medium")].scores.append(s);
         }
-        else if(s.gameDifficulty == HARD)
+        else if(s.gameDifficulty == GameDifficulty::HARD)
         {
             tabs[tr("Hard")].scores.append(s);
         }

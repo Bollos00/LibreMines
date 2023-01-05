@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -27,7 +27,7 @@
  * @brief
  *
  */
-enum CELL_STATE: qint8{
+enum class CellValue: qint8{
     MINE = -1,
     ZERO = 0,
     ONE = 1,
@@ -44,7 +44,7 @@ enum CELL_STATE: qint8{
  * @brief
  *
  */
-enum GAME_DIFFICULTY: uchar{
+enum class GameDifficulty: uchar{
     NONE,
     EASY,
     MEDIUM,
@@ -52,6 +52,11 @@ enum GAME_DIFFICULTY: uchar{
     CUSTOMIZED
 };
 
+enum class FlagState : quint8{
+    NoFlag   = 0,
+    HasFlag  = 1,
+    Question = 2
+};
 
 class Vector2Dshort
 {

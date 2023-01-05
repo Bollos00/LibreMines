@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -80,6 +80,7 @@ public:
     QString optionMinefieldGenerationAnimationString()const;
     AskToSaveMatchScore optionAskToSaveMatchScoreBehaviour()const;
     int optionSoundVolume()const;
+    bool optionUseQuestionMark()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
@@ -96,6 +97,7 @@ public:
     void setOptionMinefieldGenerationAnimation(const QString& option);
     void setOptionAskToSaveMatchScoreBehaviour(const uchar option);
     void setOptionSoundVolume(const int option);
+    void setOptionUseQuestionMark(const QString& option);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;

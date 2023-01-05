@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -24,7 +24,7 @@
 
 LibreMinesScore::LibreMinesScore():
     iTimeInNs(0),
-    gameDifficulty(NONE),
+    gameDifficulty(GameDifficulty::NONE),
     width(0),
     heigth(0),
     mines(0),
@@ -37,13 +37,13 @@ LibreMinesScore::LibreMinesScore():
 LibreMinesScore::operator QString() const
 {
     QString strGameDiffuclty;
-    if(this->gameDifficulty == EASY)
+    if(this->gameDifficulty == GameDifficulty::EASY)
         strGameDiffuclty = "Easy";
-    else if(this->gameDifficulty == MEDIUM)
+    else if(this->gameDifficulty == GameDifficulty::MEDIUM)
         strGameDiffuclty = "Medium";
-    else if(this->gameDifficulty == HARD)
+    else if(this->gameDifficulty == GameDifficulty::HARD)
         strGameDiffuclty = "Hard";
-    else if(this->gameDifficulty == CUSTOMIZED)
+    else if(this->gameDifficulty == GameDifficulty::CUSTOMIZED)
     {
         strGameDiffuclty = "Customized " + QString::number(this->width) +
                            " x " + QString::number(this->heigth) + " : " +
@@ -124,7 +124,7 @@ QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score)
     stream >> score.iTimeInNs;
     uchar charGameDifficulty;
     stream >> charGameDifficulty;
-    score.gameDifficulty = (GAME_DIFFICULTY)charGameDifficulty;
+    score.gameDifficulty = (GameDifficulty)charGameDifficulty;
     stream >> score.width;
     stream >> score.heigth;
     stream >> score.mines;

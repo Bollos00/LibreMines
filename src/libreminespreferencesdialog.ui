@@ -25,6 +25,9 @@
         <property name="text">
          <string>First cell clean</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -33,12 +36,25 @@
          <string>Clean neighbor cells when
 clicked on showed cell</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbProgressBarInGame">
         <property name="text">
          <string>Show progress bar</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbUseQuestionMark">
+        <property name="text">
+         <string>Use Question Mark</string>
         </property>
        </widget>
       </item>
@@ -193,7 +209,7 @@ Animation</string>
            <x>0</x>
            <y>0</y>
            <width>570</width>
-           <height>240</height>
+           <height>237</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -209,7 +225,7 @@ Animation</string>
                 <string>Always</string>
                </property>
                <property name="checked">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -217,6 +233,9 @@ Animation</string>
               <widget class="QRadioButton" name="rbSaveScoreWhenHighScoreAndGameCompleted">
                <property name="text">
                 <string>When a new high score is achieved or when the game is completed</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -312,7 +331,7 @@ Animation</string>
         <item>
          <widget class="QLabel" name="labelSoundVolume">
           <property name="text">
-           <string>0</string>
+           <string notr="true">0</string>
           </property>
          </widget>
         </item>

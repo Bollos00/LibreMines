@@ -10,7 +10,7 @@ bool MinefieldExtraTheme::isValidTheme(const QString& themePath)
 
     // Files expected on the theme directory
     QStringList entries({ "0", "1", "2", "3", "4", "5", "6", "7", "8",
-                          "boom", "flag", "mine", "no_flag", "wrong_flag"});
+                          "boom", "flag", "mine", "no_flag", "wrong_flag", "question_flag"});
     for(QString& v : entries)
     {
         v.append(".svg");

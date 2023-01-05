@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -192,6 +192,7 @@ private Q_SLOTS:
     void SLOT_currentTime(const ushort time);
     void SLOT_minesLeft(const ushort minesLeft);
     void SLOT_flagCell(const uchar _X, const uchar _Y);
+    void SLOT_QuestionCell(const uchar _X, const uchar _Y);
     void SLOT_unflagCell(const uchar _X, const uchar _Y);
 
     void SLOT_remakeGame();
@@ -226,7 +227,7 @@ private:
 
     int cellLength; /**< TODO: describe */
 
-    GAME_DIFFICULTY difficult; /**< TODO: describe */
+    GameDifficulty difficult; /**< TODO: describe */
 
     QPushButton *buttonEasy; /**< TODO: describe */
     QPushButton *buttonMedium; /**< TODO: describe */

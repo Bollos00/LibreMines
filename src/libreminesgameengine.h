@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2022  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -35,11 +35,12 @@ public:
     class CellGameEngine
     {
     public:
+
         CellGameEngine();
 
-        CELL_STATE state;
+        CellValue value;
         bool isHidden;
-        bool hasFlag;
+        FlagState flagState;
     };
 
 public:
@@ -59,6 +60,8 @@ public:
     bool isGameActive()const;
 
     void setFirstCellClean(const bool x);
+    void setUseQuestionMark(const bool x);
+
 private:
     void vResetPrincipalMatrix();
     bool bCleanCell(const uchar _X, const uchar _Y);
@@ -84,6 +87,8 @@ private:
     bool bFirst; /**< TODO: describe */
     bool bFirstCellClean; /**< TODO: describe */
 
+    bool bUseQuestionMark;
+
     bool bGameActive;
 
 Q_SIGNALS:
@@ -98,6 +103,7 @@ Q_SIGNALS:
     void SIGNAL_currentTime(const ushort);
     void SIGNAL_minesLeft(const ushort);
     void SIGNAL_flagCell(const uchar _X, const uchar _Y);
+    void SIGNAL_questionCell(const uchar _X, const uchar _Y);
     void SIGNAL_unflagCell(const uchar _X, const uchar _Y);
     void SIGNAL_gameWon();
     void SIGNAL_gameLost(const uchar _X, const uchar _Y);
@@ -105,7 +111,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void SLOT_cleanCell(const uchar _X, const uchar _Y);
-    void SLOT_addOrRemoveFlag(const uchar _X, const uchar _Y);
+    void SLOT_changeFlagState(const uchar _X, const uchar _Y);
     void SLOT_stop();
     void SLOT_startTimer();
     void SLOT_cleanNeighborCells(const uchar _X, const uchar _Y);
