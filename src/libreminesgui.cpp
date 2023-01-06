@@ -635,7 +635,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     sbCustomizedNumbersOfMines = new QSpinBox(centralWidget());
     sbCustomizedNumbersOfMines->setMinimum(0);
-    sbCustomizedNumbersOfMines->setMaximum(sbCustomizedX->value() * sbCustomizedY->value() * sbCustomizedPercentageMines->value() / 100);
+    sbCustomizedNumbersOfMines->setMaximum(sbCustomizedX->value() * sbCustomizedY->value());
     sbCustomizedNumbersOfMines->setValue(sbCustomizedNumbersOfMines->maximum() * sbCustomizedPercentageMines->value() / 100);
 
     cbCustomizedMinesInPercentage = new QCheckBox(centralWidget());
@@ -733,6 +733,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
             sbCustomizedPercentageMines->setValue(100 * value / (sbCustomizedX->value() * sbCustomizedY->value()) );
     });
 
+    // lambda function
     auto updateCustomizedNumberOfMinesMaximum
     {
         [this]()
