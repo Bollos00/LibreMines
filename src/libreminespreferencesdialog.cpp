@@ -50,7 +50,7 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     ui->comboBoxApplicationStyle->addItems(QStyleFactory::keys());
 
     // Default Minefield themes
-    ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light", "TwEmoji"});
+    ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
 
     // Load extra minefield theme (if found).
     for(const QString& path :
@@ -264,7 +264,6 @@ void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &option)
     QString s = option;
     if(option.compare("ClassicLight", Qt::CaseInsensitive) == 0){ s = "Classic Light"; }
     else if(option.compare("ClassicDark", Qt::CaseInsensitive) == 0){ s = "Classic Dark"; }
-    else if(option.compare("TwEmoji", Qt::CaseInsensitive) == 0){ s = "TwEmoji"; }
 
     ui->comboBoxMinefieldTheme->setCurrentText(s);
 }

@@ -24,6 +24,10 @@ project(libremines
     LANGUAGES "CXX"
     )
 
+option(USE_QT6 "Wheter to use Qt5 or Qt6 libraries" FALSE)
+option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
+option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra thmes for the minefield" TRUE)
+
 # Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
@@ -193,7 +197,10 @@ if(UNIX)
             DIRECTORY share/minefield_themes/flowerfield
             DESTINATION share/libremines/minefield_extra_themes
             )
-
+        install(
+            DIRECTORY share/minefield_themes/twemoji
+            DESTINATION share/libremines/minefield_extra_themes
+            )
     endif()
 
 elseif(WIN32)

@@ -21,10 +21,6 @@ void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
     {
         prefix = ":/minefield_themes/classic_dark/";
     }
-    else if(theme.compare("TwEmoji", Qt::CaseInsensitive) == 0)
-    {
-        prefix = ":/minefield_themes/twemoji/";
-    }
     // If it is not one of the defaults themes, try to find it on the system.
     else
     {
@@ -104,12 +100,11 @@ const QPixmap& MinefieldTheme::getPixmapButton(const FlagState state)
 {
     switch (state) {
         case FlagState::NoFlag:
-        return *pmNoFlag.get();
+            return *pmNoFlag.get();
         case FlagState::HasFlag:
-        return *pmFlag.get();
+            return *pmFlag.get();
         case FlagState::Question:
-        return *pmQuestionFlag.get();
-
+            return *pmQuestionFlag.get();
     }
     return *pmNoFlag.get();
 }
