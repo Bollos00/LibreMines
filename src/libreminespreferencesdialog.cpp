@@ -353,7 +353,7 @@ void LibreMinesPreferencesDialog::setOptionSoundVolume(const int option)
 
 void LibreMinesPreferencesDialog::setOptionUseQuestionMark(const QString& option)
 {
-    ui->cbProgressBarInGame->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
+    ui->cbUseQuestionMark->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
 }
 
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
