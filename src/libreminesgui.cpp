@@ -520,7 +520,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     // Actions and Menu Bar
     actionPreferences = new QAction(this);
-    actionHighScores = new QAction(this);
+    actionShowHighScores = new QAction(this);
     actionImportHighScores = new QAction(this);
     actionExportHighScores = new QAction(this);
     actionToggleFullScreen = new QAction(this);
@@ -533,30 +533,31 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     menuBarGlobal->setGeometry(0, 0, this->width(), 100);
 
     menuOptions = new QMenu(menuBarGlobal);
+    menuHighScores = new QMenu(menuBarGlobal);
     menuHelp = new QMenu(menuBarGlobal);
 
     this->setMenuBar(menuBarGlobal);
     this->setStatusBar(new QStatusBar(this));
 
     menuBarGlobal->addAction(menuOptions->menuAction());
+    menuBarGlobal->addAction(menuHighScores->menuAction());
     menuBarGlobal->addAction(menuHelp->menuAction());
 
-    menuOptions->addActions({
-        actionPreferences, actionHighScores, actionImportHighScores,
-        actionExportHighScores, actionToggleFullScreen
-    });
-
+    menuOptions->addActions({actionPreferences, actionToggleFullScreen});
+    menuHighScores->addActions({actionShowHighScores, actionImportHighScores, actionExportHighScores});
     menuHelp->addActions({actionAbout, actionAboutQt, actionGitHubHomePage});
 
     menuOptions->setTitle(tr("Options"));
+    menuHighScores->setTitle(tr("High Scores"));
     menuHelp->setTitle(tr("Help"));
 
     actionPreferences->setText(tr("Preferences..."));
-    actionHighScores->setText(tr("Show High Scores..."));
-    actionImportHighScores->setText(tr("Import High Scores..."));
-    actionExportHighScores->setText(tr("Export High Scores..."));
     actionToggleFullScreen->setText(tr("Toggle Full Screen"));
     actionToggleFullScreen->setShortcut(QKeySequence(Qt::Key_F11));
+
+    actionShowHighScores->setText(tr("Show High Scores..."));
+    actionImportHighScores->setText(tr("Import High Scores..."));
+    actionExportHighScores->setText(tr("Export High Scores..."));
 
     actionAbout->setText(tr("About..."));
     actionAboutQt->setText(tr("About Qt..."));
@@ -690,7 +691,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
 
-    connect(actionHighScores, &QAction::triggered,
+    connect(actionShowHighScores, &QAction::triggered,
             this, &LibreMinesGui::SLOT_showHighScores);
 
     connect(actionImportHighScores, &QAction::triggered,
