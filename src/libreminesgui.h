@@ -269,10 +269,12 @@ private:
 
     QMenu* menuOptions;
     QAction* actionPreferences;
-    QAction* actionHighScores;
+    QAction* actionToggleFullScreen;
+
+    QMenu* menuHighScores;
+    QAction* actionShowHighScores;
     QAction* actionImportHighScores;
     QAction* actionExportHighScores;
-    QAction* actionToggleFullScreen;
 
     QMenu* menuHelp;
     QAction* actionAbout;

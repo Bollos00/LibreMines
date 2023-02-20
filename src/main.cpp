@@ -90,6 +90,23 @@ void loadLanguagePreference()
         else
             delete translator;
     }
+    else
+    {
+        // On the first launch, set the language to the user preference
+        QLocale usrLocale = QLocale::system();
+        if(usrLocale.language() == QLocale::Portuguese)
+        {
+            QTranslator* translator = new QTranslator();
+            translator->load(":/translations/libremines_pt_BR.qm");
+            qApp->installTranslator(translator);
+        }
+//        else if(usrLocale.language() == QLocale::Spanish)
+//        {
+//            QTranslator* translator = new QTranslator();
+//            translator->load(":/translations/libremines_es.qm");
+//            qApp->installTranslator(translator);
+//        }
+    }
 }
 
 int main(int argc, char *argv[])
