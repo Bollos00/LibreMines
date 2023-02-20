@@ -115,7 +115,7 @@ QDataStream& operator<< (QDataStream& stream, const LibreMinesScore& score)
     stream << score.username;
 
     return stream;
-};
+}
 
 QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score)
 {
@@ -133,7 +133,7 @@ QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score)
     stream >> score.username;
 
     return stream;
-};
+}
 
 QDebug operator<<(QDebug debug, const LibreMinesScore& score)
 {
