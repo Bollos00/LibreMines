@@ -207,6 +207,10 @@ private Q_SLOTS:
 
     void SLOT_showHighScores();
 
+    void SLOT_importHighScores();
+
+    void SLOT_exportHighScores();
+
     void SLOT_toggleFullScreen();
 
     void SLOT_saveMinefieldAsImage();
@@ -266,6 +270,8 @@ private:
     QMenu* menuOptions;
     QAction* actionPreferences;
     QAction* actionHighScores;
+    QAction* actionImportHighScores;
+    QAction* actionExportHighScores;
     QAction* actionToggleFullScreen;
 
     QMenu* menuHelp;
