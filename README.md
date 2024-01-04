@@ -57,28 +57,28 @@ The following dependencies are required for building and running LibreMines:
 * [Qt5 Multimedia](https://doc.qt.io/qt-5/qtmultimedia-index.html) >= 5.12
 * [CMake](https://cmake.org/) >= 3.1
 
-Note: Qt6 is also supported
+Note: Qt6 is also supported.
 
 On Arch Linux and derivatives systems, the dependencies can be installed with `pacman`:
 ```sh
-sudo pacman -S base-devel qt5-base qt5-svg qt5-multimedia cmake
+sudo pacman -S base-devel qt6-base qt6-svg qt6-multimedia cmake
 ```
 
 For Ubuntu, you can install the dependencies with the following command:
 ```sh
-sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev qtmultimedia5-dev git
+sudo apt-get install build-essential qt6-default cmake libqt6svg6-dev qtmultimedia6-dev git
 ```
 
 On Fedora, install the dependencies with:
 ```sh
-sudo dnf install qt5-qtbase-devel qt5-qtsvg-devel cmake qt5-qtmultimedia-devel git
+sudo dnf install qt6-qtbase-devel qt6-qtsvg-devel cmake qt6-qtmultimedia-devel git
 ```
 
-On FreeBSD systems, install the packages [qt5-core](https://www.freshports.org/devel/qt5-core), [qt5-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt5-svg](https://www.freshports.org/graphics/qt5-svg/), [qt5-buildtools](https://www.freshports.org/devel/qt5-buildtools/), [qt5-qmake](https://www.freshports.org/devel/qt5-qmake/), [qt5-multimedia](https://www.freshports.org/multimedia/qt5-multimedia/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/).
+On FreeBSD systems, install the packages [qt6-core](https://www.freshports.org/devel/qt5-core), [qt6-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt6-svg](https://www.freshports.org/graphics/qt5-svg/), [qt6-buildtools](https://www.freshports.org/devel/qt5-buildtools/), [qt6-qmake](https://www.freshports.org/devel/qt5-qmake/), [qt6-multimedia](https://www.freshports.org/multimedia/qt5-multimedia/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/).
 
 ```sh
 su -
-pkg install qt5-core qt5-widgets qt5-svg git cmake qt5-buildtools qt5-qmake
+pkg install qt6-core qt6-widgets qt6-svg git cmake qt6-buildtools qt6-qmake
 ```
 
 For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/) or your preferred package manager.
@@ -96,7 +96,7 @@ make
 
 You can also get a stable release from [here](https://github.com/Bollos00/LibreMines/releases).
 
-Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines using Qt6 libraries, additionally pass the argument `-DUSE_QT6="YES"` on the fourth step (the `cmake` part). Also, in order to install _alternative\_dark_ and _alternative\_light_ [minefield_themes](https://github.com/Bollos00/LibreMines/blob/master/share/minefield_themes/README.md), pass the argument `-DINSTALL_EXTRA_MINEFIELD_THEMES="YES"`.
+Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines using Qt5 libraries, additionally pass the argument `-DUSE_QT6="NO"` on the fourth step (the `cmake` part).
 
 The executable `libremines` will be generated in the build directory, now it is possible to run it with:
 ```sh

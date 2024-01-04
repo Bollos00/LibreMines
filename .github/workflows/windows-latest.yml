@@ -1,0 +1,59 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Windows Build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+#   workflow_dispatch:
+
+# env:
+#   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+#   BUILD_TYPE: Release
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        qt-version: [ '5.15.2', '6.5.3' ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Install Qt"
+        uses: jurplel/install-qt-action@latest
+        with:
+          version: ${{ matrix.qt_version }}
+          host: 'windows'
+          target: 'desktop'
+          dir: '${{ github.workspace }}/Qt/'
+          modules: 'qtsvg'
+          arch: 'win64_msvc2019_64'
+          set-env: 'true'
+          setup-python: 'false'
+
+      - name: "Create build directory and run CMake"
+        run: "mkdir build && cd build && \
+          cmake .."
+
+      - name: "Build"
+        run: "cd build && cmake --build . --config Release"
+
+      # - name: Prepare build artifacts
+      #   run: ""
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@latest
+        with:
+          name: build
+          path: build
