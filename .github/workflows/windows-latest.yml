@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        qt-version: [ '5.15.2', '6.5.3' ]
+        qt-version: [ 5.15.2, 6.5.3 ]
 
     steps:
       - uses: actions/checkout@v4
