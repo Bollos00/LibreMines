@@ -18,11 +18,11 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     strategy:
       matrix:
-        qt-version: [ 5.15.2, 6.5.3 ]
+        qt-version: [ '5.15.2', '6.5.3' ]
 
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +32,12 @@ jobs:
         with:
           version: ${{ matrix.qt_version }}
           host: 'windows'
+          target: 'desktop'
+          dir: '${{ github.workspace }}/Qt/'
           modules: 'qtsvg'
+          arch: 'win64_msvc2019_64'
+          set-env: 'true'
+          setup-python: 'false'
 
       - name: "Create build directory and run CMake"
         run: "mkdir build && cd build && \
