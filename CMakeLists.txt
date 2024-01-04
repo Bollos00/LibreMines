@@ -18,13 +18,13 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.10.0"
+    VERSION "2.0.0"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
     )
 
-option(USE_QT6 "Wheter to use Qt5 or Qt6 libraries" FALSE)
+option(USE_QT6 "Wheter to use Qt5 or Qt6 libraries" TRUE)
 option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
 option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra thmes for the minefield" TRUE)
 
