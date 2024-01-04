@@ -66,7 +66,7 @@ sudo pacman -S base-devel qt6-base qt6-svg qt6-multimedia cmake
 
 For Ubuntu, you can install the dependencies with the following command:
 ```sh
-sudo apt-get install build-essential qt6-default cmake libqt6svg6-dev qtmultimedia6-dev git
+sudo apt-get install build-essential qt6-base-dev cmake libqt6svg6-dev qt6-multimedia-dev
 ```
 
 On Fedora, install the dependencies with:

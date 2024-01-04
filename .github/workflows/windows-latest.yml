@@ -33,8 +33,6 @@ jobs:
           version: ${{ matrix.qt_version }}
           host: 'windows'
           modules: 'qtsvg'
-          set-env: 'true'
-          setup-python: 'false'
 
       - name: "Create build directory and run CMake"
         run: "mkdir build && cd build && \
