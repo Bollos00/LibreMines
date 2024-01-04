@@ -28,10 +28,10 @@ jobs:
         qt-version: [ '5.15.2', '6.5.3' ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: "Install Qt"
-        uses: jurplel/install-qt-action@latest
+        uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt_version }}
           host: 'windows'
@@ -53,7 +53,7 @@ jobs:
       #   run: ""
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@latest
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: build
