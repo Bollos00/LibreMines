@@ -27,7 +27,7 @@ jobs:
       image: archlinux:latest
       options: --privileged
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: "Install dependencies"
         run: "pacman -Syu --noconfirm base-devel qt6-base qt6-svg qt6-multimedia cmake"
@@ -41,3 +41,9 @@ jobs:
       
       - name: Prepare build artifacts
         run: "cd build && make DESTDIR=install install"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-install
+          path: build/install
