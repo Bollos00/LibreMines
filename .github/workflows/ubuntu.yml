@@ -32,7 +32,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: "Apt update"
         run: "sudo apt-get update"
@@ -46,14 +46,20 @@ jobs:
 
       - name: "Create build directory and run CMake"
         if: matrix.os == 'ubuntu-20.04'
-          run: "mkdir build && cd build && \
-            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6='NO' .."
+        run: "mkdir build && cd build && \
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6='NO' .."
         if: matrix.os == 'ubuntu-22.04'
-          run: "mkdir build && cd build && \
-            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr .."
+        run: "mkdir build && cd build && \
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr .."
 
       - name: "Build"
         run: "cd build && make"
 
       - name: Prepare build artifacts
         run: "cd build && make DESTDIR=install install"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-install
+          path: build/install
