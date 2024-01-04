@@ -22,16 +22,16 @@ jobs:
 
     strategy:
       matrix:
-        qt-version: [ '5.15.12', '6.5.3' ]
+        qt-version: [ '5.15.2', '6.5.3' ]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Install Qt 5.15.12"
-        if: matrix.qt-version == '5.15.12'
+      - name: "Install Qt 5.15.2"
+        if: matrix.qt-version == '5.15.2'
         uses: jurplel/install-qt-action@v3
         with:
-          version: '5.15.12'
+          version: '5.15.2'
           host: 'windows'
           dir: '${{ github.workspace }}/Qt/'
           # modules: 'qtsvg'
@@ -56,8 +56,8 @@ jobs:
         run: "mkdir build && cd build && \
           cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 
-      - name: "Create build directory and run CMake Qt 5.15.12"
-        if: matrix.qt-version == '5.15.12'
+      - name: "Create build directory and run CMake Qt 5.15.2"
+        if: matrix.qt-version == '5.15.2'
         run: "mkdir build && cd build && \
           cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' .."
 
