@@ -20,8 +20,8 @@ jobs:
   build:
     runs-on: windows-2022
 
-    # strategy:
-    #   matrix:
+    strategy:
+      matrix:
         qt-version: [ '5.15.12', '6.5.3' ]
 
     steps:
