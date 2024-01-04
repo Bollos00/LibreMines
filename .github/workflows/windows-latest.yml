@@ -30,7 +30,7 @@ jobs:
       - name: "Install Qt"
         uses: jurplel/install-qt-action@v3
         with:
-          version: '5.15.2'
+          version: '6.5.3'
           # version: ${{ matrix.qt_version }}
           host: 'windows'
           dir: '${{ github.workspace }}/Qt/'
