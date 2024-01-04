@@ -32,10 +32,7 @@ jobs:
         with:
           version: ${{ matrix.qt_version }}
           host: 'windows'
-          target: 'desktop'
-          dir: '${{ github.workspace }}/Qt/'
           modules: 'qtsvg'
-          arch: 'win64_msvc2019_64'
           set-env: 'true'
           setup-python: 'false'
 
