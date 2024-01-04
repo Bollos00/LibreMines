@@ -37,11 +37,12 @@ jobs:
       - name: "Apt update"
         run: "sudo apt-get update"
 
-      - name: "Install dependencies"
+      - name: "Install dependencies Ubuntu 20.04"
         if: matrix.os == 'ubuntu-20.04'
-          run: "sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev qtmultimedia5-dev"
+        run: "sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev qtmultimedia5-dev"
+      - name: "Install dependencies Ubuntu 22.04"
         if: matrix.os == 'ubuntu-22.04'
-          run: "sudo apt-get install build-essential qt6-default cmake libqt6svg6-dev qtmultimedia6-dev"
+        run: "sudo apt-get install build-essential qt6-default cmake libqt6svg6-dev qtmultimedia6-dev"
 
       - name: "Create build directory and run CMake"
         if: matrix.os == 'ubuntu-20.04'
