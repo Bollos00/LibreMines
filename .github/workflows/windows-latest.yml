@@ -22,16 +22,16 @@ jobs:
 
     # strategy:
     #   matrix:
-    #     qt-version: [ '5.15.2', '6.5.3' ]
+        qt-version: [ '5.15.12', '6.5.3' ]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Install Qt"
+      - name: "Install Qt 5.15.12"
+        if: matrix.qt-version == '5.15.12'
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.5.3'
-          # version: ${{ matrix.qt_version }}
+          version: '5.15.12'
           host: 'windows'
           dir: '${{ github.workspace }}/Qt/'
           # modules: 'qtsvg'
@@ -39,9 +39,27 @@ jobs:
           set-env: 'true'
           setup-python: 'true'
 
-      - name: "Create build directory and run CMake"
+      - name: "Install Qt 6.5.3"
+        if: matrix.qt-version == '6.5.3'
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.5.3'
+          host: 'windows'
+          dir: '${{ github.workspace }}/Qt/'
+          modules: 'qtmultimedia'
+          arch: 'win64_msvc2019_64'
+          set-env: 'true'
+          setup-python: 'true'
+
+      - name: "Create build directory and run CMake Qt 6.5.3"
+        if: matrix.qt-version == '6.5.3'
         run: "mkdir build && cd build && \
-          cmake .."
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
+
+      - name: "Create build directory and run CMake Qt 5.15.12"
+        if: matrix.qt-version == '5.15.12'
+        run: "mkdir build && cd build && \
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' .."
 
       - name: "Build"
         run: "cd build && cmake --build . --config Release"
@@ -52,5 +70,5 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build
+          name: build-${{ matrix.qt-version }}
           path: build
