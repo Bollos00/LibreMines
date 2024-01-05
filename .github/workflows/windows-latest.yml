@@ -65,7 +65,7 @@ jobs:
       - name: Prepare build artifacts
         run: |
           Set-Location ./build
-          '${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt' './Release'
+          '${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt.exe' ./Release
           Copy-Item ../README.md ./Release
           Copy-Item ../LICENSE ./Release
           

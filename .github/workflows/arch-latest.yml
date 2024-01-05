@@ -39,7 +39,7 @@ jobs:
       - name: Prepare build artifacts
         run: |
           cd build && make DESTDIR=install ./install
-          cp ../LICENSE ../README.md ./install
+          cp ../LICENSE ../README.md ./install/usr/share/libremines
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
