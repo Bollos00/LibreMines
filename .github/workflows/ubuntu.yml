@@ -1,0 +1,61 @@
+name: Ubuntu Build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  # Allows you to run this workflow manually from the Actions tab
+    # workflow_dispatch:
+
+# env:
+#   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+#   BUILD_TYPE: Release
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, ubuntu-22.04 ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Apt update"
+        run: "sudo apt-get update"
+
+      - name: "Install dependencies Ubuntu 20.04"
+        if: matrix.os == 'ubuntu-20.04'
+        run: "sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev qtmultimedia5-dev"
+      - name: "Install dependencies Ubuntu 22.04"
+        if: matrix.os == 'ubuntu-22.04'
+        run: "sudo apt-get install build-essential qt6-base-dev cmake libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev"
+
+      - name: "Create build directory and run CMake Ubuntu 20.04"
+        if: matrix.os == 'ubuntu-20.04'
+        run: "mkdir build && cd build && \
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6='NO' .."
+      - name: "Create build directory and run CMake Ubuntu 22.04"
+        if: matrix.os == 'ubuntu-22.04'
+        run: "mkdir build && cd build && \
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr .."
+
+      - name: "Build"
+        run: "cd build && make"
+
+      - name: Prepare build artifacts
+        run: |
+          cd build && make DESTDIR=install ./install
+          cp ../LICENSE ../README.md ./install/usr/share/libremines
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libremines-build-${{ matrix.os }}
+          path: build/install

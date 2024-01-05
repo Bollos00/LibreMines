@@ -520,7 +520,9 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     // Actions and Menu Bar
     actionPreferences = new QAction(this);
-    actionHighScores = new QAction(this);
+    actionShowHighScores = new QAction(this);
+    actionImportHighScores = new QAction(this);
+    actionExportHighScores = new QAction(this);
     actionToggleFullScreen = new QAction(this);
     actionAbout = new QAction(this);
     actionAboutQt = new QAction(this);
@@ -531,24 +533,31 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     menuBarGlobal->setGeometry(0, 0, this->width(), 100);
 
     menuOptions = new QMenu(menuBarGlobal);
+    menuHighScores = new QMenu(menuBarGlobal);
     menuHelp = new QMenu(menuBarGlobal);
 
     this->setMenuBar(menuBarGlobal);
     this->setStatusBar(new QStatusBar(this));
 
     menuBarGlobal->addAction(menuOptions->menuAction());
+    menuBarGlobal->addAction(menuHighScores->menuAction());
     menuBarGlobal->addAction(menuHelp->menuAction());
 
-    menuOptions->addActions({actionPreferences, actionHighScores, actionToggleFullScreen});
+    menuOptions->addActions({actionPreferences, actionToggleFullScreen});
+    menuHighScores->addActions({actionShowHighScores, actionImportHighScores, actionExportHighScores});
     menuHelp->addActions({actionAbout, actionAboutQt, actionGitHubHomePage});
 
     menuOptions->setTitle(tr("Options"));
+    menuHighScores->setTitle(tr("High Scores"));
     menuHelp->setTitle(tr("Help"));
 
     actionPreferences->setText(tr("Preferences..."));
-    actionHighScores->setText(tr("High Scores..."));
     actionToggleFullScreen->setText(tr("Toggle Full Screen"));
     actionToggleFullScreen->setShortcut(QKeySequence(Qt::Key_F11));
+
+    actionShowHighScores->setText(tr("Show High Scores..."));
+    actionImportHighScores->setText(tr("Import High Scores..."));
+    actionExportHighScores->setText(tr("Export High Scores..."));
 
     actionAbout->setText(tr("About..."));
     actionAboutQt->setText(tr("About Qt..."));
@@ -682,8 +691,14 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
 
-    connect(actionHighScores, &QAction::triggered,
+    connect(actionShowHighScores, &QAction::triggered,
             this, &LibreMinesGui::SLOT_showHighScores);
+
+    connect(actionImportHighScores, &QAction::triggered,
+            this, &LibreMinesGui::SLOT_importHighScores);
+
+    connect(actionExportHighScores, &QAction::triggered,
+            this, &LibreMinesGui::SLOT_exportHighScores);
 
     connect(actionToggleFullScreen, &QAction::triggered,
             this, &LibreMinesGui::SLOT_toggleFullScreen);
@@ -1596,6 +1611,75 @@ void LibreMinesGui::SLOT_showHighScores()
     dialog.setWindowIcon(QIcon(":/icons_rsc/icons/libremines.svg"));
     dialog.setScores(scores);
     dialog.exec();
+}
+
+void LibreMinesGui::SLOT_importHighScores()
+{
+    QString importFileName = QFileDialog::getOpenFileName(
+        this, tr("Import high scores from file"),
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+    );
+
+    if(!importFileName.isEmpty())
+    {
+        QScopedPointer<QFile> fileImport( new QFile(importFileName) );
+
+
+        fileImport->open(QIODevice::ReadOnly);
+
+        QDataStream stream(fileImport.get());
+        stream.setVersion(QDataStream::Qt_5_12);
+
+        bool fileOk = true;
+
+        while(!stream.atEnd())
+        {
+            stream.startTransaction();
+            LibreMinesScore s;
+            stream >> s;
+            if(!stream.commitTransaction())
+            {
+                QMessageBox::critical(this, tr("Invalid high scores file"),
+                                      tr("Error parsing the data of the file!"));
+                fileOk = false;
+                break;
+            }
+        }
+
+        if(fileOk)
+        {
+            // Backup the old scores file if it exists
+            QFile::rename(dirAppData.absoluteFilePath("scoresLibreMines"),
+                          dirAppData.absoluteFilePath("scoresLibreMines." +
+                          QString::number(QDateTime::currentSecsSinceEpoch()) + ".bkp"));
+
+            if(fileImport->copy(dirAppData.absoluteFilePath("scoresLibreMines")))
+            {
+                QMessageBox::information(this, tr("High scores import complete"),
+                                         tr("Operation completed!"));
+            }
+        }
+    }
+
+}
+
+void LibreMinesGui::SLOT_exportHighScores()
+{
+    QString backupFileName = QFileDialog::getSaveFileName(
+        this, tr("Backup high scores to file"),
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/scoresLibreMines.bkp"
+    );
+
+    if(!backupFileName.isEmpty())
+    {
+        QScopedPointer<QFile> fileScores( new QFile(dirAppData.absoluteFilePath("scoresLibreMines")) );
+        if(fileScores && fileScores->exists() && fileScores->copy(backupFileName))
+        {
+            QMessageBox::information(this, tr("High scores bakcup complete"),
+                                    tr("Successfully backup high scores to \"") + backupFileName + '\"');
+        }
+
+    }
 }
 
 void LibreMinesGui::SLOT_toggleFullScreen()
