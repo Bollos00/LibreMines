@@ -64,13 +64,14 @@ jobs:
 
       - name: Prepare build artifacts
         run: |
-          New-Item -ItemType Directory -Name install
-          Copy-Item -Path build/Release/libremines.exe -Destination ./install
-          '${{ github.workspace }}/Qt/${{ matrix.qt-version}}' ./install
+          Set-Location ./build
+          '${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt' './Release'
+          Copy-Item ../README.md ./Release
+          Copy-Item ../LICENSE ./Release
           
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: libremines-build-qt-${{ matrix.qt-version }}
-          path: install
+          path: build/Release
