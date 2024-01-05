@@ -33,7 +33,7 @@ jobs:
         with:
           version: '5.15.2'
           host: 'windows'
-          dir: '${{ github.workspace }}/Qt/'
+          dir: '${{ github.workspace }}'
           # modules: 'qtsvg'
           arch: 'win64_msvc2019_64'
           set-env: 'true'
@@ -45,7 +45,7 @@ jobs:
         with:
           version: '6.5.3'
           host: 'windows'
-          dir: '${{ github.workspace }}/Qt/'
+          dir: '${{ github.workspace }}'
           modules: 'qtmultimedia'
           arch: 'win64_msvc2019_64'
           set-env: 'true'
@@ -65,8 +65,7 @@ jobs:
       - name: Prepare build artifacts
         run: |
           Set-Location ./build
-          ls ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin
-          Start-Process -FilePath '${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt.exe' -NoNewWindow -Wait -ArgumentList '--no-translations ./Release'
+          ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt.exe--no-translations ./Release
           Copy-Item ../README.md ./Release
           Copy-Item ../LICENSE ./Release
           
