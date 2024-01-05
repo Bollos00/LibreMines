@@ -53,28 +53,24 @@ jobs:
 
       - name: "Create build directory and run CMake Qt 6.5.3"
         if: matrix.qt-version == '6.5.3'
-        run: "mkdir build && cd build && \
-          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
+        run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 
       - name: "Create build directory and run CMake Qt 5.15.2"
         if: matrix.qt-version == '5.15.2'
-        run: "mkdir build && cd build && \
-          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' .."
+        run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' .."
 
       - name: "Build"
         run: "cd build && cmake --build . --config Release"
 
-      # - name: Prepare build artifacts
-      #   run: ""
+      - name: Prepare build artifacts
+        run: |
+          New-Item -ItemType Directory -Name install
+          Copy-Item -Path build/Release/libremines.exe -Destination ./install
+          '${{ github.workspace }}/Qt/${{ matrix.qt-version}}' ./install
+          
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.qt-version }}
-          path: build
-
-      - name: Upload Qt test
-        uses: actions/upload-artifact@v4
-        with:
-          name: qt-${{ matrix.qt-version }}
-          path: '${{ github.workspace }}/Qt/'
+          name: libremines-build-qt-${{ matrix.qt-version }}
+          path: install

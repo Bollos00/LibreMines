@@ -50,10 +50,12 @@ jobs:
         run: "cd build && make"
 
       - name: Prepare build artifacts
-        run: "cd build && make DESTDIR=install install"
+        run: |
+          cd build && make DESTDIR=install ./install
+          cp ../LICENSE ../README.txt ./install
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-install-${{ matrix.os }}
+          name: libremines-build-${{ matrix.os }}
           path: build/install
