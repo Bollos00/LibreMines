@@ -627,12 +627,12 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     buttonCustomizedNewGame->setFont(QFont("Liberation Sans", 20));
 
     sbCustomizedX = new QSpinBox(centralWidget());
-    sbCustomizedX->setMinimum(10);
+    sbCustomizedX->setMinimum(5);
     sbCustomizedX->setMaximum(100);
     sbCustomizedX->setValue(20);
 
     sbCustomizedY = new QSpinBox(centralWidget());
-    sbCustomizedY->setMinimum(10);
+    sbCustomizedY->setMinimum(5);
     sbCustomizedY->setMaximum(100);
     sbCustomizedY->setValue(20);
 
