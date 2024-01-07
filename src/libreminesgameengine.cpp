@@ -88,44 +88,16 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
         }
     }
 
-
-    QVector<Vector2Dshort> vt_vt2d_CleanPoints = QVector<Vector2Dshort>();
-
-    // If we are remaking the game, we make sure that all of the neighbors
-    //  of the clean cell does not have mines.
-    if(bRemakingGame)
-    {
-        vt_vt2d_CleanPoints.reserve(9);
-
-        for (short i=-1; i<=1; i++)
-        {
-            for (short j=-1; j<=1; j++)
-            {
-                vt_vt2d_CleanPoints.append(Vector2Dshort(i_X_Clean + i, i_Y_Clean + j));
-            }
-        }
-    }
-
     // Add mines on random places until the number of mines is correct
     while(i_nMines_ > 0)
     {
         uchar i = QRandomGenerator::global()->bounded(0, iX);
         uchar j = QRandomGenerator::global()->bounded(0, iY);
 
-        if(bRemakingGame)
+        // Avoid cells neighbor of clean cell when remaking the game
+        if(bRemakingGame && i <= i_X_Clean+1 && i >= i_X_Clean-1 && j <= i_Y_Clean+1 && j >= i_Y_Clean-1)
         {
-            bool forbidden = false;
-            for (const Vector2Dshort& n: vt_vt2d_CleanPoints)
-            {
-                if(n.x == i &&
-                   n.y == j)
-                {
-                    forbidden = true;
-                    break;
-                }
-            }
-            if(forbidden)
-                continue;
+            continue;
         }
 
         CellGameEngine& cell = principalMatrix[i][j];

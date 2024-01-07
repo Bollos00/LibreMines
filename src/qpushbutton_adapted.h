@@ -37,11 +37,17 @@ public:
      *
      * @param parent
      */
-    explicit QPushButton_adapted(QWidget *parent = nullptr);
+    explicit QPushButton_adapted(QWidget *parent = nullptr, const uchar x = 255, const uchar y = 255);
+    uchar getXCell();
+    uchar getYCell();
 
 protected:
     void mouseReleaseEvent(QMouseEvent* e);
     void mousePressEvent(QMouseEvent* e);
+
+private:
+    const uchar xCell;
+    const uchar yCell;
 
 Q_SIGNALS:
     /**

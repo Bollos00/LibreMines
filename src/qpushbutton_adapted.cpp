@@ -21,11 +21,23 @@
 #include "qpushbutton_adapted.h"
 #include <QMouseEvent>
 
-QPushButton_adapted::QPushButton_adapted(QWidget *parent) : QPushButton(parent)
+QPushButton_adapted::QPushButton_adapted(QWidget *parent, const uchar x, const uchar y) :
+    QPushButton(parent),
+    xCell(x),
+    yCell(y)
 {
     setFocusPolicy(Qt::ClickFocus);
 }
 
+uchar QPushButton_adapted::getXCell()
+{
+    return xCell;
+}
+
+uchar QPushButton_adapted::getYCell()
+{
+    return yCell;
+}
 
 void QPushButton_adapted::mouseReleaseEvent(QMouseEvent *e)
 {

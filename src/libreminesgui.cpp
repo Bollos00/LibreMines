@@ -379,8 +379,8 @@ void LibreMinesGui::vNewGame(const uchar _X,
 //            cell.label = new QLabel_adapted(this);
 //            cell.button = new QPushButton_adapted(this);
 
-            cell.label = new QLabel_adapted(widgetBoardContents);
-            cell.button = new QPushButton_adapted(widgetBoardContents);
+            cell.label = new QLabel_adapted(widgetBoardContents, i, j);
+            cell.button = new QPushButton_adapted(widgetBoardContents, i, j);
 
             layoutBoard->addWidget(cell.label, j, i);
             layoutBoard->addWidget(cell.button, j, i);
@@ -1105,28 +1105,18 @@ void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
 
     QPushButton_adapted *buttonClicked = (QPushButton_adapted *) sender();
 
-    for(uchar j=0; j<gameEngine->lines(); j++)
+    switch (e->button())
     {
-        for (uchar i=0; i<gameEngine->rows(); i++)
-        {
-            // Find the emissor of the signal
-            if(buttonClicked == principalMatrix[i][j].button)
-            {
-                switch (e->button())
-                {
-                    case Qt::RightButton:
-                        Q_EMIT SIGNAL_addOrRemoveFlag(i, j);
-                        return;
+        case Qt::RightButton:
+            Q_EMIT SIGNAL_addOrRemoveFlag(buttonClicked->getXCell(), buttonClicked->getYCell());
+            return;
 
-                    case Qt::LeftButton:
-                        Q_EMIT SIGNAL_cleanCell(i, j);
-                        return;
+        case Qt::LeftButton:
+            Q_EMIT SIGNAL_cleanCell(buttonClicked->getXCell(), buttonClicked->getYCell());
+            return;
 
-                    default:
-                        return;
-                }
-            }
-        }
+        default:
+            return;
     }
 }
 
@@ -1157,27 +1147,14 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
 
     QLabel_adapted *buttonClicked = (QLabel_adapted *) sender();
 
-    for(uchar j=0; j<gameEngine->lines(); j++)
+    switch (e->button())
     {
-        for (uchar i=0; i<gameEngine->rows(); i++)
-        {
-            // Find the emissor of the signal
-            if(buttonClicked == principalMatrix[i][j].label)
-            {
-                if(e->button() != Qt::LeftButton)
-                    return;
+        case Qt::LeftButton:
+            Q_EMIT SIGNAL_cleanNeighborCells(buttonClicked->getXCell(), buttonClicked->getYCell());
+            return;
 
-                switch (e->button())
-                {
-                    case Qt::LeftButton:
-                        Q_EMIT SIGNAL_cleanNeighborCells(i, j);
-                        return;
-
-                    default:
-                        return;
-                }
-            }
-        }
+        default:
+            return;
     }
 }
 

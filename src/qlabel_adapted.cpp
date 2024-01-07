@@ -21,10 +21,22 @@
 #include "qlabel_adapted.h"
 #include <QMouseEvent>
 
-QLabel_adapted::QLabel_adapted(QWidget *parent):
-    QLabel(parent)
+QLabel_adapted::QLabel_adapted(QWidget *parent, const uchar x, const uchar y):
+    QLabel(parent),
+    xCell(x),
+    yCell(y)
 {
     setFocusPolicy(Qt::ClickFocus);
+}
+
+uchar QLabel_adapted::getXCell()
+{
+    return xCell;
+}
+
+uchar QLabel_adapted::getYCell()
+{
+    return yCell;
 }
 
 void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
@@ -53,3 +65,4 @@ void QLabel_adapted::mousePressEvent(QMouseEvent *e)
 
     Q_EMIT SIGNAL_clicked(e);
 }
+
