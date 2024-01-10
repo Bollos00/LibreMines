@@ -122,9 +122,6 @@ add_executable(${PROJECT_NAME} WIN32
     src/qpushbutton_adapted.h
     src/soundeffects.cpp
     src/soundeffects.h
-    share/application_stylesheets/qdarkstyle/dark/qdarkstyle_dark.qrc
-    share/application_stylesheets/qdarkstyle/light/qdarkstyle_light.qrc
-    share/application_stylesheets/qss/qss.qrc
     share/facesreaction.qrc
     share/icons.qrc
     share/icons.rc

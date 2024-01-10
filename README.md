@@ -178,8 +178,6 @@ All kinds of contributions are welcome on this project. You can help:
 * Adding or improve the [translations](https://github.com/Bollos00/LibreMines/blob/master/etc/translations/README.md).
 
 # Third party Repositories used in this software
-* [GTRONICK/QSS](https://github.com/GTRONICK/QSS)
-* [QDarkStyleSheet](https://github.com/ColinDuquesnoy/QDarkStyleSheet)
 * [TwEmoji](https://github.com/twitter/twemoji)
 * [OpenEmoji](https://github.com/hfg-gmuend/openmoji)
 * [socialify](https://github.com/wei/socialify)

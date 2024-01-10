@@ -40,12 +40,6 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     // Dark and light fusion
     ui->comboBoxApplicationStyle->addItems({"Fusion Dark", "Fusion Light"});
 
-    // QSS
-    ui->comboBoxApplicationStyle->addItems({"ConsoleStyle", "NeonButtons"});
-
-    // QDarkStyle
-    ui->comboBoxApplicationStyle->addItems({"QDarkStyle", "QDarkStyle Light"});
-
     // Styles from system
     ui->comboBoxApplicationStyle->addItems(QStyleFactory::keys());
 
@@ -254,7 +248,6 @@ void LibreMinesPreferencesDialog::setOptionApplicationStyle(const QString &optio
     QString s = option;
     if(option.compare("FusionDark", Qt::CaseInsensitive) == 0){ s = "Fusion Dark"; }
     else if(option.compare("FusionLight", Qt::CaseInsensitive) == 0){ s = "Fusion Light"; }
-    else if(option.compare("QDarkStyleLight", Qt::CaseInsensitive) == 0){ s = "QDarkStyle Light"; }
     
     ui->comboBoxApplicationStyle->setCurrentText(s);
 }

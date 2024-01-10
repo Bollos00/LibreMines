@@ -70,32 +70,7 @@ bool LibreMinesAppTheme::bSetApplicationTheme(const QString& theme)
     }
     else
     {
-        qApp->setPalette(QPalette());
-        qApp->setStyle("");
 
-        QString prefix;
-
-        if(theme.compare("ConsoleStyle", Qt::CaseInsensitive) == 0)
-            prefix = ":/qss/ConsoleStyle.qss";
-        else if(theme.compare("NeonButtons", Qt::CaseInsensitive) == 0)
-            prefix = ":/qss/NeonButtons.qss";
-        else if(theme.compare("QDarkStyle", Qt::CaseInsensitive) == 0)
-            prefix = ":/qdarkstyle/dark/style.qss";
-        else if(theme.compare("QDarkStyleLight", Qt::CaseInsensitive) == 0)
-            prefix = ":/qdarkstyle/light/style.qss";
-
-        QFile fileQSS(prefix);
-
-        if (!fileQSS.exists())
-        {
-            qWarning() << "Unable to set stylesheet, file not found";
-        }
-        else
-        {
-            fileQSS.open(QFile::ReadOnly | QFile::Text);
-            QTextStream ts(&fileQSS);
-            qApp->setStyleSheet(ts.readAll());
-        }
     }
 
     firstTimeHere = false;
