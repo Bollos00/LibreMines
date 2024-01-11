@@ -641,6 +641,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     sbCustomizedPercentageMines->setMinimum(0);
     sbCustomizedPercentageMines->setMaximum(100);
     sbCustomizedPercentageMines->setValue(20);
+    sbCustomizedPercentageMines->setSuffix("%");
 
     sbCustomizedNumbersOfMines = new QSpinBox(centralWidget());
     sbCustomizedNumbersOfMines->setMinimum(0);
@@ -755,6 +756,8 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
         {
             sbCustomizedNumbersOfMines->setMaximum(sbCustomizedX->value() * sbCustomizedY->value());
             sbCustomizedNumbersOfMines->setValue(sbCustomizedX->value() * sbCustomizedY->value() * sbCustomizedPercentageMines->value() / 100);
+            sbCustomizedNumbersOfMines->setSuffix(
+                " / " +QString::number(sbCustomizedX->value()*sbCustomizedY->value()));
         }
     };
 
@@ -900,12 +903,12 @@ void LibreMinesGui::vAdjustMainMenu()
     sbCustomizedY->setGeometry(labelCustomizedY->x()+labelCustomizedY->width(), labelCustomizedY->y(),
                                labelCustomizedY->width(), labelCustomizedY->height());
 
-    cbCustomizedMinesInPercentage->setStyleSheet(
-                "QCheckBox::indicator "
-                "{"
-                "    width: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
-                "    height: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
-                "}");
+    // cbCustomizedMinesInPercentage->setStyleSheet(
+    //             "QCheckBox::indicator "
+    //             "{"
+    //             "    width: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
+    //             "    height: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
+    //             "}");
 }
 
 void LibreMinesGui::SLOT_Easy()
