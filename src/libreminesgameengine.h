@@ -84,7 +84,6 @@ private:
     uchar iY; /**< TODO: describe */
 
     ushort nMines; /**< TODO: describe */
-    ushort iTimeInSeconds; /**< TODO: describe */
     ushort iMinesLeft; /**< TODO: describe */
     ushort iHiddenCells; /**< TODO: describe */
     ushort iCellsToUnlock; /**< TODO: describe */

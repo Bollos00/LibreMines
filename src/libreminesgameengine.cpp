@@ -603,7 +603,6 @@ void LibreMinesGameEngine::SLOT_stop()
 
 void LibreMinesGameEngine::SLOT_startTimer()
 {
-    iTimeInSeconds = 0;
     timerTimeInGame.reset(new QTimer());
     QObject::connect(timerTimeInGame.get(), &QTimer::timeout,
                      this, &LibreMinesGameEngine::SLOT_UpdateTime);
@@ -647,7 +646,6 @@ void LibreMinesGameEngine::SLOT_generateEndGameScoreAgain()
 
 void LibreMinesGameEngine::SLOT_UpdateTime()
 {
-    iTimeInSeconds++;
-    Q_EMIT SIGNAL_currentTime(iTimeInSeconds);
+    Q_EMIT SIGNAL_currentTime(elapsedPreciseTimeInGame.elapsed()/1000);
 }
 
