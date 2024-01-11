@@ -68,10 +68,14 @@ jobs:
           ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt.exe --no-translations ./Release
           Copy-Item ../README.md ./Release
           Copy-Item ../LICENSE ./Release
-          
+          New-Item -ItemType Directory ./Release/minefield_extra_themes
+          Copy-Item ../share/minefield_themes/alternative_dark ./Release/minefield_extra_themes -Recurse
+          Copy-Item ../share/minefield_themes/alternative_light ./Release/minefield_extra_themes -Recurse
+          Copy-Item ../share/minefield_themes/flowerfield ./Release/minefield_extra_themes -Recurse
+          Copy-Item ../share/minefield_themes/twemoji ./Release/minefield_extra_themes -Recurse
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: libremines-build-qt-${{ matrix.qt-version }}
+          name: libremines-build-windows-qt-${{ matrix.qt-version }}
           path: build/Release
