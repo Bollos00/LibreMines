@@ -1632,14 +1632,17 @@ void LibreMinesGui::SLOT_importHighScores()
         if(fileOk)
         {
             // Backup the old scores file if it exists
-            QFile::rename(dirAppData.absoluteFilePath("scoresLibreMines"),
-                          dirAppData.absoluteFilePath("scoresLibreMines." +
-                          QString::number(QDateTime::currentSecsSinceEpoch()) + ".bkp"));
+            QString backupScorePath = dirAppData.absoluteFilePath(
+                "scoresLibreMines." + QString::number(QDateTime::currentSecsSinceEpoch()) + ".bkp");
+
+            QFile::rename(dirAppData.absoluteFilePath("scoresLibreMines"), backupScorePath);
 
             if(fileImport->copy(dirAppData.absoluteFilePath("scoresLibreMines")))
             {
                 QMessageBox::information(this, tr("High scores import complete"),
-                                         tr("Operation completed!"));
+                                         tr("Operation completed!") + '\n' +
+                                             tr("old high score file has been saved to") +
+                                             backupScorePath);
             }
         }
     }
