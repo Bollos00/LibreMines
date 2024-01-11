@@ -50,14 +50,12 @@ The executable `libremines.exe` will be inside the folder extracted. You can als
 ### Installation Dependencies
 
 The following dependencies are required for building and running LibreMines:
-* [Qt5 Core](https://doc.qt.io/qt-5/qtcore-index.html) >= 5.12
-* [Qt5 Gui](https://doc.qt.io/qt-5/qtgui-index.html) >= 5.12
-* [Qt5 Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
-* [Qt5 SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
-* [Qt5 Multimedia](https://doc.qt.io/qt-5/qtmultimedia-index.html) >= 5.12
+* [Qt Core](https://doc.qt.io/qt-5/qtcore-index.html) >= 5.12
+* [Qt Gui](https://doc.qt.io/qt-5/qtgui-index.html) >= 5.12
+* [Qt Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
+* [Qt SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
+* [Qt Multimedia](https://doc.qt.io/qt-5/qtmultimedia-index.html) >= 5.12
 * [CMake](https://cmake.org/) >= 3.1
-
-Note: Qt6 is also supported.
 
 On Arch Linux and derivatives systems, the dependencies can be installed with `pacman`:
 ```sh
@@ -74,11 +72,11 @@ On Fedora, install the dependencies with:
 sudo dnf install qt6-qtbase-devel qt6-qtsvg-devel cmake qt6-qtmultimedia-devel git
 ```
 
-On FreeBSD systems, install the packages [qt6-core](https://www.freshports.org/devel/qt5-core), [qt6-widgets](https://www.freshports.org/x11-toolkits/qt5-widgets/), [qt6-svg](https://www.freshports.org/graphics/qt5-svg/), [qt6-buildtools](https://www.freshports.org/devel/qt5-buildtools/), [qt6-qmake](https://www.freshports.org/devel/qt5-qmake/), [qt6-multimedia](https://www.freshports.org/multimedia/qt5-multimedia/), [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/).
+On FreeBSD systems, install the packages [qt6-base](https://www.freshports.org/devel/qt6-base), [qt6-svg](https://www.freshports.org/devel/qt6-svg), [qt6-multimedia](https://www.freshports.org/devel/qt6-multimedia) [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/).
 
 ```sh
 su -
-pkg install qt6-core qt6-widgets qt6-svg git cmake qt6-buildtools qt6-qmake
+pkg install qt6-base qt6-svg qt6-multimedia git cmake
 ```
 
 For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/) or your preferred package manager.
