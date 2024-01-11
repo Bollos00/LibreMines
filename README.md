@@ -156,7 +156,7 @@ For activate the keyboard controller mode, press one of the following keys: **A|
 
 * **Space**: Locate current cell on middle of the scroll bar;
 
-* **CTRL + R**: Retart the game;
+* **CTRL + R**: Restart the game;
 
 * **CTRL + SHIFT + P**: Save minefield as image;
 
