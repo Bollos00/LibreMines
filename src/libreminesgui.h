@@ -181,7 +181,7 @@ private Q_SLOTS:
     void SLOT_onCellLabelReleased(const QMouseEvent*const e);
     void SLOT_onCellLabelClicked(const QMouseEvent*const e);
 
-    void SLOT_showCell(const uchar _X, const uchar _Y);
+    void SLOT_showCell(const uchar _X, const uchar _Y, const bool recursive);
     void SLOT_endGameScore(LibreMinesScore score,
                            int iCorrectFlags,
                            int iWrongFlags,

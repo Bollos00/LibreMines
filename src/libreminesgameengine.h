@@ -64,7 +64,15 @@ public:
 
 private:
     void vResetPrincipalMatrix();
-    bool bCleanCell(const uchar _X, const uchar _Y);
+
+    /**
+     * @brief Clear the cell in the #_X, #_Y position.
+     * Create the condition of game lost if the cell is a MINE.
+     * Clear all neighbor cells if the cell is ZERO
+     *
+     * @param recursive - Indicates this cell is being cleared along with another cell.
+     */
+    bool bCleanCell(const uchar _X, const uchar _Y, const bool recursive=true);
     void vGameLost(const uchar _X, const uchar _Y);
     void vGameWon();
 
@@ -92,7 +100,7 @@ private:
     bool bGameActive;
 
 Q_SIGNALS:
-    void SIGNAL_showCell(const uchar _X, const uchar _Y);
+    void SIGNAL_showCell(const uchar _X, const uchar _Y, const bool recursive);
     void SIGNAL_endGameScore(LibreMinesScore score,
                              int iCorrectFlags,
                              int iWrongFlags,

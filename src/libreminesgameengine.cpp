@@ -259,7 +259,7 @@ void LibreMinesGameEngine::vResetPrincipalMatrix()
     principalMatrix.clear();
 }
 
-bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
+bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y, const bool recursive)
 {
     if(principalMatrix[_X][_Y].flagState == FlagState::NoFlag &&
        principalMatrix[_X][_Y].value == CellValue::MINE)
@@ -274,7 +274,7 @@ bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
     {
         // Unlock the cell
         principalMatrix[_X][_Y].isHidden = false;
-        Q_EMIT SIGNAL_showCell(_X, _Y);
+        Q_EMIT SIGNAL_showCell(_X, _Y, recursive);
 
         // If the state of the cell is CellValue::ZERO, unlock all neighbor cells
         if(principalMatrix[_X][_Y].value == CellValue::ZERO)
@@ -555,7 +555,7 @@ void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
         SLOT_startTimer();
         bFirst = false;
     }
-    bCleanCell(_X, _Y);
+    bCleanCell(_X, _Y, false);
 }
 
 void LibreMinesGameEngine::SLOT_changeFlagState(const uchar _X, const uchar _Y)
@@ -614,6 +614,8 @@ void LibreMinesGameEngine::SLOT_startTimer()
 
 void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _Y)
 {
+
+    bool recursive = false;
     // Clean all hided and unflaged neighbor flags
     for(short i=_X-1; i<=_X+1; i++)
     {
@@ -629,8 +631,10 @@ void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _
 
             if(cell.isHidden && cell.flagState == FlagState::NoFlag)
             {
-                if(!bCleanCell(i, j))
+                if(!bCleanCell(i, j, recursive))
                     return;
+
+                recursive = true;
             }
         }
     }

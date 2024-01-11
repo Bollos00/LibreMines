@@ -12,14 +12,12 @@ public:
     SoundEffects(QObject* parent = nullptr);
 
     void setVolume(const int vol);
-    void setMuted(const bool mute);
 
 Q_SIGNALS:
 
     void SIGNAL_gameBegin();
     void SIGNAL_gameWon();
     void SIGNAL_gameLost();
-    void SIGNAL_clockTick();
 
     void SIGNAL_keyboardControllerMove();
     void SIGNAL_releaseCell();
@@ -29,7 +27,6 @@ private:
     QSoundEffect soundGameBegin;
     QSoundEffect soundGameWon;
     QSoundEffect soundGameLost;
-    QSoundEffect soundClockTick;
 
     QSoundEffect soundKeyboardControllMove;
     QSoundEffect soundReleaseCell;

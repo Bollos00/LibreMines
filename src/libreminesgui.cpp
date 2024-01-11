@@ -1169,7 +1169,7 @@ void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
 
 }
 
-void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
+void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y, const bool recursive)
 {
     principalMatrix[_X][_Y].button->hide();
 
@@ -1180,7 +1180,10 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
     }
 
 
-    Q_EMIT(sound->SIGNAL_releaseCell());
+    if(!recursive)
+    {
+        Q_EMIT(sound->SIGNAL_releaseCell());
+    }
 }
 
 void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
@@ -1963,5 +1966,4 @@ void LibreMinesGui::vUpdatePreferences()
     }
 
     sound->setVolume(preferences->optionSoundVolume());
-    sound->setMuted(preferences->optionSoundVolume() == 0);
 }
