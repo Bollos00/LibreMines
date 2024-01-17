@@ -62,7 +62,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
     sound( new SoundEffects() )
 {
-    this->resize(800, 600);
+    // this->resize(800, 600);
+    this->setMinimumSize(QSize(700, 500));
 
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
@@ -109,6 +110,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     // Necessary for some reason
     QTimer::singleShot(100, [this]()
     { vSetApplicationTheme(preferences->optionApplicationStyle()); });
+
+    bMinefieldBeingCreated = false;
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -308,9 +311,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
                              ushort i_nMines_)
 {
+    bMinefieldBeingCreated = true;
+
     vAdjustInterfaceInGame();
     vShowInterfaceInGame();
-
 
     // Reset the controller attributes
     controller.ctrlPressed = false;
@@ -334,6 +338,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     buttonRestartInGame->setEnabled(false);
     buttonSaveMinefieldAsImage->setEnabled(false);
     buttonSaveScore->hide();
+    scrollAreaEndGameResults->hide();
 
     // Create the game engine instance
     gameEngine.reset(new LibreMinesGameEngine());
@@ -343,10 +348,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
     // Set the length of each cell
-    if(iLimitWidthField/_X < iLimitHeightField/_Y)
-        cellLength = iLimitWidthField/_X;
-    else
-        cellLength = iLimitHeightField/_Y;
+    cellLength = qMin(iLimitWidthField/_X, iLimitHeightField/_Y);
 
     if(cellLength < preferences->optionMinimumCellLength())
         cellLength = preferences->optionMinimumCellLength();
@@ -387,6 +389,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
             cell.label->resize(cellLength, cellLength);
             cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(CellValue::ZERO));
+            cell.label->setScaledContents(true);
             cell.label->show();
 
             cell.button->resize(cellLength, cellLength);
@@ -480,6 +483,10 @@ void LibreMinesGui::vNewGame(const uchar _X,
     SLOT_minesLeft(gameEngine->mines());
 
     labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+
+    bMinefieldBeingCreated = false;
+
+    vAdjustInterfaceInGame();
 }
 
 void LibreMinesGui::vAttributeAllCells()
@@ -575,28 +582,45 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     buttonQuitInGame = new QPushButton(centralWidget());
     buttonSaveMinefieldAsImage = new QPushButton(centralWidget());
     buttonSaveScore = new QPushButton(centralWidget());
-    labelYouWonYouLost = new QLabel(centralWidget());
-    labelStatisLastMatch = new QLabel(centralWidget());
 
     scrollAreaBoard = new QScrollArea(centralWidget());
-    widgetBoardContents = new QWidget();
-
+    widgetBoardContents = new QWidget();    
     layoutBoard = new QGridLayout();
     layoutBoard->setSpacing(0);
+
+    scrollAreaEndGameResults = new QScrollArea(centralWidget());
+    widgetEndGameResultsContents = new QWidget();
+    layoutEndGameResults = new QVBoxLayout();
 
     widgetBoardContents->setLayout(layoutBoard);
     widgetBoardContents->setFocusPolicy(Qt::NoFocus);
     scrollAreaBoard->setWidget(widgetBoardContents);
     scrollAreaBoard->setFocusPolicy(Qt::NoFocus);
 
+    widgetEndGameResultsContents->setLayout(layoutEndGameResults);
+    widgetEndGameResultsContents->setFocusPolicy(Qt::NoFocus);
+    scrollAreaEndGameResults->setWidget(widgetEndGameResultsContents);
+    scrollAreaEndGameResults->setFocusPolicy(Qt::NoFocus);
+    scrollAreaEndGameResults->setStyleSheet("QScrollArea { background: transparent; }");
+
+    labelYouWonYouLost = new QLabel(widgetEndGameResultsContents);
+    labelStatsLastMatch = new QLabel(widgetEndGameResultsContents);
+
+    layoutEndGameResults->addWidget(labelYouWonYouLost);
+    layoutEndGameResults->addWidget(labelStatsLastMatch);
+
     labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
     lcd_numberMinesLeft->setDecMode();
     lcd_numberMinesLeft->display(0);
+    labelFaceReactionInGame->setScaledContents(true);
     progressBarGameCompleteInGame->setTextVisible(false);
     buttonRestartInGame->setText(tr("Restart"));
+    buttonRestartInGame->setMinimumSize(0, 35);
     buttonQuitInGame->setText(tr("Quit"));
+    buttonQuitInGame->setMinimumSize(0, 35);
     buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
+    buttonSaveMinefieldAsImage->setMinimumSize(0, 35);
     buttonSaveScore->setText(tr("Save Score"));
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
@@ -957,26 +981,120 @@ void LibreMinesGui::vAdjustInterfaceInGame()
 
     scrollAreaBoard->setGeometry(0, 0, iLimitWidthField, iLimitHeightField);
 
-    labelFaceReactionInGame->setGeometry(88*w /100, h /20,
-                                         9*w /100, 9*w /100);
-    labelTimerInGame->setGeometry(85*w /100, labelFaceReactionInGame->y() + labelFaceReactionInGame->height(),
-                                  15*w /100, h /14);
-    lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
-                                     labelTimerInGame->width(), h /7);
-    progressBarGameCompleteInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
-                                     lcd_numberMinesLeft->width(), h /20);
-    buttonRestartInGame->setGeometry(progressBarGameCompleteInGame->x(), progressBarGameCompleteInGame->y()+progressBarGameCompleteInGame->height(),
-                                     progressBarGameCompleteInGame->width()/2, h /20);
-    buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
-                                  buttonRestartInGame->width(), buttonRestartInGame->height());
-    buttonSaveMinefieldAsImage->setGeometry(buttonRestartInGame->x(), buttonRestartInGame->y() + buttonRestartInGame->height()*1.1,
-                                            progressBarGameCompleteInGame->width(), progressBarGameCompleteInGame->height());
-    buttonSaveScore->setGeometry(buttonSaveMinefieldAsImage->x(), buttonSaveMinefieldAsImage->y() + buttonSaveMinefieldAsImage->height()*1.1,
-                                 buttonSaveMinefieldAsImage->width(), buttonSaveMinefieldAsImage->height());
-    labelYouWonYouLost->setGeometry(buttonSaveScore->x(), buttonSaveScore->y()+buttonSaveScore->height()*1.1,
-                                    lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
-    labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
-                                      labelYouWonYouLost->width(), h /5);
+    labelFaceReactionInGame->setGeometry(
+        85*w /100, h/50, w/10, w/10
+        );
+    vSetFacesReaction(preferences->optionFacesReaction());
+
+    labelTimerInGame->setGeometry(
+        81*w /100, labelFaceReactionInGame->y() + labelFaceReactionInGame->height(),
+        18*w /100, h /14
+        );
+    lcd_numberMinesLeft->setGeometry(
+        labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
+        labelTimerInGame->width(), h /7
+        );
+    progressBarGameCompleteInGame->setGeometry(
+        lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
+        lcd_numberMinesLeft->width(), h /20
+        );
+    buttonRestartInGame->setGeometry(
+        progressBarGameCompleteInGame->x(),
+        progressBarGameCompleteInGame->y()+progressBarGameCompleteInGame->height() + h/200,
+        progressBarGameCompleteInGame->width()/2 - h/400, h/20
+        );
+    buttonQuitInGame->setGeometry(
+        buttonRestartInGame->x() + buttonRestartInGame->width() + h/200, buttonRestartInGame->y(),
+        buttonRestartInGame->width(), buttonRestartInGame->height()
+        );
+
+    if(progressBarGameCompleteInGame->width() > 200)
+    {
+        buttonSaveMinefieldAsImage->setGeometry(
+            buttonRestartInGame->x(),
+            buttonRestartInGame->y() + buttonRestartInGame->height() + h/200,
+            progressBarGameCompleteInGame->width(), progressBarGameCompleteInGame->height()
+            );
+        buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
+    }
+    else
+    {
+        buttonSaveMinefieldAsImage->setGeometry(
+            buttonRestartInGame->x(),
+            buttonRestartInGame->y() + buttonRestartInGame->height() + h/200,
+            progressBarGameCompleteInGame->width(), 2*progressBarGameCompleteInGame->height()
+            );
+        buttonSaveMinefieldAsImage->setText(tr("Save Minefield\nas Image"));
+    }
+
+    buttonSaveScore->setGeometry(
+        buttonSaveMinefieldAsImage->x(),
+        buttonSaveMinefieldAsImage->y() + buttonSaveMinefieldAsImage->height() + h/200,
+        buttonSaveMinefieldAsImage->width(), buttonSaveMinefieldAsImage->height()
+        );
+
+    scrollAreaEndGameResults->setGeometry(
+        QRect(QPoint(buttonSaveScore->x(),
+                     buttonSaveScore->y() + buttonSaveScore->height() + h/200),
+              QPoint(buttonSaveScore->x() + buttonSaveScore->width(), centralWidget()->rect().bottom()))
+        );
+
+    labelYouWonYouLost->adjustSize();
+    labelStatsLastMatch->adjustSize();
+    widgetEndGameResultsContents->adjustSize();
+
+    // labelYouWonYouLost->setGeometry(
+    //     buttonSaveScore->x(), buttonSaveScore->y()+buttonSaveScore->height()*1.1,
+    //     lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height()
+    //     );
+    // labelStatsLastMatch->setGeometry(
+    //     labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
+    //     labelYouWonYouLost->width(), h/5
+    //     );
+
+    QFont lFont = labelTimerInGame->font();
+    lFont.setPixelSize(qMin(labelTimerInGame->width(), labelTimerInGame->height()));
+    labelTimerInGame->setFont(lFont);
+
+
+    int _X = principalMatrix.size();
+    if(gameEngine.isNull() || _X ==0 || bMinefieldBeingCreated)
+        return;
+
+    int _Y = principalMatrix[0].size();
+    // Recalculate the length of each cell
+    int oldCellLength = cellLength;
+    cellLength = qMin((iLimitWidthField-5)/_X, (iLimitHeightField-5)/_Y);
+
+    if(cellLength < preferences->optionMinimumCellLength())
+        cellLength = preferences->optionMinimumCellLength();
+    else if(cellLength > preferences->optionMaximumCellLength())
+        cellLength = preferences->optionMaximumCellLength();
+
+    if(cellLength == oldCellLength)
+        return;
+
+    fieldTheme.vSetMinefieldTheme(preferences->optionMinefieldTheme(), cellLength);
+
+    widgetBoardContents->setGeometry(
+        0, 0, _X*cellLength, _Y*cellLength);
+
+    for(uchar j=0; j<_Y; j++)
+    {
+        for (uchar i=0; i<_X; i++)
+        {
+            CellGui& cell = principalMatrix[i][j];
+            const LibreMinesGameEngine::CellGameEngine& cellGE =
+                gameEngine->getPrincipalMatrix()[i][j];
+
+            cell.label->resize(cellLength, cellLength);
+            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(cellGE.value));
+
+            cell.button->resize(cellLength, cellLength);
+            cell.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
+            cell.button->setIconSize(QSize(cellLength, cellLength));
+        }
+    }
 }
 
 
@@ -991,9 +1109,11 @@ void LibreMinesGui::vHideInterfaceInGame()
     buttonSaveMinefieldAsImage->hide();
     buttonSaveScore->hide();
     labelYouWonYouLost->hide();
-    labelStatisLastMatch->hide();
+    labelStatsLastMatch->hide();
     widgetBoardContents->hide();
     scrollAreaBoard->hide();
+    widgetEndGameResultsContents->hide();
+    scrollAreaEndGameResults->hide();
 }
 
 void LibreMinesGui::vShowInterfaceInGame()
@@ -1007,9 +1127,11 @@ void LibreMinesGui::vShowInterfaceInGame()
     buttonQuitInGame->show();
     buttonSaveMinefieldAsImage->show();
     labelYouWonYouLost->show();
-    labelStatisLastMatch->show();
+    labelStatsLastMatch->show();
     widgetBoardContents->show();
     scrollAreaBoard->show();
+    widgetEndGameResultsContents->show();
+    scrollAreaEndGameResults->show();
 }
 
 void LibreMinesGui::vSetApplicationTheme(const QString& theme)
@@ -1047,7 +1169,7 @@ void LibreMinesGui::SLOT_RestartGame()
 
     vResetPrincipalMatrix();
 
-    labelStatisLastMatch->setText(" ");
+    labelStatsLastMatch->setText(" ");
     labelYouWonYouLost->setText(" ");
 
     const uchar x = gameEngine->rows();
@@ -1079,7 +1201,7 @@ void LibreMinesGui::SLOT_QuitGame()
 
     qApp->restoreOverrideCursor();
 
-    labelStatisLastMatch->setText(" ");
+    labelStatsLastMatch->setText(" ");
 
     Q_EMIT SIGNAL_stopGame();
 
@@ -1208,7 +1330,13 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             + '\n'
             + tr("Game Complete: ") + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
 
-    labelStatisLastMatch->setText(QS_Statics);
+    labelStatsLastMatch->setText(QS_Statics);
+
+
+    labelYouWonYouLost->adjustSize();
+    labelStatsLastMatch->adjustSize();
+    widgetEndGameResultsContents->adjustSize();
+    scrollAreaEndGameResults->show();
 
     score.gameDifficulty = difficult;
     score.username = preferences->optionUsername();
@@ -1466,8 +1594,9 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
                                         QString::number(gameEngine->mines()) +
                                         tr(" Mines"));
     }
-    principalMatrix[_X][_Y].label->setPixmap(fieldTheme.getPixmapBoom());
 
+
+    principalMatrix[_X][_Y].label->setPixmap(fieldTheme.getPixmapBoom());
 
     for(uchar j=0; j<gameEngine->lines(); j++)
     {

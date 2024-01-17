@@ -29,6 +29,7 @@
 #include <QGridLayout>
 #include <QScrollArea>
 #include <QProgressBar>
+#include <QVBoxLayout>
 
 #include "common.h"
 #include "libreminespreferencesdialog.h"
@@ -264,8 +265,11 @@ private:
     QWidget* widgetBoardContents;
     QGridLayout* layoutBoard;
 
+    QScrollArea* scrollAreaEndGameResults;
+    QWidget* widgetEndGameResultsContents;
+    QVBoxLayout* layoutEndGameResults;
     QLabel *labelYouWonYouLost; /**< TODO: describe */
-    QLabel *labelStatisLastMatch; /**< TODO: describe */
+    QLabel *labelStatsLastMatch; /**< TODO: describe */
 
     QMenu* menuOptions;
     QAction* actionPreferences;
@@ -297,5 +301,7 @@ private:
     QDir dirAppData;
 
     QScopedPointer<SoundEffects> sound;
+
+    bool bMinefieldBeingCreated;
 };
 #endif // LIBREMINESGUI_H
