@@ -38,8 +38,9 @@ flatpak install flathub io.github.Bollos00.LibreMines
 
 ## Binary installation for Windows
 
-For windows systems, if you do not want to install LibreMines from the source code, you can just get one of the releases [here](https://github.com/Bollos00/LibreMines/releases). And follow those steps:
+For windows systems, you can just get one of the releases [here](https://github.com/Bollos00/LibreMines/releases). And follow those steps:
 
+* Make sure you have [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) installed.
 * Download the file `libremines_vX.X.X_windows_release.zip` of the last version available;
 * Extract it on your preferred location;
 
