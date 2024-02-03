@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QIcon>
 
-#include "minefieldextratheme.h"
+#include "extrathemes.h"
 
 MinefieldTheme::MinefieldTheme()
 {
@@ -21,7 +21,7 @@ void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
     {
         prefix = ":/minefield_themes/classic_dark/";
     }
-    // If it is not one of the defaults themes, try to find it on the system.
+    // If it is not one of the default themes, try to find it on the system.
     else
     {
         for(const QString& path :
@@ -33,7 +33,7 @@ void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
             if(!pathDir.exists() || !pathDir.cd("minefield_extra_themes") || !pathDir.cd(theme))
                 continue;
 
-            if(MinefieldExtraTheme::isValidTheme(pathDir.path()))
+            if(ExtraThemes::isValidTheme(pathDir.path(), ExtraThemes::Minefield))
             {
                 prefix = pathDir.path() + '/';
                 break;

@@ -38,6 +38,7 @@
 #include "qpushbutton_adapted.h"
 #include "minefieldtheme.h"
 #include "soundeffects.h"
+#include "facesreaction.h"
 
 /**
  * @brief
@@ -126,7 +127,6 @@ private:
     void vShowInterfaceInGame();
 
     void vSetApplicationTheme(const QString& theme);
-    void vSetFacesReaction(const QString& which);
 
     void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
     void vKeyboardControllUnsetCurrentCell();
@@ -286,13 +286,7 @@ private:
     QAction* actionGitHubHomePage;
 
     MinefieldTheme fieldTheme;
-
-    QScopedPointer<QPixmap> pmDizzyFace;
-    QScopedPointer<QPixmap> pmGrimacingFace;
-    QScopedPointer<QPixmap> pmGrinningFace;
-    QScopedPointer<QPixmap> pmOpenMouthFace;
-    QScopedPointer<QPixmap> pmSleepingFace;
-    QScopedPointer<QPixmap> pmSmillingFace;
+    FacesReaction facesReac;
 
     KeyboardController controller;
 

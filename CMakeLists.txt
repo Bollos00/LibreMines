@@ -27,6 +27,7 @@ project(libremines
 option(USE_QT6 "Wheter to use Qt5 or Qt6 libraries" TRUE)
 option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
 option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra thmes for the minefield" TRUE)
+option(INSTALL_EXTRA_FACESREACTION_THEMES "Install extra thmes for the faces reaction" TRUE)
 
 # Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
@@ -90,44 +91,29 @@ set(CMAKE_AUTOUIC ON)
 
 add_executable(${PROJECT_NAME} WIN32
     etc/translations/libremines_translations_qm.qrc
-    src/common.cpp
-    src/common.h
+    src/common.cpp src/common.h
+    src/extrathemes.cpp src/extrathemes.h
     src/main.cpp
-    src/libreminesapptheme.cpp
-    src/libreminesapptheme.h
-    src/libreminesgameengine.cpp
-    src/libreminesgameengine.h
-    src/libreminesgui.cpp
-    src/libreminesgui.h
-    src/libreminespreferencesdialog.cpp
-    src/libreminespreferencesdialog.h
-    src/libreminespreferencesdialog.ui
-    src/libreminespreferencessaver.cpp
-    src/libreminespreferencessaver.h
-    src/libreminesscore.cpp
-    src/libreminesscore.h
-    src/libreminesscoresdialog.cpp
-    src/libreminesscoresdialog.h
-    src/libreminesviewscoresdialog.cpp
-    src/libreminesviewscoresdialog.h
-    src/minefieldextratheme.cpp
-    src/minefieldextratheme.h
-    src/minefieldtheme.cpp
-    src/minefieldtheme.h
-    src/qkeyinput.cpp
-    src/qkeyinput.h
-    src/qlabel_adapted.cpp
-    src/qlabel_adapted.h
-    src/qpushbutton_adapted.cpp
-    src/qpushbutton_adapted.h
-    src/soundeffects.cpp
-    src/soundeffects.h
+    src/facesreaction.h src/facesreaction.cpp
+    src/libreminesapptheme.cpp src/libreminesapptheme.h
+    src/libreminesgameengine.cpp src/libreminesgameengine.h
+    src/libreminesgui.cpp src/libreminesgui.h
+    src/libreminespreferencesdialog.cpp src/libreminespreferencesdialog.h src/libreminespreferencesdialog.ui
+    src/libreminespreferencessaver.cpp src/libreminespreferencessaver.h
+    src/libreminesscore.cpp src/libreminesscore.h
+    src/libreminesscoresdialog.cpp src/libreminesscoresdialog.h
+    src/libreminesviewscoresdialog.cpp src/libreminesviewscoresdialog.h
+    src/minefieldtheme.cpp src/minefieldtheme.h
+    src/qkeyinput.cpp src/qkeyinput.h
+    src/qlabel_adapted.cpp src/qlabel_adapted.h
+    src/qpushbutton_adapted.cpp src/qpushbutton_adapted.h
+    src/soundeffects.cpp src/soundeffects.h
     share/facesreaction.qrc
     share/icons.qrc
     share/icons.rc
     share/minefield_themes.qrc
     share/sound_effects.qrc
-    )
+)
 
 include_directories(src)
 include_directories(include)
@@ -197,6 +183,24 @@ if(UNIX)
         install(
             DIRECTORY share/minefield_themes/twemoji
             DESTINATION share/libremines/minefield_extra_themes
+            )
+    endif()
+    if(INSTALL_EXTRA_FACESREACTION_THEMES)
+        install(
+            DIRECTORY share/faces_reaction/open-emoji-black
+            DESTINATION share/libremines/facesreaction_extra_themes
+             )
+        install(
+            DIRECTORY share/faces_reaction/open-emoji-white
+            DESTINATION share/libremines/facesreaction_extra_themes
+            )
+        install(
+            DIRECTORY share/faces_reaction/twemoji-color
+            DESTINATION share/libremines/facesreaction_extra_themes
+            )
+        install(
+            DIRECTORY share/faces_reaction/SecularSteve_custom
+            DESTINATION share/libremines/facesreaction_extra_themes
             )
     endif()
 

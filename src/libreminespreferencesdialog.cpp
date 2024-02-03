@@ -25,7 +25,7 @@
 #include <QMessageBox>
 #include <QSoundEffect>
 
-#include "minefieldextratheme.h"
+#include "extrathemes.h"
 
 LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     QDialog(parent),
@@ -45,39 +45,12 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     // Default Minefield themes
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
+    ui->comboBoxMinefieldTheme->addItems(ExtraThemes::getExtraThemes(ExtraThemes::Minefield));
 
-    // Load extra minefield theme (if found).
-    for(const QString& path :
-        QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation))
-    {
-        QDir dir(path);
+    ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Disable"});
+    ui->comboBoxFacesReaction->addItems(ExtraThemes::getExtraThemes(ExtraThemes::FacesReaction));
 
-        // Continue if the directory does not exist
-        if(!dir.exists() || !dir.cd("minefield_extra_themes"))
-            continue;
 
-        for(const QString& themeName :
-            dir.entryList(QDir::AllDirs | QDir::NoDot | QDir::NoDotDot))
-        {
-            // Add the new theme to the check box if it has a valid format
-            if(MinefieldExtraTheme::isValidTheme(dir.path(), themeName))
-            {
-                if(ui->comboBoxMinefieldTheme->findText(themeName) != -1)
-                {
-                    qWarning() << "The minefield theme \'" << themeName
-                               << "\' seems to be duplicate.";
-                }
-                else
-                {
-                    ui->comboBoxMinefieldTheme->addItem(themeName);
-                }
-            }
-        }
-
-    }
-
-    ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White",
-                                         "TwEmoji Colored", "SecularSteve Custom", "Disable"});
     ui->comboBoxWhenCtrlIsPressed->addItems({tr("Go to the Edge"), tr("Jump 3 Cells"),
                                              tr("Jump 5 Cells"), tr("Jump 10 Cells")});
 

@@ -73,6 +73,11 @@ jobs:
           Copy-Item ../share/minefield_themes/alternative_light ./Release/minefield_extra_themes -Recurse
           Copy-Item ../share/minefield_themes/flowerfield ./Release/minefield_extra_themes -Recurse
           Copy-Item ../share/minefield_themes/twemoji ./Release/minefield_extra_themes -Recurse
+          New-Item -ItemType Directory ./Release/facesreaction_extra_themes
+          Copy-Item ../share/faces_reaction/open-emoji-black ./Release/facesreaction_extra_themes -Recurse
+          Copy-Item ../share/faces_reaction/open-emoji-white ./Release/facesreaction_extra_themes -Recurse
+          Copy-Item ../share/faces_reaction/twemoji-color ./Release/facesreaction_extra_themes -Recurse
+          Copy-Item ../share/faces_reaction/SecularSteve_custom ./Release/facesreaction_extra_themes -Recurse
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
