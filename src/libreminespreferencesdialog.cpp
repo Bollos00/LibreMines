@@ -236,12 +236,8 @@ void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &option)
 
 void LibreMinesPreferencesDialog::setOptionFacesReaction(const QString &option)
 {
-    QString s = "Disable";
+    QString s = option;
     if(option.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0){ s = "Open Emoji Colored"; }
-    else if(option.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0){ s = "Open Emoji Black"; }
-    else if(option.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0){ s = "Open Emoji White"; }
-    else if(option.compare("TwEmojiColored", Qt::CaseInsensitive) == 0){ s = "TwEmoji Colored"; }
-    else if(option.compare("SecularSteveCustom", Qt::CaseInsensitive) == 0){ s = "SecularSteve Custom"; }
 
     ui->comboBoxFacesReaction->setCurrentText(s);
 }
