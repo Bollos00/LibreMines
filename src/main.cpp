@@ -127,7 +127,7 @@ void autoImportScoresAndSettingsFromLocalShare()
             if(oldLanguage.copy(newLanguageStr))
             {
                 qDebug() << oldLanguage.fileName() << " was automatticaly copied to " << newLanguageStr
-                         << " to preserve user high scores history.";
+                         << " user language preference.";
             }
             else
             {

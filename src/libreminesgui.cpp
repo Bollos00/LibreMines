@@ -1225,8 +1225,13 @@ void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
     labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
 
     // if the button is released outside its area do not treat the event
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if(e->position().x() >= cellLength || e->position().x() < 0 ||
+        e->position().y() >= cellLength || e->position().y() < 0)
+#else
     if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
        e->localPos().y() >= cellLength || e->localPos().y() < 0)
+#endif
     {
         return;
     }
@@ -1267,8 +1272,13 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
     labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
 
     // if the button is released outside its area do not treat the event
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if(e->position().x() >= cellLength || e->position().x() < 0 ||
+        e->position().y() >= cellLength || e->position().y() < 0)
+#else
     if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
        e->localPos().y() >= cellLength || e->localPos().y() < 0)
+#endif
     {
         return;
     }
