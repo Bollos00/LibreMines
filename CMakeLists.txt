@@ -91,10 +91,11 @@ set(CMAKE_AUTOUIC ON)
 
 add_executable(${PROJECT_NAME} WIN32
     etc/translations/libremines_translations_qm.qrc
-    src/common.cpp src/common.h
+    src/common.h
     src/extrathemes.cpp src/extrathemes.h
     src/main.cpp
     src/facesreaction.h src/facesreaction.cpp
+    src/keyboardcontroller.h src/keyboardcontroller.cpp
     src/libreminesapptheme.cpp src/libreminesapptheme.h
     src/libreminesgameengine.cpp src/libreminesgameengine.h
     src/libreminesgui.cpp src/libreminesgui.h

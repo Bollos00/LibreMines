@@ -39,6 +39,7 @@
 #include "minefieldtheme.h"
 #include "soundeffects.h"
 #include "facesreaction.h"
+#include "keyboardcontroller.h"
 
 /**
  * @brief
@@ -48,6 +49,7 @@ class LibreMinesGui : public QMainWindow
 {
     Q_OBJECT
 
+    friend class KeyboardController;
 private:
     class CellGui
     {
@@ -127,14 +129,6 @@ private:
     void vShowInterfaceInGame();
 
     void vSetApplicationTheme(const QString& theme);
-
-    void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
-    void vKeyboardControllUnsetCurrentCell();
-    void vKeyboardControllerMoveLeft();
-    void vKeyboardControllerMoveRight();
-    void vKeyboardControllerMoveDown();
-    void vKeyboardControllerMoveUp();
-    void vKeyboardControllerCenterCurrentCell();
 
     void vUpdatePreferences();
 
