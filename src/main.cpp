@@ -30,16 +30,113 @@ struct InitializeOptions
     InitializeOptions():
         heightMainWindow(0),
         widthMainWindow(0)
-    {};
+    {}
 
     InitializeOptions(int h, int w):
         heightMainWindow(h),
         widthMainWindow(w)
-    {};
+    {}
 
     int heightMainWindow = -1;
     int widthMainWindow = -1;
 };
+
+// This functions will check if the current application local dir is different of
+//  "~/.local/share/libremines". This will occur when the user upgrade the application
+//  from version 1.9.1 (or before) to the current 2.0.0 (or older).
+//  In case the directories are different and that are user settings or high scores,
+//  it will import those files by copying to the new data dir location.
+void autoImportScoresAndSettingsFromLocalShare()
+{
+    QDir oldFlatpakDataDir = QDir( QDir::homePath() + "/.local/share/libremines");
+
+    QDir newFlatpakDataDir = QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+
+    if(!oldFlatpakDataDir.exists() ||
+        oldFlatpakDataDir.absolutePath() == newFlatpakDataDir.absolutePath())
+    {
+        return;
+    }
+
+    qDebug() << "oldFlatpakDataDir: " << oldFlatpakDataDir.absolutePath();
+    qDebug() << "newFlatpakDataDir: " << newFlatpakDataDir.absolutePath();
+
+    if(!newFlatpakDataDir.exists())
+    {
+        qDebug() << newFlatpakDataDir.absolutePath() << " does not exist.";
+        if(newFlatpakDataDir.mkpath("."))
+        {
+            qDebug() << newFlatpakDataDir.absolutePath() << " successsfully created.";
+        }
+        else
+        {
+            qDebug() << "Failed to create " << newFlatpakDataDir.absolutePath()
+                     << ". Ending here!";
+            return;
+        }
+    }
+
+
+    QFile oldSettings(oldFlatpakDataDir.absoluteFilePath("libreminesLastSession.txt"));
+
+    if(oldSettings.exists())
+    {
+        QString newSettingsStr = newFlatpakDataDir.absoluteFilePath("libreminesLastSession.txt");
+        if(!QFile(newSettingsStr).exists())
+        {
+            if(oldSettings.copy(newSettingsStr))
+            {
+                qDebug() << oldSettings.fileName() << " was automatticaly copied to " << newSettingsStr
+                         << " to preserve user preferences.";
+            }
+            else
+            {
+                qDebug() << "Failed to copy " << oldSettings.fileName() << " to " << newSettingsStr;
+
+            }
+        }
+    }
+
+    QFile oldHighScores(oldFlatpakDataDir.absoluteFilePath("scoresLibreMines"));
+
+    if(oldHighScores.exists())
+    {
+        QString newHighScoresStr = newFlatpakDataDir.absoluteFilePath("scoresLibreMines");
+        if(!QFile(newHighScoresStr).exists())
+        {
+            if(oldHighScores.copy(newHighScoresStr))
+            {
+                qDebug() << oldHighScores.fileName() << " was automatticaly copied to " << newHighScoresStr
+                         << " to preserve user high scores history.";
+            }
+            else
+            {
+                qDebug() << "Failed to copy " << oldHighScores.fileName() << " to " << newHighScoresStr;
+
+            }
+        }
+    }
+
+    QFile oldLanguage(oldFlatpakDataDir.absoluteFilePath("libreminesDefaultLanguage.txt"));
+
+    if(oldLanguage.exists())
+    {
+        QString newLanguageStr = newFlatpakDataDir.absoluteFilePath("libreminesDefaultLanguage.txt");
+        if(!QFile(newLanguageStr).exists())
+        {
+            if(oldLanguage.copy(newLanguageStr))
+            {
+                qDebug() << oldLanguage.fileName() << " was automatticaly copied to " << newLanguageStr
+                         << " to preserve user high scores history.";
+            }
+            else
+            {
+                qDebug() << "Failed to copy " << oldLanguage.fileName() << " to " << newLanguageStr;
+
+            }
+        }
+    }
+}
 
 InitializeOptions getOptions(const QStringList& args)
 {
@@ -97,8 +194,10 @@ void loadLanguagePreference()
         if(usrLocale.language() == QLocale::Portuguese)
         {
             QTranslator* translator = new QTranslator();
-            translator->load(":/translations/libremines_pt_BR.qm");
-            qApp->installTranslator(translator);
+            if(translator->load(":/translations/libremines_pt_BR.qm"))
+                qApp->installTranslator(translator);
+            else
+                delete translator;
         }
 //        else if(usrLocale.language() == QLocale::Spanish)
 //        {
@@ -116,6 +215,8 @@ int main(int argc, char *argv[])
     a.setApplicationVersion(LIBREMINES_PROJECT_VERSION);
 
     InitializeOptions ops = getOptions(a.arguments());
+
+    autoImportScoresAndSettingsFromLocalShare();
 
     loadLanguagePreference();
 
