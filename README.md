@@ -8,7 +8,7 @@ LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [O
 
 The game has dark and light themes, is widely customizable, has options to create customizable fields, allows the user to play with the keyboard, among other things.
 
-The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory, except the files on `share/application_stylesheets` directory, which licenses are indicated with the `LICENSE` files inside subdirectories.
+The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory.
 
 ## Installing from Package Manager
 
