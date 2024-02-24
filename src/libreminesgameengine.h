@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -64,7 +64,15 @@ public:
 
 private:
     void vResetPrincipalMatrix();
-    bool bCleanCell(const uchar _X, const uchar _Y);
+
+    /**
+     * @brief Clear the cell in the #_X, #_Y position.
+     * Create the condition of game lost if the cell is a MINE.
+     * Clear all neighbor cells if the cell is ZERO
+     *
+     * @param recursive - Indicates this cell is being cleared along with another cell.
+     */
+    bool bCleanCell(const uchar _X, const uchar _Y, const bool recursive=true);
     void vGameLost(const uchar _X, const uchar _Y);
     void vGameWon();
 
@@ -76,7 +84,6 @@ private:
     uchar iY; /**< TODO: describe */
 
     ushort nMines; /**< TODO: describe */
-    ushort iTimeInSeconds; /**< TODO: describe */
     ushort iMinesLeft; /**< TODO: describe */
     ushort iHiddenCells; /**< TODO: describe */
     ushort iCellsToUnlock; /**< TODO: describe */
@@ -92,7 +99,7 @@ private:
     bool bGameActive;
 
 Q_SIGNALS:
-    void SIGNAL_showCell(const uchar _X, const uchar _Y);
+    void SIGNAL_showCell(const uchar _X, const uchar _Y, const bool recursive);
     void SIGNAL_endGameScore(LibreMinesScore score,
                              int iCorrectFlags,
                              int iWrongFlags,

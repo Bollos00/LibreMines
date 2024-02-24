@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -115,7 +115,7 @@ QDataStream& operator<< (QDataStream& stream, const LibreMinesScore& score)
     stream << score.username;
 
     return stream;
-};
+}
 
 QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score)
 {
@@ -133,7 +133,7 @@ QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score)
     stream >> score.username;
 
     return stream;
-};
+}
 
 QDebug operator<<(QDebug debug, const LibreMinesScore& score)
 {

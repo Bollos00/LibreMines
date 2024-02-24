@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -62,7 +62,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
     sound( new SoundEffects() )
 {
-    this->resize(800, 600);
+    // this->resize(800, 600);
+    this->setMinimumSize(QSize(700, 500));
 
     connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_optionChanged,
             this, &LibreMinesGui::SLOT_optionChanged);
@@ -90,10 +91,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     this->setWindowTitle("LibreMines");
 
     // Initializr keyboard controller attributes
-    controller.ctrlPressed = false;
-    controller.active = false;
-    controller.currentX = 0;
-    controller.currentY = 0;
+    controller = KeyboardController();
 
     // Load configuration file and set the theme
     LibreMinesPreferencesSaver::vLastSessionLoadConfigurationFile
@@ -103,12 +101,19 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
         *cbCustomizedMinesInPercentage
     );
     vUpdatePreferences();
-    fieldTheme.vSetMinefieldTheme(preferences->optionMinefieldTheme(), cellLength);
-    vSetFacesReaction(preferences->optionFacesReaction());
+    fieldTheme.vSetMinefieldTheme(preferences->optionMinefieldTheme(), 0);
+    facesReac.vSetFacesReactionTheme(preferences->optionFacesReaction(), 0);
 
     // Necessary for some reason
     QTimer::singleShot(100, [this]()
     { vSetApplicationTheme(preferences->optionApplicationStyle()); });
+
+    bMinefieldBeingCreated = false;
+
+    connect(this, &LibreMinesGui::SIGNAL_setSoundEffectVolume,
+            sound.get(), &SoundEffects::SLOT_setVolume);
+    connect(this, &LibreMinesGui::SIGNAL_playSoundEffect,
+            sound.get(), &SoundEffects::SLOT_playSound);
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -133,7 +138,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
        event->type() != QEvent::KeyRelease)
         return false;
 
-    // If the game is not running, do not deal woth the event
+    // If the game is not running, do not deal with the event
     if(!gameEngine || !gameEngine->isGameActive())
         return false;
 
@@ -143,152 +148,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
        !principalMatrix[0][0].button->isEnabled())
         return false;
 
-    // If the keyboard controller has invalid settings
-    if(!controller.valid)
-        return false;
-
-
-    // Lock the cursor on the lower left of the screen while the controller is activated
-//    if(controller.active)
-//    {
-//        qApp->overrideCursor()->setPos(90*qApp->primaryScreen()->geometry().width()/100,
-//                                       90*qApp->primaryScreen()->geometry().height()/100);
-//    }
-
-    switch(event->type())
-    {
-        case QEvent::KeyPress:
-        {
-            Qt::Key key = (Qt::Key)((QKeyEvent*)event)->key();
-
-            if(key == Qt::Key_Control)
-            {
-                controller.ctrlPressed = true;
-                return true;
-            }
-            if(controller.active)
-            {
-                if(key == controller.keyLeft ||
-                   key == controller.keyUp ||
-                   key == controller.keyDown ||
-                   key == controller.keyRight ||
-                   key == controller.keyCenterCell ||
-                   key == controller.keyFlagCell ||
-                   key == controller.keyReleaseCell)
-                {
-                    return true;
-                }
-            }
-
-        }break;
-
-        case QEvent::KeyRelease:
-        {
-            Qt::Key key = (Qt::Key)((QKeyEvent*)event)->key();
-
-            if(key == Qt::Key_Control)
-            {
-                controller.ctrlPressed = false;
-                return true;
-            }
-
-            // Active the controller depending on the key
-            // Additionally hide the cursor when the controller is activated
-            if(!controller.active)
-            {
-                if(key == controller.keyLeft ||
-                   key == controller.keyUp ||
-                   key == controller.keyDown ||
-                   key == controller.keyRight)
-                {
-                    controller.active = true;
-                    vKeyboardControllerSetCurrentCell(0, 0);
-                    qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
-                    qApp->overrideCursor()->setPos(90*qApp->primaryScreen()->geometry().width()/100,
-                                                   90*qApp->primaryScreen()->geometry().height()/100);
-
-                    this->setFocus();
-
-                    return true;
-                }
-            }
-            else
-            {
-                if(key == controller.keyLeft ||
-                   key == controller.keyUp ||
-                   key == controller.keyDown ||
-                   key == controller.keyRight ||
-                   key == controller.keyCenterCell ||
-                   key == controller.keyFlagCell ||
-                   key == controller.keyReleaseCell)
-                {
-                    this->setFocus();
-                }
-
-
-                if(key == controller.keyLeft)
-                {
-                    vKeyboardControllerMoveLeft();
-                    return true;
-                }
-                if(key == controller.keyUp)
-                {
-                    vKeyboardControllerMoveUp();
-                    return true;
-                }
-                if(key == controller.keyDown)
-                {
-                    vKeyboardControllerMoveDown();
-                    return true;
-                }
-                if(key == controller.keyRight)
-                {
-                    vKeyboardControllerMoveRight();
-                    return true;
-                }
-                if(key == controller.keyReleaseCell)
-                {
-                    const LibreMinesGameEngine::CellGameEngine& cell =
-                            gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
-
-                    if(cell.isHidden)
-                    {
-                        Q_EMIT SIGNAL_cleanCell(controller.currentX, controller.currentY);
-                        return true;
-                    }
-                    if(preferences->optionCleanNeighborCellsWhenClickedOnShowedCell())
-                    {
-                        Q_EMIT SIGNAL_cleanNeighborCells(controller.currentX, controller.currentY);
-                        return true;
-                    }
-
-                }
-                if(key == controller.keyFlagCell)
-                {
-                    Q_EMIT SIGNAL_addOrRemoveFlag(controller.currentX, controller.currentY);
-                    return true;
-                }
-                if(key == Qt::Key_Space)
-                {
-                    vKeyboardControllerCenterCurrentCell();
-                    return true;
-                }
-                if(key == Qt::Key_Escape)
-                {
-                    controller.active = false;
-                    vKeyboardControllUnsetCurrentCell();
-                    qApp->restoreOverrideCursor();
-                    return true;
-                }
-            }
-
-        }break;
-
-        default:
-            break;
-    }
-
-    return false;
+    return controller.handleEvent(event, this);
 }
 
 void LibreMinesGui::resizeEvent(QResizeEvent *e)
@@ -308,18 +168,18 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
                              ushort i_nMines_)
 {
+    bMinefieldBeingCreated = true;
+
     vAdjustInterfaceInGame();
     vShowInterfaceInGame();
 
-
     // Reset the controller attributes
-    controller.ctrlPressed = false;
-    controller.active = false;
-    controller.currentX = 0;
-    controller.currentY = 0;
+    controller = KeyboardController();
+    controller.setKeys(preferences->optionKeyboardControllerKeys());
+
     qApp->restoreOverrideCursor();
 
-    if(!controller.valid)
+    if(!controller.isValid())
     {
         QMessageBox::warning(this, tr("Keyboard Controller is invalid"),
                              tr("Dear user, unfortunately your Keyboard Controller preferences"
@@ -334,6 +194,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     buttonRestartInGame->setEnabled(false);
     buttonSaveMinefieldAsImage->setEnabled(false);
     buttonSaveScore->hide();
+    scrollAreaEndGameResults->hide();
 
     // Create the game engine instance
     gameEngine.reset(new LibreMinesGameEngine());
@@ -343,10 +204,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
     // Set the length of each cell
-    if(iLimitWidthField/_X < iLimitHeightField/_Y)
-        cellLength = iLimitWidthField/_X;
-    else
-        cellLength = iLimitHeightField/_Y;
+    cellLength = qMin(iLimitWidthField/_X, iLimitHeightField/_Y);
 
     if(cellLength < preferences->optionMinimumCellLength())
         cellLength = preferences->optionMinimumCellLength();
@@ -357,11 +215,12 @@ void LibreMinesGui::vNewGame(const uchar _X,
     // Update the pixmaps
     fieldTheme.vSetMinefieldTheme(preferences->optionMinefieldTheme(), cellLength);
     // Update faces reaction
-    vSetFacesReaction(preferences->optionFacesReaction());
+    facesReac.vSetFacesReactionTheme(preferences->optionFacesReaction(),
+                                              labelFaceReactionInGame->width());
 
     widgetBoardContents->setGeometry(0, 0, _X*cellLength, _Y*cellLength);
 
-    labelFaceReactionInGame->setPixmap(*pmSleepingFace);
+    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_BEING_GENERATED));
 
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
@@ -379,14 +238,15 @@ void LibreMinesGui::vNewGame(const uchar _X,
 //            cell.label = new QLabel_adapted(this);
 //            cell.button = new QPushButton_adapted(this);
 
-            cell.label = new QLabel_adapted(widgetBoardContents);
-            cell.button = new QPushButton_adapted(widgetBoardContents);
+            cell.label = new QLabel_adapted(widgetBoardContents, i, j);
+            cell.button = new QPushButton_adapted(widgetBoardContents, i, j);
 
             layoutBoard->addWidget(cell.label, j, i);
             layoutBoard->addWidget(cell.button, j, i);
 
             cell.label->resize(cellLength, cellLength);
             cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(CellValue::ZERO));
+            cell.label->setScaledContents(true);
             cell.label->show();
 
             cell.button->resize(cellLength, cellLength);
@@ -479,7 +339,11 @@ void LibreMinesGui::vNewGame(const uchar _X,
     //  of mines
     SLOT_minesLeft(gameEngine->mines());
 
-    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
+
+    bMinefieldBeingCreated = false;
+
+    vAdjustInterfaceInGame();
 }
 
 void LibreMinesGui::vAttributeAllCells()
@@ -520,7 +384,9 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     // Actions and Menu Bar
     actionPreferences = new QAction(this);
-    actionHighScores = new QAction(this);
+    actionShowHighScores = new QAction(this);
+    actionImportHighScores = new QAction(this);
+    actionExportHighScores = new QAction(this);
     actionToggleFullScreen = new QAction(this);
     actionAbout = new QAction(this);
     actionAboutQt = new QAction(this);
@@ -531,24 +397,31 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     menuBarGlobal->setGeometry(0, 0, this->width(), 100);
 
     menuOptions = new QMenu(menuBarGlobal);
+    menuHighScores = new QMenu(menuBarGlobal);
     menuHelp = new QMenu(menuBarGlobal);
 
     this->setMenuBar(menuBarGlobal);
     this->setStatusBar(new QStatusBar(this));
 
     menuBarGlobal->addAction(menuOptions->menuAction());
+    menuBarGlobal->addAction(menuHighScores->menuAction());
     menuBarGlobal->addAction(menuHelp->menuAction());
 
-    menuOptions->addActions({actionPreferences, actionHighScores, actionToggleFullScreen});
+    menuOptions->addActions({actionPreferences, actionToggleFullScreen});
+    menuHighScores->addActions({actionShowHighScores, actionImportHighScores, actionExportHighScores});
     menuHelp->addActions({actionAbout, actionAboutQt, actionGitHubHomePage});
 
     menuOptions->setTitle(tr("Options"));
+    menuHighScores->setTitle(tr("High Scores"));
     menuHelp->setTitle(tr("Help"));
 
     actionPreferences->setText(tr("Preferences..."));
-    actionHighScores->setText(tr("High Scores..."));
     actionToggleFullScreen->setText(tr("Toggle Full Screen"));
     actionToggleFullScreen->setShortcut(QKeySequence(Qt::Key_F11));
+
+    actionShowHighScores->setText(tr("Show High Scores..."));
+    actionImportHighScores->setText(tr("Import High Scores..."));
+    actionExportHighScores->setText(tr("Export High Scores..."));
 
     actionAbout->setText(tr("About..."));
     actionAboutQt->setText(tr("About Qt..."));
@@ -566,28 +439,45 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     buttonQuitInGame = new QPushButton(centralWidget());
     buttonSaveMinefieldAsImage = new QPushButton(centralWidget());
     buttonSaveScore = new QPushButton(centralWidget());
-    labelYouWonYouLost = new QLabel(centralWidget());
-    labelStatisLastMatch = new QLabel(centralWidget());
 
     scrollAreaBoard = new QScrollArea(centralWidget());
-    widgetBoardContents = new QWidget();
-
+    widgetBoardContents = new QWidget();    
     layoutBoard = new QGridLayout();
     layoutBoard->setSpacing(0);
+
+    scrollAreaEndGameResults = new QScrollArea(centralWidget());
+    widgetEndGameResultsContents = new QWidget();
+    layoutEndGameResults = new QVBoxLayout();
 
     widgetBoardContents->setLayout(layoutBoard);
     widgetBoardContents->setFocusPolicy(Qt::NoFocus);
     scrollAreaBoard->setWidget(widgetBoardContents);
     scrollAreaBoard->setFocusPolicy(Qt::NoFocus);
 
+    widgetEndGameResultsContents->setLayout(layoutEndGameResults);
+    widgetEndGameResultsContents->setFocusPolicy(Qt::NoFocus);
+    scrollAreaEndGameResults->setWidget(widgetEndGameResultsContents);
+    scrollAreaEndGameResults->setFocusPolicy(Qt::NoFocus);
+    scrollAreaEndGameResults->setStyleSheet("QScrollArea { background: transparent; }");
+
+    labelYouWonYouLost = new QLabel(widgetEndGameResultsContents);
+    labelStatsLastMatch = new QLabel(widgetEndGameResultsContents);
+
+    layoutEndGameResults->addWidget(labelYouWonYouLost);
+    layoutEndGameResults->addWidget(labelStatsLastMatch);
+
     labelTimerInGame->setFont(QFont("Liberation Sans", 40));
     labelTimerInGame->setNum(0);
     lcd_numberMinesLeft->setDecMode();
     lcd_numberMinesLeft->display(0);
+    labelFaceReactionInGame->setScaledContents(true);
     progressBarGameCompleteInGame->setTextVisible(false);
     buttonRestartInGame->setText(tr("Restart"));
+    buttonRestartInGame->setMinimumSize(0, 35);
     buttonQuitInGame->setText(tr("Quit"));
+    buttonQuitInGame->setMinimumSize(0, 35);
     buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
+    buttonSaveMinefieldAsImage->setMinimumSize(0, 35);
     buttonSaveScore->setText(tr("Save Score"));
     labelYouWonYouLost->setFont(QFont("Liberation Sans", 15));
 
@@ -618,12 +508,12 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     buttonCustomizedNewGame->setFont(QFont("Liberation Sans", 20));
 
     sbCustomizedX = new QSpinBox(centralWidget());
-    sbCustomizedX->setMinimum(10);
+    sbCustomizedX->setMinimum(5);
     sbCustomizedX->setMaximum(100);
     sbCustomizedX->setValue(20);
 
     sbCustomizedY = new QSpinBox(centralWidget());
-    sbCustomizedY->setMinimum(10);
+    sbCustomizedY->setMinimum(5);
     sbCustomizedY->setMaximum(100);
     sbCustomizedY->setValue(20);
 
@@ -632,6 +522,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     sbCustomizedPercentageMines->setMinimum(0);
     sbCustomizedPercentageMines->setMaximum(100);
     sbCustomizedPercentageMines->setValue(20);
+    sbCustomizedPercentageMines->setSuffix("%");
 
     sbCustomizedNumbersOfMines = new QSpinBox(centralWidget());
     sbCustomizedNumbersOfMines->setMinimum(0);
@@ -682,8 +573,14 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     connect(actionPreferences, &QAction::triggered,
             preferences, &QDialog::show);
 
-    connect(actionHighScores, &QAction::triggered,
+    connect(actionShowHighScores, &QAction::triggered,
             this, &LibreMinesGui::SLOT_showHighScores);
+
+    connect(actionImportHighScores, &QAction::triggered,
+            this, &LibreMinesGui::SLOT_importHighScores);
+
+    connect(actionExportHighScores, &QAction::triggered,
+            this, &LibreMinesGui::SLOT_exportHighScores);
 
     connect(actionToggleFullScreen, &QAction::triggered,
             this, &LibreMinesGui::SLOT_toggleFullScreen);
@@ -740,6 +637,8 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
         {
             sbCustomizedNumbersOfMines->setMaximum(sbCustomizedX->value() * sbCustomizedY->value());
             sbCustomizedNumbersOfMines->setValue(sbCustomizedX->value() * sbCustomizedY->value() * sbCustomizedPercentageMines->value() / 100);
+            sbCustomizedNumbersOfMines->setSuffix(
+                " / " +QString::number(sbCustomizedX->value()*sbCustomizedY->value()));
         }
     };
 
@@ -885,12 +784,12 @@ void LibreMinesGui::vAdjustMainMenu()
     sbCustomizedY->setGeometry(labelCustomizedY->x()+labelCustomizedY->width(), labelCustomizedY->y(),
                                labelCustomizedY->width(), labelCustomizedY->height());
 
-    cbCustomizedMinesInPercentage->setStyleSheet(
-                "QCheckBox::indicator "
-                "{"
-                "    width: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
-                "    height: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
-                "}");
+    // cbCustomizedMinesInPercentage->setStyleSheet(
+    //             "QCheckBox::indicator "
+    //             "{"
+    //             "    width: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
+    //             "    height: " + QString::number(cbCustomizedMinesInPercentage->width()) + "px;"
+    //             "}");
 }
 
 void LibreMinesGui::SLOT_Easy()
@@ -939,26 +838,122 @@ void LibreMinesGui::vAdjustInterfaceInGame()
 
     scrollAreaBoard->setGeometry(0, 0, iLimitWidthField, iLimitHeightField);
 
-    labelFaceReactionInGame->setGeometry(88*w /100, h /20,
-                                         9*w /100, 9*w /100);
-    labelTimerInGame->setGeometry(85*w /100, labelFaceReactionInGame->y() + labelFaceReactionInGame->height(),
-                                  15*w /100, h /14);
-    lcd_numberMinesLeft->setGeometry(labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
-                                     labelTimerInGame->width(), h /7);
-    progressBarGameCompleteInGame->setGeometry(lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
-                                     lcd_numberMinesLeft->width(), h /20);
-    buttonRestartInGame->setGeometry(progressBarGameCompleteInGame->x(), progressBarGameCompleteInGame->y()+progressBarGameCompleteInGame->height(),
-                                     progressBarGameCompleteInGame->width()/2, h /20);
-    buttonQuitInGame->setGeometry(buttonRestartInGame->x()+buttonRestartInGame->width(), buttonRestartInGame->y(),
-                                  buttonRestartInGame->width(), buttonRestartInGame->height());
-    buttonSaveMinefieldAsImage->setGeometry(buttonRestartInGame->x(), buttonRestartInGame->y() + buttonRestartInGame->height()*1.1,
-                                            progressBarGameCompleteInGame->width(), progressBarGameCompleteInGame->height());
-    buttonSaveScore->setGeometry(buttonSaveMinefieldAsImage->x(), buttonSaveMinefieldAsImage->y() + buttonSaveMinefieldAsImage->height()*1.1,
-                                 buttonSaveMinefieldAsImage->width(), buttonSaveMinefieldAsImage->height());
-    labelYouWonYouLost->setGeometry(buttonSaveScore->x(), buttonSaveScore->y()+buttonSaveScore->height()*1.1,
-                                    lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height());
-    labelStatisLastMatch->setGeometry(labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
-                                      labelYouWonYouLost->width(), h /5);
+    labelFaceReactionInGame->setGeometry(
+        85*w /100, h/50, w/10, w/10
+        );
+
+    facesReac.vSetFacesReactionTheme(preferences->optionFacesReaction(),
+                                     labelFaceReactionInGame->width());
+
+    labelTimerInGame->setGeometry(
+        81*w /100, labelFaceReactionInGame->y() + labelFaceReactionInGame->height(),
+        18*w /100, h /14
+        );
+    lcd_numberMinesLeft->setGeometry(
+        labelTimerInGame->x(), labelTimerInGame->y()+labelTimerInGame->height(),
+        labelTimerInGame->width(), h /7
+        );
+    progressBarGameCompleteInGame->setGeometry(
+        lcd_numberMinesLeft->x(), lcd_numberMinesLeft->y()+lcd_numberMinesLeft->height(),
+        lcd_numberMinesLeft->width(), h /20
+        );
+    buttonRestartInGame->setGeometry(
+        progressBarGameCompleteInGame->x(),
+        progressBarGameCompleteInGame->y()+progressBarGameCompleteInGame->height() + h/200,
+        progressBarGameCompleteInGame->width()/2 - h/400, h/20
+        );
+    buttonQuitInGame->setGeometry(
+        buttonRestartInGame->x() + buttonRestartInGame->width() + h/200, buttonRestartInGame->y(),
+        buttonRestartInGame->width(), buttonRestartInGame->height()
+        );
+
+    if(progressBarGameCompleteInGame->width() > 200)
+    {
+        buttonSaveMinefieldAsImage->setGeometry(
+            buttonRestartInGame->x(),
+            buttonRestartInGame->y() + buttonRestartInGame->height() + h/200,
+            progressBarGameCompleteInGame->width(), progressBarGameCompleteInGame->height()
+            );
+        buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
+    }
+    else
+    {
+        buttonSaveMinefieldAsImage->setGeometry(
+            buttonRestartInGame->x(),
+            buttonRestartInGame->y() + buttonRestartInGame->height() + h/200,
+            progressBarGameCompleteInGame->width(), 2*progressBarGameCompleteInGame->height()
+            );
+        buttonSaveMinefieldAsImage->setText(tr("Save Minefield\nas Image"));
+    }
+
+    buttonSaveScore->setGeometry(
+        buttonSaveMinefieldAsImage->x(),
+        buttonSaveMinefieldAsImage->y() + buttonSaveMinefieldAsImage->height() + h/200,
+        buttonSaveMinefieldAsImage->width(), buttonSaveMinefieldAsImage->height()
+        );
+
+    scrollAreaEndGameResults->setGeometry(
+        QRect(QPoint(buttonSaveScore->x(),
+                     buttonSaveScore->y() + buttonSaveScore->height() + h/200),
+              QPoint(buttonSaveScore->x() + buttonSaveScore->width(), centralWidget()->rect().bottom()))
+        );
+
+    labelYouWonYouLost->adjustSize();
+    labelStatsLastMatch->adjustSize();
+    widgetEndGameResultsContents->adjustSize();
+
+    // labelYouWonYouLost->setGeometry(
+    //     buttonSaveScore->x(), buttonSaveScore->y()+buttonSaveScore->height()*1.1,
+    //     lcd_numberMinesLeft->width(), lcd_numberMinesLeft->height()
+    //     );
+    // labelStatsLastMatch->setGeometry(
+    //     labelYouWonYouLost->x(), labelYouWonYouLost->y() + labelYouWonYouLost->height(),
+    //     labelYouWonYouLost->width(), h/5
+    //     );
+
+    QFont lFont = labelTimerInGame->font();
+    lFont.setPixelSize(qMin(labelTimerInGame->width(), labelTimerInGame->height()));
+    labelTimerInGame->setFont(lFont);
+
+
+    int _X = principalMatrix.size();
+    if(gameEngine.isNull() || _X ==0 || bMinefieldBeingCreated)
+        return;
+
+    int _Y = principalMatrix[0].size();
+    // Recalculate the length of each cell
+    int oldCellLength = cellLength;
+    cellLength = qMin((iLimitWidthField-5)/_X, (iLimitHeightField-5)/_Y);
+
+    if(cellLength < preferences->optionMinimumCellLength())
+        cellLength = preferences->optionMinimumCellLength();
+    else if(cellLength > preferences->optionMaximumCellLength())
+        cellLength = preferences->optionMaximumCellLength();
+
+    if(cellLength == oldCellLength)
+        return;
+
+    fieldTheme.vSetMinefieldTheme(preferences->optionMinefieldTheme(), cellLength);
+
+    widgetBoardContents->setGeometry(
+        0, 0, _X*cellLength, _Y*cellLength);
+
+    for(uchar j=0; j<_Y; j++)
+    {
+        for (uchar i=0; i<_X; i++)
+        {
+            CellGui& cell = principalMatrix[i][j];
+            const LibreMinesGameEngine::CellGameEngine& cellGE =
+                gameEngine->getPrincipalMatrix()[i][j];
+
+            cell.label->resize(cellLength, cellLength);
+            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(cellGE.value));
+
+            cell.button->resize(cellLength, cellLength);
+            cell.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
+            cell.button->setIconSize(QSize(cellLength, cellLength));
+        }
+    }
 }
 
 
@@ -973,9 +968,11 @@ void LibreMinesGui::vHideInterfaceInGame()
     buttonSaveMinefieldAsImage->hide();
     buttonSaveScore->hide();
     labelYouWonYouLost->hide();
-    labelStatisLastMatch->hide();
+    labelStatsLastMatch->hide();
     widgetBoardContents->hide();
     scrollAreaBoard->hide();
+    widgetEndGameResultsContents->hide();
+    scrollAreaEndGameResults->hide();
 }
 
 void LibreMinesGui::vShowInterfaceInGame()
@@ -989,9 +986,11 @@ void LibreMinesGui::vShowInterfaceInGame()
     buttonQuitInGame->show();
     buttonSaveMinefieldAsImage->show();
     labelYouWonYouLost->show();
-    labelStatisLastMatch->show();
+    labelStatsLastMatch->show();
     widgetBoardContents->show();
     scrollAreaBoard->show();
+    widgetEndGameResultsContents->show();
+    scrollAreaEndGameResults->show();
 }
 
 void LibreMinesGui::vSetApplicationTheme(const QString& theme)
@@ -1029,7 +1028,7 @@ void LibreMinesGui::SLOT_RestartGame()
 
     vResetPrincipalMatrix();
 
-    labelStatisLastMatch->setText(" ");
+    labelStatsLastMatch->setText(" ");
     labelYouWonYouLost->setText(" ");
 
     const uchar x = gameEngine->rows();
@@ -1061,7 +1060,7 @@ void LibreMinesGui::SLOT_QuitGame()
 
     qApp->restoreOverrideCursor();
 
-    labelStatisLastMatch->setText(" ");
+    labelStatsLastMatch->setText(" ");
 
     Q_EMIT SIGNAL_stopGame();
 
@@ -1076,93 +1075,80 @@ void LibreMinesGui::SLOT_QuitGame()
 
 void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
 {
-    if(!gameEngine->isGameActive() || controller.active)
+    if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
 
     // if the button is released outside its area do not treat the event
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if(e->position().x() >= cellLength || e->position().x() < 0 ||
+        e->position().y() >= cellLength || e->position().y() < 0)
+#else
     if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
        e->localPos().y() >= cellLength || e->localPos().y() < 0)
+#endif
     {
         return;
     }
 
     QPushButton_adapted *buttonClicked = (QPushButton_adapted *) sender();
 
-    for(uchar j=0; j<gameEngine->lines(); j++)
+    switch (e->button())
     {
-        for (uchar i=0; i<gameEngine->rows(); i++)
-        {
-            // Find the emissor of the signal
-            if(buttonClicked == principalMatrix[i][j].button)
-            {
-                switch (e->button())
-                {
-                    case Qt::RightButton:
-                        Q_EMIT SIGNAL_addOrRemoveFlag(i, j);
-                        return;
+        case Qt::RightButton:
+            Q_EMIT SIGNAL_addOrRemoveFlag(buttonClicked->getXCell(), buttonClicked->getYCell());
+            return;
 
-                    case Qt::LeftButton:
-                        Q_EMIT SIGNAL_cleanCell(i, j);
-                        return;
+        case Qt::LeftButton:
+            Q_EMIT SIGNAL_cleanCell(buttonClicked->getXCell(), buttonClicked->getYCell());
+            return;
 
-                    default:
-                        return;
-                }
-            }
-        }
+        default:
+            return;
     }
 }
 
 void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
 {
-    if(!gameEngine->isGameActive() || controller.active)
+    if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
     if(e->button() != Qt::LeftButton)
         return;
 
-    labelFaceReactionInGame->setPixmap(*pmOpenMouthFace);
+    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::HIDDEN_CELL_PRESSED));
 }
 
 void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
 {
-    if(!gameEngine->isGameActive() || controller.active)
+    if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(*pmSmillingFace);
+    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
 
     // if the button is released outside its area do not treat the event
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if(e->position().x() >= cellLength || e->position().x() < 0 ||
+        e->position().y() >= cellLength || e->position().y() < 0)
+#else
     if(e->localPos().x() >= cellLength || e->localPos().x() < 0 ||
        e->localPos().y() >= cellLength || e->localPos().y() < 0)
+#endif
     {
         return;
     }
 
     QLabel_adapted *buttonClicked = (QLabel_adapted *) sender();
 
-    for(uchar j=0; j<gameEngine->lines(); j++)
+    switch (e->button())
     {
-        for (uchar i=0; i<gameEngine->rows(); i++)
-        {
-            // Find the emissor of the signal
-            if(buttonClicked == principalMatrix[i][j].label)
-            {
-                if(e->button() != Qt::LeftButton)
-                    return;
+        case Qt::LeftButton:
+            Q_EMIT SIGNAL_cleanNeighborCells(buttonClicked->getXCell(), buttonClicked->getYCell());
+            return;
 
-                switch (e->button())
-                {
-                    case Qt::LeftButton:
-                        Q_EMIT SIGNAL_cleanNeighborCells(i, j);
-                        return;
-
-                    default:
-                        return;
-                }
-            }
-        }
+        default:
+            return;
     }
 }
 
@@ -1170,25 +1156,23 @@ void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
 {
     Q_UNUSED(e)
 
-    if(!gameEngine->isGameActive() || controller.active)
+    if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(*pmGrimacingFace);
+    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::UNHIDDEN_CELL_PRESSED));
 
 }
 
-void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y)
+void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y, const bool recursive)
 {
     principalMatrix[_X][_Y].button->hide();
 
-    if(controller.active && controller.currentX == _X && controller.currentY == _Y)
+    controller.refresh(_X, _Y, this);
+
+    if(!recursive)
     {
-        vKeyboardControllUnsetCurrentCell();
-        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
+        Q_EMIT SIGNAL_playSoundEffect(SoundEffects::RELEASE_CELL);
     }
-
-
-    Q_EMIT(sound->SIGNAL_releaseCell());
 }
 
 void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
@@ -1210,7 +1194,13 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             + '\n'
             + tr("Game Complete: ") + QString::number(score.dPercentageGameCompleted, 'f', 2) + " %";
 
-    labelStatisLastMatch->setText(QS_Statics);
+    labelStatsLastMatch->setText(QS_Statics);
+
+
+    labelYouWonYouLost->adjustSize();
+    labelStatsLastMatch->adjustSize();
+    widgetEndGameResultsContents->adjustSize();
+    scrollAreaEndGameResults->show();
 
     score.gameDifficulty = difficult;
     score.username = preferences->optionUsername();
@@ -1352,12 +1342,9 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
-    if(controller.active && controller.currentX == _X && controller.currentY == _Y)
-    {
-        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
-    }
+    controller.refresh(_X, _Y, this);
 
-    Q_EMIT(sound->SIGNAL_flagCell());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::FLAG_CELL);
 }
 
 
@@ -1371,12 +1358,9 @@ void LibreMinesGui::SLOT_QuestionCell(const uchar _X, const uchar _Y)
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
-    if(controller.active && controller.currentX == _X && controller.currentY == _Y)
-    {
-        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
-    }
+    controller.refresh(_X, _Y, this);
 
-    Q_EMIT(sound->SIGNAL_flagCell());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::FLAG_CELL);
 }
 
 void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
@@ -1389,12 +1373,9 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
-    if(controller.active && controller.currentX == _X && controller.currentY == _Y)
-    {
-        vKeyboardControllerSetCurrentCell(controller.currentX, controller.currentY);
-    }
+    controller.refresh(_X, _Y, this);
 
-    Q_EMIT(sound->SIGNAL_flagCell());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::FLAG_CELL);
 }
 
 void LibreMinesGui::SLOT_remakeGame()
@@ -1432,16 +1413,11 @@ void LibreMinesGui::SLOT_gameWon()
         }
     }
 
-    if(controller.active)
-    {
-        controller.active = false;
-        qApp->restoreOverrideCursor();
-        vKeyboardControllUnsetCurrentCell();
-    }
+    controller.deactivate(this);
 
-    labelFaceReactionInGame->setPixmap(*pmGrinningFace);
+    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_WON));
 
-    Q_EMIT(sound->SIGNAL_gameWon());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::GAME_WON);
 }
 
 void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
@@ -1468,8 +1444,9 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
                                         QString::number(gameEngine->mines()) +
                                         tr(" Mines"));
     }
-    principalMatrix[_X][_Y].label->setPixmap(fieldTheme.getPixmapBoom());
 
+
+    principalMatrix[_X][_Y].label->setPixmap(fieldTheme.getPixmapBoom());
 
     for(uchar j=0; j<gameEngine->lines(); j++)
     {
@@ -1498,15 +1475,10 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
         }
     }
 
-    if(controller.active)
-    {
-        controller.active = false;
-        qApp->restoreOverrideCursor();
-        vKeyboardControllUnsetCurrentCell();
-    }
+    controller.deactivate(this);
 
-    labelFaceReactionInGame->setPixmap(*pmDizzyFace);
-    Q_EMIT(sound->SIGNAL_gameLost());
+    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_LOST));
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::GAME_LOST);
 }
 
 void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value)
@@ -1545,7 +1517,7 @@ void LibreMinesGui::SLOT_showAboutDialog()
 {
     QString text =
             "LibreMines " + QString(LIBREMINES_PROJECT_VERSION) + "\n" +
-            tr("Copyright (C) 2020-2023  Bruno Bollos Correa\n"
+            tr("Copyright (C) 2020-2024  Bruno Bollos Correa\n"
             "\n"
             "This program is free software: you can redistribute it and/or modify"
             " it under the terms of the GNU General Public License as published by"
@@ -1598,6 +1570,78 @@ void LibreMinesGui::SLOT_showHighScores()
     dialog.exec();
 }
 
+void LibreMinesGui::SLOT_importHighScores()
+{
+    QString importFileName = QFileDialog::getOpenFileName(
+        this, tr("Import high scores from file"),
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+    );
+
+    if(!importFileName.isEmpty())
+    {
+        QScopedPointer<QFile> fileImport( new QFile(importFileName) );
+
+
+        fileImport->open(QIODevice::ReadOnly);
+
+        QDataStream stream(fileImport.get());
+        stream.setVersion(QDataStream::Qt_5_12);
+
+        bool fileOk = true;
+
+        while(!stream.atEnd())
+        {
+            stream.startTransaction();
+            LibreMinesScore s;
+            stream >> s;
+            if(!stream.commitTransaction())
+            {
+                QMessageBox::critical(this, tr("Invalid high scores file"),
+                                      tr("Error parsing the data of the file!"));
+                fileOk = false;
+                break;
+            }
+        }
+
+        if(fileOk)
+        {
+            // Backup the old scores file if it exists
+            QString backupScorePath = dirAppData.absoluteFilePath(
+                "scoresLibreMines." + QString::number(QDateTime::currentSecsSinceEpoch()) + ".bkp");
+
+            QFile::rename(dirAppData.absoluteFilePath("scoresLibreMines"), backupScorePath);
+
+            if(fileImport->copy(dirAppData.absoluteFilePath("scoresLibreMines")))
+            {
+                QMessageBox::information(this, tr("High scores import complete"),
+                                         tr("Operation completed!") + '\n' +
+                                             tr("old high score file has been saved to") +
+                                             backupScorePath);
+            }
+        }
+    }
+
+}
+
+void LibreMinesGui::SLOT_exportHighScores()
+{
+    QString backupFileName = QFileDialog::getSaveFileName(
+        this, tr("Backup high scores to file"),
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/scoresLibreMines.bkp"
+    );
+
+    if(!backupFileName.isEmpty())
+    {
+        QScopedPointer<QFile> fileScores( new QFile(dirAppData.absoluteFilePath("scoresLibreMines")) );
+        if(fileScores && fileScores->exists() && fileScores->copy(backupFileName))
+        {
+            QMessageBox::information(this, tr("High scores bakcup complete"),
+                                    tr("Successfully backup high scores to \"") + backupFileName + '\"');
+        }
+
+    }
+}
+
 void LibreMinesGui::SLOT_toggleFullScreen()
 {
     if(isFullScreen())
@@ -1613,7 +1657,7 @@ void LibreMinesGui::SLOT_toggleFullScreen()
 
 void LibreMinesGui::SLOT_saveMinefieldAsImage()
 {
-    if(controller.active)
+    if(controller.isActive())
         qApp->restoreOverrideCursor();
 
     QString picturesDirPAth = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
@@ -1636,261 +1680,15 @@ void LibreMinesGui::SLOT_saveMinefieldAsImage()
     widgetBoardContents->render(&painter);
     image.save(fullFileName);
 
-    if(controller.active)
+    if(controller.isActive())
         qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
-}
-
-void LibreMinesGui::vSetFacesReaction(const QString &which)
-{
-    if(which.compare("Disable", Qt::CaseInsensitive) == 0)
-    {
-        pmDizzyFace.reset( new QPixmap() );
-        pmGrimacingFace.reset( new QPixmap() );
-        pmGrinningFace.reset( new QPixmap() );
-        pmOpenMouthFace.reset( new QPixmap() );
-        pmSleepingFace.reset( new QPixmap() );
-        pmSmillingFace.reset( new QPixmap() );
-    }
-    else
-    {
-        QString prefix = ":/facesreaction/faces_reaction/open-emoji-color/";
-        if(which.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0)
-            prefix = ":/facesreaction/faces_reaction/open-emoji-color/";
-        else if(which.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0)
-            prefix = ":/facesreaction/faces_reaction/open-emoji-black/";
-        else if(which.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0)
-            prefix = ":/facesreaction/faces_reaction/open-emoji-white/";
-        else if(which.compare("TwEmojiColored", Qt::CaseInsensitive) == 0)
-            prefix = ":/facesreaction/faces_reaction/twemoji-color/";
-        else if(which.compare("SecularSteveCustom", Qt::CaseInsensitive) == 0)
-            prefix = ":/facesreaction/faces_reaction/SecularSteve_custom/";
-        else
-        {
-            qWarning() << "Faces reaction option: \"" << qPrintable(which) << "\" will not be handled";
-        }
-
-        const int length = labelFaceReactionInGame->width();
-
-        pmDizzyFace.reset( new QPixmap( QIcon(prefix + "dizzy_face.svg").pixmap(length, length) ));
-        pmGrimacingFace.reset( new QPixmap( QIcon(prefix + "grimacing_face.svg").pixmap(length, length) ));
-        pmGrinningFace.reset( new QPixmap( QIcon(prefix + "grinning_face.svg").pixmap(length, length) ));
-        pmOpenMouthFace.reset( new QPixmap( QIcon(prefix + "open_mouth_face.svg").pixmap(length, length) ));
-        pmSleepingFace.reset( new QPixmap( QIcon(prefix + "sleeping_face.svg").pixmap(length, length) ));
-        pmSmillingFace.reset( new QPixmap( QIcon(prefix + "smilling_face.svg").pixmap(length, length) ));
-    }
-}
-
-void LibreMinesGui::vKeyboardControllerSetCurrentCell(const uchar x, const uchar y)
-{
-    controller.currentX = x;
-    controller.currentY = y;
-
-    const LibreMinesGameEngine::CellGameEngine& cellGE = gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
-    CellGui& cellGui= principalMatrix[controller.currentX][controller.currentY];
-
-    if(cellGE.isHidden)
-    {
-        QImage img = fieldTheme.getPixmapButton(cellGE.flagState).toImage();
-        img.invertPixels();
-        cellGui.button->setIcon(QIcon(QPixmap::fromImage(img)));
-    }
-    else
-    {
-        QImage img = fieldTheme.getPixmapFromCellValue(cellGE.value).toImage();
-        img.invertPixels();
-
-        cellGui.label->setPixmap(QPixmap::fromImage(img));
-    }
-
-    scrollAreaBoard->ensureVisible(x*cellLength + cellLength/2, y*cellLength + cellLength/2,
-                                   cellLength/2 + 1, cellLength/2 + 1);
-}
-
-void LibreMinesGui::vKeyboardControllUnsetCurrentCell()
-{
-    const LibreMinesGameEngine::CellGameEngine& cellGE = gameEngine->getPrincipalMatrix()[controller.currentX][controller.currentY];
-    CellGui& cellGui= principalMatrix[controller.currentX][controller.currentY];
-
-    if(cellGE.isHidden)
-    {
-        cellGui.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
-    }
-    else
-    {
-        cellGui.label->setPixmap(fieldTheme.getPixmapFromCellValue(cellGE.value));
-    }
-}
-
-void LibreMinesGui::vKeyboardControllerMoveLeft()
-{   
-    vKeyboardControllUnsetCurrentCell();
-
-    uchar destX = 0;
-
-    if(controller.ctrlPressed)
-    {
-        if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump3Cells &&
-           controller.currentX >= 3)
-        {
-            destX = controller.currentX - 3;
-        }
-        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump5Cells &&
-            controller.currentX >= 5)
-        {
-            destX = controller.currentX - 5;
-        }
-        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump10Cells &&
-                controller.currentX >= 10)
-        {
-            destX = controller.currentX - 10;
-        }
-//        else
-//        {
-//            destX = 0;
-//        }
-    }
-    else
-    {
-        destX = (controller.currentX == 0) ? gameEngine->rows() - 1 : controller.currentX - 1;
-    }
-
-    vKeyboardControllerSetCurrentCell(destX, controller.currentY);
-
-    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
-}
-
-void LibreMinesGui::vKeyboardControllerMoveRight()
-{
-    vKeyboardControllUnsetCurrentCell();
-
-    uchar destX = gameEngine->rows() - 1;
-
-    if(controller.ctrlPressed)
-    {
-        if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump3Cells &&
-            controller.currentX < gameEngine->rows() - 3)
-        {
-            destX = controller.currentX + 3;
-        }
-        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump5Cells &&
-            controller.currentX < gameEngine->rows() - 5)
-        {
-            destX = controller.currentX + 5;
-        }
-        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump10Cells &&
-                controller.currentX < gameEngine->rows() - 10)
-        {
-            destX = controller.currentX + 10;
-        }
-    }
-    else
-    {
-        destX = (controller.currentX == gameEngine->rows() - 1) ? 0 : (controller.currentX + 1);
-    }
-
-    vKeyboardControllerSetCurrentCell(destX, controller.currentY);
-
-    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
-}
-
-void LibreMinesGui::vKeyboardControllerMoveDown()
-{
-    vKeyboardControllUnsetCurrentCell();
-
-    uchar destY = gameEngine->lines() - 1;
-
-    if(controller.ctrlPressed)
-    {
-        if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump3Cells &&
-            controller.currentY < gameEngine->lines() - 3)
-        {
-            destY = controller.currentY + 3;
-        }
-        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump5Cells &&
-            controller.currentY < gameEngine->lines() - 5)
-        {
-            destY = controller.currentY + 5;
-        }
-        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump10Cells &&
-                controller.currentY < gameEngine->lines() - 10)
-        {
-            destY = controller.currentY + 10;
-        }
-    }
-    else
-    {
-        destY = (controller.currentY == gameEngine->lines() - 1) ? 0 : (controller.currentY + 1);
-    }
-
-    vKeyboardControllerSetCurrentCell(controller.currentX, destY);
-
-    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
-}
-
-void LibreMinesGui::vKeyboardControllerMoveUp()
-{
-    vKeyboardControllUnsetCurrentCell();
-
-    uchar destY = 0;
-
-    if(controller.ctrlPressed)
-    {
-        if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump3Cells &&
-            controller.currentY >= 3)
-        {
-            destY = controller.currentY - 3;
-        }
-        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump5Cells &&
-            controller.currentY >= 5)
-        {
-            destY = controller.currentY - 5;
-        }
-        else if(preferences->optionWhenCtrlIsPressed() == LibreMines::Jump10Cells &&
-                controller.currentY >= 10)
-        {
-            destY = controller.currentY - 10;
-        }
-    }
-    else
-    {
-        destY = (controller.currentY == 0) ? gameEngine->lines() - 1 : controller.currentY - 1;
-    }
-
-    vKeyboardControllerSetCurrentCell(controller.currentX, destY);
-
-    Q_EMIT(sound->SIGNAL_keyboardControllerMove());
-}
-
-void LibreMinesGui::vKeyboardControllerCenterCurrentCell()
-{
-    const uchar x = controller.currentX;
-    const uchar y = controller.currentY;
-    scrollAreaBoard->ensureVisible(x*cellLength + cellLength/2, y*cellLength + cellLength/2,
-                                   cellLength/2 + scrollAreaBoard->width()/2, cellLength/2 + scrollAreaBoard->height()/2);
-
 }
 
 void LibreMinesGui::vUpdatePreferences()
 {
     const QList<int> keys = preferences->optionKeyboardControllerKeys();
 
-    controller.keyLeft = keys.at(0);
-    controller.keyUp = keys.at(1);
-    controller.keyRight = keys.at(2);
-    controller.keyDown = keys.at(3);
-    controller.keyReleaseCell= keys.at(4);
-    controller.keyFlagCell = keys.at(5);
-    controller.keyCenterCell = keys.at(6);
-
-    controller.valid = true;
-    for (int i=0; i<keys.size()-1; ++i)
-    {
-        for(int j=i+1; j<keys.size(); ++j)
-        {
-            controller.valid &= keys[i] != keys[j];
-        }
-    }
-    controller.valid &= !keys.contains(-1);
+    controller.setKeys(keys);
 
     if(preferences->optionUsername().isEmpty())
     {
@@ -1901,6 +1699,5 @@ void LibreMinesGui::vUpdatePreferences()
 #endif
     }
 
-    sound->setVolume(preferences->optionSoundVolume());
-    sound->setMuted(preferences->optionSoundVolume() == 0);
+    sound->SLOT_setVolume(preferences->optionSoundVolume());
 }

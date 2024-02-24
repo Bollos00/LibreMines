@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>974</width>
-    <height>787</height>
+    <height>833</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,6 +69,9 @@ clicked on showed cell</string>
         </item>
         <item>
          <widget class="QSpinBox" name="sbMinimumCellLength">
+          <property name="minimum">
+           <number>10</number>
+          </property>
           <property name="maximum">
            <number>999</number>
           </property>
@@ -87,6 +90,9 @@ clicked on showed cell</string>
         </item>
         <item>
          <widget class="QSpinBox" name="sbMaximumCellLength">
+          <property name="minimum">
+           <number>10</number>
+          </property>
           <property name="maximum">
            <number>999</number>
           </property>
@@ -209,7 +215,7 @@ Animation</string>
            <x>0</x>
            <y>0</y>
            <width>570</width>
-           <height>237</height>
+           <height>264</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">

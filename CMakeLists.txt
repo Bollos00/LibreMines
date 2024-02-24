@@ -1,6 +1,6 @@
 #############################################################################
 # LibreMines                                                                #
-# Copyright (C) 2020-2023  Bruno Bollos Correa                              #                                                                         #
+# Copyright (C) 2020-2024  Bruno Bollos Correa                              #                                                                         #
 # This program is free software: you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
 # the Free Software Foundation, either version 3 of the License, or         #
@@ -18,15 +18,16 @@
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.1.0)
 project(libremines
-    VERSION "1.10.0"
+    VERSION "2.0.0"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
     )
 
-option(USE_QT6 "Wheter to use Qt5 or Qt6 libraries" FALSE)
+option(USE_QT6 "Wheter to use Qt5 or Qt6 libraries" TRUE)
 option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
 option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra thmes for the minefield" TRUE)
+option(INSTALL_EXTRA_FACESREACTION_THEMES "Install extra thmes for the faces reaction" TRUE)
 
 # Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
@@ -90,47 +91,30 @@ set(CMAKE_AUTOUIC ON)
 
 add_executable(${PROJECT_NAME} WIN32
     etc/translations/libremines_translations_qm.qrc
-    src/common.cpp
     src/common.h
+    src/extrathemes.cpp src/extrathemes.h
     src/main.cpp
-    src/libreminesapptheme.cpp
-    src/libreminesapptheme.h
-    src/libreminesgameengine.cpp
-    src/libreminesgameengine.h
-    src/libreminesgui.cpp
-    src/libreminesgui.h
-    src/libreminespreferencesdialog.cpp
-    src/libreminespreferencesdialog.h
-    src/libreminespreferencesdialog.ui
-    src/libreminespreferencessaver.cpp
-    src/libreminespreferencessaver.h
-    src/libreminesscore.cpp
-    src/libreminesscore.h
-    src/libreminesscoresdialog.cpp
-    src/libreminesscoresdialog.h
-    src/libreminesviewscoresdialog.cpp
-    src/libreminesviewscoresdialog.h
-    src/minefieldextratheme.cpp
-    src/minefieldextratheme.h
-    src/minefieldtheme.cpp
-    src/minefieldtheme.h
-    src/qkeyinput.cpp
-    src/qkeyinput.h
-    src/qlabel_adapted.cpp
-    src/qlabel_adapted.h
-    src/qpushbutton_adapted.cpp
-    src/qpushbutton_adapted.h
-    src/soundeffects.cpp
-    src/soundeffects.h
-    share/application_stylesheets/qdarkstyle/dark/qdarkstyle_dark.qrc
-    share/application_stylesheets/qdarkstyle/light/qdarkstyle_light.qrc
-    share/application_stylesheets/qss/qss.qrc
+    src/facesreaction.h src/facesreaction.cpp
+    src/keyboardcontroller.h src/keyboardcontroller.cpp
+    src/libreminesapptheme.cpp src/libreminesapptheme.h
+    src/libreminesgameengine.cpp src/libreminesgameengine.h
+    src/libreminesgui.cpp src/libreminesgui.h
+    src/libreminespreferencesdialog.cpp src/libreminespreferencesdialog.h src/libreminespreferencesdialog.ui
+    src/libreminespreferencessaver.cpp src/libreminespreferencessaver.h
+    src/libreminesscore.cpp src/libreminesscore.h
+    src/libreminesscoresdialog.cpp src/libreminesscoresdialog.h
+    src/libreminesviewscoresdialog.cpp src/libreminesviewscoresdialog.h
+    src/minefieldtheme.cpp src/minefieldtheme.h
+    src/qkeyinput.cpp src/qkeyinput.h
+    src/qlabel_adapted.cpp src/qlabel_adapted.h
+    src/qpushbutton_adapted.cpp src/qpushbutton_adapted.h
+    src/soundeffects.cpp src/soundeffects.h
     share/facesreaction.qrc
     share/icons.qrc
     share/icons.rc
     share/minefield_themes.qrc
     share/sound_effects.qrc
-    )
+)
 
 include_directories(src)
 include_directories(include)
@@ -200,6 +184,24 @@ if(UNIX)
         install(
             DIRECTORY share/minefield_themes/twemoji
             DESTINATION share/libremines/minefield_extra_themes
+            )
+    endif()
+    if(INSTALL_EXTRA_FACESREACTION_THEMES)
+        install(
+            DIRECTORY share/faces_reaction/open-emoji-black
+            DESTINATION share/libremines/facesreaction_extra_themes
+             )
+        install(
+            DIRECTORY share/faces_reaction/open-emoji-white
+            DESTINATION share/libremines/facesreaction_extra_themes
+            )
+        install(
+            DIRECTORY share/faces_reaction/twemoji-color
+            DESTINATION share/libremines/facesreaction_extra_themes
+            )
+        install(
+            DIRECTORY share/faces_reaction/SecularSteve_custom
+            DESTINATION share/libremines/facesreaction_extra_themes
             )
     endif()
 

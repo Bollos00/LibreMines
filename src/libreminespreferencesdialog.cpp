@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -25,7 +25,7 @@
 #include <QMessageBox>
 #include <QSoundEffect>
 
-#include "minefieldextratheme.h"
+#include "extrathemes.h"
 
 LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     QDialog(parent),
@@ -40,50 +40,17 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     // Dark and light fusion
     ui->comboBoxApplicationStyle->addItems({"Fusion Dark", "Fusion Light"});
 
-    // QSS
-    ui->comboBoxApplicationStyle->addItems({"ConsoleStyle", "NeonButtons"});
-
-    // QDarkStyle
-    ui->comboBoxApplicationStyle->addItems({"QDarkStyle", "QDarkStyle Light"});
-
     // Styles from system
     ui->comboBoxApplicationStyle->addItems(QStyleFactory::keys());
 
     // Default Minefield themes
     ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
+    ui->comboBoxMinefieldTheme->addItems(ExtraThemes::getExtraThemes(ExtraThemes::Minefield));
 
-    // Load extra minefield theme (if found).
-    for(const QString& path :
-        QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation))
-    {
-        QDir dir(path);
+    ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Disable"});
+    ui->comboBoxFacesReaction->addItems(ExtraThemes::getExtraThemes(ExtraThemes::FacesReaction));
 
-        // Continue if the directory does not exist
-        if(!dir.exists() || !dir.cd("minefield_extra_themes"))
-            continue;
 
-        for(const QString& themeName :
-            dir.entryList(QDir::AllDirs | QDir::NoDot | QDir::NoDotDot))
-        {
-            // Add the new theme to the check box if it has a valid format
-            if(MinefieldExtraTheme::isValidTheme(dir.path(), themeName))
-            {
-                if(ui->comboBoxMinefieldTheme->findText(themeName) != -1)
-                {
-                    qWarning() << "The minefield theme \'" << themeName
-                               << "\' seems to be duplicate.";
-                }
-                else
-                {
-                    ui->comboBoxMinefieldTheme->addItem(themeName);
-                }
-            }
-        }
-
-    }
-
-    ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Open Emoji Black", "Open Emoji White",
-                                         "TwEmoji Colored", "SecularSteve Custom", "Disable"});
     ui->comboBoxWhenCtrlIsPressed->addItems({tr("Go to the Edge"), tr("Jump 3 Cells"),
                                              tr("Jump 5 Cells"), tr("Jump 10 Cells")});
 
@@ -254,7 +221,6 @@ void LibreMinesPreferencesDialog::setOptionApplicationStyle(const QString &optio
     QString s = option;
     if(option.compare("FusionDark", Qt::CaseInsensitive) == 0){ s = "Fusion Dark"; }
     else if(option.compare("FusionLight", Qt::CaseInsensitive) == 0){ s = "Fusion Light"; }
-    else if(option.compare("QDarkStyleLight", Qt::CaseInsensitive) == 0){ s = "QDarkStyle Light"; }
     
     ui->comboBoxApplicationStyle->setCurrentText(s);
 }
@@ -270,12 +236,8 @@ void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &option)
 
 void LibreMinesPreferencesDialog::setOptionFacesReaction(const QString &option)
 {
-    QString s = "Disable";
+    QString s = option;
     if(option.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0){ s = "Open Emoji Colored"; }
-    else if(option.compare("OpenEmojiBlack", Qt::CaseInsensitive) == 0){ s = "Open Emoji Black"; }
-    else if(option.compare("OpenEmojiWhite", Qt::CaseInsensitive) == 0){ s = "Open Emoji White"; }
-    else if(option.compare("TwEmojiColored", Qt::CaseInsensitive) == 0){ s = "TwEmoji Colored"; }
-    else if(option.compare("SecularSteveCustom", Qt::CaseInsensitive) == 0){ s = "SecularSteve Custom"; }
 
     ui->comboBoxFacesReaction->setCurrentText(s);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -88,44 +88,16 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
         }
     }
 
-
-    QVector<Vector2Dshort> vt_vt2d_CleanPoints = QVector<Vector2Dshort>();
-
-    // If we are remaking the game, we make sure that all of the neighbors
-    //  of the clean cell does not have mines.
-    if(bRemakingGame)
-    {
-        vt_vt2d_CleanPoints.reserve(9);
-
-        for (short i=-1; i<=1; i++)
-        {
-            for (short j=-1; j<=1; j++)
-            {
-                vt_vt2d_CleanPoints.append(Vector2Dshort(i_X_Clean + i, i_Y_Clean + j));
-            }
-        }
-    }
-
     // Add mines on random places until the number of mines is correct
     while(i_nMines_ > 0)
     {
         uchar i = QRandomGenerator::global()->bounded(0, iX);
         uchar j = QRandomGenerator::global()->bounded(0, iY);
 
-        if(bRemakingGame)
+        // Avoid cells neighbor of clean cell when remaking the game
+        if(bRemakingGame && i <= i_X_Clean+1 && i >= i_X_Clean-1 && j <= i_Y_Clean+1 && j >= i_Y_Clean-1)
         {
-            bool forbidden = false;
-            for (const Vector2Dshort& n: vt_vt2d_CleanPoints)
-            {
-                if(n.x == i &&
-                   n.y == j)
-                {
-                    forbidden = true;
-                    break;
-                }
-            }
-            if(forbidden)
-                continue;
+            continue;
         }
 
         CellGameEngine& cell = principalMatrix[i][j];
@@ -287,7 +259,7 @@ void LibreMinesGameEngine::vResetPrincipalMatrix()
     principalMatrix.clear();
 }
 
-bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
+bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y, const bool recursive)
 {
     if(principalMatrix[_X][_Y].flagState == FlagState::NoFlag &&
        principalMatrix[_X][_Y].value == CellValue::MINE)
@@ -302,7 +274,7 @@ bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y)
     {
         // Unlock the cell
         principalMatrix[_X][_Y].isHidden = false;
-        Q_EMIT SIGNAL_showCell(_X, _Y);
+        Q_EMIT SIGNAL_showCell(_X, _Y, recursive);
 
         // If the state of the cell is CellValue::ZERO, unlock all neighbor cells
         if(principalMatrix[_X][_Y].value == CellValue::ZERO)
@@ -583,7 +555,7 @@ void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
         SLOT_startTimer();
         bFirst = false;
     }
-    bCleanCell(_X, _Y);
+    bCleanCell(_X, _Y, false);
 }
 
 void LibreMinesGameEngine::SLOT_changeFlagState(const uchar _X, const uchar _Y)
@@ -631,7 +603,6 @@ void LibreMinesGameEngine::SLOT_stop()
 
 void LibreMinesGameEngine::SLOT_startTimer()
 {
-    iTimeInSeconds = 0;
     timerTimeInGame.reset(new QTimer());
     QObject::connect(timerTimeInGame.get(), &QTimer::timeout,
                      this, &LibreMinesGameEngine::SLOT_UpdateTime);
@@ -642,6 +613,8 @@ void LibreMinesGameEngine::SLOT_startTimer()
 
 void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _Y)
 {
+
+    bool recursive = false;
     // Clean all hided and unflaged neighbor flags
     for(short i=_X-1; i<=_X+1; i++)
     {
@@ -657,8 +630,10 @@ void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _
 
             if(cell.isHidden && cell.flagState == FlagState::NoFlag)
             {
-                if(!bCleanCell(i, j))
+                if(!bCleanCell(i, j, recursive))
                     return;
+
+                recursive = true;
             }
         }
     }
@@ -671,7 +646,6 @@ void LibreMinesGameEngine::SLOT_generateEndGameScoreAgain()
 
 void LibreMinesGameEngine::SLOT_UpdateTime()
 {
-    iTimeInSeconds++;
-    Q_EMIT SIGNAL_currentTime(iTimeInSeconds);
+    Q_EMIT SIGNAL_currentTime(elapsedPreciseTimeInGame.elapsed()/1000);
 }
 

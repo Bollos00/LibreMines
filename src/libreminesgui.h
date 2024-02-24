@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -29,6 +29,7 @@
 #include <QGridLayout>
 #include <QScrollArea>
 #include <QProgressBar>
+#include <QVBoxLayout>
 
 #include "common.h"
 #include "libreminespreferencesdialog.h"
@@ -37,6 +38,8 @@
 #include "qpushbutton_adapted.h"
 #include "minefieldtheme.h"
 #include "soundeffects.h"
+#include "facesreaction.h"
+#include "keyboardcontroller.h"
 
 /**
  * @brief
@@ -46,6 +49,7 @@ class LibreMinesGui : public QMainWindow
 {
     Q_OBJECT
 
+    friend class KeyboardController;
 private:
     class CellGui
     {
@@ -125,15 +129,6 @@ private:
     void vShowInterfaceInGame();
 
     void vSetApplicationTheme(const QString& theme);
-    void vSetFacesReaction(const QString& which);
-
-    void vKeyboardControllerSetCurrentCell(const uchar x, const uchar y);
-    void vKeyboardControllUnsetCurrentCell();
-    void vKeyboardControllerMoveLeft();
-    void vKeyboardControllerMoveRight();
-    void vKeyboardControllerMoveDown();
-    void vKeyboardControllerMoveUp();
-    void vKeyboardControllerCenterCurrentCell();
 
     void vUpdatePreferences();
 
@@ -181,7 +176,7 @@ private Q_SLOTS:
     void SLOT_onCellLabelReleased(const QMouseEvent*const e);
     void SLOT_onCellLabelClicked(const QMouseEvent*const e);
 
-    void SLOT_showCell(const uchar _X, const uchar _Y);
+    void SLOT_showCell(const uchar _X, const uchar _Y, const bool recursive);
     void SLOT_endGameScore(LibreMinesScore score,
                            int iCorrectFlags,
                            int iWrongFlags,
@@ -207,6 +202,10 @@ private Q_SLOTS:
 
     void SLOT_showHighScores();
 
+    void SLOT_importHighScores();
+
+    void SLOT_exportHighScores();
+
     void SLOT_toggleFullScreen();
 
     void SLOT_saveMinefieldAsImage();
@@ -216,6 +215,8 @@ Q_SIGNALS:
     void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);
     void SIGNAL_addOrRemoveFlag(const uchar _X, const uchar _Y);
     void SIGNAL_stopGame();
+    void SIGNAL_playSoundEffect(SoundEffects::SoundType t);
+    void SIGNAL_setSoundEffectVolume(const int v);
 
 private:
 
@@ -260,13 +261,20 @@ private:
     QWidget* widgetBoardContents;
     QGridLayout* layoutBoard;
 
+    QScrollArea* scrollAreaEndGameResults;
+    QWidget* widgetEndGameResultsContents;
+    QVBoxLayout* layoutEndGameResults;
     QLabel *labelYouWonYouLost; /**< TODO: describe */
-    QLabel *labelStatisLastMatch; /**< TODO: describe */
+    QLabel *labelStatsLastMatch; /**< TODO: describe */
 
     QMenu* menuOptions;
     QAction* actionPreferences;
-    QAction* actionHighScores;
     QAction* actionToggleFullScreen;
+
+    QMenu* menuHighScores;
+    QAction* actionShowHighScores;
+    QAction* actionImportHighScores;
+    QAction* actionExportHighScores;
 
     QMenu* menuHelp;
     QAction* actionAbout;
@@ -274,13 +282,7 @@ private:
     QAction* actionGitHubHomePage;
 
     MinefieldTheme fieldTheme;
-
-    QScopedPointer<QPixmap> pmDizzyFace;
-    QScopedPointer<QPixmap> pmGrimacingFace;
-    QScopedPointer<QPixmap> pmGrinningFace;
-    QScopedPointer<QPixmap> pmOpenMouthFace;
-    QScopedPointer<QPixmap> pmSleepingFace;
-    QScopedPointer<QPixmap> pmSmillingFace;
+    FacesReaction facesReac;
 
     KeyboardController controller;
 
@@ -289,5 +291,7 @@ private:
     QDir dirAppData;
 
     QScopedPointer<SoundEffects> sound;
+
+    bool bMinefieldBeingCreated;
 };
 #endif // LIBREMINESGUI_H

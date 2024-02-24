@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2023  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -57,40 +57,6 @@ enum class FlagState : quint8{
     HasFlag  = 1,
     Question = 2
 };
-
-class Vector2Dshort
-{
-public:
-    Vector2Dshort();
-    Vector2Dshort(const qint16 _x, const qint16 _y);
-
-    float length() const;
-    float distanceToPoint(const Vector2Dshort& point) const;
-
-    short x;
-    short y;
-
-
-};
-
-struct KeyboardController
-{
-    bool ctrlPressed;
-    bool active;
-    uchar currentX;
-    uchar currentY;
-
-    int keyLeft;
-    int keyDown;
-    int keyRight;
-    int keyUp;
-    int keyReleaseCell;
-    int keyFlagCell;
-    int keyCenterCell;
-
-    bool valid;
-};
-
 
 
 #endif // COMMON_H
