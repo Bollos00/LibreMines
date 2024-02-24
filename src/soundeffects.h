@@ -11,17 +11,18 @@ class SoundEffects : public QObject
 public:
     SoundEffects(QObject* parent = nullptr);
 
-    void setVolume(const int vol);
+    enum SoundType {
+        GAME_BEGIN,
+        GAME_WON,
+        GAME_LOST,
+        KEYBOARD_CONTROLLER_MOVE,
+        RELEASE_CELL,
+        FLAG_CELL
+    };
 
-Q_SIGNALS:
-
-    void SIGNAL_gameBegin();
-    void SIGNAL_gameWon();
-    void SIGNAL_gameLost();
-
-    void SIGNAL_keyboardControllerMove();
-    void SIGNAL_releaseCell();
-    void SIGNAL_flagCell();
+public Q_SLOTS:
+    void SLOT_playSound(const SoundType type);
+    void SLOT_setVolume(const int vol);
 
 private:
     QSoundEffect soundGameBegin;

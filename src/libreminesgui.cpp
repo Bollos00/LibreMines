@@ -109,6 +109,11 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     { vSetApplicationTheme(preferences->optionApplicationStyle()); });
 
     bMinefieldBeingCreated = false;
+
+    connect(this, &LibreMinesGui::SIGNAL_setSoundEffectVolume,
+            sound.get(), &SoundEffects::SLOT_setVolume);
+    connect(this, &LibreMinesGui::SIGNAL_playSoundEffect,
+            sound.get(), &SoundEffects::SLOT_playSound);
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -1166,7 +1171,7 @@ void LibreMinesGui::SLOT_showCell(const uchar _X, const uchar _Y, const bool rec
 
     if(!recursive)
     {
-        Q_EMIT(sound->SIGNAL_releaseCell());
+        Q_EMIT SIGNAL_playSoundEffect(SoundEffects::RELEASE_CELL);
     }
 }
 
@@ -1339,7 +1344,7 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
 
     controller.refresh(_X, _Y, this);
 
-    Q_EMIT(sound->SIGNAL_flagCell());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::FLAG_CELL);
 }
 
 
@@ -1355,7 +1360,7 @@ void LibreMinesGui::SLOT_QuestionCell(const uchar _X, const uchar _Y)
 
     controller.refresh(_X, _Y, this);
 
-    Q_EMIT(sound->SIGNAL_flagCell());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::FLAG_CELL);
 }
 
 void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
@@ -1370,7 +1375,7 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
 
     controller.refresh(_X, _Y, this);
 
-    Q_EMIT(sound->SIGNAL_flagCell());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::FLAG_CELL);
 }
 
 void LibreMinesGui::SLOT_remakeGame()
@@ -1412,7 +1417,7 @@ void LibreMinesGui::SLOT_gameWon()
 
     labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_WON));
 
-    Q_EMIT(sound->SIGNAL_gameWon());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::GAME_WON);
 }
 
 void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
@@ -1473,7 +1478,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
     controller.deactivate(this);
 
     labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_LOST));
-    Q_EMIT(sound->SIGNAL_gameLost());
+    Q_EMIT SIGNAL_playSoundEffect(SoundEffects::GAME_LOST);
 }
 
 void LibreMinesGui::SLOT_optionChanged(const QString &name, const QString &value)
@@ -1694,5 +1699,5 @@ void LibreMinesGui::vUpdatePreferences()
 #endif
     }
 
-    sound->setVolume(preferences->optionSoundVolume());
+    sound->SLOT_setVolume(preferences->optionSoundVolume());
 }

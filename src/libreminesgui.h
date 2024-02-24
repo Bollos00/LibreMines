@@ -215,6 +215,8 @@ Q_SIGNALS:
     void SIGNAL_cleanNeighborCells(const uchar _X, const uchar _Y);
     void SIGNAL_addOrRemoveFlag(const uchar _X, const uchar _Y);
     void SIGNAL_stopGame();
+    void SIGNAL_playSoundEffect(SoundEffects::SoundType t);
+    void SIGNAL_setSoundEffectVolume(const int v);
 
 private:
 

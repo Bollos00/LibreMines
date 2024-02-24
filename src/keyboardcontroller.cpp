@@ -297,7 +297,7 @@ void KeyboardController::moveLeft(LibreMinesGui* gui)
 
     setCurrentCell(destX, currentY, gui);
 
-    Q_EMIT gui->sound->SIGNAL_keyboardControllerMove();
+    Q_EMIT gui->SIGNAL_playSoundEffect(SoundEffects::KEYBOARD_CONTROLLER_MOVE);
 }
 
 void KeyboardController::moveRight(LibreMinesGui* gui)
@@ -331,7 +331,7 @@ void KeyboardController::moveRight(LibreMinesGui* gui)
 
     setCurrentCell(destX, currentY, gui);
 
-    Q_EMIT gui->sound->SIGNAL_keyboardControllerMove();
+    Q_EMIT gui->SIGNAL_playSoundEffect(SoundEffects::KEYBOARD_CONTROLLER_MOVE);
 }
 
 void KeyboardController::moveDown(LibreMinesGui* gui)
@@ -365,7 +365,7 @@ void KeyboardController::moveDown(LibreMinesGui* gui)
 
     setCurrentCell(currentX, destY, gui);
 
-    Q_EMIT gui->sound->SIGNAL_keyboardControllerMove();
+    Q_EMIT gui->SIGNAL_playSoundEffect(SoundEffects::KEYBOARD_CONTROLLER_MOVE);
 }
 
 void KeyboardController::moveUp(LibreMinesGui* gui)
@@ -399,7 +399,7 @@ void KeyboardController::moveUp(LibreMinesGui* gui)
 
     setCurrentCell(currentX, destY, gui);
 
-    Q_EMIT gui->sound->SIGNAL_keyboardControllerMove();
+    Q_EMIT gui->SIGNAL_playSoundEffect(SoundEffects::KEYBOARD_CONTROLLER_MOVE);
 }
 
 void KeyboardController::centerCurrentCell(LibreMinesGui* gui)
