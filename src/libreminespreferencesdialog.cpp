@@ -427,6 +427,10 @@ void LibreMinesPreferencesDialog::on_sliderSoundVolume_valueChanged(int value)
     {
         static QSoundEffect sound;
         sound.setSource(QUrl("qrc:/sound_effects/move.wav"));
+        if(sound.isPlaying())
+        {
+            sound.stop();
+        }
         sound.setVolume(value/100.f);
         sound.play();
     }
