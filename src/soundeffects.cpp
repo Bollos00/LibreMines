@@ -24,6 +24,8 @@ void SoundEffects::SLOT_setVolume(const int vol)
         sound->setVolume(vol/100.f);
         sound->setMuted(vol == 0);
     }
+    // Preview sound volume.
+    SLOT_playSound(RELEASE_CELL);
 }
 
 void SoundEffects::SLOT_playSound(const SoundType type)
@@ -34,10 +36,12 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameBegin.isMuted())
             {
-                if(soundGameBegin.isPlaying())
-                {
-                    soundGameBegin.stop();
-                }
+// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+//                 if(soundGameBegin.isPlaying())
+//                 {
+//                     soundGameBegin.stop();
+//                 }
+// #endif
                 soundGameBegin.play();
             }
         }break;
@@ -45,10 +49,12 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameWon.isMuted())
             {
-                if(soundGameWon.isPlaying())
-                {
-                    soundGameWon.stop();
-                }
+// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+//                 if(soundGameWon.isPlaying())
+//                 {
+//                     soundGameWon.stop();
+//                 }
+// #endif
                 soundGameWon.play();
             }
         }break;
@@ -56,10 +62,12 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameLost.isMuted())
             {
-                if(soundGameLost.isPlaying())
-                {
-                    soundGameLost.stop();
-                }
+// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+//                 if(soundGameLost.isPlaying())
+//                 {
+//                     soundGameLost.stop();
+//                 }
+// #endif
                 soundGameLost.play();
             }
         }break;
@@ -67,10 +75,12 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundKeyboardControllMove.isMuted())
             {
-                if(soundKeyboardControllMove.isPlaying())
-                {
-                    soundKeyboardControllMove.stop();
-                }
+// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+//                 if(soundKeyboardControllMove.isPlaying())
+//                 {
+//                     soundKeyboardControllMove.stop();
+//                 }
+// #endif
                 soundKeyboardControllMove.play();
             }
         }break;
@@ -78,10 +88,12 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundReleaseCell.isMuted())
             {
-                if(soundReleaseCell.isPlaying())
-                {
-                    soundReleaseCell.stop();
-                }
+// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+//                 if(soundReleaseCell.isPlaying())
+//                 {
+//                     soundReleaseCell.stop();
+//                 }
+// #endif
                 soundReleaseCell.play();
             }
         }break;
@@ -89,11 +101,13 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundFlagCell.isMuted())
             {
-                if(soundFlagCell.isPlaying())
-                {
-                    soundFlagCell.stop();
-                }
-                soundFlagCell.play();
+// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+//                 if(soundFlagCell.isPlaying())
+//                 {
+//                     soundFlagCell.stop();
+//                 }
+//                 soundFlagCell.play();
+// #endif
             }
         }break;
     }

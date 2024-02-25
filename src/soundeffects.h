@@ -36,4 +36,6 @@ private:
     QList<QSoundEffect*> soundEffects;
 };
 
+Q_DECLARE_METATYPE(SoundEffects::SoundType)
+
 #endif // SOUNDEFFECTS_H

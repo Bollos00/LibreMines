@@ -23,7 +23,6 @@
 
 #include <QStyleFactory>
 #include <QMessageBox>
-#include <QSoundEffect>
 
 #include "extrathemes.h"
 
@@ -425,14 +424,7 @@ void LibreMinesPreferencesDialog::on_sliderSoundVolume_valueChanged(int value)
 
     if(value != 0 && !firstTime)
     {
-        static QSoundEffect sound;
-        sound.setSource(QUrl("qrc:/sound_effects/move.wav"));
-        if(sound.isPlaying())
-        {
-            sound.stop();
-        }
-        sound.setVolume(value/100.f);
-        sound.play();
+        Q_EMIT SIGNAL_setSoundEffectVolume(value);
     }
 
     firstTime = false;

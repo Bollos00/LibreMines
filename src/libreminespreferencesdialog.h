@@ -123,6 +123,8 @@ private Q_SLOTS:
 Q_SIGNALS:
     void SIGNAL_optionChanged(const QString& name, const QString& value);
     void SIGNAL_visibilityChanged(const bool visible);
+
+    void SIGNAL_setSoundEffectVolume(const int v);
 };
 
 #endif // LIBREMINESPREFERENCESDIALOG_H
