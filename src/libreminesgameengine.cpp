@@ -38,7 +38,7 @@ LibreMinesGameEngine::LibreMinesGameEngine()
 
 void LibreMinesGameEngine::vNewGame(const uchar _X,
                                     const uchar _Y,
-                                    ushort i_nMines_,
+                                    short i_nMines_,
                                     const uchar i_X_Clean,
                                     const uchar i_Y_Clean)
 {
@@ -511,7 +511,7 @@ uchar LibreMinesGameEngine::lines() const
     return iY;
 }
 
-ushort LibreMinesGameEngine::mines() const
+short LibreMinesGameEngine::mines() const
 {
     return nMines;
 }
