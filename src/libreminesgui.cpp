@@ -169,6 +169,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              short i_nMines_)
 {
     bMinefieldBeingCreated = true;
+    
     vAdjustInterfaceInGame();
     vShowInterfaceInGame();
 
