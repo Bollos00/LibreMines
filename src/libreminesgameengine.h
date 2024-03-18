@@ -47,14 +47,14 @@ public:
     LibreMinesGameEngine();
     void vNewGame(const uchar _X,
                   const uchar _Y,
-                  ushort i_nMines_,
+                  short i_nMines_,
                   const uchar i_X_Clean = 255,
                   const uchar i_Y_Clean = 255);
 
     const std::vector< std::vector<CellGameEngine> >& getPrincipalMatrix()const;
     uchar rows()const;
     uchar lines()const;
-    ushort mines()const;
+    short mines()const;
     ushort cellsToUnlock()const;
     ushort hiddenCells()const;
     bool isGameActive()const;
@@ -83,8 +83,8 @@ private:
     uchar iX; /**< TODO: describe */
     uchar iY; /**< TODO: describe */
 
-    ushort nMines; /**< TODO: describe */
-    ushort iMinesLeft; /**< TODO: describe */
+    short nMines; /**< TODO: describe */
+    short iMinesLeft; /**< TODO: describe */
     ushort iHiddenCells; /**< TODO: describe */
     ushort iCellsToUnlock; /**< TODO: describe */
 
@@ -108,7 +108,7 @@ Q_SIGNALS:
                              double dCellsPerSecond,
                              bool ignorePreferences=false);
     void SIGNAL_currentTime(const ushort);
-    void SIGNAL_minesLeft(const ushort);
+    void SIGNAL_minesLeft(const short);
     void SIGNAL_flagCell(const uchar _X, const uchar _Y);
     void SIGNAL_questionCell(const uchar _X, const uchar _Y);
     void SIGNAL_unflagCell(const uchar _X, const uchar _Y);
