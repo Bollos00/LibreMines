@@ -34,7 +34,7 @@ public:
     GameDifficulty gameDifficulty;
     uchar width;
     uchar heigth;
-    ushort mines;
+    short mines;
     bool bGameCompleted;
     double dPercentageGameCompleted;
     QString username;
