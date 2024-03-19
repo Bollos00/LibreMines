@@ -92,7 +92,7 @@ protected:
 private:
     void vNewGame(const uchar _X,
                   const uchar _Y,
-                  ushort i_nMines_);
+                  short i_nMines_);
 
     void vAttributeAllCells();
     void vResetPrincipalMatrix();
@@ -185,7 +185,7 @@ private Q_SLOTS:
                            double dCellsPerSecond,
                            bool ignorePreferences=false);
     void SLOT_currentTime(const ushort time);
-    void SLOT_minesLeft(const ushort minesLeft);
+    void SLOT_minesLeft(const short minesLeft);
     void SLOT_flagCell(const uchar _X, const uchar _Y);
     void SLOT_QuestionCell(const uchar _X, const uchar _Y);
     void SLOT_unflagCell(const uchar _X, const uchar _Y);

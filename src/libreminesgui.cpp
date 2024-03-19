@@ -166,10 +166,10 @@ void LibreMinesGui::closeEvent(QCloseEvent *e)
 
 void LibreMinesGui::vNewGame(const uchar _X,
                              const uchar _Y,
-                             ushort i_nMines_)
+                             short i_nMines_)
 {
     bMinefieldBeingCreated = true;
-
+    
     vAdjustInterfaceInGame();
     vShowInterfaceInGame();
 
@@ -1327,7 +1327,7 @@ void LibreMinesGui::SLOT_currentTime(const ushort time)
 //    Q_EMIT(sound->SIGNAL_clockTick());
 }
 
-void LibreMinesGui::SLOT_minesLeft(const ushort minesLeft)
+void LibreMinesGui::SLOT_minesLeft(const short minesLeft)
 {
     lcd_numberMinesLeft->display(minesLeft);
 }
