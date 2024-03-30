@@ -60,8 +60,11 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     difficult(GameDifficulty::NONE ),
     preferences( new LibreMinesPreferencesDialog(this) ),
     dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
-    sound( new SoundEffects() )
+    sound( new SoundEffects() ),
+    soundThread( new QThread() )
 {
+    qRegisterMetaType<SoundEffects::SoundType>();
+
     // this->resize(800, 600);
     this->setMinimumSize(QSize(700, 500));
 
@@ -100,7 +103,17 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
         *sbCustomizedPercentageMines, *sbCustomizedX, *sbCustomizedY,
         *cbCustomizedMinesInPercentage
     );
+
+    sound->moveToThread(soundThread.get());
+    connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_setSoundEffectVolume,
+            sound.get(), &SoundEffects::SLOT_setVolume);
+    connect(this, &LibreMinesGui::SIGNAL_playSoundEffect,
+            sound.get(), &SoundEffects::SLOT_playSound);
+    soundThread->start();
+
+
     vUpdatePreferences();
+
     fieldTheme.vSetMinefieldTheme(preferences->optionMinefieldTheme(), 0);
     facesReac.vSetFacesReactionTheme(preferences->optionFacesReaction(), 0);
 
@@ -110,10 +123,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
 
     bMinefieldBeingCreated = false;
 
-    connect(this, &LibreMinesGui::SIGNAL_setSoundEffectVolume,
-            sound.get(), &SoundEffects::SLOT_setVolume);
-    connect(this, &LibreMinesGui::SIGNAL_playSoundEffect,
-            sound.get(), &SoundEffects::SLOT_playSound);
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -160,6 +169,7 @@ void LibreMinesGui::resizeEvent(QResizeEvent *e)
 
 void LibreMinesGui::closeEvent(QCloseEvent *e)
 {
+    soundThread->quit();
     SLOT_quitApplication();
     e->ignore();
 }
@@ -1698,6 +1708,4 @@ void LibreMinesGui::vUpdatePreferences()
         preferences->setOptionUsername(qgetenv("USER"));
 #endif
     }
-
-    sound->SLOT_setVolume(preferences->optionSoundVolume());
 }

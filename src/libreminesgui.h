@@ -216,7 +216,6 @@ Q_SIGNALS:
     void SIGNAL_addOrRemoveFlag(const uchar _X, const uchar _Y);
     void SIGNAL_stopGame();
     void SIGNAL_playSoundEffect(SoundEffects::SoundType t);
-    void SIGNAL_setSoundEffectVolume(const int v);
 
 private:
 
@@ -291,6 +290,7 @@ private:
     QDir dirAppData;
 
     QScopedPointer<SoundEffects> sound;
+    QScopedPointer<QThread> soundThread;
 
     bool bMinefieldBeingCreated;
 };
