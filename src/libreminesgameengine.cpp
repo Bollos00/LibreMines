@@ -264,7 +264,7 @@ bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y, const bool
     if(principalMatrix[_X][_Y].flagState == FlagState::NoFlag &&
        principalMatrix[_X][_Y].value == CellValue::MINE)
     {
-        // If the user tried to unlock an unflaged mined cell, (s)he lose
+        // If the user tried to unlock an unflagged mined cell, (s)he lose
         vGameLost(_X, _Y);
         return false;
     }
