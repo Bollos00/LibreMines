@@ -293,5 +293,7 @@ private:
     QScopedPointer<SoundEffects> sound;
 
     bool bMinefieldBeingCreated;
+
+    const float percentageDelta = 2.5f;
 };
 #endif // LIBREMINESGUI_H
