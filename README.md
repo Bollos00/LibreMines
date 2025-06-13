@@ -4,7 +4,7 @@
 
 ## Introduction
 
-LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [Open Source](https://en.wikipedia.org/wiki/Open-source_software) software Qt based Minesweeper clone available for GNU/Linux, FreeBSD and Windows systems.
+LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [Open Source](https://en.wikipedia.org/wiki/Open-source_software) software Qt based Minesweeper clone available for GNU/Linux, FreeBSD, macOS and Windows systems.
 
 The game has dark and light themes, is widely customizable, has options to create customizable fields, allows the user to play with the keyboard, among other things.
 
@@ -80,6 +80,11 @@ su -
 pkg install qt6-base qt6-svg qt6-multimedia git cmake
 ```
 
+On macOS systems, install the dependencies with [homebrew](https://brew.sh/):
+```sh
+brew install cmake ninja qt
+```
+
 For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/) or your preferred package manager.
 
 ### Building
@@ -96,6 +101,8 @@ make
 You can also get a stable release from [here](https://github.com/Bollos00/LibreMines/releases).
 
 Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines using Qt5 libraries, additionally pass the argument `-DUSE_QT6="NO"` on the fourth step (the `cmake` part).
+
+macOS users may need to pass the `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` option to `cmake`.
 
 The executable `libremines` will be generated in the build directory, now it is possible to run it with:
 ```sh
