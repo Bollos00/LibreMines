@@ -36,6 +36,8 @@
 #include <QTranslator>
 #include <QStandardPaths>
 
+#include <cmath>
+
 #include "libreminesgui.h"
 #include "libreminesscoresdialog.h"
 #include "libreminesconfig.h"
@@ -520,13 +522,23 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     sbCustomizedPercentageMines = new QSpinBox(centralWidget());
     sbCustomizedPercentageMines->setMinimum(0);
-    sbCustomizedPercentageMines->setMaximum(100);
+    sbCustomizedPercentageMines->setMaximum(100 - this->percentageDelta);
     sbCustomizedPercentageMines->setValue(20);
     sbCustomizedPercentageMines->setSuffix("%");
 
     sbCustomizedNumbersOfMines = new QSpinBox(centralWidget());
     sbCustomizedNumbersOfMines->setMinimum(0);
-    sbCustomizedNumbersOfMines->setMaximum(sbCustomizedX->value() * sbCustomizedY->value());
+
+    auto maxNumOfMines = sbCustomizedX->value() * sbCustomizedY->value();
+
+    auto subtractPercentage = [&](const float& delta){
+        auto amountToSubtract = (delta / 100) * maxNumOfMines;
+        return static_cast<int>(
+            std::floor(maxNumOfMines - amountToSubtract)
+        );
+    };
+
+    sbCustomizedNumbersOfMines->setMaximum(subtractPercentage(this->percentageDelta));
     sbCustomizedNumbersOfMines->setValue(sbCustomizedNumbersOfMines->maximum() * sbCustomizedPercentageMines->value() / 100);
 
     cbCustomizedMinesInPercentage = new QCheckBox(centralWidget());
