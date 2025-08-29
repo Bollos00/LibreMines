@@ -56,7 +56,7 @@ The following dependencies are required for building and running LibreMines:
 * [Qt Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
 * [Qt SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
 * [Qt Multimedia](https://doc.qt.io/qt-5/qtmultimedia-index.html) >= 5.12
-* [CMake](https://cmake.org/) >= 3.1
+* [CMake](https://cmake.org/) >= 3.5
 
 On Arch Linux and derivatives systems, the dependencies can be installed with `pacman`:
 ```sh
@@ -101,8 +101,6 @@ make
 You can also get a stable release from [here](https://github.com/Bollos00/LibreMines/releases).
 
 Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines using Qt5 libraries, additionally pass the argument `-DUSE_QT6="NO"` on the fourth step (the `cmake` part).
-
-macOS users may need to pass the `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` option to `cmake`.
 
 The executable `libremines` will be generated in the build directory, now it is possible to run it with:
 ```sh
