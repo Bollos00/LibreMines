@@ -56,7 +56,7 @@ The following dependencies are required for building and running LibreMines:
 * [Qt Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
 * [Qt SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
 * [Qt Multimedia](https://doc.qt.io/qt-5/qtmultimedia-index.html) >= 5.12
-* [CMake](https://cmake.org/) >= 3.1
+* [CMake](https://cmake.org/) >= 3.5
 
 On Arch Linux and derivatives systems, the dependencies can be installed with `pacman`:
 ```sh
@@ -94,7 +94,7 @@ In order to build LibreMines from the source code, follow those steps:
 git clone https://github.com/Bollos00/LibreMines.git
 cd LibreMines
 mkdir -p build && cd build
-cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/usr/local ..
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 make
 ```
 
