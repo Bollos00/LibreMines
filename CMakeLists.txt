@@ -89,7 +89,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-add_executable(${PROJECT_NAME} WIN32
+add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
     etc/translations/libremines_translations_qm.qrc
     src/common.h
     src/extrathemes.cpp src/extrathemes.h
@@ -158,6 +158,7 @@ if(UNIX)
         ${PROJECT_NAME}
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
