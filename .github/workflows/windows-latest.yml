@@ -7,6 +7,18 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version tag for the release'
+        required: false
+        type: string
+        default: ''
+      upload_to_release:
+        description: 'Whether to upload artifacts to a release'
+        required: false
+        type: boolean
+        default: false
   # Allows you to run this workflow manually from the Actions tab
     # workflow_dispatch:
 
@@ -83,8 +95,24 @@ jobs:
           Copy-Item ../share/faces_reaction/twemoji-color ./Release/facesreaction_extra_themes -Recurse
           Copy-Item ../share/faces_reaction/SecularSteve_custom ./Release/facesreaction_extra_themes -Recurse
 
+      - name: Create ZIP for Release
+        if: inputs.upload_to_release
+        run: |
+          Set-Location ./build
+          if ("${{ matrix.qt-version }}" -eq "5.15.2") {
+            Compress-Archive -Path ./Release/* -DestinationPath "libremines-${{ inputs.version }}-windows-qt5.zip"
+          } else {
+            Compress-Archive -Path ./Release/* -DestinationPath "libremines-${{ inputs.version }}-windows-qt6.zip"  
+          }
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: libremines-build-windows-qt-${{ matrix.qt-version }}
           path: build/Release
+          
+      - name: Upload to Release
+        if: inputs.upload_to_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.zip

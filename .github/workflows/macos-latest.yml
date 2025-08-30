@@ -7,6 +7,18 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version tag for the release'
+        required: false
+        type: string
+        default: ''
+      upload_to_release:
+        description: 'Whether to upload artifacts to a release'
+        required: false
+        type: boolean
+        default: false
   # Allows you to run this workflow manually from the Actions tab
     # workflow_dispatch:
 
@@ -74,8 +86,25 @@ jobs:
           cp -r ../share/faces_reaction/twemoji-color ./libremines.app/Contents/Resources/facesreaction_extra_themes/
           cp -r ../share/faces_reaction/SecularSteve_custom ./libremines.app/Contents/Resources/facesreaction_extra_themes/
 
+      - name: Create TAR.GZ for Release
+        if: inputs.upload_to_release
+        run: |
+          cd build
+          if [ "${{ matrix.os }}" = "macos-13" ]; then
+            ARCH="intel"
+          else
+            ARCH="arm64"
+          fi
+          tar -czf "libremines-${{ inputs.version }}-macos-${ARCH}-qt${{ matrix.qt-version }}.app.tar.gz" libremines.app
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: libremines-build-macos-${{ matrix.os }}-qt-${{ matrix.qt-version }}
           path: build/libremines.app
+          
+      - name: Upload to Release
+        if: inputs.upload_to_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.tar.gz

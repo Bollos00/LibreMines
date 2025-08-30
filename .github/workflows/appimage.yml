@@ -3,9 +3,20 @@ name: AppImage Build
 on:
   push:
     branches: [ master ]
-    tags: [ 'v*' ]
   pull_request:
     branches: [ master ]
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version tag for the release'
+        required: false
+        type: string
+        default: ''
+      upload_to_release:
+        description: 'Whether to upload artifacts to a release'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   appimage:
@@ -44,9 +55,21 @@ jobs:
           ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt
           # Create final AppImage with appimagetool using pre-downloaded runtime
           ../appimagetool-x86_64.AppImage --runtime-file ../runtime-x86_64 AppDir
+
+      - name: Rename AppImage for Release
+        if: inputs.upload_to_release
+        run: |
+          cd build
+          mv *.AppImage "LibreMines-${{ inputs.version }}-x86_64.AppImage"
       
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
           name: LibreMines-AppImage-x86_64
           path: build/*.AppImage
+          
+      - name: Upload to Release
+        if: inputs.upload_to_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.AppImage
