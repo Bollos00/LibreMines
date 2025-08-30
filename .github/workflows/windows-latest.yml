@@ -94,14 +94,15 @@ jobs:
           Copy-Item ../share/faces_reaction/open-emoji-white ./Release/facesreaction_extra_themes -Recurse
           Copy-Item ../share/faces_reaction/twemoji-color ./Release/facesreaction_extra_themes -Recurse
           Copy-Item ../share/faces_reaction/SecularSteve_custom ./Release/facesreaction_extra_themes -Recurse
-          
-          # Create ZIP file with proper naming for releases
-          if ("${{ inputs.version }}" -ne "") {
-            if ("${{ matrix.qt-version }}" -eq "5.15.2") {
-              Compress-Archive -Path ./Release/* -DestinationPath "libremines-${{ inputs.version }}-windows-qt5.zip"
-            } else {
-              Compress-Archive -Path ./Release/* -DestinationPath "libremines-${{ inputs.version }}-windows-qt6.zip"  
-            }
+
+      - name: Create ZIP for Release
+        if: inputs.upload_to_release
+        run: |
+          Set-Location ./build
+          if ("${{ matrix.qt-version }}" -eq "5.15.2") {
+            Compress-Archive -Path ./Release/* -DestinationPath "libremines-${{ inputs.version }}-windows-qt5.zip"
+          } else {
+            Compress-Archive -Path ./Release/* -DestinationPath "libremines-${{ inputs.version }}-windows-qt6.zip"  
           }
 
       - name: Upload build artifacts

@@ -85,16 +85,17 @@ jobs:
           cp -r ../share/faces_reaction/open-emoji-white ./libremines.app/Contents/Resources/facesreaction_extra_themes/
           cp -r ../share/faces_reaction/twemoji-color ./libremines.app/Contents/Resources/facesreaction_extra_themes/
           cp -r ../share/faces_reaction/SecularSteve_custom ./libremines.app/Contents/Resources/facesreaction_extra_themes/
-          
-          # Create TAR.GZ file with proper naming for releases
-          if [ "${{ inputs.version }}" != "" ]; then
-            if [ "${{ matrix.os }}" = "macos-13" ]; then
-              ARCH="intel"
-            else
-              ARCH="arm64"
-            fi
-            tar -czf "libremines-${{ inputs.version }}-macos-${ARCH}-qt${{ matrix.qt-version }}.app.tar.gz" libremines.app
+
+      - name: Create TAR.GZ for Release
+        if: inputs.upload_to_release
+        run: |
+          cd build
+          if [ "${{ matrix.os }}" = "macos-13" ]; then
+            ARCH="intel"
+          else
+            ARCH="arm64"
           fi
+          tar -czf "libremines-${{ inputs.version }}-macos-${ARCH}-qt${{ matrix.qt-version }}.app.tar.gz" libremines.app
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
