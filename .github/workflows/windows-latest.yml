@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        qt-version: [ '5.15.2', '6.8.*' ]
+        qt-version: [ '5.15.2', '6.8.3' ]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,11 +39,11 @@ jobs:
           set-env: 'true'
           setup-python: 'true'
 
-      - name: "Install Qt 6.8.*"
-        if: matrix.qt-version == '6.8.*'
+      - name: "Install Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.8.*'
+          version: '6.8.3'
           host: 'windows'
           dir: '${{ github.workspace }}'
           modules: 'qtmultimedia'
@@ -51,8 +51,8 @@ jobs:
           set-env: 'true'
           setup-python: 'true'
 
-      - name: "Create build directory and run CMake Qt 6.8.*"
-        if: matrix.qt-version == '6.8.*'
+      - name: "Create build directory and run CMake Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
         run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 
       - name: "Create build directory and run CMake Qt 5.15.2"
