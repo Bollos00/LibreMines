@@ -155,7 +155,7 @@ You will start the timer when you release the first cell, you can play with your
 
 ### Playing with the keyboard
 
-To activate the keyboard controller mode, press: **W**, **A**, **S**, **D**
+To activate the keyboard controller mode, press either **W**, **A**, **S** or **D**.
 
 * **Escape**: Exit keyboard controller mode;
 
