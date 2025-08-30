@@ -2,3 +2,7 @@
 *.user.*
 *build-*
 build
+
+# AppImage build tools
+*.AppImage
+runtime-x86_64
