@@ -181,39 +181,6 @@ If you do not feel comfortable with these keys, you can edit them by going to th
 
 Tip: hold the **CTRL** modifier while moving in order to move faster.
 
-## Automated Releases
-
-LibreMines uses automated GitHub Actions workflows to generate cross-platform release assets automatically when a new version tag is created.
-
-### Release Assets
-
-Each release includes the following assets:
-
-* **Linux AppImage**: `LibreMines-{version}-x86_64.AppImage` - Self-contained Linux binary with Qt6
-* **Windows (Qt5)**: `libremines-{version}-windows-qt5.zip` - Windows build with Qt 5.15.2
-* **Windows (Qt6)**: `libremines-{version}-windows-qt6.zip` - Windows build with Qt 6.8.3
-* **macOS (Intel + Qt5)**: `libremines-{version}-macos-intel-qt5.app.tar.gz` - macOS Intel build with Qt5
-* **macOS (Intel + Qt6)**: `libremines-{version}-macos-intel-qt6.app.tar.gz` - macOS Intel build with Qt6
-* **macOS (Apple Silicon + Qt5)**: `libremines-{version}-macos-arm64-qt5.app.tar.gz` - macOS Apple Silicon build with Qt5
-* **macOS (Apple Silicon + Qt6)**: `libremines-{version}-macos-arm64-qt6.app.tar.gz` - macOS Apple Silicon build with Qt6
-
-### Creating a Release
-
-For maintainers, creating a new release is simple:
-
-1. Create and push a new tag following semantic versioning (e.g., `v2.1.0`):
-   ```bash
-   git tag v2.1.0
-   git push origin v2.1.0
-   ```
-
-2. The release workflow will automatically:
-   - Create a GitHub release with auto-generated release notes
-   - Build all platform-specific binaries
-   - Upload all assets to the release
-
-The entire process takes approximately 20-30 minutes and requires no manual intervention.
-
 ## Contributing
 
 All kinds of contributions are welcome on this project. You can help by:
