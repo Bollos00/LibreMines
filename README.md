@@ -127,7 +127,7 @@ At least, if you want install LibreMines on your system, use the following comma
 sudo make install
 ```
 
-To uninstall LibreMines, while on the `build` directory, run:
+To uninstall LibreMines, run this while on the `build` directory:
 ```sh
 sudo xargs rm < install_manifest.txt
 ```
