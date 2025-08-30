@@ -1,0 +1,85 @@
+name: macOS Build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  # Allows you to run this workflow manually from the Actions tab
+    # workflow_dispatch:
+
+# env:
+#   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+#   BUILD_TYPE: Release
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        qt-version: [ '5.15.2', '6.5.3' ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Install Qt 5.15.2"
+        if: matrix.qt-version == '5.15.2'
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '5.15.2'
+          host: 'mac'
+          dir: '${{ github.workspace }}'
+          arch: 'clang_64'
+          set-env: 'true'
+          setup-python: 'true'
+
+      - name: "Install Qt 6.5.3"
+        if: matrix.qt-version == '6.5.3'
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.5.3'
+          host: 'mac'
+          dir: '${{ github.workspace }}'
+          modules: 'qtmultimedia'
+          arch: 'clang_64'
+          set-env: 'true'
+          setup-python: 'true'
+
+      - name: "Create build directory and run CMake Qt 6.5.3"
+        if: matrix.qt-version == '6.5.3'
+        run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
+
+      - name: "Create build directory and run CMake Qt 5.15.2"
+        if: matrix.qt-version == '5.15.2'
+        run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' .."
+
+      - name: "Build"
+        run: "cd build && make"
+
+      - name: Prepare build artifacts
+        run: |
+          cd build
+          ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/clang_64/bin/macdeployqt ./libremines.app
+          cp ../README.md ./libremines.app/Contents/Resources/
+          cp ../LICENSE ./libremines.app/Contents/Resources/
+          mkdir -p ./libremines.app/Contents/Resources/minefield_extra_themes
+          cp -r ../share/minefield_themes/alternative_dark ./libremines.app/Contents/Resources/minefield_extra_themes/
+          cp -r ../share/minefield_themes/alternative_light ./libremines.app/Contents/Resources/minefield_extra_themes/
+          cp -r ../share/minefield_themes/flowerfield ./libremines.app/Contents/Resources/minefield_extra_themes/
+          cp -r ../share/minefield_themes/twemoji ./libremines.app/Contents/Resources/minefield_extra_themes/
+          mkdir -p ./libremines.app/Contents/Resources/facesreaction_extra_themes
+          cp -r ../share/faces_reaction/open-emoji-black ./libremines.app/Contents/Resources/facesreaction_extra_themes/
+          cp -r ../share/faces_reaction/open-emoji-white ./libremines.app/Contents/Resources/facesreaction_extra_themes/
+          cp -r ../share/faces_reaction/twemoji-color ./libremines.app/Contents/Resources/facesreaction_extra_themes/
+          cp -r ../share/faces_reaction/SecularSteve_custom ./libremines.app/Contents/Resources/facesreaction_extra_themes/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libremines-build-macos-qt-${{ matrix.qt-version }}
+          path: build/libremines.app
