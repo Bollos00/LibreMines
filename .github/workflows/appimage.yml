@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install build-essential qt6-base-dev cmake \
-            libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev fuse libfuse2t64
+            libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev fuse libfuse2
       
       - name: Build LibreMines
         run: |
