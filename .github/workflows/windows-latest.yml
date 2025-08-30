@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        qt-version: [ '5.15.2', '6.5.3' ]
+        qt-version: [ '5.15.2', '6.8.3' ]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,20 +39,20 @@ jobs:
           set-env: 'true'
           setup-python: 'true'
 
-      - name: "Install Qt 6.5.3"
-        if: matrix.qt-version == '6.5.3'
+      - name: "Install Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.5.3'
+          version: '6.8.3'
           host: 'windows'
           dir: '${{ github.workspace }}'
           modules: 'qtmultimedia'
-          arch: 'win64_msvc2019_64'
+          arch: 'win64_msvc2022_64'
           set-env: 'true'
           setup-python: 'true'
 
-      - name: "Create build directory and run CMake Qt 6.5.3"
-        if: matrix.qt-version == '6.5.3'
+      - name: "Create build directory and run CMake Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
         run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 
       - name: "Create build directory and run CMake Qt 5.15.2"
@@ -65,7 +65,11 @@ jobs:
       - name: Prepare build artifacts
         run: |
           Set-Location ./build
-          ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt.exe --no-translations ./Release
+          if ("${{ matrix.qt-version }}" -eq "5.15.2") {
+            ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt.exe --no-translations ./Release
+          } else {
+            ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2022_64/bin/windeployqt.exe --no-translations ./Release
+          }
           Copy-Item ../README.md ./Release
           Copy-Item ../LICENSE ./Release
           New-Item -ItemType Directory ./Release/minefield_extra_themes
