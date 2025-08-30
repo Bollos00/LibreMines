@@ -14,15 +14,28 @@ The source code is licensed under the [GNU General Public License at version 3](
 
 ### Arch User Repository
 
-[LibreMines is available on the Arch User Repository](https://aur.archlinux.org/packages/libremines/). With `yay` it can be installed with:
+[LibreMines is available on the Arch User Repository](https://aur.archlinux.org/packages/libremines/). It can be installed with an AUR helper:
 
+To install using `yay`:
 ```sh
 yay -S libremines
 ```
 
+To install using `paru`:
+```sh
+paru -S libremines
+```
+
+To install manually using `git`:
+```sh
+git clone https://aur.archlinux.org/libremines.git
+cd libremines
+makepkg -si
+```
+
 ### FreeBSD
 
-[LibreMines is available in FreeBSD ports tree](https://www.freshports.org/games/LibreMines). With `pkg` it can be installed with:
+[LibreMines is available in FreeBSD ports tree](https://www.freshports.org/games/LibreMines). It can be installed with `pkg`:
 
 ```sh
 pkg install libremines
@@ -38,15 +51,15 @@ flatpak install flathub io.github.Bollos00.LibreMines
 
 ## Binary installation for Windows
 
-For windows systems, you can just get one of the releases [here](https://github.com/Bollos00/LibreMines/releases). And follow those steps:
+For Windows systems, you can just get one of the releases [here](https://github.com/Bollos00/LibreMines/releases) and follow these steps:
 
 * Make sure you have [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) installed.
-* Download the file `libremines_vX.X.X_windows_release.zip` of the last version available;
-* Extract it on your preferred location;
+* Download the latest version of file `libremines_vX.X.X_windows_release.zip` available
+* Extract it to your preferred location
 
-The executable `libremines.exe` will be inside the folder extracted. You can also add a Desktop shortcut or put it on the taskbar.
+You can run the executable `libremines.exe`. You can also add a desktop shortcut or put it on the taskbar.
 
-## Installing from the source code
+## Compiling from the source code
 
 ### Installation Dependencies
 
@@ -56,11 +69,11 @@ The following dependencies are required for building and running LibreMines:
 * [Qt Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
 * [Qt SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
 * [Qt Multimedia](https://doc.qt.io/qt-5/qtmultimedia-index.html) >= 5.12
-* [CMake](https://cmake.org/) >= 3.1
+* [CMake](https://cmake.org/) >= 3.5
 
 On Arch Linux and derivatives systems, the dependencies can be installed with `pacman`:
 ```sh
-sudo pacman -S base-devel qt6-base qt6-svg qt6-multimedia cmake
+sudo pacman -Sy --needed base-devel qt6-base qt6-svg qt6-multimedia cmake
 ```
 
 For Ubuntu, you can install the dependencies with the following command:
@@ -89,11 +102,11 @@ For others systems, check the [qt online installers](https://download.qt.io/offi
 
 ### Building
 
-In order to build LibreMines from the source code, follow those steps:
+In order to build LibreMines from the source code, run these commands:
 ```sh
 git clone https://github.com/Bollos00/LibreMines.git
 cd LibreMines
-mkdir build && cd build
+mkdir -p build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 make
 ```
@@ -101,8 +114,6 @@ make
 You can also get a stable release from [here](https://github.com/Bollos00/LibreMines/releases).
 
 Note that the option `CMAKE_INSTALL_PREFIX` determines the target directory of the installation. If you want to install LibreMines using Qt5 libraries, additionally pass the argument `-DUSE_QT6="NO"` on the fourth step (the `cmake` part).
-
-macOS users may need to pass the `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` option to `cmake`.
 
 The executable `libremines` will be generated in the build directory, now it is possible to run it with:
 ```sh
@@ -116,7 +127,7 @@ At least, if you want install LibreMines on your system, use the following comma
 sudo make install
 ```
 
-For uninstall LibreMines, on the `build` directory, run:
+To uninstall LibreMines, run this while on the `build` directory:
 ```sh
 sudo xargs rm < install_manifest.txt
 ```
@@ -133,18 +144,18 @@ When you initialize the application, you will face this screen:
 ![](./share/Screenshots/Screenshot0.png)
 
 
-Here you can start to play one of the predefined game modes -- easy, medium and hard --, or you can customize the field the way that you want to play. Select one of those options and you will be ready to start. (Note the options on the upper left of the screen).
+Here you can start to play one of the predefined game modes -- easy, medium and hard --, or you can customize the field the way that you want to play. Select one of these options and you are ready to start. (Also notice "Options" on the menu bar).
 
-You will start the timer of the new game when you release the first cell, you can play with your mouse or with your keyboard.
+You will start the timer when you release the first cell, you can play with your mouse or with your keyboard.
 
 ### Playing with the mouse
 
-* **Left Click**: release the cell which the mouse is pointing on;
-* **Right Click**: flag/unflag the cell which the mouse is pointing on.
+* **Left Click**: Release the cell which the mouse is pointing on;
+* **Right Click**: Flag/unflag the cell which the mouse is pointing on.
 
 ### Playing with the keyboard
 
-For activate the keyboard controller mode, press one of the following keys: **A|S|D|W**
+To activate the keyboard controller mode, press either **W**, **A**, **S** or **D**.
 
 * **Escape**: Exit keyboard controller mode;
 
@@ -166,13 +177,13 @@ For activate the keyboard controller mode, press one of the following keys: **A|
 
 * **CTRL + SHIFT + P**: Save minefield as image;
 
-If you do not feel comfortable with those keys, you can edit them going to the main menu, then Options > Preferences.
+If you do not feel comfortable with these keys, you can edit them by going to the main menu, then Options > Preferences.
 
 Tip: hold the **CTRL** modifier while moving in order to move faster.
 
 ## Contributing
 
-All kinds of contributions are welcome on this project. You can help:
+All kinds of contributions are welcome on this project. You can help by:
 
 * Making artworks (SVG) for [minefield themes](https://github.com/Bollos00/LibreMines/blob/master/share/minefield_themes/README.md) and new faces reaction;
 * Documenting the source code and making tutorials of the game;

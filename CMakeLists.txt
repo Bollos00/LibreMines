@@ -1,6 +1,6 @@
 #############################################################################
 # LibreMines                                                                #
-# Copyright (C) 2020-2024  Bruno Bollos Correa                              #                                                                         #
+# Copyright (C) 2020-2025  Bruno Bollos Correa                              #
 # This program is free software: you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
 # the Free Software Foundation, either version 3 of the License, or         #
@@ -16,7 +16,7 @@
 #############################################################################
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.5.0)
 project(libremines
     VERSION "2.0.1"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD, macOS and Windows systems. "
