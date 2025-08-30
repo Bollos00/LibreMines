@@ -16,9 +16,9 @@
 #############################################################################
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.10.0)
 project(libremines
-    VERSION "2.0.1"
+    VERSION "2.1.0"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD, macOS and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"

@@ -130,7 +130,7 @@ Follow these C++ coding standards and patterns that are established in the Libre
   ```cpp
   /*****************************************************************************
    * LibreMines                                                                *
-   * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
+   * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
    *                                                                           *
    * This program is free software: you can redistribute it and/or modify      *
    * it under the terms of the GNU General Public License as published by      *
