@@ -99,17 +99,26 @@ jobs:
         if: inputs.upload_to_release
         run: |
           Set-Location ./build
+          New-Item -ItemType Directory -Name "libremines"
+          Copy-Item ./Release/* ./libremines -Recurse
           if ("${{ matrix.qt-version }}" -eq "5.15.2") {
-            Compress-Archive -Path ./Release/* -DestinationPath "libremines-${{ inputs.version }}-windows-qt5.zip"
+            Compress-Archive -Path ./libremines -DestinationPath "libremines-${{ inputs.version }}-windows-qt5.zip"
           } else {
-            Compress-Archive -Path ./Release/* -DestinationPath "libremines-${{ inputs.version }}-windows-qt6.zip"  
+            Compress-Archive -Path ./libremines -DestinationPath "libremines-${{ inputs.version }}-windows-qt6.zip"  
           }
+
+      - name: Prepare artifact directory structure
+        run: |
+          Set-Location ./build
+          New-Item -ItemType Directory -Name "artifact-temp" -Force
+          New-Item -ItemType Directory -Name "artifact-temp/libremines" -Force
+          Copy-Item ./Release/* ./artifact-temp/libremines -Recurse
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: libremines-build-windows-qt-${{ matrix.qt-version }}
-          path: build/Release
+          path: build/artifact-temp/
           
       - name: Upload to Release
         if: inputs.upload_to_release
