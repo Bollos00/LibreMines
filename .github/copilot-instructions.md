@@ -120,3 +120,148 @@ The application consists of several main components:
 - All workflows follow the same build pattern: dependencies → cmake → make
 
 **REMEMBER**: Always validate your changes using the manual testing procedures above since there are no automated tests to catch regressions.
+
+## C++ Coding Best Practices
+
+Follow these C++ coding standards and patterns that are established in the LibreMines codebase:
+
+### File Structure and Headers
+- **ALWAYS include the GPL license header** at the top of every new C++ file:
+  ```cpp
+  /*****************************************************************************
+   * LibreMines                                                                *
+   * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
+   *                                                                           *
+   * This program is free software: you can redistribute it and/or modify      *
+   * it under the terms of the GNU General Public License as published by      *
+   * the Free Software Foundation, either version 3 of the License, or         *
+   * (at your option) any later version.                                       *
+   *                                                                           *
+   * This program is distributed in the hope that it will be useful,           *
+   * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+   * GNU General Public License for more details.                              *
+   *                                                                           *
+   * You should have received a copy of the GNU General Public License         *
+   * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
+   *****************************************************************************/
+  ```
+- **Use traditional include guards** (not `#pragma once`):
+  ```cpp
+  #ifndef CLASSNAME_H
+  #define CLASSNAME_H
+  // ... content ...
+  #endif // CLASSNAME_H
+  ```
+
+### Naming Conventions
+- **Classes**: PascalCase (e.g., `LibreMinesGui`, `MinefieldTheme`, `SoundEffects`)
+- **Methods**: 
+  - camelCase for getters and general methods (e.g., `getPixmapFromCellValue`)
+  - Prefix `v` for void methods (e.g., `vNewGame`, `vSetMinefieldTheme`)
+  - Qt signal/slot convention: `SIGNAL_name`, `SLOT_name`
+- **Variables**:
+  - Instance variables: hungarian notation style with type prefixes (`i` for int, `b` for bool, `n` for count)
+  - Examples: `iX`, `iY`, `bFirst`, `nMines`, `cellLength`
+  - Member pointers: `pm` prefix for pixmaps, descriptive names otherwise
+- **Enums**: Use scoped enums (`enum class`) with PascalCase names and values
+  ```cpp
+  enum class CellValue: qint8 {
+      MINE = -1,
+      ZERO = 0,
+      ONE = 1
+  };
+  ```
+
+### Memory Management and Qt Patterns
+- **Use Qt smart pointers** for automatic memory management:
+  ```cpp
+  QScopedPointer<QPixmap> pmMine;
+  QPointer<LibreMinesGameEngine> gameEngine;
+  ```
+- **Follow Qt parent-child ownership** for GUI objects:
+  ```cpp
+  LibreMinesPreferencesDialog* preferences = new LibreMinesPreferencesDialog(this);
+  ```
+- **Use RAII principles** - initialize in constructors, cleanup automatic via destructors
+- **Prefer Qt containers** over STL when working with Qt objects (`QString`, `QDir`, `QFile`)
+
+### Class Design Patterns
+- **Use nested classes** for tightly coupled helper classes:
+  ```cpp
+  class LibreMinesGui : public QMainWindow {
+      class CellGui {
+          // Helper class implementation
+      };
+  };
+  ```
+- **Initialize members in constructor initialization lists**:
+  ```cpp
+  LibreMinesGui::LibreMinesGui(QWidget *parent) :
+      QMainWindow(parent),
+      gameEngine(),
+      iLimitHeightField(0),
+      cellLength(0)
+  {
+  }
+  ```
+- **Use default member initialization** in headers for simple types:
+  ```cpp
+  class Example {
+      int value = 0;
+      bool flag = false;
+  };
+  ```
+
+### Modern C++ Features (C++11+)
+- **Use scoped enums** (`enum class`) instead of traditional enums
+- **Use range-based for loops** when appropriate:
+  ```cpp
+  for(CellGameEngine& cell : row) {
+      cell.value = CellValue::ZERO;
+  }
+  ```
+- **Use lambda expressions** for Qt signal/slot connections:
+  ```cpp
+  connect(object, &Class::signal, [this](bool value) {
+      this->handleSignal(value);
+  });
+  ```
+- **Use auto** sparingly, prefer explicit types for clarity in Qt code
+
+### Qt-Specific Conventions
+- **Always use Q_OBJECT macro** in classes that inherit from QObject
+- **Connect signals and slots** using new syntax when possible:
+  ```cpp
+  connect(sender, &SenderClass::signalName, receiver, &ReceiverClass::slotName);
+  ```
+- **Use Qt's debug system** instead of std::cout:
+  ```cpp
+  qDebug() << "Debug message with" << variable;
+  ```
+- **Check Qt object validity** before use in long-running operations
+- **Use QStandardPaths** for platform-appropriate data directories
+
+### Error Handling and Validation
+- **Check file operations** before proceeding:
+  ```cpp
+  if (!file.open(QIODevice::ReadOnly)) {
+      qDebug() << "Failed to open file:" << file.fileName();
+      return;
+  }
+  ```
+- **Validate parameters** in public methods, especially for game engine operations
+- **Use Qt's built-in validation** for GUI input (QValidator classes)
+
+### Code Organization
+- **Group related functionality** in logical sections within classes
+- **Use consistent indentation** (4 spaces, no tabs)
+- **Keep line length reasonable** (prefer under 100 characters)
+- **Separate concerns**: UI in GUI classes, logic in GameEngine, themes in Theme classes
+- **Use forward declarations** in headers when possible to reduce compilation dependencies
+
+### Resource Management
+- **Use Qt resource system** for embedded files (themes, sounds, translations)
+- **Load resources efficiently** - cache pixmaps, reuse objects
+- **Clean up temporary files** and handle platform differences properly
+- **Test resource loading** with both Qt5 and Qt6 compatibility
