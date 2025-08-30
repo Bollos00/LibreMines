@@ -546,7 +546,18 @@ void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 {
     if(bFirst && bFirstCellClean && principalMatrix[_X][_Y].value != CellValue::ZERO)
     {
-        vNewGame(iX, iY, nMines, _X, _Y);
+        // Check if it's impossible to place all mines while keeping the clicked cell and its neighbors clean
+        // This prevents infinite loop when nMines > (total cells - 9)
+        const int totalCells = iX * iY;
+        const int minRequiredFreeCells = 9; // clicked cell + 8 neighbors
+        
+        // Cannot guarantee 9 free cells, so don't regenerate the game
+        // Just start the timer and proceed with current mine layout
+        if(nMines <= (totalCells - minRequiredFreeCells))
+        {
+            vNewGame(iX, iY, nMines, _X, _Y);
+        }
+        
         SLOT_startTimer();
         bFirst = false;
     }
