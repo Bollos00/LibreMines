@@ -68,11 +68,13 @@ jobs:
       - name: Prepare build artifacts
         run: |
           cd build
+          
           if [ "${{ matrix.qt-version }}" = "5" ]; then
             $(brew --prefix qt@5)/bin/macdeployqt ./libremines.app
           else
             $(brew --prefix qt)/bin/macdeployqt ./libremines.app
           fi
+          
           cp ../README.md ./libremines.app/Contents/Resources/
           cp ../LICENSE ./libremines.app/Contents/Resources/
           mkdir -p ./libremines.app/Contents/Resources/minefield_extra_themes
@@ -86,25 +88,33 @@ jobs:
           cp -r ../share/faces_reaction/twemoji-color ./libremines.app/Contents/Resources/facesreaction_extra_themes/
           cp -r ../share/faces_reaction/SecularSteve_custom ./libremines.app/Contents/Resources/facesreaction_extra_themes/
 
-      - name: Create TAR.GZ for Release
+      - name: Create ZIP for Release using ditto
         if: inputs.upload_to_release
         run: |
           cd build
+          # Determine architecture based on the macOS version
           if [ "${{ matrix.os }}" = "macos-13" ]; then
             ARCH="intel"
           else
             ARCH="arm64"
           fi
-          tar -czf "libremines-${{ inputs.version }}-macos-${ARCH}-qt${{ matrix.qt-version }}.app.tar.gz" libremines.app
+          # Use ditto to create a proper macOS app bundle archive that preserves symlinks
+          ditto -c -k --sequesterRsrc --keepParent libremines.app "libremines-${{ inputs.version }}-macos-${ARCH}-qt${{ matrix.qt-version }}.app.zip"
+
+      - name: Prepare artifact directory structure
+        run: |
+          cd build
+          mkdir -p artifact-temp
+          cp -R libremines.app artifact-temp/
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: libremines-build-macos-${{ matrix.os }}-qt-${{ matrix.qt-version }}
-          path: build/libremines.app
+          path: build/artifact-temp/
           
       - name: Upload to Release
         if: inputs.upload_to_release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/*.tar.gz
+          files: build/*.zip
