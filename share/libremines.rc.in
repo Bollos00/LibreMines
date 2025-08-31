@@ -1,7 +1,7 @@
 #include <windows.h>
 
 // Application Icon
-IDI_ICON1 ICON DISCARDABLE "icons/libremines.ico"
+IDI_ICON1 ICON DISCARDABLE "libremines.ico"
 
 // Version Information
 VS_VERSION_INFO VERSIONINFO

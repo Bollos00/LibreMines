@@ -141,6 +141,13 @@ if(WIN32)
     set(LIBREMINES_VERSION_PATCH ${CMAKE_MATCH_3})
     set(LIBREMINES_VERSION_BUILD 0)
     
+    # Copy the icon file to the build directory for resource compilation
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/share/icons/libremines.ico
+        ${CMAKE_CURRENT_BINARY_DIR}/libremines.ico
+        COPYONLY
+    )
+    
     # Configure the Windows resource file with version information
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/share/libremines.rc.in
