@@ -1,15 +1,15 @@
 # Requirements
 
-In order to help translating LibreMines, it is necessary to have the [Qt Linguistic Tool](https://doc.qt.io/qt-5/qtlinguist-index.html) installed.
+In order to help translating LibreMines, it is necessary to have the [Qt Linguistic Tool](https://doc.qt.io/qt-6/qtlinguist-index.html) installed.
 
-On Arch Linux and its derivatives, it can be done by installing rhe package `qt5-tools` (or `qt6-tools` for Qt6):
+On Arch Linux and its derivatives, it can be done by installing the package `qt6-tools` (or `qt5-tools` for Qt5):
 ```sh
-sudo pacman -S qt5-tools
+sudo pacman -Sy qt6-tools
 ```
 
-On Ubuntu systems, it can be done with:
+On Debian Linux and its derivatives, it can be done with:
 ```sh
-sudo apt install qttools5-dev
+sudo apt install qt6-tools-dev
 ```
 
 # Updating and creating translation files
@@ -39,7 +39,7 @@ Qt uses files of type QM to translate the application. While TS files are more h
 ```sh
 git clone https://github.com/Bollos00/LibreMines.git
 cd LibreMines
-mkdir build && cd build
+mkdir -p build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DUPDATE_TRANSLATIONS="YES" ..
 make
 
