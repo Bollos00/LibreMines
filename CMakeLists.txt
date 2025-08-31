@@ -242,7 +242,7 @@ if(UNIX)
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
 
-    install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
+    install(FILES share/desktop_entry/io.github.Bollos00.LibreMines.desktop DESTINATION share/applications)
     install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
 
     # Install AppStream metainfo file

@@ -59,7 +59,7 @@
     <category>LogicGame</category>
   </categories>
 
-  <launchable type="desktop-id">libremines.desktop</launchable>
+  <launchable type="desktop-id">io.github.Bollos00.LibreMines.desktop</launchable>
   <content_rating type="oars-1.1" />
 
   <url type="homepage">https://github.com/Bollos00/LibreMines</url>
