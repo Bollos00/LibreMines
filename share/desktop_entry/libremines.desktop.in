@@ -7,3 +7,6 @@ Type=Application
 Categories=Game;LogicGame
 Keywords=Minesweeper;mines
 Exec=libremines
+Version=@PROJECT_VERSION@
+StartupNotify=true
+StartupWMClass=libremines

@@ -235,9 +235,18 @@ if(UNIX)
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
 
-    # Install the desktop entry and the icon
-    install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
+    # Configure and install the desktop entry
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/share/desktop_entry/libremines.desktop.in
+        ${CMAKE_CURRENT_BINARY_DIR}/libremines.desktop
+        @ONLY
+    )
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libremines.desktop DESTINATION share/applications)
     install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
+
+    # Install AppStream metainfo file
+    install(FILES share/metainfo/io.github.bollos00.libremines.appdata.xml
+            DESTINATION share/metainfo)
 
     # Install the extra minefield themes on
     #  ${CMAKE_INSTALL_PREFIX}/share/libremines/minefield_extra_themes
