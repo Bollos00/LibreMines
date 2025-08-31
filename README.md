@@ -4,9 +4,9 @@
 
 ## Introduction
 
-LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [Open Source](https://en.wikipedia.org/wiki/Open-source_software) software Qt based Minesweeper clone available for GNU/Linux, FreeBSD, macOS and Windows systems.
+LibreMines is a Qt Minesweeper clone available for GNU/Linux, FreeBSD, macOS and Windows systems.
 
-The game has dark and light themes, is widely customizable, has options to create customizable fields, allows the user to play with the keyboard, among other things.
+The game has dark and light themes, is widely customizable, has options to create customizable fields, allows the user to play even with the keyboard.
 
 The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory.
 
@@ -14,22 +14,21 @@ The source code is licensed under the [GNU General Public License at version 3](
 
 ### Arch User Repository
 
-[LibreMines is available on the Arch User Repository](https://aur.archlinux.org/packages/libremines/). It can be installed with an AUR helper:
+[LibreMines is available in Arch User Repository](https://aur.archlinux.org/packages/libremines/). It can be installed with an AUR helper:
 
 To install using `yay`:
 ```sh
-yay -S libremines
+yay -Sy libremines
 ```
 
 To install using `paru`:
 ```sh
-paru -S libremines
+paru -Sy libremines
 ```
 
-To install manually using `git`:
+To install manually using `git` **without an AUR helper**:
 ```sh
-git clone https://aur.archlinux.org/libremines.git
-cd libremines
+git clone https://aur.archlinux.org/libremines.git && cd libremines
 makepkg -si
 ```
 
@@ -43,7 +42,7 @@ pkg install libremines
 
 ### Flatpak
 
-There is a [package for LibreMines available on FlatHub](https://flathub.org/apps/details/io.github.Bollos00.LibreMines). The package can be installed, via command line, with:
+[LibreMines is available in FlatHub](https://flathub.org/apps/details/io.github.Bollos00.LibreMines). It can be installed with `flatpak`:
 
 ```sh
 flatpak install flathub io.github.Bollos00.LibreMines
@@ -71,36 +70,35 @@ The following dependencies are required for building and running LibreMines:
 * [Qt Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) >= 5.12
 * [Qt SVG](https://doc.qt.io/qt-5/qtsvg-index.html) >= 5.12
 * [Qt Multimedia](https://doc.qt.io/qt-5/qtmultimedia-index.html) >= 5.12
-* [CMake](https://cmake.org/) >= 3.10
+* [CMake](https://cmake.org/) >= 3.5.0
 
-On Arch Linux and derivatives systems, the dependencies can be installed with `pacman`:
+On Arch Linux and derivatives, the dependencies can be installed with `pacman`:
 ```sh
 sudo pacman -Sy --needed base-devel qt6-base qt6-svg qt6-multimedia cmake
 ```
 
-For Ubuntu, you can install the dependencies with the following command:
+On Debian Linux and derivatives, the dependencies can be installed with `apt`:
 ```sh
 sudo apt-get install build-essential qt6-base-dev cmake libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev
 ```
 
-On Fedora, install the dependencies with:
+On Fedora Linux and derivatives, the dependencies can be installed with `dnf`:
 ```sh
 sudo dnf install qt6-qtbase-devel qt6-qtsvg-devel cmake qt6-qtmultimedia-devel git
 ```
 
-On FreeBSD systems, install the packages [qt6-base](https://www.freshports.org/devel/qt6-base), [qt6-svg](https://www.freshports.org/devel/qt6-svg), [qt6-multimedia](https://www.freshports.org/devel/qt6-multimedia) [git](https://www.freshports.org/devel/git/) and [cmake](https://www.freshports.org/devel/cmake/).
+On FreeBSD systems, the dependencies can be installed with `pkg`:
 
 ```sh
-su -
-pkg install qt6-base qt6-svg qt6-multimedia git cmake
+sudo pkg install qt6-base qt6-svg qt6-multimedia git cmake
 ```
 
-On macOS systems, install the dependencies with [homebrew](https://brew.sh/):
+On macOS systems, the dependencies with can be installed with [homebrew](https://brew.sh/):
 ```sh
 brew install cmake ninja qt
 ```
 
-For others systems, check the [qt online installers](https://download.qt.io/official_releases/online_installers/) or your preferred package manager.
+For others systems, check out the [qt online installers](https://download.qt.io/official_releases/online_installers/) or use your preferred package manager to install dependencies.
 
 ### Building
 
@@ -108,7 +106,7 @@ In order to build LibreMines from the source code, run these commands:
 ```sh
 git clone https://github.com/Bollos00/LibreMines.git
 cd LibreMines
-mkdir build && cd build
+mkdir -p build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 make
 ```
@@ -146,7 +144,7 @@ When you initialize the application, you will face this screen:
 ![](./share/Screenshots/Screenshot0.png)
 
 
-Here you can start to play one of the predefined game modes -- easy, medium and hard --, or you can customize the field the way that you want to play. Select one of these options and you are ready to start. (Also notice "Options" on the menu bar).
+Here you can start to play one of the predefined game modes: easy, medium and hard. You can also customize the field the way that you want to play. Select one of these options and you are ready to start. (Also notice "Options" on the menu bar).
 
 You will start the timer when you release the first cell, you can play with your mouse or with your keyboard.
 
@@ -159,42 +157,42 @@ You will start the timer when you release the first cell, you can play with your
 
 To activate the keyboard controller mode, press either **W**, **A**, **S** or **D**.
 
-* **Escape**: Exit keyboard controller mode;
+* **Escape**: Exit keyboard controller mode
 
-* **A**: Move Current Cell Left;
+* **A**: Move current cell left
 
-* **S**: Move Current Cell Downwards;
+* **S**: Move current cell downwards
 
-* **D**: Move Current Cell Right;
+* **D**: Move current cell right
 
-* **W**: Move Current Cell Upwards;
+* **W**: Move current cell upwards
 
-* **O**: Release Current Cell;
+* **O**: Release current cell
 
-* **P**: Flag/Unflag Current Cell;
+* **P**: Flag/unflag current cell
 
-* **Space**: Locate current cell on middle of the scroll bar;
+* **Space**: Locate current cell on middle of the scroll bar
 
-* **CTRL + R**: Restart the game;
+* **CTRL + R**: Restart the game
 
-* **CTRL + SHIFT + P**: Save minefield as image;
+* **CTRL + SHIFT + P**: Save minefield as image
 
-If you do not feel comfortable with these keys, you can edit them by going to the main menu, then Options > Preferences.
+If you do not feel comfortable with these keys, by going to the main menu, then Options > Preferences, you can change the keybinds on the bottom right part.
 
-Tip: hold the **CTRL** modifier while moving in order to move faster.
+Tip: Hold the **CTRL** modifier while moving in order to move faster.
 
 ## Contributing
 
 All kinds of contributions are welcome on this project. You can help by:
 
-* Making artworks (SVG) for [minefield themes](https://github.com/Bollos00/LibreMines/blob/master/share/minefield_themes/README.md) and new faces reaction;
-* Documenting the source code and making tutorials of the game;
-* Sharing the game in order to attract more users;
-* Adapting the software for other Operational Systems;
-* Packaging the software for other distributions;
-* Increasing the playability and adding new features by making changes on the source code;
-* Reporting new [issues](https://github.com/Bollos00/LibreMines/issues) or solving existing ones;
-* Adding or improve the [translations](https://github.com/Bollos00/LibreMines/blob/master/etc/translations/README.md).
+* Making artworks (SVG) for [minefield themes](https://github.com/Bollos00/LibreMines/blob/master/share/minefield_themes/README.md) and new faces reaction
+* Documenting the source code and making tutorials of the game
+* Sharing the game in order to attract more users
+* Adapting the software for other operating systems
+* Packaging the software for other distributions
+* Increasing the playability and adding new features by making changes on the source code
+* Reporting new [issues](https://github.com/Bollos00/LibreMines/issues) or solving existing ones
+* Adding or improving the [translations](https://github.com/Bollos00/LibreMines/blob/master/etc/translations/README.md)
 
 # Third party Repositories used in this software
 * [TwEmoji](https://github.com/twitter/twemoji)
