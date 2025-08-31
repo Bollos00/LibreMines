@@ -182,9 +182,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     if(!controller.isValid())
     {
         QMessageBox::warning(this, tr("Keyboard Controller is invalid"),
-                             tr("Dear user, unfortunately your Keyboard Controller preferences"
-                             " are invalid. Therefore you will not be able to play with the keyboard.\n"
-                             "To fix it go to (Main Meun > Options > Preferences) and edit your preferences."));
+                             tr("Your Keyboard Controller preferences are invalid. Therefore,"
+                             " you will not be able to play with the keyboard.\n To fix it, go to"
+                             " (Main Menu > Options > Preferences) and edit your preferences."));
     }
 
     // Create a new matrix
@@ -1390,16 +1390,16 @@ void LibreMinesGui::SLOT_gameWon()
         case GameDifficulty::NONE:
             break;
         case GameDifficulty::EASY:
-            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: EASY"));
+            labelYouWonYouLost->setText(tr("You Win!") + '\n' + tr("Difficulty: EASY"));
             break;
         case GameDifficulty::MEDIUM:
-            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: MEDIUM"));
+            labelYouWonYouLost->setText(tr("You Win!") + '\n' + tr("Difficulty: MEDIUM"));
             break;
         case GameDifficulty::HARD:
-            labelYouWonYouLost->setText(tr("You Won") + '\n' + tr("Difficulty: HARD"));
+            labelYouWonYouLost->setText(tr("You Win!") + '\n' + tr("Difficulty: HARD"));
             break;
         case GameDifficulty::CUSTOMIZED:
-            labelYouWonYouLost->setText(tr("You Won") +'\n' + tr("Difficulty: CUSTOM\n") +
+            labelYouWonYouLost->setText(tr("You Win!") +'\n' + tr("Difficulty: CUSTOM\n") +
                                         QString::number(gameEngine->rows()) +
                                         "x" + QString::number(gameEngine->lines()) +
                                         " : " + QString::number(gameEngine->mines()) + tr(" Mines"));
@@ -1615,7 +1615,7 @@ void LibreMinesGui::SLOT_importHighScores()
             {
                 QMessageBox::information(this, tr("High scores import complete"),
                                          tr("Operation completed!") + '\n' +
-                                             tr("old high score file has been saved to") +
+                                             tr("Old high score file has been saved to") +
                                              backupScorePath);
             }
         }
@@ -1635,7 +1635,7 @@ void LibreMinesGui::SLOT_exportHighScores()
         QScopedPointer<QFile> fileScores( new QFile(dirAppData.absoluteFilePath("scoresLibreMines")) );
         if(fileScores && fileScores->exists() && fileScores->copy(backupFileName))
         {
-            QMessageBox::information(this, tr("High scores bakcup complete"),
+            QMessageBox::information(this, tr("High scores backup complete"),
                                     tr("Successfully backup high scores to \"") + backupFileName + '\"');
         }
 
