@@ -242,13 +242,7 @@ if(UNIX)
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
 
-    # Configure and install the desktop entry
-    configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/share/desktop_entry/libremines.desktop.in
-        ${CMAKE_CURRENT_BINARY_DIR}/libremines.desktop
-        @ONLY
-    )
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libremines.desktop DESTINATION share/applications)
+    install(FILES share/desktop_entry/libremines.desktop DESTINATION share/applications)
     install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
 
     # Install AppStream metainfo file
