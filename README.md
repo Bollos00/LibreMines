@@ -26,7 +26,7 @@ To install using `paru`:
 paru -Sy libremines
 ```
 
-To install manually using `git` **without an AUR helper**:
+To install manually using `git` **without** an AUR helper:
 ```sh
 git clone https://aur.archlinux.org/libremines.git && cd libremines
 makepkg -si
