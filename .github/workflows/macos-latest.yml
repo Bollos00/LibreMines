@@ -68,11 +68,13 @@ jobs:
       - name: Prepare build artifacts
         run: |
           cd build
+          
           if [ "${{ matrix.qt-version }}" = "5" ]; then
             $(brew --prefix qt@5)/bin/macdeployqt ./libremines.app
           else
             $(brew --prefix qt)/bin/macdeployqt ./libremines.app
           fi
+          
           cp ../README.md ./libremines.app/Contents/Resources/
           cp ../LICENSE ./libremines.app/Contents/Resources/
           mkdir -p ./libremines.app/Contents/Resources/minefield_extra_themes
@@ -90,6 +92,7 @@ jobs:
         if: inputs.upload_to_release
         run: |
           cd build
+          # Determine architecture based on the macOS version
           if [ "${{ matrix.os }}" = "macos-13" ]; then
             ARCH="intel"
           else
