@@ -1202,6 +1202,9 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
     widgetEndGameResultsContents->adjustSize();
     scrollAreaEndGameResults->show();
 
+    // Update the timer label to avoid this being shown different from statistics time (#83).
+    labelTimerInGame->setNum(static_cast<int>(score.iTimeInNs*1e-9));
+
     score.gameDifficulty = difficult;
     score.username = preferences->optionUsername();
     if(score.username.isEmpty())
