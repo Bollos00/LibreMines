@@ -107,7 +107,7 @@ In order to build LibreMines from the source code, run these commands:
 ```sh
 git clone https://github.com/Bollos00/LibreMines.git
 cd LibreMines
-mkdir -p build && cd build
+mkdir build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 make
 ```
