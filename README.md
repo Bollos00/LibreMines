@@ -90,6 +90,7 @@ sudo dnf install qt6-qtbase-devel qt6-qtsvg-devel cmake qt6-qtmultimedia-devel g
 On FreeBSD systems, the dependencies can be installed with `pkg`:
 
 ```sh
+su -
 sudo pkg install qt6-base qt6-svg qt6-multimedia git cmake
 ```
 
