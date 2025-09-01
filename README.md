@@ -145,7 +145,7 @@ When you initialize the application, you will face this screen:
 ![](./share/Screenshots/Screenshot0.png)
 
 
-Here you can start to play one of the predefined game modes: easy, medium and hard. You can also customize the field the way that you want to play. Select one of these options and you are ready to start. (Also notice "Options" on the menu bar).
+Here you can start to play one of the predefined game modes: easy, medium and hard; or you can customize the field the way that you want to play. Select one of these options and you are ready to start. (Also notice "Options" on the menu bar).
 
 You will start the timer when you release the first cell, you can play with your mouse or with your keyboard.
 
