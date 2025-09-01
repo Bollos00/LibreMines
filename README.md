@@ -4,7 +4,7 @@
 
 ## Introduction
 
-LibreMines is a Qt Minesweeper clone available for GNU/Linux, FreeBSD, macOS and Windows systems.
+LibreMines is a [Free/Libre](https://en.wikipedia.org/wiki/Free_software) and [Open Source](https://en.wikipedia.org/wiki/Open-source_software) software Qt based Minesweeper clone available for GNU/Linux, FreeBSD, macOS and Windows systems.
 
 The game has dark and light themes, is widely customizable, has options to create customizable fields, allows the user to play even with the keyboard.
 
