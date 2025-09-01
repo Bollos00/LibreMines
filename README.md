@@ -177,7 +177,7 @@ To activate the keyboard controller mode, press either **W**, **A**, **S** or **
 
 * **CTRL + SHIFT + P**: Save minefield as image
 
-If you do not feel comfortable with these keys, by going to the main menu, then Options > Preferences, you can change the keybinds on the bottom right part.
+If you do not feel comfortable with these keys, you can edit them by going to the main menu, then Options > Preferences.
 
 Tip: Hold the **CTRL** modifier while moving in order to move faster.
 
