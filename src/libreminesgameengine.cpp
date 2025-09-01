@@ -618,7 +618,9 @@ void LibreMinesGameEngine::SLOT_startTimer()
     QObject::connect(timerTimeInGame.get(), &QTimer::timeout,
                      this, &LibreMinesGameEngine::SLOT_UpdateTime);
 
-    timerTimeInGame->start(1000);
+    // reduce the timer interval to 100 ms.
+    // This fixes issue #83 where the display timer was one second ahead of real time
+    timerTimeInGame->start(100);
     elapsedPreciseTimeInGame.start();
 }
 
