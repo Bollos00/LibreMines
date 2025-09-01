@@ -9,7 +9,7 @@ sudo pacman -Sy --needed qt6-tools
 
 On Debian and its derivatives, it can be done with:
 ```sh
-sudo apt install qt6-tools-dev
+sudo apt install qt6-tools-dev linguist-qt6
 ```
 
 # Updating and creating translation files
