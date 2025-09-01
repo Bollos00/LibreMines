@@ -182,9 +182,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     if(!controller.isValid())
     {
         QMessageBox::warning(this, tr("Keyboard Controller is invalid"),
-                             tr("Your Keyboard Controller preferences are invalid. Therefore,"
-                             " you will not be able to play with the keyboard.\n To fix it, go to"
-                             " (Main Menu > Options > Preferences) and edit your preferences."));
+                             tr("Dear user, your Keyboard Controller preferences"
+                             " are invalid. Therefore, you will not be able to play with the keyboard.\n"
+                             "To fix it, go to (Main Menu > Options > Preferences) and edit your preferences."));
     }
 
     // Create a new matrix
