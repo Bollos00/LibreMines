@@ -158,19 +158,19 @@ You will start the timer when you release the first cell, you can play with your
 
 To activate the keyboard controller mode, press either **W**, **A**, **S** or **D**.
 
-* **Escape**: Exit keyboard controller mode
+* **Escape**: Exit Keyboard Controller Mode
 
-* **A**: Move current cell left
+* **A**: Move Current cell Left
 
-* **S**: Move current cell downwards
+* **S**: Move Current Cell Downwards
 
-* **D**: Move current cell right
+* **D**: Move Current Cell Right
 
-* **W**: Move current cell upwards
+* **W**: Move Current Cell Upwards
 
-* **O**: Release current cell
+* **O**: Release Current Cell
 
-* **P**: Flag/unflag current cell
+* **P**: Flag/Unflag Current Cell
 
 * **Space**: Locate current cell on middle of the scroll bar
 
