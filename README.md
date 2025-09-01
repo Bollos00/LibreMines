@@ -91,7 +91,7 @@ On FreeBSD systems, the dependencies can be installed with `pkg`:
 
 ```sh
 su -
-sudo pkg install qt6-base qt6-svg qt6-multimedia git cmake
+pkg install qt6-base qt6-svg qt6-multimedia git cmake
 ```
 
 On macOS systems, the dependencies can be installed with [homebrew](https://brew.sh/):
