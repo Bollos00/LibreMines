@@ -316,7 +316,7 @@ Get the source code of LibreMines on
         <location filename="../../src/libreminesgui.cpp" line="1621"/>
         <source>Old high score file has been saved to</source>
         <translatorcomment>Means &quot;Old high score file has been saved to this file: backupScorePath&quot;. To improve quality, backupScorePath needs to be inside of the sentence.</translatorcomment>
-        <translation>Eski en iyi skor dosyası şuraya kaydedildi: </translation>
+        <translation type="unfinished">Eski en iyi skor dosyası şuraya kaydedildi: </translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1632"/>
@@ -333,7 +333,7 @@ Get the source code of LibreMines on
         <location filename="../../src/libreminesgui.cpp" line="1642"/>
         <source>Successfully backup high scores to &quot;</source>
         <translatorcomment>Means &quot;Successfully backed up high scores to this file: backupFileName&quot;. To improve quality, backupFileName needs to be inside of the sentence.</translatorcomment>
-        <translation>En iyi skorlar şuraya başarılı bir şekilde aktarıldı:</translation>
+        <translation type="unfinished">En iyi skorlar şuraya başarılı bir şekilde aktarıldı:</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1674"/>
