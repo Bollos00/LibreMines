@@ -140,4 +140,7 @@ QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score);
  */
 QDebug operator<<(QDebug debug, const LibreMinesScore& score);
 
+// Register LibreMinesScore with Qt's meta-object system for QVariant support
+Q_DECLARE_METATYPE(LibreMinesScore)
+
 #endif // LIBREMINESSCORE_H
