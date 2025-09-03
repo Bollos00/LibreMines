@@ -17,6 +17,17 @@
  *****************************************************************************
  */
 
+/**
+ * @file libreminespreferencesdialog.h
+ * @brief User preferences and settings dialog for LibreMines
+ * @author Bruno Bollos Correa
+ * @date 2020-2025
+ * 
+ * This file defines the LibreMinesPreferencesDialog class and related
+ * enumerations for managing user preferences and configuration options.
+ * It provides a comprehensive settings interface for customizing game
+ * behavior, appearance, controls, and other user preferences.
+ */
 
 #ifndef LIBREMINESPREFERENCESDIALOG_H
 #define LIBREMINESPREFERENCESDIALOG_H
@@ -28,35 +39,80 @@ namespace Ui {
 class LibreMinesPreferencesDialog;
 }
 
+/**
+ * @brief Namespace for LibreMines-specific enumerations and types
+ * 
+ * Contains enumerations and type definitions specific to LibreMines
+ * configuration and preferences that are used throughout the application.
+ */
 namespace LibreMines
 {
-enum WhenCtrlIsPressedOptions : uchar
-{
-    GoToTheEdge = 0,
-    Jump3Cells = 1,
-    Jump5Cells = 2,
-    Jump10Cells = 3
-};
+    /**
+     * @brief Keyboard navigation behavior when Ctrl key is pressed
+     * 
+     * Defines how the keyboard controller behaves when the Ctrl key
+     * is held down during navigation, affecting movement speed and distance.
+     */
+    enum WhenCtrlIsPressedOptions : uchar
+    {
+        GoToTheEdge = 0,    ///< Move cursor to the edge of the grid
+        Jump3Cells = 1,     ///< Move cursor 3 cells at a time
+        Jump5Cells = 2,     ///< Move cursor 5 cells at a time
+        Jump10Cells = 3     ///< Move cursor 10 cells at a time
+    };
 
-enum MinefieldGenerationAnimation : uchar
-{
-    AnimationOn = 0,
-    AnimationLimited = 1,
-    AnimationOff = 2
-};
+    /**
+     * @brief Animation settings for minefield generation
+     * 
+     * Controls the visual animation played during minefield generation,
+     * allowing users to balance visual feedback with performance.
+     */
+    enum MinefieldGenerationAnimation : uchar
+    {
+        AnimationOn = 0,      ///< Full animation during generation
+        AnimationLimited = 1, ///< Limited animation for faster generation  
+        AnimationOff = 2      ///< No animation for fastest generation
+    };
 
-enum AskToSaveMatchScore : uchar
-{
-    SaveNever              = 0x00,
-    SaveWhenNewHighScore   = 0x01,
-    SaveWhenGameCompleted  = 0x02,
-    SaveAlways             = 0x04
-};
-
+    /**
+     * @brief Options for automatic score saving behavior
+     * 
+     * Defines when the application should automatically save or prompt
+     * to save game scores. Can be combined using bitwise operations.
+     */
+    enum AskToSaveMatchScore : uchar
+    {
+        SaveNever              = 0x00, ///< Never save scores automatically
+        SaveWhenNewHighScore   = 0x01, ///< Save when achieving a new high score
+        SaveWhenGameCompleted  = 0x02, ///< Save when successfully completing any game
+        SaveAlways             = 0x04  ///< Always save scores regardless of outcome
+    };
 }
 Q_DECLARE_FLAGS(AskToSaveMatchScore, LibreMines::AskToSaveMatchScore)
 Q_DECLARE_OPERATORS_FOR_FLAGS(AskToSaveMatchScore)
 
+/**
+ * @brief Comprehensive preferences and settings dialog for LibreMines
+ * 
+ * LibreMinesPreferencesDialog provides a user interface for configuring
+ * all aspects of the LibreMines application including game behavior,
+ * visual appearance, keyboard controls, sound settings, and user preferences.
+ * 
+ * The dialog is organized into multiple sections covering:
+ * - Game behavior (first cell safety, neighbor clearing, etc.)
+ * - Visual themes and appearance settings
+ * - Keyboard navigation and accessibility options  
+ * - Audio volume and sound effect settings
+ * - Score saving and user account preferences
+ * - Language and localization options
+ * 
+ * All settings are automatically persisted when changed and emit signals
+ * to notify other parts of the application when preferences are updated.
+ * The dialog integrates with the LibreMinesPreferencesSaver for reliable
+ * configuration storage across application sessions.
+ * 
+ * @since 1.0
+ */
 class LibreMinesPreferencesDialog : public QDialog
 {
     Q_OBJECT
