@@ -1301,7 +1301,7 @@ void TestGameEngine::testEndGameScoreCalculation()
     
     // Verify score parameters
     QCOMPARE(score.width, static_cast<uchar>(3));
-    QCOMPARE(score.heigth, static_cast<uchar>(3));
+    QCOMPARE(score.height, static_cast<uchar>(3));
     QCOMPARE(score.mines, static_cast<short>(1));
     QVERIFY(score.bGameCompleted);
     QCOMPARE(score.dPercentageGameCompleted, 100.0);

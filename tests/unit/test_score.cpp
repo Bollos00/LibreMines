@@ -110,7 +110,7 @@ void TestScore::testScoreConstruction()
     QCOMPARE(score.iTimeInNs, static_cast<qint64>(0));
     QCOMPARE(score.gameDifficulty, GameDifficulty::NONE);
     QCOMPARE(score.width, static_cast<uchar>(0));
-    QCOMPARE(score.heigth, static_cast<uchar>(0));
+    QCOMPARE(score.height, static_cast<uchar>(0));
     QCOMPARE(score.mines, static_cast<short>(0));
     QCOMPARE(score.bGameCompleted, false);
     QCOMPARE(score.dPercentageGameCompleted, 0.0);
@@ -125,7 +125,7 @@ void TestScore::testScoreAssignment()
     score.iTimeInNs = 15000000000LL; // 15 seconds in nanoseconds
     score.gameDifficulty = GameDifficulty::MEDIUM;
     score.width = 16;
-    score.heigth = 16;
+    score.height = 16;
     score.mines = 40;
     score.bGameCompleted = true;
     score.dPercentageGameCompleted = 100.0;
@@ -135,7 +135,7 @@ void TestScore::testScoreAssignment()
     QCOMPARE(score.iTimeInNs, 15000000000LL);
     QCOMPARE(score.gameDifficulty, GameDifficulty::MEDIUM);
     QCOMPARE(score.width, static_cast<uchar>(16));
-    QCOMPARE(score.heigth, static_cast<uchar>(16));
+    QCOMPARE(score.height, static_cast<uchar>(16));
     QCOMPARE(score.mines, static_cast<short>(40));
     QCOMPARE(score.bGameCompleted, true);
     QCOMPARE(score.dPercentageGameCompleted, 100.0);
@@ -148,7 +148,7 @@ void TestScore::testScoreStringConversion()
     score.iTimeInNs = 10000000000LL; // 10 seconds
     score.gameDifficulty = GameDifficulty::EASY;
     score.width = 9;
-    score.heigth = 9;
+    score.height = 9;
     score.mines = 10;
     score.bGameCompleted = true;
     score.dPercentageGameCompleted = 100.0;
@@ -218,7 +218,7 @@ void TestScore::testScoreSerialization()
     LibreMinesScore originalScore = createTestScore(12345678900LL, GameDifficulty::MEDIUM);
     originalScore.username = "SerializationTest";
     originalScore.width = 12;
-    originalScore.heigth = 8;
+    originalScore.height = 8;
     originalScore.mines = 25;
     
     QByteArray data;
@@ -235,7 +235,7 @@ void TestScore::testScoreDeserialization()
     LibreMinesScore originalScore = createTestScore(98765432100LL, GameDifficulty::HARD);
     originalScore.username = "DeserializationTest";
     originalScore.width = 20;
-    originalScore.heigth = 15;
+    originalScore.height = 15;
     originalScore.mines = 60;
     
     QByteArray data;
@@ -252,7 +252,7 @@ void TestScore::testScoreDeserialization()
     QCOMPARE(deserializedScore.gameDifficulty, originalScore.gameDifficulty);
     QCOMPARE(deserializedScore.username, originalScore.username);
     QCOMPARE(deserializedScore.width, originalScore.width);
-    QCOMPARE(deserializedScore.heigth, originalScore.heigth);
+    QCOMPARE(deserializedScore.height, originalScore.height);
     QCOMPARE(deserializedScore.mines, originalScore.mines);
     QCOMPARE(deserializedScore.bGameCompleted, originalScore.bGameCompleted);
     QCOMPARE(deserializedScore.dPercentageGameCompleted, originalScore.dPercentageGameCompleted);
@@ -419,22 +419,22 @@ LibreMinesScore TestScore::createTestScore(qint64 timeNs, GameDifficulty difficu
     switch (difficulty) {
         case GameDifficulty::EASY:
             score.width = 9;
-            score.heigth = 9;
+            score.height = 9;
             score.mines = 10;
             break;
         case GameDifficulty::MEDIUM:
             score.width = 16;
-            score.heigth = 16;
+            score.height = 16;
             score.mines = 40;
             break;
         case GameDifficulty::HARD:
             score.width = 30;
-            score.heigth = 16;
+            score.height = 16;
             score.mines = 99;
             break;
         default:
             score.width = 8;
-            score.heigth = 8;
+            score.height = 8;
             score.mines = 5;
             break;
     }
@@ -447,7 +447,7 @@ void TestScore::compareScores(const LibreMinesScore& s1, const LibreMinesScore& 
     QCOMPARE(s1.iTimeInNs, s2.iTimeInNs);
     QCOMPARE(s1.gameDifficulty, s2.gameDifficulty);
     QCOMPARE(s1.width, s2.width);
-    QCOMPARE(s1.heigth, s2.heigth);
+    QCOMPARE(s1.height, s2.height);
     QCOMPARE(s1.mines, s2.mines);
     QCOMPARE(s1.bGameCompleted, s2.bGameCompleted);
     QCOMPARE(s1.dPercentageGameCompleted, s2.dPercentageGameCompleted);
