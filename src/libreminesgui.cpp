@@ -1617,9 +1617,8 @@ void LibreMinesGui::SLOT_importHighScores()
             if(fileImport->copy(dirAppData.absoluteFilePath("scoresLibreMines")))
             {
                 QMessageBox::information(this, tr("High scores import complete"),
-                                         tr("Operation completed!") + '\n' +
-                                             tr("Old high score file has been saved to") +
-                                             backupScorePath);
+                                         tr("Operation completed!")
+                                             tr("Old high score file has been saved to \"%1\".").arg(backupScorePath)); # Made using AI, better be checked
             }
         }
     }
@@ -1639,7 +1638,7 @@ void LibreMinesGui::SLOT_exportHighScores()
         if(fileScores && fileScores->exists() && fileScores->copy(backupFileName))
         {
             QMessageBox::information(this, tr("High scores backup complete"),
-                                    tr("Successfully backup high scores to \"") + backupFileName + '\"');
+                                    tr("Successfully backup high scores to %1").arg('\"'backupFileName + '\"');
         }
 
     }
