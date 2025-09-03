@@ -1618,7 +1618,7 @@ void LibreMinesGui::SLOT_importHighScores()
             {
                 QMessageBox::information(this, tr("High scores import complete"),
                                          tr("Operation completed!")
-                                             tr("Old high score file has been saved to \"%1\".").arg(backupScorePath)); # Made using AI, better be checked
+                                             tr("Old high score file has been saved to \"%1\".").arg(backupScorePath));
             }
         }
     }
