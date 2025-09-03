@@ -34,8 +34,20 @@ jobs:
       - name: Build LibreMines
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ..
+          if [ "${{ inputs.upload_to_release }}" = "true" ]; then
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ..
+          else
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTS=ON ..
+          fi
           make -j$(nproc)
+
+      - name: "Run tests"
+        if: inputs.upload_to_release != true
+        run: "cd build && ctest --output-on-failure"
+
+      - name: Install LibreMines
+        run: |
+          cd build
           make install DESTDIR=AppDir
       
       - name: Download linuxdeploy tools and AppImage runtime
