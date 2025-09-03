@@ -88,7 +88,7 @@ jobs:
 
       - name: "Run tests"
         if: inputs.upload_to_release != true
-        run: "cd build && ctest --verbose --progress --output-on-failure -C Release"
+        run: "cd build && ctest --extra-verbose --progress --output-on-failure -C Release"
 
       - name: Prepare build artifacts
         run: |

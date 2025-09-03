@@ -1169,7 +1169,8 @@ void TestGameEngine::testFirstClickSafetyWithCleanArea()
 // Timer integration and game flow tests (High Priority)
 void TestGameEngine::testTimerStartsOnFirstClick()
 {
-    engine->vNewGame(5, 5, 3);
+    engine->setFirstCellClean(false);
+    engine->vNewGame(8, 8, 12);
     
     QSignalSpy currentTimeSpy(engine, &LibreMinesGameEngine::SIGNAL_currentTime);
     
@@ -1179,8 +1180,8 @@ void TestGameEngine::testTimerStartsOnFirstClick()
     // Find a non-mined cell to click
     const auto& matrix = engine->getPrincipalMatrix();
     bool foundSafeCell = false;
-    for (int x = 0; x < 5 && !foundSafeCell; ++x) {
-        for (int y = 0; y < 5 && !foundSafeCell; ++y) {
+    for (int x = 0; x < 8 && !foundSafeCell; ++x) {
+        for (int y = 0; y < 8 && !foundSafeCell; ++y) {
             if (matrix[x][y].value != CellValue::MINE) {
                 // First click should start timer
                 engine->SLOT_cleanCell(x, y);
