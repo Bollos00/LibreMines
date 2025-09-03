@@ -79,7 +79,7 @@ jobs:
 
       - name: "Run tests"
         if: inputs.upload_to_release != true
-        run: "cd build && ctest --output-on-failure"
+        run: "cd build && ctest --verbose --progress --output-on-failure"
 
       - name: Prepare build artifacts
         run: |

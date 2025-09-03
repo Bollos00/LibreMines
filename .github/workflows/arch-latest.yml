@@ -37,7 +37,7 @@ jobs:
         run: "cd build && make"
 
       - name: "Run tests"
-        run: "cd build && ctest --output-on-failure"
+        run: "cd build && ctest --verbose --progress --output-on-failure"
       
       - name: Prepare build artifacts
         run: |
