@@ -69,13 +69,9 @@ else()
 endif()
 
 # Set up MOC for core library
-if(USE_QT6)
-    qt6_standard_project_setup()
-else()
-    set(CMAKE_AUTOMOC ON)
-    set(CMAKE_AUTORCC ON)
-    set(CMAKE_AUTOUIC ON)
-endif()
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 # Function to create a test executable
 function(add_libremines_test test_name test_source)
