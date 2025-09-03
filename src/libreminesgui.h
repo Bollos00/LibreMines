@@ -45,7 +45,7 @@
  * @file libreminesgui.h
  * @brief Main GUI class for the LibreMines application
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-12
  * 
  * This file defines the LibreMinesGui class which serves as the main window
  * and primary user interface for the LibreMines minesweeper game. It manages
@@ -75,7 +75,7 @@
  * and keyboard navigation, multiple themes, and comprehensive accessibility
  * features.
  * 
- * @since 1.0
+ * @since v1.0
  */
 class LibreMinesGui : public QMainWindow
 {
@@ -95,7 +95,7 @@ private:
      * hidden cells that can be clicked to reveal, and labels represent
      * revealed cells that can be used for chord clicking operations.
      * 
-     * @since 1.0
+     * @since v1.0
      */
     class CellGui
     {

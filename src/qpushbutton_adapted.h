@@ -21,7 +21,7 @@
  * @file qpushbutton_adapted.h
  * @brief Custom QPushButton widget for LibreMines minefield cells
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-12
  * 
  * This file defines QPushButton_adapted, a specialized QPushButton widget
  * that represents hidden cells in the minesweeper grid. It extends QPushButton
@@ -47,7 +47,7 @@
  * mouse events occur, allowing the game engine to respond appropriately
  * to user interactions with hidden cells.
  * 
- * @since 1.0
+ * @since v1.0
  */
 class QPushButton_adapted : public QPushButton
 {

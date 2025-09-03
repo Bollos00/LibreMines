@@ -21,7 +21,7 @@
  * @file qlabel_adapted.h
  * @brief Custom QLabel widget for LibreMines minefield cells
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-12
  * 
  * This file defines QLabel_adapted, a specialized QLabel widget that
  * represents revealed cells in the minesweeper grid. It extends QLabel
@@ -46,7 +46,7 @@
  * mouse events occur, allowing the game engine to respond appropriately
  * to user interactions with revealed cells.
  * 
- * @since 1.0
+ * @since v1.0
  */
 class QLabel_adapted : public QLabel
 {

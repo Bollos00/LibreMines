@@ -2,7 +2,7 @@
  * @file libreminespreferencessaver.h
  * @brief Preferences persistence and configuration file management
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-17
  * 
  * This file defines utilities for saving and loading user preferences
  * and game configuration settings. It handles the persistence of all

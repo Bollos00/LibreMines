@@ -2,7 +2,7 @@
  * @file extrathemes.h
  * @brief Extra theme validation and discovery for LibreMines
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2021-04-10
  * 
  * This file defines utilities for validating and discovering additional
  * themes for LibreMines beyond the built-in themes. It provides functions

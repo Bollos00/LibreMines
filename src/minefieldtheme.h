@@ -2,7 +2,7 @@
  * @file minefieldtheme.h
  * @brief Visual theme management for LibreMines minefield cells
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2021-01-16
  * 
  * This file defines the MinefieldTheme class which manages the visual
  * appearance of minesweeper cells including numbers, mines, flags, and
@@ -36,7 +36,7 @@
  * can be dynamically switched during gameplay to provide visual
  * customization options for users.
  * 
- * @since 1.0
+ * @since v1.2.2
  */
 class MinefieldTheme
 {

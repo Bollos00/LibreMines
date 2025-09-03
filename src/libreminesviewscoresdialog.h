@@ -21,7 +21,7 @@
  * @file libreminesviewscoresdialog.h
  * @brief High scores viewing dialog with tabbed interface
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2021-01-02
  * 
  * This file defines the LibreMinesViewScoresDialog class which provides
  * a comprehensive interface for viewing high scores organized by difficulty
@@ -54,7 +54,7 @@
  * configurations. This allows players to compare their performance
  * across different game types and track their progress in each category.
  * 
- * @since 1.0
+ * @since v1.2.1
  */
 class LibreMinesViewScoresDialog : public QDialog
 {

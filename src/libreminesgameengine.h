@@ -21,7 +21,7 @@
  * @file libreminesgameengine.h
  * @brief Core game engine for LibreMines minesweeper logic
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-12
  * 
  * This file contains the main game engine that handles all minesweeper game logic
  * including mine placement, cell clearing, flag management, timing, and score
@@ -53,7 +53,7 @@
  * complete game state and provides methods for querying game status and
  * statistics.
  * 
- * @since 1.0
+ * @since v1.0
  */
 class LibreMinesGameEngine: public QObject
 {
@@ -68,7 +68,7 @@ public:
      * and flag status. This nested class provides a clean interface for
      * managing cell properties within the game engine.
      * 
-     * @since 1.0
+     * @since v1.0
      */
     class CellGameEngine
     {

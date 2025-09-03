@@ -21,7 +21,7 @@
  * @file libreminesscoresdialog.h
  * @brief Score display and editing dialog for LibreMines
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-17
  * 
  * This file defines the LibreMinesScoresDialog class which provides
  * a user interface for displaying high scores and allowing users to
@@ -53,7 +53,7 @@
  * the username and save/cancel buttons for confirming or discarding
  * changes.
  * 
- * @since 1.0
+ * @since v1.1.0
  */
 class LibreMinesScoresDialog : public QDialog
 {

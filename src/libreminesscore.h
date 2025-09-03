@@ -21,7 +21,7 @@
  * @file libreminesscore.h
  * @brief Score management and tracking for LibreMines games
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-12
  * 
  * This file defines the LibreMinesScore class which encapsulates all
  * information about a completed game including timing, difficulty,
@@ -47,7 +47,7 @@
  * allowing for meaningful comparison of both completed and partially
  * completed games.
  * 
- * @since 1.0
+ * @since v1.0
  */
 class LibreMinesScore
 {

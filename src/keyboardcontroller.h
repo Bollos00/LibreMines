@@ -2,7 +2,7 @@
  * @file keyboardcontroller.h
  * @brief Keyboard navigation system for LibreMines accessibility
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-12
  * 
  * This file defines the KeyboardController class which provides full
  * keyboard navigation and control for the LibreMines game. It enables
@@ -37,7 +37,7 @@ class LibreMinesGui;
  * - Configurable key mappings for accessibility
  * - Audio feedback integration for actions
  * 
- * @since 1.0
+ * @since v1.0
  */
 class KeyboardController
 {

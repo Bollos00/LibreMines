@@ -21,7 +21,7 @@
  * @file common.h
  * @brief Common definitions and enumerations for LibreMines
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-12
  * 
  * This file contains fundamental data types and enumerations used throughout
  * the LibreMines application. It defines the core game concepts including
@@ -41,7 +41,7 @@
  * game. Values from ZERO to EIGHT indicate the number of adjacent mines,
  * while MINE indicates the cell contains a mine.
  * 
- * @since 1.0
+ * @since v1.0
  */
 enum class CellValue: qint8{
     MINE = -1,    ///< Cell contains a mine
@@ -63,7 +63,7 @@ enum class CellValue: qint8{
  * Each level corresponds to specific board dimensions and mine counts.
  * CUSTOMIZED allows players to create their own game parameters.
  * 
- * @since 1.0
+ * @since v1.0
  */
 enum class GameDifficulty: uchar{
     NONE,         ///< No difficulty selected (initial state)
@@ -79,7 +79,7 @@ enum class GameDifficulty: uchar{
  * Represents the possible flag states that can be applied to a cell
  * by the player. Used for marking suspected mines or uncertain cells.
  * 
- * @since 1.0
+ * @since v1.0
  */
 enum class FlagState : quint8{
     NoFlag   = 0, ///< Cell has no flag

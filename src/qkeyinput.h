@@ -21,7 +21,7 @@
  * @file qkeyinput.h
  * @brief Key input widget for keyboard shortcut configuration
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-29
  * 
  * This file defines QKeyInput, a specialized QLineEdit widget that allows
  * users to configure keyboard shortcuts by capturing key presses and
@@ -47,7 +47,7 @@
  * for use as shortcuts and offers utility functions for converting between
  * key codes and display text.
  * 
- * @since 1.0
+ * @since v1.2.0
  */
 class QKeyInput : public QLineEdit
 {

@@ -21,7 +21,7 @@
  * @file libreminespreferencesdialog.h
  * @brief User preferences and settings dialog for LibreMines
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2020-12-17
  * 
  * This file defines the LibreMinesPreferencesDialog class and related
  * enumerations for managing user preferences and configuration options.
@@ -111,7 +111,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(AskToSaveMatchScore)
  * The dialog integrates with the LibreMinesPreferencesSaver for reliable
  * configuration storage across application sessions.
  * 
- * @since 1.0
+ * @since v1.1.0
  */
 class LibreMinesPreferencesDialog : public QDialog
 {

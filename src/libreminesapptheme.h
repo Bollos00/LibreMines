@@ -2,7 +2,7 @@
  * @file libreminesapptheme.h
  * @brief Application-wide theme management for LibreMines
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2021-04-10
  * 
  * This file defines the LibreMinesAppTheme namespace which provides
  * functionality for managing the overall application theme including

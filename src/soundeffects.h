@@ -2,7 +2,7 @@
  * @file soundeffects.h
  * @brief Audio system for LibreMines game events
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2022-02-07
  * 
  * This file defines the SoundEffects class which manages all audio feedback
  * in the LibreMines application. It provides sound effects for various game
@@ -28,7 +28,7 @@
  * suitable for interactive applications. All sound files are managed as
  * Qt resources for reliable cross-platform deployment.
  * 
- * @since 1.0
+ * @since v1.9.0
  */
 class SoundEffects : public QObject
 {

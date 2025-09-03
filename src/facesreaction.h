@@ -2,7 +2,7 @@
  * @file facesreaction.h
  * @brief Emoji reaction system for LibreMines game events
  * @author Bruno Bollos Correa
- * @date 2020-2025
+ * @date 2021-03-29
  * 
  * This file defines the FacesReaction class which manages emoji/face
  * reactions that provide visual feedback to the player based on game
@@ -27,7 +27,7 @@
  * to be loaded and displayed. Face images are scaled appropriately for
  * the current display settings.
  * 
- * @since 1.0
+ * @since v1.4.0
  */
 class FacesReaction
 {
