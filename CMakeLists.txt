@@ -292,3 +292,10 @@ elseif(WIN32)
     # Windows-specific installation settings can be added here if needed
 
 endif()
+
+# Add tests (optional - can be disabled)
+option(BUILD_TESTS "Build the test suite" OFF)
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

@@ -26,7 +26,7 @@ LibreMinesScore::LibreMinesScore():
     iTimeInNs(0),
     gameDifficulty(GameDifficulty::NONE),
     width(0),
-    heigth(0),
+    height(0),
     mines(0),
     bGameCompleted(false),
     dPercentageGameCompleted(0)
@@ -46,7 +46,7 @@ LibreMinesScore::operator QString() const
     else if(this->gameDifficulty == GameDifficulty::CUSTOMIZED)
     {
         strGameDiffuclty = "Customized " + QString::number(this->width) +
-                           " x " + QString::number(this->heigth) + " : " +
+                           " x " + QString::number(this->height) + " : " +
                            QString::number(this->mines);
     }
 
@@ -61,7 +61,7 @@ bool LibreMinesScore::bFirstIsBetter(const LibreMinesScore &first, const LibreMi
 {
     if(first.gameDifficulty != second.gameDifficulty ||
        first.width != second.width ||
-       first.heigth != second.heigth)
+       first.height != second.height)
     {
         qFatal("The two Scores must have the same game diffuculty");
     }
@@ -108,7 +108,7 @@ QDataStream& operator<< (QDataStream& stream, const LibreMinesScore& score)
     stream << score.iTimeInNs;
     stream << (uchar)score.gameDifficulty;
     stream << score.width;
-    stream << score.heigth;
+    stream << score.height;
     stream << score.mines;
     stream << score.bGameCompleted;
     stream << score.dPercentageGameCompleted;
@@ -126,7 +126,7 @@ QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score)
     stream >> charGameDifficulty;
     score.gameDifficulty = (GameDifficulty)charGameDifficulty;
     stream >> score.width;
-    stream >> score.heigth;
+    stream >> score.height;
     stream >> score.mines;
     stream >> score.bGameCompleted;
     stream >> score.dPercentageGameCompleted;

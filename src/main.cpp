@@ -149,7 +149,7 @@ InitializeOptions getOptions(const QStringList& args)
     parser.addVersionOption();
     parser.addOptions({
                 {"width", "Width of the Main Widget - in pixels", "width", "-1"},
-                {"heigth", "Heigth of the Main Widget - in pixels", "heigth", "-1"}
+                {"height", "Height of the Main Widget - in pixels", "height", "-1"}
                       });
 
     parser.process(args);
@@ -157,7 +157,7 @@ InitializeOptions getOptions(const QStringList& args)
     QStringList results = parser.positionalArguments();
 
     w = parser.value("width").toInt();
-    h = parser.value("heigth").toInt();
+    h = parser.value("height").toInt();
     return{h, w};
 }
 

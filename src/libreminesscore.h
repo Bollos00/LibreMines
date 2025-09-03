@@ -73,7 +73,7 @@ public:
     qint64 iTimeInNs;                    ///< Game duration in nanoseconds
     GameDifficulty gameDifficulty;       ///< Difficulty level of the game
     uchar width;                         ///< Game board width (columns)
-    uchar heigth;                        ///< Game board height (rows) 
+    uchar height;                        ///< Game board height (rows) 
     short mines;                         ///< Total number of mines in the game
     bool bGameCompleted;                 ///< Whether the game was successfully completed
     double dPercentageGameCompleted;     ///< Percentage of game completed (0.0 to 1.0)
@@ -139,5 +139,8 @@ QDataStream& operator>> (QDataStream& stream, LibreMinesScore& score);
  * @return Reference to the debug stream for chaining
  */
 QDebug operator<<(QDebug debug, const LibreMinesScore& score);
+
+// Register LibreMinesScore with Qt's meta-object system for QVariant support
+Q_DECLARE_METATYPE(LibreMinesScore)
 
 #endif // LIBREMINESSCORE_H

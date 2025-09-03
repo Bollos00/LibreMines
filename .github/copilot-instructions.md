@@ -43,7 +43,7 @@ LibreMines is a Free/Libre and Open Source Qt6-based Minesweeper clone available
   ```
 - **Manual functionality validation (CRITICAL):**
   ```
-  timeout 10s bash -c "QT_QPA_PLATFORM=offscreen ./libremines --width 800 --heigth 600"
+  timeout 10s bash -c "QT_QPA_PLATFORM=offscreen ./libremines --width 800 --height 600"
   ```
   - Should run for 10 seconds without crashing (exit code 124 is expected from timeout)
   - Audio warnings about missing PulseAudio are normal in headless environments

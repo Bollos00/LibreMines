@@ -56,7 +56,7 @@ void LibreMinesViewScoresDialog::setScores(const QList<LibreMinesScore>& scores)
         {
             QString strDifficulty;
             strDifficulty += QString::number(s.width) + " x ";
-            strDifficulty += QString::number(s.heigth) + " : ";
+            strDifficulty += QString::number(s.height) + " : ";
             strDifficulty += QString::number(s.mines);
 
             if(!tabs.contains(strDifficulty))

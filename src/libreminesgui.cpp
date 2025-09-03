@@ -1245,7 +1245,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                 stream >> s;
 
                 if(s.gameDifficulty == score.gameDifficulty &&
-                   s.heigth == score.heigth &&
+                   s.height == score.height &&
                    s.width == score.width &&
                    s.mines == score.mines)
                 {
@@ -1273,7 +1273,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             else if(score.gameDifficulty == GameDifficulty::CUSTOMIZED)
             {
                 strGameDiffuclty = tr("Customized ") + QString::number(score.width) +
-                                   " x " + QString::number(score.heigth) + " : " +
+                                   " x " + QString::number(score.height) + " : " +
                                    QString::number(score.mines);
             }
 

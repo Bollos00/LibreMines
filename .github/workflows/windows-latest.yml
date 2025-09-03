@@ -65,14 +65,30 @@ jobs:
 
       - name: "Create build directory and run CMake Qt 6.8.3"
         if: matrix.qt-version == '6.8.3'
-        run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
+        run: |
+          mkdir build && cd build
+          if ("${{ inputs.upload_to_release }}" -eq "true") {
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+          } else {
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON ..
+          }
 
       - name: "Create build directory and run CMake Qt 5.15.2"
         if: matrix.qt-version == '5.15.2'
-        run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' .."
+        run: |
+          mkdir build && cd build
+          if ("${{ inputs.upload_to_release }}" -eq "true") {
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' ..
+          } else {
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' -DBUILD_TESTS=ON ..
+          }
 
       - name: "Build"
         run: "cd build && cmake --build . --config Release"
+
+      - name: "Run tests"
+        if: inputs.upload_to_release != true
+        run: "cd build && ctest --extra-verbose --progress --output-on-failure -C Release"
 
       - name: Prepare build artifacts
         run: |
