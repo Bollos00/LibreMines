@@ -1176,8 +1176,20 @@ void TestGameEngine::testTimerStartsOnFirstClick()
     // Timer should not be running initially
     QVERIFY(!engine->isGameActive() || currentTimeSpy.count() == 0);
     
-    // First click should start timer
-    engine->SLOT_cleanCell(2, 2);
+    // Find a non-mined cell to click
+    const auto& matrix = engine->getPrincipalMatrix();
+    bool foundSafeCell = false;
+    for (int x = 0; x < 5 && !foundSafeCell; ++x) {
+        for (int y = 0; y < 5 && !foundSafeCell; ++y) {
+            if (matrix[x][y].value != CellValue::MINE) {
+                // First click should start timer
+                engine->SLOT_cleanCell(x, y);
+                foundSafeCell = true;
+            }
+        }
+    }
+    
+    QVERIFY(foundSafeCell); // Ensure we found and clicked a safe cell
     
     // Wait for timer signals
     bool timerStarted = false;
