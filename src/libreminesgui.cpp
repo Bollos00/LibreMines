@@ -1638,7 +1638,7 @@ void LibreMinesGui::SLOT_exportHighScores()
         if(fileScores && fileScores->exists() && fileScores->copy(backupFileName))
         {
             QMessageBox::information(this, tr("High scores backup complete"),
-                                    tr("Successfully backup high scores to %1").arg('\"'backupFileName + '\"');
+                                    tr("Successfully backup high scores to %1").arg('\"' + backupFileName + '\"');
         }
 
     }
