@@ -265,3 +265,143 @@ Follow these C++ coding standards and patterns that are established in the Libre
 - **Load resources efficiently** - cache pixmaps, reuse objects
 - **Clean up temporary files** and handle platform differences properly
 - **Test resource loading** with both Qt5 and Qt6 compatibility
+
+## Code Documentation Standards
+
+LibreMines follows comprehensive JavaDoc/Doxygen-style documentation practices for all C++ header files. **ALWAYS** maintain these documentation standards when adding or modifying code.
+
+### Documentation Style
+- **Use JavaDoc/Doxygen format** with `@` tags consistently throughout
+- **Document ALL public and protected** classes, methods, enums, and member variables
+- **Follow established patterns** - examine existing header files for reference examples
+- **Maintain professional quality** - documentation should be clear, accurate, and helpful
+
+### File-Level Documentation
+**REQUIRED** for every header file:
+```cpp
+/**
+ * @file filename.h
+ * @brief Concise description of file purpose
+ * @author Bruno Bollos Correa
+ * @date YYYY-MM-DD
+ * 
+ * Detailed description explaining the file's role in the application
+ * architecture, its main components, and how it fits into the larger
+ * system. Include key concepts and relationships to other components.
+ */
+```
+
+### Historical Accuracy Requirements
+- **@date field**: Use actual file creation date from Git history in ISO 8601 format (YYYY-MM-DD)
+  - **NEVER use generic ranges** like "2020-2025"
+  - **Research Git history**: `git log --follow --format=%ad --date=short -- filename.h | tail -1`
+- **@since field**: Use actual version when class/feature was first introduced
+  - **Research release tags**: Check Git tags and release history
+  - Examples: v1.0, v1.1.0, v1.2.0, v1.2.2, v1.4.0, v1.5.0, v1.9.0
+
+### Class Documentation
+**REQUIRED** for every public/protected class:
+```cpp
+/**
+ * @brief One-line summary of class purpose
+ * 
+ * Detailed description of the class responsibilities, key features,
+ * and how it interacts with other components. Include:
+ * - Primary responsibilities and role in application
+ * - Key relationships with other classes
+ * - Usage patterns and important behaviors
+ * - Any architectural significance
+ * 
+ * @since vX.Y.Z
+ */
+class ClassName {
+```
+
+### Method Documentation
+**REQUIRED** for all public/protected methods:
+```cpp
+/**
+ * @brief Concise description of what the method does
+ * 
+ * Optional detailed description for complex methods including
+ * behavior notes, side effects, or usage guidelines.
+ * 
+ * @param paramName Description of parameter purpose and constraints
+ * @param anotherParam Description with type information if needed
+ * @return Description of return value and possible values/states
+ */
+ReturnType methodName(Type paramName, Type anotherParam);
+```
+
+### Qt Signal/Slot Documentation
+**REQUIRED** for all signals and slots:
+```cpp
+/**
+ * @brief Description of when signal is emitted or slot is called
+ * 
+ * @param param Specific meaning of parameter in this signal context
+ */
+void SIGNAL_signalName(Type param);
+
+/**
+ * @brief Description of slot's action and response
+ * 
+ * @param param How this parameter affects the slot's behavior
+ */
+void SLOT_slotName(Type param);
+```
+
+### Enumeration Documentation
+**REQUIRED** with inline comments for each value:
+```cpp
+/**
+ * @brief Purpose and usage of this enumeration
+ * 
+ * Detailed description of when and how this enum is used,
+ * including any important behavioral notes.
+ * 
+ * @since vX.Y.Z
+ */
+enum class EnumName {
+    VALUE_ONE,      ///< Description of what this value represents
+    VALUE_TWO,      ///< Description with behavioral context
+    VALUE_THREE     ///< Description including usage notes
+};
+```
+
+### Member Variable Documentation
+**REQUIRED** for public/protected members:
+```cpp
+class ClassName {
+public:
+    int memberVariable;    ///< Description of variable purpose and usage
+    bool flagMember;       ///< Description of what states this flag represents
+};
+```
+
+### Cross-References and Links
+- **Use @see tags** to link related classes, methods, or concepts:
+  ```cpp
+  * @see RelatedClass
+  * @see RelatedClass::relatedMethod()
+  * @see EnumName for possible values
+  ```
+- **Reference Qt documentation** when using Qt-specific patterns
+- **Link to architectural components** that interact with the documented code
+
+### Documentation Validation
+**ALWAYS verify documentation accuracy:**
+1. **Build successfully** - ensure documentation doesn't break compilation
+2. **Check historical accuracy** - verify dates and versions against Git history
+3. **Review completeness** - ensure all public/protected members are documented
+4. **Test cross-references** - verify @see links point to existing components
+5. **Validate examples** - ensure any code examples compile and work correctly
+
+### Common Patterns in LibreMines
+- **Game engine classes**: Document game logic, state management, and signal emissions
+- **GUI classes**: Document user interaction, widget management, and Qt parent-child relationships
+- **Theme classes**: Document resource loading, pixmap management, and Qt resource system usage
+- **Utility classes**: Document helper functions, data processing, and configuration management
+- **Dialog classes**: Document user workflow, settings persistence, and validation logic
+
+**Remember**: Good documentation is essential for maintainability and contributor onboarding. Treat documentation as seriously as the code itself.
