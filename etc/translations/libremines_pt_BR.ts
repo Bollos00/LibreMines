@@ -4,29 +4,28 @@
 <context>
     <name>LibreMinesGui</name>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="324"/>
+        <location filename="../../src/libreminesgui.cpp" line="184"/>
         <source>Keyboard Controller is invalid</source>
         <translation>Controle com o teclado é inválido</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="325"/>
         <source>Dear user, unfortunately your Keyboard Controller preferences are invalid. Therefore you will not be able to play with the keyboard.
 To fix it go to (Main Meun &gt; Options &gt; Preferences) and edit your preferences.</source>
-        <translation>Caro(a) usuário(a), infelizmente seu controle com teclado é inválido. Dessa forma você não poderá jogar com o teclado.
+        <translation type="vanished">Caro(a) usuário(a), infelizmente seu controle com teclado é inválido. Dessa forma você não poderá jogar com o teclado.
 Para resolver o problema vá para (Menu Principal &gt; Opções &gt; Preferências) e edite suas preferências.</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="550"/>
+        <location filename="../../src/libreminesgui.cpp" line="414"/>
         <source>Options</source>
         <translation>Opções</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="552"/>
+        <location filename="../../src/libreminesgui.cpp" line="416"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="554"/>
+        <location filename="../../src/libreminesgui.cpp" line="418"/>
         <source>Preferences...</source>
         <translation>Preferências...</translation>
     </message>
@@ -35,100 +34,257 @@ Para resolver o problema vá para (Menu Principal &gt; Opções &gt; Preferênci
         <translation type="vanished">Maiores Potuações...</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="555"/>
+        <location filename="../../src/libreminesgui.cpp" line="419"/>
         <source>Toggle Full Screen</source>
         <translation>Trocar Tela Cheia</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="562"/>
+        <location filename="../../src/libreminesgui.cpp" line="426"/>
         <source>About...</source>
         <translation>Sobre...</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="563"/>
+        <location filename="../../src/libreminesgui.cpp" line="427"/>
         <source>About Qt...</source>
         <translation>Sobre Qt...</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="564"/>
+        <location filename="../../src/libreminesgui.cpp" line="428"/>
         <source>GitHub Homepage...</source>
         <translation>Página principal do GitHub...</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="598"/>
+        <location filename="../../src/libreminesgui.cpp" line="477"/>
         <source>Quit</source>
         <translation>Sair</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="597"/>
+        <location filename="../../src/libreminesgui.cpp" line="475"/>
         <source>Restart</source>
         <translation>Reiniciar</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="551"/>
+        <location filename="../../src/libreminesgui.cpp" line="185"/>
+        <source>Dear user, your Keyboard Controller preferences are invalid. Therefore, you will not be able to play with the keyboard.
+To fix it, go to (Main Menu &gt; Options &gt; Preferences) and edit your preferences.</source>
+        <translation type="unfinished">Caro(a) usuário(a), seu controle com teclado está inválido. Dessa forma você não poderá jogar com o teclado.
+Para resolver o problema vá para (Menu Principal &gt; Opções &gt; Preferências) e edite suas preferências.</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="415"/>
         <source>High Scores</source>
         <translation>Maiores Pontuações</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="558"/>
+        <location filename="../../src/libreminesgui.cpp" line="422"/>
         <source>Show High Scores...</source>
         <translation>Mostrar Maiores Pontuações...</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="559"/>
+        <location filename="../../src/libreminesgui.cpp" line="423"/>
         <source>Import High Scores...</source>
         <translation>Importar Maiores Pontuações...</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="560"/>
+        <location filename="../../src/libreminesgui.cpp" line="424"/>
         <source>Export High Scores...</source>
         <translation>Exportar Maiores Pontuações...</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="599"/>
+        <location filename="../../src/libreminesgui.cpp" line="479"/>
+        <location filename="../../src/libreminesgui.cpp" line="877"/>
         <source>Save Minefield as Image</source>
         <translation>Salvar Campo Minado como Imagem</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="600"/>
+        <location filename="../../src/libreminesgui.cpp" line="481"/>
         <source>Save Score</source>
         <translation>Salvar Pontuação</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="613"/>
-        <location filename="../../src/libreminesgui.cpp" line="1290"/>
+        <location filename="../../src/libreminesgui.cpp" line="494"/>
+        <source>Easy
+
+8x8
+
+%1 Mines</source>
+        <translation>Fácil
+
+8x8
+
+%1 Bombas</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="498"/>
+        <source>Medium
+
+16x16
+
+%1 Mines</source>
+        <translation>Médio
+
+16x16
+
+%1 Bombas</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="503"/>
+        <source>Hard
+
+30x16
+
+%1 Mines</source>
+        <translation>Difícil
+
+30x16
+
+%1 Bombas</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="886"/>
+        <source>Save Minefield
+as Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1187"/>
+        <source>Total time: %1 secs</source>
+        <translation>Tempo total: %1 segs</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1188"/>
+        <source>Correct Flags: %1</source>
+        <translation>Bandeiras Corretas: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1189"/>
+        <source>Wrong Flags: %1</source>
+        <translation>Bandeiras Erradas: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1190"/>
+        <source>Unlocked Cells: %1</source>
+        <translation>Células Desbloqueadas: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1192"/>
+        <source>Flags/s: %1</source>
+        <translation>Bandeiras/s: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1193"/>
+        <source>Cells/s: %1</source>
+        <translation>Células/s: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1195"/>
+        <source>Game Complete: %1 %</source>
+        <translation>Jogo Completo: %1 %</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1268"/>
         <source>Easy</source>
         <translation>Fácil</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="613"/>
-        <source>10 Mines</source>
-        <translation>10 Bombas</translation>
+        <location filename="../../src/libreminesgui.cpp" line="1275"/>
+        <source>Customized %1 x %2 : %3</source>
+        <translation>Personalizado %1 x %2 : %3</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="617"/>
-        <location filename="../../src/libreminesgui.cpp" line="1292"/>
+        <location filename="../../src/libreminesgui.cpp" line="1397"/>
+        <source>You Win!
+Difficulty: EASY</source>
+        <translation>Você Venceu!
+Dificuldade: FÁCIL</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1400"/>
+        <source>You Win!
+Difficulty: MEDIUM</source>
+        <translation>Você Venceu!
+Dificuldade: MÉDIO</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1403"/>
+        <source>You Win!
+Difficulty: HARD</source>
+        <translation>Você Venceu!
+Dificuldade: DIFÍCIL</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1406"/>
+        <source>You Win!
+Difficulty: CUSTOM
+%1x%2 : %3 Mines</source>
+        <translation>Você Venceu!
+Dificuldade: PERSONALIZADO
+%1x%2 : %3 Bombas</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1435"/>
+        <source>You Lost
+Difficulty: EASY</source>
+        <translation>Você Perdeu
+Dificuldade: FÁCIL</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1438"/>
+        <source>You Lost
+Difficulty: MEDIUM</source>
+        <translation>Você Perdeu
+Dificuldade: MÉDIO</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1441"/>
+        <source>You Lost
+Difficulty: HARD</source>
+        <translation>Você Perdeu
+Dificuldade: DIFÍCIL</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1444"/>
+        <source>You Lost
+Difficulty: CUSTOM
+%1x%2 : %3 Mines</source>
+        <translation>Você Perdeu
+Dificuldade: PERSONALIZADO
+%1x%2 : %3 Bombas</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1640"/>
+        <source>High scores backup complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1641"/>
+        <source>Successfully backup high scores to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>10 Mines</source>
+        <translation type="vanished">10 Bombas</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1270"/>
         <source>Medium</source>
         <translation>Médio</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="617"/>
         <source>40 Mines</source>
-        <translation>40 Bombas</translation>
+        <translation type="vanished">40 Bombas</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="622"/>
-        <location filename="../../src/libreminesgui.cpp" line="1294"/>
+        <location filename="../../src/libreminesgui.cpp" line="1272"/>
         <source>Hard</source>
         <translation>Difícil</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="622"/>
         <source>99 Mines</source>
-        <translation>99 Bombas</translation>
+        <translation type="vanished">99 Bombas</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1563"/>
+        <location filename="../../src/libreminesgui.cpp" line="1523"/>
         <source>Copyright (C) 2020-2025  Bruno Bollos Correa
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -142,192 +298,168 @@ Get the source code of LibreMines on
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1619"/>
+        <location filename="../../src/libreminesgui.cpp" line="1579"/>
         <source>Import high scores from file</source>
         <translation>Importe arquivo de maiores pontuações</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1642"/>
+        <location filename="../../src/libreminesgui.cpp" line="1602"/>
         <source>Invalid high scores file</source>
         <translation>Arquivo de maiores pontuações inválido</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1643"/>
+        <location filename="../../src/libreminesgui.cpp" line="1603"/>
         <source>Error parsing the data of the file!</source>
         <translation>Erro analisando os dados do arquivo!</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1658"/>
+        <location filename="../../src/libreminesgui.cpp" line="1619"/>
         <source>High scores import complete</source>
         <translation>Importação de maiores pontuações completa</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1659"/>
+        <location filename="../../src/libreminesgui.cpp" line="1620"/>
         <source>Operation completed!</source>
         <translation>Operação concluída!</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1669"/>
+        <location filename="../../src/libreminesgui.cpp" line="1621"/>
+        <source>Old high score file has been saved to &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1631"/>
         <source>Backup high scores to file</source>
         <translation>Realize backup de maiores pontuações em um arquivo</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1678"/>
         <source>High scores bakcup complete</source>
-        <translation>Backup de maiores pontuações concluída</translation>
+        <translation type="vanished">Backup de maiores pontuações concluída</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1679"/>
         <source>Successfully backup high scores to &quot;</source>
-        <translation>Backup de maiores pontuações finalizado com sucesso em </translation>
+        <translation type="vanished">Backup de maiores pontuações finalizado com sucesso em </translation>
     </message>
     <message>
         <source>Customized New Game</source>
         <translation type="vanished">Novo Jogo Customizado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="626"/>
+        <location filename="../../src/libreminesgui.cpp" line="507"/>
         <source>Customized Game</source>
         <translation>Jogo Customizado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="653"/>
+        <location filename="../../src/libreminesgui.cpp" line="535"/>
         <source>Width: </source>
         <translation>Largura: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="656"/>
+        <location filename="../../src/libreminesgui.cpp" line="538"/>
         <source>Height: </source>
         <translation>Altura: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="659"/>
+        <location filename="../../src/libreminesgui.cpp" line="541"/>
         <source>Percent of Mines: </source>
         <translation>Porcentagem de Bombas: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="662"/>
+        <location filename="../../src/libreminesgui.cpp" line="544"/>
         <source>Number of Mines: </source>
         <translation>Número de Bombas: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1035"/>
-        <location filename="../../src/libreminesgui.cpp" line="1067"/>
-        <location filename="../../src/libreminesgui.cpp" line="1546"/>
+        <location filename="../../src/libreminesgui.cpp" line="1019"/>
+        <location filename="../../src/libreminesgui.cpp" line="1051"/>
+        <location filename="../../src/libreminesgui.cpp" line="1506"/>
         <source>There is a game happening.</source>
         <translation>Um jogo está ocorrendo.</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1036"/>
-        <location filename="../../src/libreminesgui.cpp" line="1068"/>
-        <location filename="../../src/libreminesgui.cpp" line="1547"/>
+        <location filename="../../src/libreminesgui.cpp" line="1020"/>
+        <location filename="../../src/libreminesgui.cpp" line="1052"/>
+        <location filename="../../src/libreminesgui.cpp" line="1507"/>
         <source>Are you sure you want to quit?</source>
         <translation>Você tem certeza que deseja sair?</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1218"/>
         <source>Total time: </source>
-        <translation>Tempo total: </translation>
+        <translation type="vanished">Tempo total: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1218"/>
         <source> secs</source>
-        <translation> segs</translation>
+        <translation type="vanished"> segs</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1219"/>
         <source>Correct Flags: </source>
-        <translation>Bandeiras corretas: </translation>
+        <translation type="vanished">Bandeiras corretas: </translation>
     </message>
     <message>
         <source>WrongFlags: </source>
         <translation type="vanished">Bandeiras Incorretas: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1220"/>
         <source>Wrong Flags: </source>
-        <translation>Bandeiras Incorretas: </translation>
+        <translation type="vanished">Bandeiras Incorretas: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1221"/>
         <source>Unlocked Cells: </source>
-        <translation>Células Desbloqueadas: </translation>
+        <translation type="vanished">Células Desbloqueadas: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1223"/>
         <source>Flags/s: </source>
-        <translation>Bandeiras/seg : </translation>
+        <translation type="vanished">Bandeiras/seg : </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1224"/>
         <source>Cells/s: </source>
-        <translation>Células/seg: </translation>
+        <translation type="vanished">Células/seg: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1226"/>
         <source>Game Complete: </source>
-        <translation>Jogo Completo: </translation>
+        <translation type="vanished">Jogo Completo: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1297"/>
         <source>Customized </source>
-        <translation>Customizado </translation>
+        <translation type="vanished">Customizado </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1427"/>
-        <location filename="../../src/libreminesgui.cpp" line="1430"/>
-        <location filename="../../src/libreminesgui.cpp" line="1433"/>
-        <location filename="../../src/libreminesgui.cpp" line="1436"/>
         <source>You Won</source>
-        <translation>Você venceu</translation>
+        <translation type="vanished">Você venceu</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1427"/>
-        <location filename="../../src/libreminesgui.cpp" line="1469"/>
         <source>Difficulty: EASY</source>
-        <translation>Dificuldade: FÁCIL</translation>
+        <translation type="vanished">Dificuldade: FÁCIL</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1430"/>
-        <location filename="../../src/libreminesgui.cpp" line="1472"/>
         <source>Difficulty: MEDIUM</source>
-        <translation>Dificuldade: MÉDIO</translation>
+        <translation type="vanished">Dificuldade: MÉDIO</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1433"/>
-        <location filename="../../src/libreminesgui.cpp" line="1475"/>
         <source>Difficulty: HARD</source>
-        <translation>Dificuldade: DIFÍCIL</translation>
+        <translation type="vanished">Dificuldade: DIFÍCIL</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1436"/>
-        <location filename="../../src/libreminesgui.cpp" line="1478"/>
         <source>Difficulty: CUSTOM
 </source>
-        <translation>Dificuldade: CUSTOMIZADO
+        <translation type="vanished">Dificuldade: CUSTOMIZADO
 </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1439"/>
-        <location filename="../../src/libreminesgui.cpp" line="1484"/>
         <source> Mines</source>
-        <translation> Bombas</translation>
+        <translation type="vanished"> Bombas</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1469"/>
-        <location filename="../../src/libreminesgui.cpp" line="1472"/>
-        <location filename="../../src/libreminesgui.cpp" line="1475"/>
-        <location filename="../../src/libreminesgui.cpp" line="1478"/>
         <source>You Lost</source>
-        <translation>Você Perdeu</translation>
+        <translation type="vanished">Você Perdeu</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1711"/>
+        <location filename="../../src/libreminesgui.cpp" line="1673"/>
         <source>Save Minefield as image</source>
         <translation>Salvar Campo Minado como Imagem</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1713"/>
+        <location filename="../../src/libreminesgui.cpp" line="1675"/>
         <source>Image (*.bmp *.jpg *png *.jpeg)</source>
         <translation>Imagem (*.bmp *.jpg *png *.jpeg)</translation>
     </message>
@@ -398,144 +530,144 @@ clicar numa célula vizinha</translation>
         <translation>Comprimento mínimo da célula</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="84"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="87"/>
         <source>Maximum cell length</source>
         <translation>Comprimento máximo da célula</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="108"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="114"/>
         <source>Minefield Generation
 Animation</source>
         <translation>Animação na geração
 do campo minado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="175"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="181"/>
         <source>User Information</source>
         <translation>Informações do usuário</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="183"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="189"/>
         <source>Username</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="276"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="282"/>
         <source>Language Settings</source>
         <translation>Opções de Idioma</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="284"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="290"/>
         <source>Language</source>
         <translation>Idioma</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="299"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="305"/>
         <source>Sound effects</source>
         <translation>Efeitos sonoros</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="305"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="311"/>
         <source>Mute</source>
         <translation>Mudo</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="317"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="323"/>
         <source>Volume: </source>
         <translation>Volume:</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="346"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="352"/>
         <source>Keyboard Controller</source>
         <translation>Controlador com o teclado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="354"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="360"/>
         <source>Move left</source>
         <translation>Mover-se à esquerda</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="387"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="393"/>
         <source>Move upwards</source>
         <translation>Mover-se para cima</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="420"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="426"/>
         <source>Move right</source>
         <translation>Mover-se à direita</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="453"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="459"/>
         <source>Move downwards</source>
         <translation>Mover-se para baixo</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="486"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="492"/>
         <source>Clean cell</source>
         <translation>Limpar célula</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="519"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="525"/>
         <source>(Un)flag cell</source>
         <translation>(Des)marcar célula</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="552"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="558"/>
         <source>Center cell on the scroll area</source>
         <translation>Centrar célula na área de rolagem</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="585"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="591"/>
         <source>When CTRL is pressed</source>
         <translation>Quando CTRL estiver pressionado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="198"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="204"/>
         <source>Scores</source>
         <translation>Pontuações</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="219"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="225"/>
         <source>Ask to save the match score:</source>
         <translation>Pergunte para salvar a pontuação da partida:</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="225"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="231"/>
         <source>Always</source>
         <translation>Sempre</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="235"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="241"/>
         <source>When a new high score is achieved or when the game is completed</source>
         <translation>Quando um novo recorde é alcançado ou quando o jogo é finalizado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="245"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="251"/>
         <source>When a new high score is achieved</source>
         <translation>Quando um novo recorde é alcançado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="252"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="258"/>
         <source>When the game is completed</source>
         <translation>Quando o jogo é finalizado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="259"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="265"/>
         <source>Never</source>
         <translation>Nunca</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="132"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="138"/>
         <source>Application style:</source>
         <translation>Estilo da aplicação:</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="146"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="152"/>
         <source>Minefield theme:</source>
         <translation>Tema do campo minado:</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="160"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="166"/>
         <source>Faces reaction:</source>
         <translation></translation>
     </message>
@@ -568,52 +700,52 @@ do campo minado</translation>
         <translation type="obsolete">Quando CTRL estiver pressionado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="124"/>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="130"/>
         <source>Appearance</source>
         <translation>Visual</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="87"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="54"/>
         <source>Go to the Edge</source>
         <translation>Ir às bordas</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="87"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="54"/>
         <source>Jump 3 Cells</source>
         <translation>Pular 3 células</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="88"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="55"/>
         <source>Jump 5 Cells</source>
         <translation>Pular 5 células</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="88"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="55"/>
         <source>Jump 10 Cells</source>
         <translation>Pular 10 células</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="92"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="59"/>
         <source>On</source>
         <translation>Ativado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="92"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="59"/>
         <source>Limited</source>
         <translation>Limitado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="92"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="59"/>
         <source>Off</source>
         <translation>Desativado</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="436"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="398"/>
         <source>Restart LibreMines to apply this preference!</source>
         <translation>Reinicie LibreMines para aplicar essa preferência!</translation>
     </message>
     <message>
-        <location filename="../../src/libreminespreferencesdialog.cpp" line="437"/>
+        <location filename="../../src/libreminespreferencesdialog.cpp" line="399"/>
         <source>Please restart the application to redefine your language</source>
         <translation>Por favor reinicie a aplicação para redefinir o idioma</translation>
     </message>
@@ -652,8 +784,12 @@ do campo minado</translation>
     </message>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="58"/>
+        <source>%1th</source>
+        <translation>%1º</translation>
+    </message>
+    <message>
         <source>th</source>
-        <translation>º</translation>
+        <translation type="vanished">º</translation>
     </message>
 </context>
 <context>
@@ -708,8 +844,12 @@ do campo minado</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="97"/>
+        <source>%1th</source>
+        <translation>%1º</translation>
+    </message>
+    <message>
         <source>th</source>
-        <translation>º</translation>
+        <translation type="vanished">º</translation>
     </message>
 </context>
 </TS>

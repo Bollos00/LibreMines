@@ -74,6 +74,7 @@ if(UPDATE_TRANSLATIONS)
     set(TS_FILES
         etc/translations/${PROJECT_NAME}_es.ts
         etc/translations/${PROJECT_NAME}_pt_BR.ts
+        etc/translations/${PROJECT_NAME}_tr.ts
         )
     # Put the QM Files on `etc/translations`
     set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR}/etc/translations)

@@ -96,36 +96,157 @@ Bu durumu çözmek için (Ana Menü &gt; Seçenekler &gt; Tercihler) adımların
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="494"/>
+        <source>Easy
+
+8x8
+
+%1 Mines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="498"/>
+        <source>Medium
+
+16x16
+
+%1 Mines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="503"/>
+        <source>Hard
+
+30x16
+
+%1 Mines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1187"/>
+        <source>Total time: %1 secs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1188"/>
+        <source>Correct Flags: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1189"/>
+        <source>Wrong Flags: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1190"/>
+        <source>Unlocked Cells: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1192"/>
+        <source>Flags/s: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1193"/>
+        <source>Cells/s: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1195"/>
+        <source>Game Complete: %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../src/libreminesgui.cpp" line="1268"/>
         <source>Easy</source>
         <translation>Kolay</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="494"/>
-        <source>10 Mines</source>
-        <translation>10 Mayın</translation>
+        <location filename="../../src/libreminesgui.cpp" line="1275"/>
+        <source>Customized %1 x %2 : %3</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="498"/>
+        <location filename="../../src/libreminesgui.cpp" line="1397"/>
+        <source>You Win!
+Difficulty: EASY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1400"/>
+        <source>You Win!
+Difficulty: MEDIUM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1403"/>
+        <source>You Win!
+Difficulty: HARD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1406"/>
+        <source>You Win!
+Difficulty: CUSTOM
+%1x%2 : %3 Mines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1435"/>
+        <source>You Lost
+Difficulty: EASY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1438"/>
+        <source>You Lost
+Difficulty: MEDIUM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1441"/>
+        <source>You Lost
+Difficulty: HARD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1444"/>
+        <source>You Lost
+Difficulty: CUSTOM
+%1x%2 : %3 Mines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1621"/>
+        <source>Old high score file has been saved to &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1641"/>
+        <source>Successfully backup high scores to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>10 Mines</source>
+        <translation type="vanished">10 Mayın</translation>
+    </message>
+    <message>
         <location filename="../../src/libreminesgui.cpp" line="1270"/>
         <source>Medium</source>
         <translation>Orta</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="498"/>
         <source>40 Mines</source>
-        <translation>40 Mayın</translation>
+        <translation type="vanished">40 Mayın</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="503"/>
         <location filename="../../src/libreminesgui.cpp" line="1272"/>
         <source>Hard</source>
         <translation>Zor</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="503"/>
         <source>99 Mines</source>
-        <translation>99 Mayın</translation>
+        <translation type="vanished">99 Mayın</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="507"/>
@@ -174,102 +295,75 @@ as Image</source>
         <translation type="unfinished">Ayrılmak istediğinize emin misiniz?</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1187"/>
         <source>Total time: </source>
-        <translation>Toplam süre: </translation>
+        <translation type="vanished">Toplam süre: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1187"/>
         <source> secs</source>
-        <translation> saniye</translation>
+        <translation type="vanished"> saniye</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1188"/>
         <source>Correct Flags: </source>
         <translatorcomment>Translated as &quot;Correctly Placed Flag Count: &quot;, which is the best way to show in my knowledge .</translatorcomment>
-        <translation type="unfinished">Doğru Yerleştirilen Bayrak Sayısı: </translation>
+        <translation type="obsolete">Doğru Yerleştirilen Bayrak Sayısı: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1189"/>
         <source>Wrong Flags: </source>
         <translatorcomment>Translated as &quot;Falsely Placed Flag Count: &quot;, which is the best way to show in my knowledge .</translatorcomment>
-        <translation type="unfinished">Yanlış Yerleştirilen Bayrak Sayısı: </translation>
+        <translation type="obsolete">Yanlış Yerleştirilen Bayrak Sayısı: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1190"/>
         <source>Unlocked Cells: </source>
-        <translation>Gösterilen Hücre Sayısı: </translation>
+        <translation type="vanished">Gösterilen Hücre Sayısı: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1192"/>
         <source>Flags/s: </source>
         <translatorcomment>Translated as &quot;Flags Placed Per Second: &quot;.</translatorcomment>
-        <translation type="unfinished">Saniye Başına Yerleştirilen Bayrak: </translation>
+        <translation type="obsolete">Saniye Başına Yerleştirilen Bayrak: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1193"/>
         <source>Cells/s: </source>
         <translatorcomment>Translated as &quot;Revealed Cells Per Second: &quot;.</translatorcomment>
-        <translation type="unfinished">Saniye Başına Gösterilen Hücre: </translation>
+        <translation type="obsolete">Saniye Başına Gösterilen Hücre: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1195"/>
         <source>Game Complete: </source>
-        <translation>Tamamlanma Oranı: </translation>
+        <translation type="vanished">Tamamlanma Oranı: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1275"/>
         <source>Customized </source>
-        <translation>Özelleştirilmiş </translation>
+        <translation type="vanished">Özelleştirilmiş </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1396"/>
-        <location filename="../../src/libreminesgui.cpp" line="1433"/>
         <source>Difficulty: EASY</source>
-        <translation>Zorluk: KOLAY</translation>
+        <translation type="vanished">Zorluk: KOLAY</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1396"/>
-        <location filename="../../src/libreminesgui.cpp" line="1399"/>
-        <location filename="../../src/libreminesgui.cpp" line="1402"/>
-        <location filename="../../src/libreminesgui.cpp" line="1405"/>
         <source>You Win!</source>
-        <translation>Kazandın!</translation>
+        <translation type="vanished">Kazandın!</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1399"/>
-        <location filename="../../src/libreminesgui.cpp" line="1436"/>
         <source>Difficulty: MEDIUM</source>
-        <translation>Zorluk: ORTA</translation>
+        <translation type="vanished">Zorluk: ORTA</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1402"/>
-        <location filename="../../src/libreminesgui.cpp" line="1439"/>
         <source>Difficulty: HARD</source>
-        <translation>Zorluk: ZOR</translation>
+        <translation type="vanished">Zorluk: ZOR</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1405"/>
-        <location filename="../../src/libreminesgui.cpp" line="1442"/>
         <source>Difficulty: CUSTOM
 </source>
-        <translation>Zorluk: ÖZEL
+        <translation type="vanished">Zorluk: ÖZEL
 </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1408"/>
-        <location filename="../../src/libreminesgui.cpp" line="1448"/>
         <source> Mines</source>
         <translatorcomment>I don&apos;t know how it looks like in the game, switch to &quot;Mayın&quot; if it&apos;s being used in quantities (35 Mines &gt; 35 Mayın).</translatorcomment>
-        <translation type="unfinished"> Mayınlar</translation>
+        <translation type="obsolete"> Mayınlar</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1433"/>
-        <location filename="../../src/libreminesgui.cpp" line="1436"/>
-        <location filename="../../src/libreminesgui.cpp" line="1439"/>
-        <location filename="../../src/libreminesgui.cpp" line="1442"/>
         <source>You Lost</source>
-        <translation>Kaybettin</translation>
+        <translation type="vanished">Kaybettin</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1523"/>
@@ -313,35 +407,33 @@ Get the source code of LibreMines on
         <translation>İşlem tamamlandı!</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1621"/>
         <source>Old high score file has been saved to</source>
         <translatorcomment>Means &quot;Old high score file has been saved to this file: backupScorePath&quot;. To improve quality, backupScorePath needs to be inside of the sentence.</translatorcomment>
-        <translation type="unfinished">Eski en iyi skor dosyası şuraya kaydedildi: </translation>
+        <translation type="obsolete">Eski en iyi skor dosyası şuraya kaydedildi: </translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1632"/>
+        <location filename="../../src/libreminesgui.cpp" line="1631"/>
         <source>Backup high scores to file</source>
         <translation>En iyi skorları dosyaya çıkart</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1641"/>
+        <location filename="../../src/libreminesgui.cpp" line="1640"/>
         <source>High scores backup complete</source>
         <translatorcomment>Translated as &quot;Backup is successful&quot;.</translatorcomment>
         <translation type="unfinished">Yedekleme başarılı</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1642"/>
         <source>Successfully backup high scores to &quot;</source>
         <translatorcomment>Means &quot;Successfully backed up high scores to this file: backupFileName&quot;. To improve quality, backupFileName needs to be inside of the sentence.</translatorcomment>
-        <translation type="unfinished">En iyi skorlar şuraya başarılı bir şekilde aktarıldı:</translation>
+        <translation type="obsolete">En iyi skorlar şuraya başarılı bir şekilde aktarıldı:</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1674"/>
+        <location filename="../../src/libreminesgui.cpp" line="1673"/>
         <source>Save Minefield as image</source>
         <translation>Mayın Tarlasını Fotoğraf Olarak Kaydet</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1676"/>
+        <location filename="../../src/libreminesgui.cpp" line="1675"/>
         <source>Image (*.bmp *.jpg *png *.jpeg)</source>
         <translation>Fotoğraf (*.bmp *.jpg *.png *.jpeg)</translation>
     </message>
@@ -613,9 +705,13 @@ Animasyonu</translation>
     </message>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="58"/>
+        <source>%1th</source>
+        <translation>%1.</translation>
+    </message>
+    <message>
         <source>th</source>
         <translatorcomment>???</translatorcomment>
-        <translation type="unfinished">th</translation>
+        <translation type="obsolete">th</translation>
     </message>
 </context>
 <context>
@@ -670,9 +766,13 @@ Animasyonu</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="97"/>
+        <source>%1th</source>
+        <translation>%1.</translation>
+    </message>
+    <message>
         <source>th</source>
         <translatorcomment>???</translatorcomment>
-        <translation type="unfinished">th</translation>
+        <translation type="obsolete">th</translation>
     </message>
 </context>
 </TS>

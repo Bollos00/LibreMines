@@ -199,6 +199,14 @@ void loadLanguagePreference()
             else
                 delete translator;
         }
+        else if(usrLocale.language() == QLocale::Turkish)
+        {
+            QTranslator* translator = new QTranslator();
+            if(translator->load(":/translations/libremines_tr.qm"))
+                qApp->installTranslator(translator);
+            else
+                delete translator;
+        }
 //        else if(usrLocale.language() == QLocale::Spanish)
 //        {
 //            QTranslator* translator = new QTranslator();
