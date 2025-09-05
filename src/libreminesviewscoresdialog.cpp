@@ -94,7 +94,7 @@ void LibreMinesViewScoresDialog::setScores(const QList<LibreMinesScore>& scores)
 
         for(int i=4; i<=tab.scores.size(); ++i)
         {
-            tableVerticalHeader.append(QString::number(i) + tr("th"));
+            tableVerticalHeader.append(tr("%1th").arg(i));
         }
         tab.table->setVerticalHeaderLabels(tableVerticalHeader);
 
