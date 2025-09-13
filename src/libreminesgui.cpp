@@ -1245,7 +1245,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
                 stream >> s;
 
                 if(s.gameDifficulty == score.gameDifficulty &&
-                   s.heigth == score.heigth &&
+                   s.height == score.height &&
                    s.width == score.width &&
                    s.mines == score.mines)
                 {
@@ -1274,7 +1274,7 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             {
                 strGameDiffuclty = tr("Customized %1 x %2 : %3")
                                    .arg(score.width)
-                                   .arg(score.heigth)
+                                   .arg(score.height)
                                    .arg(score.mines);
             }
 

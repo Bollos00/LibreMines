@@ -31,10 +31,13 @@ jobs:
 
       - name: "Create build directory and run CMake"
         run: "mkdir build && cd build && \
-          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr .."
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTS=ON .."
 
       - name: "Build"
         run: "cd build && make"
+
+      - name: "Run tests"
+        run: "cd build && ctest --verbose --progress --output-on-failure"
       
       - name: Prepare build artifacts
         run: |
