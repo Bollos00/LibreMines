@@ -80,6 +80,36 @@ public:
      */
     uchar getYCell();
 
+    /**
+     * @brief Set pixmap with pre-cached inverted version for performance
+     * 
+     * This method pre-computes the inverted version of the pixmap to avoid
+     * expensive real-time image processing during mouse events. The inverted
+     * version is cached and used for visual feedback during user interactions.
+     * 
+     * @param pixmap The normal pixmap to display and cache
+     */
+    void setPixmapCached(const QPixmap& pxmap);
+
+    /**
+     * @brief Switch to the pre-cached inverted pixmap for visual feedback
+     * 
+     * Instantly switches the label display to the inverted pixmap version
+     * that was pre-computed during setPixmapCached(). This provides immediate
+     * visual feedback during mouse press events without expensive real-time
+     * image processing. Only switches if currently displaying normal pixmap.
+     */
+    void setPixmapInverted();
+
+    /**
+     * @brief Switch back to the normal pixmap state
+     * 
+     * Instantly switches the label display back to the normal pixmap version.
+     * Used to restore the standard appearance after mouse release events.
+     * Only switches if currently displaying inverted pixmap.
+     */
+    void setPixmapNormal();
+
 protected:
     /**
      * @brief Handle mouse release events
@@ -104,6 +134,10 @@ protected:
 private:
     const uchar xCell; ///< X coordinate (column) of this cell in the game grid
     const uchar yCell; ///< Y coordinate (row) of this cell in the game grid
+
+    QPixmap normalPixmap;    ///< Normal pixmap state for the label
+    QPixmap invertedPixmap;  ///< Pre-computed inverted pixmap for visual feedback
+    bool isInverted = false; ///< Current state tracking for proper pixmap management
 
 Q_SIGNALS:
     /**

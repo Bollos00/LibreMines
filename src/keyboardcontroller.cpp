@@ -229,16 +229,11 @@ void KeyboardController::setCurrentCell(const uchar x, const uchar y, LibreMines
 
     if(cellGE.isHidden)
     {
-        QImage img = gui->fieldTheme.getPixmapButton(cellGE.flagState).toImage();
-        img.invertPixels();
-        cellGui.button->setIcon(QIcon(QPixmap::fromImage(img)));
+        cellGui.button->setIconInverted();
     }
     else
     {
-        QImage img = gui->fieldTheme.getPixmapFromCellValue(cellGE.value).toImage();
-        img.invertPixels();
-
-        cellGui.label->setPixmap(QPixmap::fromImage(img));
+        cellGui.label->setPixmapInverted();
     }
 
     gui->scrollAreaBoard->ensureVisible(
@@ -254,11 +249,11 @@ void KeyboardController::unsetCurrentCell(LibreMinesGui* gui)
 
     if(cellGE.isHidden)
     {
-        cellGui.button->setIcon(QIcon(gui->fieldTheme.getPixmapButton(cellGE.flagState)));
+        cellGui.button->setIconNormal();
     }
     else
     {
-        cellGui.label->setPixmap(gui->fieldTheme.getPixmapFromCellValue(cellGE.value));
+        cellGui.label->setPixmapNormal();
     }
 }
 

@@ -185,6 +185,17 @@ private:
 
     void vUpdatePreferences();
 
+    /**
+     * @brief Update face reaction only if state has changed
+     * 
+     * Optimized method to update the face reaction display that tracks
+     * the current state and only performs GUI updates when the face
+     * reaction actually changes. Eliminates redundant pixmap updates.
+     * 
+     * @param newState The new face reaction state to display
+     */
+    void updateFaceReaction(FacesReaction::GameEvent newState);
+
 private Q_SLOTS:
     /**
      * @brief
@@ -336,6 +347,7 @@ private:
 
     MinefieldTheme fieldTheme;
     FacesReaction facesReac;
+    FacesReaction::GameEvent currentFaceState; ///< Current face reaction state to avoid redundant updates
 
     KeyboardController controller;
 

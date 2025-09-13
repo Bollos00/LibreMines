@@ -39,29 +39,49 @@ uchar QLabel_adapted::getYCell()
     return yCell;
 }
 
+void QLabel_adapted::setPixmapCached(const QPixmap& pxmap)
+{
+    // Store the normal pixmap
+    normalPixmap = pxmap;
+
+    // Pre-compute and store inverted version once
+    QImage img = pxmap.toImage();
+    img.invertPixels();
+    invertedPixmap = QPixmap::fromImage(img);
+
+    // Set the normal pixmap initially
+    setPixmap(normalPixmap);
+    isInverted = false;
+}
+
+void QLabel_adapted::setPixmapInverted()
+{
+    // Cached pixmap swap
+    if (!isInverted) {
+        setPixmap(invertedPixmap);
+        isInverted = true;
+    }
+}
+
+void QLabel_adapted::setPixmapNormal()
+{
+    // Cached pixmap swap
+    if (isInverted) {
+        setPixmap(normalPixmap);
+        isInverted = false;
+    }
+}
+
 void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
 {
-
-#if QT_VERSION > QT_VERSION_CHECK(5, 15, 0)
-    QImage img = pixmap(Qt::ReturnByValue).toImage();
-#else
-    QImage img = pixmap()->toImage();
-#endif
-    img.invertPixels();
-    setPixmap(QPixmap::fromImage(img));
+    setPixmapNormal();
 
     Q_EMIT SIGNAL_released(e);
 }
 
 void QLabel_adapted::mousePressEvent(QMouseEvent *e)
 {
-#if QT_VERSION > QT_VERSION_CHECK(5, 15, 0)
-    QImage img = pixmap(Qt::ReturnByValue).toImage();
-#else
-    QImage img = pixmap()->toImage();
-#endif
-    img.invertPixels();
-    setPixmap(QPixmap::fromImage(img));
+    setPixmapInverted();
 
     Q_EMIT SIGNAL_clicked(e);
 }
