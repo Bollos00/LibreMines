@@ -1,0 +1,87 @@
+name: AppImage Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version tag for the release'
+        required: false
+        type: string
+        default: ''
+      upload_to_release:
+        description: 'Whether to upload artifacts to a release'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  appimage:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential qt6-base-dev qt6-tools-dev cmake \
+            libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev fuse libfuse2
+      
+      - name: Build LibreMines
+        run: |
+          mkdir build && cd build
+          if [ "${{ inputs.upload_to_release }}" = "true" ]; then
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ..
+          else
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTS=ON ..
+          fi
+          make -j$(nproc)
+
+      - name: "Run tests"
+        if: inputs.upload_to_release != true
+        run: "cd build && ctest --verbose --progress --output-on-failure"
+
+      - name: Install LibreMines
+        run: |
+          cd build
+          make install DESTDIR=AppDir
+      
+      - name: Download linuxdeploy tools and AppImage runtime
+        run: |
+          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          wget https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
+          chmod +x linuxdeploy*.AppImage appimagetool-x86_64.AppImage
+      
+      - name: Create AppImage
+        run: |
+          cd build
+          export QML_SOURCES_PATHS=""
+          export QMAKE=/usr/bin/qmake6
+          # Bundle Qt6 dependencies with linuxdeploy
+          ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt
+          # Create final AppImage with appimagetool using pre-downloaded runtime
+          ../appimagetool-x86_64.AppImage --runtime-file ../runtime-x86_64 AppDir
+
+      - name: Rename AppImage for Release
+        if: inputs.upload_to_release
+        run: |
+          cd build
+          mv *.AppImage "LibreMines-${{ inputs.version }}-x86_64.AppImage"
+      
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: LibreMines-AppImage-x86_64
+          path: build/*.AppImage
+          
+      - name: Upload to Release
+        if: inputs.upload_to_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.AppImage

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -149,7 +149,7 @@ InitializeOptions getOptions(const QStringList& args)
     parser.addVersionOption();
     parser.addOptions({
                 {"width", "Width of the Main Widget - in pixels", "width", "-1"},
-                {"heigth", "Heigth of the Main Widget - in pixels", "heigth", "-1"}
+                {"height", "Height of the Main Widget - in pixels", "height", "-1"}
                       });
 
     parser.process(args);
@@ -157,7 +157,7 @@ InitializeOptions getOptions(const QStringList& args)
     QStringList results = parser.positionalArguments();
 
     w = parser.value("width").toInt();
-    h = parser.value("heigth").toInt();
+    h = parser.value("height").toInt();
     return{h, w};
 }
 
@@ -195,6 +195,14 @@ void loadLanguagePreference()
         {
             QTranslator* translator = new QTranslator();
             if(translator->load(":/translations/libremines_pt_BR.qm"))
+                qApp->installTranslator(translator);
+            else
+                delete translator;
+        }
+        else if(usrLocale.language() == QLocale::Turkish)
+        {
+            QTranslator* translator = new QTranslator();
+            if(translator->load(":/translations/libremines_tr.qm"))
                 qApp->installTranslator(translator);
             else
                 delete translator;

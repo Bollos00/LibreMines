@@ -20,7 +20,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-20.04, ubuntu-22.04 ]
+        os: [ ubuntu-22.04, ubuntu-24.04 ]
 
     runs-on: ${{ matrix.os }}
 
@@ -30,24 +30,18 @@ jobs:
       - name: "Apt update"
         run: "sudo apt-get update"
 
-      - name: "Install dependencies Ubuntu 20.04"
-        if: matrix.os == 'ubuntu-20.04'
-        run: "sudo apt-get install build-essential qt5-default cmake libqt5svg5-dev qtmultimedia5-dev"
-      - name: "Install dependencies Ubuntu 22.04"
-        if: matrix.os == 'ubuntu-22.04'
+      - name: "Install dependencies"
         run: "sudo apt-get install build-essential qt6-base-dev cmake libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev"
 
-      - name: "Create build directory and run CMake Ubuntu 20.04"
-        if: matrix.os == 'ubuntu-20.04'
+      - name: "Create build directory and run CMake"
         run: "mkdir build && cd build && \
-          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6='NO' .."
-      - name: "Create build directory and run CMake Ubuntu 22.04"
-        if: matrix.os == 'ubuntu-22.04'
-        run: "mkdir build && cd build && \
-          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr .."
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTS=ON .."
 
       - name: "Build"
         run: "cd build && make"
+
+      - name: "Run tests"
+        run: "cd build && ctest --verbose --progress --output-on-failure"
 
       - name: Prepare build artifacts
         run: |

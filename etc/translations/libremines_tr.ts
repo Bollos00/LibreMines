@@ -1,94 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es_ES">
+<TS version="2.1" language="tr_TR">
 <context>
     <name>LibreMinesGui</name>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="184"/>
         <source>Keyboard Controller is invalid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="414"/>
-        <source>Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="416"/>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="418"/>
-        <source>Preferences...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="419"/>
-        <source>Toggle Full Screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="426"/>
-        <source>About...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="427"/>
-        <source>About Qt...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="477"/>
-        <source>Quit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="475"/>
-        <source>Restart</source>
-        <translation type="unfinished"></translation>
+        <translation>Klavye kontrolleri geçersiz</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="185"/>
         <source>Dear user, your Keyboard Controller preferences are invalid. Therefore, you will not be able to play with the keyboard.
 To fix it, go to (Main Menu &gt; Options &gt; Preferences) and edit your preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Değerli kullanıcı, klavye kontrolleriniz geçersizdir. Bundan ötürü, klavyeyle kullanarak oynayamayacaksınız.
+Bu durumu çözmek için (Ana Menü &gt; Seçenekler &gt; Tercihler) adımlarını takip edin ve klavye tercihlerinizi düzenleyin.</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="414"/>
+        <source>Options</source>
+        <translation>Seçenekler</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="415"/>
         <source>High Scores</source>
-        <translation type="unfinished"></translation>
+        <translation>En İyi Skorlar</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="416"/>
+        <source>Help</source>
+        <translation>Yardım</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="418"/>
+        <source>Preferences...</source>
+        <translation>Tercihler...</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="419"/>
+        <source>Toggle Full Screen</source>
+        <translation>Tam Ekrana Geçiş Yap</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="422"/>
         <source>Show High Scores...</source>
-        <translation type="unfinished"></translation>
+        <translation>En İyi Skorları Listele...</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="423"/>
         <source>Import High Scores...</source>
-        <translation type="unfinished"></translation>
+        <translation>En İyi Skorları İçe Aktar...</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="424"/>
         <source>Export High Scores...</source>
-        <translation type="unfinished"></translation>
+        <translation>En İyi Skorları Dışa Aktar...</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="426"/>
+        <source>About...</source>
+        <translatorcomment>Translated as &quot;About LibreMines&quot;.</translatorcomment>
+        <translation>LibreMines Hakkında...</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="427"/>
+        <source>About Qt...</source>
+        <translation>Qt Hakkında...</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="428"/>
         <source>GitHub Homepage...</source>
-        <translation type="unfinished"></translation>
+        <translation>GitHub Anasayfa...</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="475"/>
+        <source>Restart</source>
+        <translatorcomment>Translated as &quot;New Game&quot;</translatorcomment>
+        <translation>Yeni Oyun</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="477"/>
+        <source>Quit</source>
+        <translatorcomment>Translated as &quot;Main Menu&quot;</translatorcomment>
+        <translation>Ana Menü</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="479"/>
         <location filename="../../src/libreminesgui.cpp" line="877"/>
         <source>Save Minefield as Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Mayın Tarlasını Fotoğraf Olarak Kaydet</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="481"/>
         <source>Save Score</source>
-        <translation type="unfinished"></translation>
+        <translation>Skoru Kaydet</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="494"/>
@@ -97,7 +101,11 @@ To fix it, go to (Main Menu &gt; Options &gt; Preferences) and edit your prefere
 8x8
 
 %1 Mines</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolay
+
+8x8
+
+%1 Mayın</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="498"/>
@@ -106,7 +114,11 @@ To fix it, go to (Main Menu &gt; Options &gt; Preferences) and edit your prefere
 16x16
 
 %1 Mines</source>
-        <translation type="unfinished"></translation>
+        <translation>Orta
+
+16x16
+
+%1 Mayın</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="503"/>
@@ -115,167 +127,182 @@ To fix it, go to (Main Menu &gt; Options &gt; Preferences) and edit your prefere
 30x16
 
 %1 Mines</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="886"/>
-        <source>Save Minefield
-as Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Zor
+
+30x16
+
+%1 Mayın</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1187"/>
         <source>Total time: %1 secs</source>
-        <translation type="unfinished"></translation>
+        <translation>Toplam süre: %1 saniye</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1188"/>
         <source>Correct Flags: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Doğru Yerleştirilen Bayraklar: %1</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1189"/>
         <source>Wrong Flags: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Yanlış Yerleştirilen Bayraklar: %1</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1190"/>
         <source>Unlocked Cells: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Açılan Hücreler: %1</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1192"/>
         <source>Flags/s: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Bayrak/sn: %1</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1193"/>
         <source>Cells/s: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hücre/sn: %1</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1195"/>
         <source>Game Complete: %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamamlanma Oranı: %1 %</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1268"/>
         <source>Easy</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolay</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1275"/>
         <source>Customized %1 x %2 : %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Özel Oyun %1 x %2 : %3</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1397"/>
         <source>You Win!
 Difficulty: EASY</source>
-        <translation type="unfinished"></translation>
+        <translation>Kazandın!
+Zorluk: KOLAY</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1400"/>
         <source>You Win!
 Difficulty: MEDIUM</source>
-        <translation type="unfinished"></translation>
+        <translation>Kazandın!
+Zorluk: ORTA</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1403"/>
         <source>You Win!
 Difficulty: HARD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kazandın!
+Zorluk: ZOR</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1406"/>
         <source>You Win!
 Difficulty: CUSTOM
 %1x%2 : %3 Mines</source>
-        <translation type="unfinished"></translation>
+        <translation>Kazandın!
+Zorluk: ÖZEL
+%1x%2 : %3 Mayın</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1435"/>
         <source>You Lost
 Difficulty: EASY</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaybettin
+Zorluk: KOLAY</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1438"/>
         <source>You Lost
 Difficulty: MEDIUM</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaybettin
+Zorluk: ORTA</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1441"/>
         <source>You Lost
 Difficulty: HARD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaybettin
+Zorluk: ZOR</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1444"/>
         <source>You Lost
 Difficulty: CUSTOM
 %1x%2 : %3 Mines</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaybettin
+Zorluk: ÖZEL
+%1x%2 : %3 Mayın</translation>
     </message>
     <message>
-        <location filename="../../src/libreminesgui.cpp" line="1640"/>
-        <source>High scores backup complete</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../src/libreminesgui.cpp" line="1621"/>
+        <source>Old high score file has been saved to &quot;%1&quot;.</source>
+        <translation>Eski en iyi skorlar &quot;%1&quot; dosyasına kaydedildi.</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1641"/>
         <source>Successfully backup high scores to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>En iyi skorlar başarılı bir şekilde %1 konumuna kaydedildi</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1270"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Orta</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1272"/>
         <source>Hard</source>
-        <translation type="unfinished"></translation>
+        <translation>Zor</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="507"/>
         <source>Customized Game</source>
-        <translation type="unfinished"></translation>
+        <translation>Özel Oyun</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="535"/>
         <source>Width: </source>
-        <translation type="unfinished"></translation>
+        <translation>Genişlik: </translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="538"/>
         <source>Height: </source>
-        <translation type="unfinished"></translation>
+        <translation>Yükseklik: </translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="541"/>
         <source>Percent of Mines: </source>
-        <translation type="unfinished"></translation>
+        <translation>Mayın Oranı: </translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="544"/>
         <source>Number of Mines: </source>
-        <translation type="unfinished"></translation>
+        <translation>Mayın Sayısı: </translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="886"/>
+        <source>Save Minefield
+as Image</source>
+        <translation>Mayın Tarlasını Fotoğraf Olarak Kaydet</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1019"/>
         <location filename="../../src/libreminesgui.cpp" line="1051"/>
         <location filename="../../src/libreminesgui.cpp" line="1506"/>
         <source>There is a game happening.</source>
-        <translation type="unfinished"></translation>
+        <translation>Halihazırda devam eden bir oyun var.</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1020"/>
         <location filename="../../src/libreminesgui.cpp" line="1052"/>
         <location filename="../../src/libreminesgui.cpp" line="1507"/>
         <source>Are you sure you want to quit?</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Translated as &quot;Are you sure you want to leave?&quot;</translatorcomment>
+        <translation>Ayrılmak istediğinize emin misiniz?</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1523"/>
@@ -289,52 +316,55 @@ You should have received a copy of the GNU General Public License along with thi
 
 Get the source code of LibreMines on
 </source>
+        <translatorcomment>Skipped the translation for LICENCE.</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1579"/>
         <source>Import high scores from file</source>
-        <translation type="unfinished"></translation>
+        <translation>En iyi skorları dosyadan içe aktar</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1602"/>
         <source>Invalid high scores file</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçersiz dosya</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1603"/>
         <source>Error parsing the data of the file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Dosyanın verileri ayrıştırılırken hata oluştu!</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1619"/>
         <source>High scores import complete</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Translated as &quot;Import is successful&quot;.</translatorcomment>
+        <translation>İçe aktarma başarılı</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1620"/>
         <source>Operation completed!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminesgui.cpp" line="1621"/>
-        <source>Old high score file has been saved to &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>İşlem tamamlandı!</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1631"/>
         <source>Backup high scores to file</source>
-        <translation type="unfinished"></translation>
+        <translation>En iyi skorları dosyaya çıkart</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminesgui.cpp" line="1640"/>
+        <source>High scores backup complete</source>
+        <translatorcomment>Translated as &quot;Backup is successful&quot;.</translatorcomment>
+        <translation>Yedekleme başarılı</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1673"/>
         <source>Save Minefield as image</source>
-        <translation type="unfinished"></translation>
+        <translation>Mayın Tarlasını Fotoğraf Olarak Kaydet</translation>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1675"/>
         <source>Image (*.bmp *.jpg *png *.jpeg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fotoğraf (*.bmp *.jpg *.png *.jpeg)</translation>
     </message>
 </context>
 <context>
@@ -342,229 +372,232 @@ Get the source code of LibreMines on
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="14"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçenekler</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="20"/>
         <source>Game Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Oyun Seçenekleri</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="26"/>
         <source>First cell clean</source>
-        <translation type="unfinished"></translation>
+        <translation>İlk hücreden kazanma</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="36"/>
         <source>Clean neighbor cells when
 clicked on showed cell</source>
-        <translation type="unfinished"></translation>
+        <translation>Gösterilen hücreye tıklandığında yanındaki hücreleri göster</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="47"/>
         <source>Show progress bar</source>
-        <translation type="unfinished"></translation>
+        <translation>İlerleme çubuğunu göster</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="57"/>
         <source>Use Question Mark</source>
-        <translation type="unfinished"></translation>
+        <translation>Soru İşareti Kullan</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="66"/>
         <source>Minimum cell length</source>
-        <translation type="unfinished"></translation>
+        <translation>Asgari hücre boyutu</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="87"/>
         <source>Maximum cell length</source>
-        <translation type="unfinished"></translation>
+        <translation>Azami hücre boyutu</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="114"/>
         <source>Minefield Generation
 Animation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="181"/>
-        <source>User Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="189"/>
-        <source>Username</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="282"/>
-        <source>Language Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="290"/>
-        <source>Language</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="305"/>
-        <source>Sound effects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="311"/>
-        <source>Mute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="323"/>
-        <source>Volume: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="352"/>
-        <source>Keyboard Controller</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="360"/>
-        <source>Move left</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="393"/>
-        <source>Move upwards</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="426"/>
-        <source>Move right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="459"/>
-        <source>Move downwards</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="492"/>
-        <source>Clean cell</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="525"/>
-        <source>(Un)flag cell</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="558"/>
-        <source>Center cell on the scroll area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="591"/>
-        <source>When CTRL is pressed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="204"/>
-        <source>Scores</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="225"/>
-        <source>Ask to save the match score:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="231"/>
-        <source>Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="241"/>
-        <source>When a new high score is achieved or when the game is completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="251"/>
-        <source>When a new high score is achieved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="258"/>
-        <source>When the game is completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="265"/>
-        <source>Never</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="138"/>
-        <source>Application style:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="152"/>
-        <source>Minefield theme:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/libreminespreferencesdialog.ui" line="166"/>
-        <source>Faces reaction:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mayın Tarlası Oluşum
+Animasyonu</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.ui" line="130"/>
         <source>Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>Görünüm</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="138"/>
+        <source>Application style:</source>
+        <translation>Uygulama stili:</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="152"/>
+        <source>Minefield theme:</source>
+        <translation>Mayın tarlası teması:</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="166"/>
+        <source>Faces reaction:</source>
+        <translation>Yüz ifadeleri:</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="181"/>
+        <source>User Information</source>
+        <translation>Kullanıcı Bilgileri</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="189"/>
+        <source>Username</source>
+        <translation>Kullanıcı Adı</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="204"/>
+        <source>Scores</source>
+        <translation>Skorlar</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="225"/>
+        <source>Ask to save the match score:</source>
+        <translation>En iyi skorları kaydetmek için sor:</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="231"/>
+        <source>Always</source>
+        <translation>Her Zaman</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="241"/>
+        <source>When a new high score is achieved or when the game is completed</source>
+        <translation>Oyun tamamlandığında veya daha iyi bir skor elde edildiğinde</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="251"/>
+        <source>When a new high score is achieved</source>
+        <translation>Daha iyi bir skor elde edildiğinde</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="258"/>
+        <source>When the game is completed</source>
+        <translation>Oyun tamamlandığında</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="265"/>
+        <source>Never</source>
+        <translation>Asla</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="282"/>
+        <source>Language Settings</source>
+        <translation>Dil Ayarları</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="290"/>
+        <source>Language</source>
+        <translation>Dil</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="305"/>
+        <source>Sound effects</source>
+        <translation>Ses efektleri</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="311"/>
+        <source>Mute</source>
+        <translation>Sessiz</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="323"/>
+        <source>Volume: </source>
+        <translation>Ses: </translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="352"/>
+        <source>Keyboard Controller</source>
+        <translation>Klavye Kontrolleri</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="360"/>
+        <source>Move left</source>
+        <translation>Sola ilerle</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="393"/>
+        <source>Move upwards</source>
+        <translation>Yukarı ilerle</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="426"/>
+        <source>Move right</source>
+        <translation>Sağa ilerle</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="459"/>
+        <source>Move downwards</source>
+        <translation>Aşağı ilerle</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="492"/>
+        <source>Clean cell</source>
+        <translation>Hücreyi göster</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="525"/>
+        <source>(Un)flag cell</source>
+        <translation>Bayrak yerleştir/geri al</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="558"/>
+        <source>Center cell on the scroll area</source>
+        <translation>Ekranın dışında kalan hücreye git</translation>
+    </message>
+    <message>
+        <location filename="../../src/libreminespreferencesdialog.ui" line="591"/>
+        <source>When CTRL is pressed</source>
+        <translation>CTRL tuşuna basıldığında</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="54"/>
         <source>Go to the Edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Kenara Git</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="54"/>
         <source>Jump 3 Cells</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Hücre Atla</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="55"/>
         <source>Jump 5 Cells</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Hücre Atla</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="55"/>
         <source>Jump 10 Cells</source>
-        <translation type="unfinished"></translation>
+        <translation>10 Hücre Atla</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="59"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Meaning for &quot;active&quot;</translatorcomment>
+        <translation>Aktif</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="59"/>
         <source>Limited</source>
-        <translation type="unfinished"></translation>
+        <translation>Kısıtlı</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="59"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Meaning for &quot;disabled&quot;</translatorcomment>
+        <translation>Devre Dışı</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="398"/>
         <source>Restart LibreMines to apply this preference!</source>
-        <translation type="unfinished"></translation>
+        <translation>Bu seçeneği uygulamak için LibreMines&apos;ı yeniden başlatın!</translation>
     </message>
     <message>
         <location filename="../../src/libreminespreferencesdialog.cpp" line="399"/>
         <source>Please restart the application to redefine your language</source>
-        <translation type="unfinished"></translation>
+        <translation>Dili değişim ayarını uygulamak için lütfen uygulamayı yeniden başlatın</translation>
     </message>
 </context>
 <context>
@@ -572,37 +605,37 @@ Animation</source>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullanıcı</translation>
     </message>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
         <source>Game Completed (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamamlanma Oranı (%)</translation>
     </message>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="45"/>
         <source>Time (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Süre (saniye cinsinden)</translation>
     </message>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="49"/>
         <source>1st</source>
-        <translation type="unfinished"></translation>
+        <translation>Birinci</translation>
     </message>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="52"/>
         <source>2nd</source>
-        <translation type="unfinished"></translation>
+        <translation>İkinci</translation>
     </message>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="54"/>
         <source>3rd</source>
-        <translation type="unfinished"></translation>
+        <translation>Üçüncü</translation>
     </message>
     <message>
         <location filename="../../src/libreminesscoresdialog.cpp" line="58"/>
         <source>%1th</source>
-        <translation type="unfinished"></translation>
+        <translation>%1.</translation>
     </message>
 </context>
 <context>
@@ -611,54 +644,54 @@ Animation</source>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="45"/>
         <source>Easy</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolay</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="49"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Orta</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="33"/>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="53"/>
         <source>Hard</source>
-        <translation type="unfinished"></translation>
+        <translation>Zor</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullanıcı</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
         <source>Game Completed (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamamlanma Oranı (%)</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="72"/>
         <source>Time (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Süre (saniye cinsinden)</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="88"/>
         <source>1st</source>
-        <translation type="unfinished"></translation>
+        <translation>Birinci</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="91"/>
         <source>2nd</source>
-        <translation type="unfinished"></translation>
+        <translation>İkinci</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="93"/>
         <source>3rd</source>
-        <translation type="unfinished"></translation>
+        <translation>Üçüncü</translation>
     </message>
     <message>
         <location filename="../../src/libreminesviewscoresdialog.cpp" line="97"/>
         <source>%1th</source>
-        <translation type="unfinished"></translation>
+        <translation>%1.</translation>
     </message>
 </context>
 </TS>

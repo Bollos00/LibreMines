@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -56,7 +56,7 @@ void LibreMinesViewScoresDialog::setScores(const QList<LibreMinesScore>& scores)
         {
             QString strDifficulty;
             strDifficulty += QString::number(s.width) + " x ";
-            strDifficulty += QString::number(s.heigth) + " : ";
+            strDifficulty += QString::number(s.height) + " : ";
             strDifficulty += QString::number(s.mines);
 
             if(!tabs.contains(strDifficulty))
@@ -94,7 +94,7 @@ void LibreMinesViewScoresDialog::setScores(const QList<LibreMinesScore>& scores)
 
         for(int i=4; i<=tab.scores.size(); ++i)
         {
-            tableVerticalHeader.append(QString::number(i) + tr("th"));
+            tableVerticalHeader.append(tr("%1th").arg(i));
         }
         tab.table->setVerticalHeaderLabels(tableVerticalHeader);
 

@@ -2,6 +2,7 @@
     <qresource prefix="/translations">
         <file>libremines_pt_BR.qm</file>
         <file>libremines_es.qm</file>
+        <file>libremines_tr.qm</file>
     </qresource>
 </RCC>
 

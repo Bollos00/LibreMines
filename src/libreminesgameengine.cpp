@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -38,7 +38,7 @@ LibreMinesGameEngine::LibreMinesGameEngine()
 
 void LibreMinesGameEngine::vNewGame(const uchar _X,
                                     const uchar _Y,
-                                    ushort i_nMines_,
+                                    short i_nMines_,
                                     const uchar i_X_Clean,
                                     const uchar i_Y_Clean)
 {
@@ -487,7 +487,7 @@ void LibreMinesGameEngine::vGenerateEndGameScore(qint64 iTimeInNs, bool ignorePr
     score.iTimeInNs = timeLastGame;
     score.gameDifficulty = GameDifficulty::NONE;
     score.width = iX;
-    score.heigth = iY;
+    score.height = iY;
     score.mines = nMines;
     score.bGameCompleted = iUnlockedCells == iCellsToUnlock;
     score.dPercentageGameCompleted = dPercentageGameComplete;
@@ -511,7 +511,7 @@ uchar LibreMinesGameEngine::lines() const
     return iY;
 }
 
-ushort LibreMinesGameEngine::mines() const
+short LibreMinesGameEngine::mines() const
 {
     return nMines;
 }
@@ -546,7 +546,18 @@ void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 {
     if(bFirst && bFirstCellClean && principalMatrix[_X][_Y].value != CellValue::ZERO)
     {
-        vNewGame(iX, iY, nMines, _X, _Y);
+        // Check if it's impossible to place all mines while keeping the clicked cell and its neighbors clean
+        // This prevents infinite loop when nMines > (total cells - 9)
+        const int totalCells = iX * iY;
+        const int minRequiredFreeCells = 9; // clicked cell + 8 neighbors
+        
+        // Cannot guarantee 9 free cells, so don't regenerate the game
+        // Just start the timer and proceed with current mine layout
+        if(nMines <= (totalCells - minRequiredFreeCells))
+        {
+            vNewGame(iX, iY, nMines, _X, _Y);
+        }
+        
         SLOT_startTimer();
         bFirst = false;
     }
@@ -607,7 +618,9 @@ void LibreMinesGameEngine::SLOT_startTimer()
     QObject::connect(timerTimeInGame.get(), &QTimer::timeout,
                      this, &LibreMinesGameEngine::SLOT_UpdateTime);
 
-    timerTimeInGame->start(1000);
+    // reduce the timer interval to 100 ms.
+    // This fixes issue #83 where the display timer was one second ahead of real time
+    timerTimeInGame->start(100);
     elapsedPreciseTimeInGame.start();
 }
 

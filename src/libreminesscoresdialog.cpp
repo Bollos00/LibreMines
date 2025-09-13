@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -55,7 +55,7 @@ LibreMinesScoresDialog::LibreMinesScoresDialog(QWidget* parent, int rowsCount):
 
     for(int i=4; i<=rowsCount; ++i)
     {
-        tableVerticalHeader.append(QString::number(i) + tr("th"));
+        tableVerticalHeader.append(tr("%1th").arg(i));
     }
     table->setVerticalHeaderLabels(tableVerticalHeader);
 

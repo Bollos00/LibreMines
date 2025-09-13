@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2024  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -42,8 +42,40 @@
 #include "keyboardcontroller.h"
 
 /**
- * @brief
- *
+ * @file libreminesgui.h
+ * @brief Main GUI class for the LibreMines application
+ * @author Bruno Bollos Correa
+ * @date 2020-12-12
+ * 
+ * This file defines the LibreMinesGui class which serves as the main window
+ * and primary user interface for the LibreMines minesweeper game. It manages
+ * the complete visual interface including the game grid, menus, dialogs,
+ * and all user interactions with the game.
+ */
+
+/**
+ * @brief Main window and user interface for LibreMines
+ * 
+ * LibreMinesGui is the central GUI class that manages the complete user
+ * interface for the LibreMines minesweeper game. It coordinates between
+ * the game engine, visual themes, user preferences, and all interactive
+ * elements to provide a comprehensive gaming experience.
+ * 
+ * Key responsibilities include:
+ * - Managing the minefield grid display and interaction
+ * - Handling menu systems and dialog integration
+ * - Coordinating with the game engine for game logic
+ * - Managing themes, sounds, and visual effects
+ * - Providing keyboard accessibility through KeyboardController
+ * - Score management and high score displays
+ * - User preferences and settings integration
+ * 
+ * The class uses a combination of adapted Qt widgets and custom components
+ * to create an interactive minesweeper interface that supports both mouse
+ * and keyboard navigation, multiple themes, and comprehensive accessibility
+ * features.
+ * 
+ * @since v1.0
  */
 class LibreMinesGui : public QMainWindow
 {
@@ -51,13 +83,34 @@ class LibreMinesGui : public QMainWindow
 
     friend class KeyboardController;
 private:
+    /**
+     * @brief GUI representation of a single minefield cell
+     * 
+     * CellGui encapsulates the visual components needed to display and
+     * interact with a single cell in the minesweeper grid. Each cell
+     * contains both a button (for hidden state) and a label (for revealed
+     * state), allowing smooth transitions between game states.
+     * 
+     * The class manages the dual-widget approach where buttons represent
+     * hidden cells that can be clicked to reveal, and labels represent
+     * revealed cells that can be used for chord clicking operations.
+     * 
+     * @since v1.0
+     */
     class CellGui
     {
     public:
+        /**
+         * @brief Default constructor for cell GUI components
+         * 
+         * Initializes the cell with null button and label pointers.
+         * The actual widgets are created and assigned by the parent
+         * LibreMinesGui class during grid setup.
+         */
         CellGui();
 
-        QPushButton_adapted *button; /**< TODO: describe */
-        QLabel_adapted *label; /**< TODO: describe */
+        QPushButton_adapted *button; ///< Button widget for hidden cell state (clickable for revealing)
+        QLabel_adapted *label;       ///< Label widget for revealed cell state (displays value, clickable for chording)
     };
 
 public:
@@ -92,7 +145,7 @@ protected:
 private:
     void vNewGame(const uchar _X,
                   const uchar _Y,
-                  ushort i_nMines_);
+                  short i_nMines_);
 
     void vAttributeAllCells();
     void vResetPrincipalMatrix();
@@ -185,7 +238,7 @@ private Q_SLOTS:
                            double dCellsPerSecond,
                            bool ignorePreferences=false);
     void SLOT_currentTime(const ushort time);
-    void SLOT_minesLeft(const ushort minesLeft);
+    void SLOT_minesLeft(const short minesLeft);
     void SLOT_flagCell(const uchar _X, const uchar _Y);
     void SLOT_QuestionCell(const uchar _X, const uchar _Y);
     void SLOT_unflagCell(const uchar _X, const uchar _Y);

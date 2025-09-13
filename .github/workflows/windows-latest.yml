@@ -7,6 +7,18 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version tag for the release'
+        required: false
+        type: string
+        default: ''
+      upload_to_release:
+        description: 'Whether to upload artifacts to a release'
+        required: false
+        type: boolean
+        default: false
   # Allows you to run this workflow manually from the Actions tab
     # workflow_dispatch:
 
@@ -22,7 +34,7 @@ jobs:
 
     strategy:
       matrix:
-        qt-version: [ '5.15.2', '6.5.3' ]
+        qt-version: [ '5.15.2', '6.8.3' ]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,33 +51,53 @@ jobs:
           set-env: 'true'
           setup-python: 'true'
 
-      - name: "Install Qt 6.5.3"
-        if: matrix.qt-version == '6.5.3'
+      - name: "Install Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.5.3'
+          version: '6.8.3'
           host: 'windows'
           dir: '${{ github.workspace }}'
           modules: 'qtmultimedia'
-          arch: 'win64_msvc2019_64'
+          arch: 'win64_msvc2022_64'
           set-env: 'true'
           setup-python: 'true'
 
-      - name: "Create build directory and run CMake Qt 6.5.3"
-        if: matrix.qt-version == '6.5.3'
-        run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .."
+      - name: "Create build directory and run CMake Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
+        run: |
+          mkdir build && cd build
+          if ("${{ inputs.upload_to_release }}" -eq "true") {
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+          } else {
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON ..
+          }
 
       - name: "Create build directory and run CMake Qt 5.15.2"
         if: matrix.qt-version == '5.15.2'
-        run: "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' .."
+        run: |
+          mkdir build && cd build
+          if ("${{ inputs.upload_to_release }}" -eq "true") {
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' ..
+          } else {
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' -DBUILD_TESTS=ON ..
+          }
 
       - name: "Build"
         run: "cd build && cmake --build . --config Release"
 
+      - name: "Run tests"
+        if: inputs.upload_to_release != true
+        run: "cd build && ctest --extra-verbose --progress --output-on-failure -C Release"
+
       - name: Prepare build artifacts
         run: |
           Set-Location ./build
-          ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt.exe --no-translations ./Release
+          if ("${{ matrix.qt-version }}" -eq "5.15.2") {
+            ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2019_64/bin/windeployqt.exe --no-translations ./Release
+          } else {
+            ${{ github.workspace }}/Qt/${{ matrix.qt-version}}/msvc2022_64/bin/windeployqt.exe --no-translations ./Release
+          }
           Copy-Item ../README.md ./Release
           Copy-Item ../LICENSE ./Release
           New-Item -ItemType Directory ./Release/minefield_extra_themes
@@ -79,8 +111,33 @@ jobs:
           Copy-Item ../share/faces_reaction/twemoji-color ./Release/facesreaction_extra_themes -Recurse
           Copy-Item ../share/faces_reaction/SecularSteve_custom ./Release/facesreaction_extra_themes -Recurse
 
+      - name: Create ZIP for Release
+        if: inputs.upload_to_release
+        run: |
+          Set-Location ./build
+          New-Item -ItemType Directory -Name "libremines"
+          Copy-Item ./Release/* ./libremines -Recurse
+          if ("${{ matrix.qt-version }}" -eq "5.15.2") {
+            Compress-Archive -Path ./libremines -DestinationPath "libremines-${{ inputs.version }}-windows-qt5.zip"
+          } else {
+            Compress-Archive -Path ./libremines -DestinationPath "libremines-${{ inputs.version }}-windows-qt6.zip"  
+          }
+
+      - name: Prepare artifact directory structure
+        run: |
+          Set-Location ./build
+          New-Item -ItemType Directory -Name "artifact-temp" -Force
+          New-Item -ItemType Directory -Name "artifact-temp/libremines" -Force
+          Copy-Item ./Release/* ./artifact-temp/libremines -Recurse
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: libremines-build-windows-qt-${{ matrix.qt-version }}
-          path: build/Release
+          path: build/artifact-temp/
+          
+      - name: Upload to Release
+        if: inputs.upload_to_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.zip
