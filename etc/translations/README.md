@@ -16,14 +16,14 @@ sudo apt install qt6-tools-dev linguist-qt6
 
 In order to update translation files (TS format), on the main directory, run:
 ```sh
-lupdate src -ts etc/translations/libremines_es.ts etc/translations/libremines_pt_BR.ts
+lupdate-qt6 src -ts etc/translations/*.ts
 ```
 
 It will update the files `etc/translations/libremines_es.ts` (Spanish) and `etc/translations/libremines_pt_BR.ts` (Brazilian Portuguese) using the source directory `src`.
 
 To generate a TS file for a new language, just append it to the end of the command above. For example, to generate a TS file for French, run:
 ```sh
-lupdate src -ts etc/translations/libremines_es.ts etc/translations/libremines_pt_BR.ts etc/translations/libremines_fr.ts
+lupdate-qt6 src -ts etc/translations/libremines_es.ts etc/translations/libremines_pt_BR.ts etc/translations/libremines_fr.ts
 ```
 
 The command above will generate the file `etc/translations/libremines_fr.ts`.

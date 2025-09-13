@@ -54,7 +54,7 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     ui->comboBoxWhenCtrlIsPressed->addItems({tr("Go to the Edge"), tr("Jump 3 Cells"),
                                              tr("Jump 5 Cells"), tr("Jump 10 Cells")});
 
-    ui->comboBoxLanguage->addItems({"English", "Português do Brasil"});
+    ui->comboBoxLanguage->addItems({"English", "Português do Brasil", "Türkçe"});
 
     ui->comboBoxMinefieldGenerationAnimation->addItems({tr("On"), tr("Limited"), tr("Off")});
 
@@ -163,6 +163,8 @@ QString LibreMinesPreferencesDialog::optionsLanguage() const
         return "en";
     if(ui->comboBoxLanguage->currentText().compare("Português do Brasil", Qt::CaseInsensitive) == 0)
         return "pt_BR";
+    if(ui->comboBoxLanguage->currentText().compare("Türkçe", Qt::CaseInsensitive) == 0)
+        return "tr";
     return "";
 }
 
@@ -268,6 +270,8 @@ void LibreMinesPreferencesDialog::setOptionLanguage(const QString &option)
     QString s = "English";
     if(option.compare("pt_BR", Qt::CaseInsensitive) == 0)
         s = "Português do Brasil";
+    else if(option.compare("tr", Qt::CaseInsensitive) == 0)
+        s = "Türkçe";
 
     // Ugly way to avoid the creation of the dialog when this function is called
     updateLanguageDialog = false;

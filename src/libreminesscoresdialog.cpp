@@ -55,7 +55,7 @@ LibreMinesScoresDialog::LibreMinesScoresDialog(QWidget* parent, int rowsCount):
 
     for(int i=4; i<=rowsCount; ++i)
     {
-        tableVerticalHeader.append(QString::number(i) + tr("th"));
+        tableVerticalHeader.append(tr("%1th").arg(i));
     }
     table->setVerticalHeaderLabels(tableVerticalHeader);
 
