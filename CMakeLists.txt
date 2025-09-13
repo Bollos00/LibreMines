@@ -247,7 +247,7 @@ if(UNIX)
     install(FILES share/icons/libremines.svg DESTINATION share/icons/hicolor/scalable/apps)
 
     # Install AppStream metainfo file
-    install(FILES share/metainfo/io.github.bollos00.libremines.appdata.xml
+    install(FILES share/metainfo/io.github.Bollos00.LibreMines.appdata.xml
             DESTINATION share/metainfo)
 
     # Install the extra minefield themes on
