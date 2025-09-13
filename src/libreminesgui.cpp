@@ -60,7 +60,8 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     difficult(GameDifficulty::NONE ),
     preferences( new LibreMinesPreferencesDialog(this) ),
     dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
-    sound( new SoundEffects() )
+    sound( new SoundEffects() ),
+    currentFaceState( FacesReaction::DEFAULT )
 {
     // this->resize(800, 600);
     this->setMinimumSize(QSize(700, 500));
@@ -220,8 +221,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     widgetBoardContents->setGeometry(0, 0, _X*cellLength, _Y*cellLength);
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_BEING_GENERATED));
-
+    updateFaceReaction(FacesReaction::GAME_BEING_GENERATED);
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
             preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
@@ -339,7 +339,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     //  of mines
     SLOT_minesLeft(gameEngine->mines());
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
+    updateFaceReaction(FacesReaction::DEFAULT);
 
     bMinefieldBeingCreated = false;
 
@@ -1073,12 +1073,20 @@ void LibreMinesGui::SLOT_QuitGame()
     gameEngine.reset();
 }
 
+void LibreMinesGui::updateFaceReaction(FacesReaction::GameEvent newState)
+{
+    if (currentFaceState != newState) {
+        currentFaceState = newState;
+        labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(newState));
+    }
+}
+
 void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
 {
     if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
+    updateFaceReaction(FacesReaction::DEFAULT);
 
     // if the button is released outside its area do not treat the event
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -1117,7 +1125,7 @@ void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
     if(e->button() != Qt::LeftButton)
         return;
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::HIDDEN_CELL_PRESSED));
+    updateFaceReaction(FacesReaction::HIDDEN_CELL_PRESSED);
 }
 
 void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
@@ -1125,7 +1133,7 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
     if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
+    updateFaceReaction(FacesReaction::DEFAULT);
 
     // if the button is released outside its area do not treat the event
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -1159,7 +1167,7 @@ void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
     if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::UNHIDDEN_CELL_PRESSED));
+    updateFaceReaction(FacesReaction::UNHIDDEN_CELL_PRESSED);
 
 }
 
@@ -1420,7 +1428,7 @@ void LibreMinesGui::SLOT_gameWon()
 
     controller.deactivate(this);
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_WON));
+    updateFaceReaction(FacesReaction::GAME_WON);
 
     Q_EMIT SIGNAL_playSoundEffect(SoundEffects::GAME_WON);
 }
@@ -1480,7 +1488,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
 
     controller.deactivate(this);
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_LOST));
+    updateFaceReaction(FacesReaction::GAME_LOST);
     Q_EMIT SIGNAL_playSoundEffect(SoundEffects::GAME_LOST);
 }
 
