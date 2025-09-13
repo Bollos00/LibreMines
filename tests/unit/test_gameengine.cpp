@@ -1,4 +1,5 @@
 /*****************************************************************************
+ * LibreMines                                                                *
  * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *

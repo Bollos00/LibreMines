@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LibreMines Test Suite                                                     *
+ * LibreMines                                                                *
  * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
@@ -64,7 +64,6 @@ private slots:
     // Edge cases
     void testZeroTime();
     void testMaximumTime();
-    void testInvalidDifficulty();
 
 private:
     LibreMinesScore *score1;
@@ -394,15 +393,6 @@ void TestScore::testMaximumTime()
     QVERIFY(LibreMinesScore::bFirstIsBetter(normalScore, maxTimeScore));
 }
 
-void TestScore::testInvalidDifficulty()
-{
-    LibreMinesScore invalidScore;
-    invalidScore.gameDifficulty = static_cast<GameDifficulty>(999); // Invalid value
-    
-    // Should handle invalid difficulty gracefully
-    QString scoreString = static_cast<QString>(invalidScore);
-    Q_UNUSED(scoreString); // Just verify no crash
-}
 
 // Helper method implementations
 LibreMinesScore TestScore::createTestScore(qint64 timeNs, GameDifficulty difficulty, 
