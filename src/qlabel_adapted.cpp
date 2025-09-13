@@ -54,24 +54,34 @@ void QLabel_adapted::setPixmapCached(const QPixmap& pxmap)
     isInverted = false;
 }
 
-void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
-{
-    // Cached pixmap swap
-    if (isInverted) {
-        setPixmap(normalPixmap);
-        isInverted = false;
-    }
-
-    Q_EMIT SIGNAL_released(e);
-}
-
-void QLabel_adapted::mousePressEvent(QMouseEvent *e)
+void QLabel_adapted::setPixmapInverted()
 {
     // Cached pixmap swap
     if (!isInverted) {
         setPixmap(invertedPixmap);
         isInverted = true;
     }
+}
+
+void QLabel_adapted::setPixmapNormal()
+{
+    // Cached pixmap swap
+    if (isInverted) {
+        setPixmap(normalPixmap);
+        isInverted = false;
+    }
+}
+
+void QLabel_adapted::mouseReleaseEvent(QMouseEvent *e)
+{
+    setPixmapNormal();
+
+    Q_EMIT SIGNAL_released(e);
+}
+
+void QLabel_adapted::mousePressEvent(QMouseEvent *e)
+{
+    setPixmapInverted();
 
     Q_EMIT SIGNAL_clicked(e);
 }

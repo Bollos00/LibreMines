@@ -55,24 +55,34 @@ void QPushButton_adapted::setIconCached(const QIcon& icn)
     isInverted = false;
 }
 
-void QPushButton_adapted::mouseReleaseEvent(QMouseEvent *e)
-{
-    // Cached pixmap swap
-    if (isInverted) {
-        setIcon(normalIcon);
-        isInverted = false;
-    }
-
-    Q_EMIT SIGNAL_released(e);
-}
-
-void QPushButton_adapted::mousePressEvent(QMouseEvent *e)
+void QPushButton_adapted::setIconInverted()
 {
     // Cached pixmap swap
     if (!isInverted) {
         setIcon(invertedIcon);
         isInverted = true;
     }
+}
+
+void QPushButton_adapted::setIconNormal()
+{
+    // Cached pixmap swap
+    if (isInverted) {
+        setIcon(normalIcon);
+        isInverted = false;
+    }
+}
+
+void QPushButton_adapted::mouseReleaseEvent(QMouseEvent *e)
+{
+    setIconNormal();
+
+    Q_EMIT SIGNAL_released(e);
+}
+
+void QPushButton_adapted::mousePressEvent(QMouseEvent *e)
+{
+    setIconInverted();
 
     Q_EMIT SIGNAL_clicked(e);
 }

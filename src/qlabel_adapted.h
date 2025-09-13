@@ -89,7 +89,26 @@ public:
      * 
      * @param pixmap The normal pixmap to display and cache
      */
-    void setPixmapCached(const QPixmap& pixmap);
+    void setPixmapCached(const QPixmap& pxmap);
+
+    /**
+     * @brief Switch to the pre-cached inverted pixmap for visual feedback
+     * 
+     * Instantly switches the label display to the inverted pixmap version
+     * that was pre-computed during setPixmapCached(). This provides immediate
+     * visual feedback during mouse press events without expensive real-time
+     * image processing. Only switches if currently displaying normal pixmap.
+     */
+    void setPixmapInverted();
+
+    /**
+     * @brief Switch back to the normal pixmap state
+     * 
+     * Instantly switches the label display back to the normal pixmap version.
+     * Used to restore the standard appearance after mouse release events.
+     * Only switches if currently displaying inverted pixmap.
+     */
+    void setPixmapNormal();
 
 protected:
     /**
