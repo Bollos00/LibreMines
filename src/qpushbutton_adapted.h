@@ -81,6 +81,17 @@ public:
      */
     uchar getYCell();
 
+    /**
+     * @brief Set icon with pre-cached inverted version for performance
+     * 
+     * This method pre-computes the inverted version of the icon to avoid
+     * expensive real-time image processing during mouse events. The inverted
+     * version is cached and used for visual feedback during user interactions.
+     * 
+     * @param icon The normal icon to display and cache
+     */
+    void setIconCached(const QIcon& icon);
+
 protected:
     /**
      * @brief Handle mouse release events
@@ -107,6 +118,10 @@ protected:
 private:
     const uchar xCell; ///< X coordinate (column) of this cell in the game grid
     const uchar yCell; ///< Y coordinate (row) of this cell in the game grid
+
+    QIcon normalIcon;    ///< Normal icon state for the button
+    QIcon invertedIcon;  ///< Pre-computed inverted icon for visual feedback
+    bool isInverted = false; ///< Current state tracking for proper icon management
 
 Q_SIGNALS:
     /**

@@ -39,20 +39,40 @@ uchar QPushButton_adapted::getYCell()
     return yCell;
 }
 
+void QPushButton_adapted::setIconCached(const QIcon& icn)
+{
+    // Store normal icon
+    normalIcon = icn;
+    
+    // Store reversed icon
+    QPixmap pm = icn.pixmap(this->size());
+    QImage img = pm.toImage();
+    img.invertPixels();
+    invertedIcon = QIcon(QPixmap::fromImage(img));
+    
+    // Set the normal icon initially
+    setIcon(normalIcon);
+    isInverted = false;
+}
+
 void QPushButton_adapted::mouseReleaseEvent(QMouseEvent *e)
 {
-    QImage img = icon().pixmap(width(), height()).toImage();
-    img.invertPixels();
-    setIcon(QIcon(QPixmap::fromImage(img)));
+    // Cached pixmap swap
+    if (isInverted) {
+        setIcon(normalIcon);
+        isInverted = false;
+    }
 
     Q_EMIT SIGNAL_released(e);
 }
 
 void QPushButton_adapted::mousePressEvent(QMouseEvent *e)
 {
-    QImage img = icon().pixmap(width(), height()).toImage();
-    img.invertPixels();
-    setIcon(QIcon(QPixmap::fromImage(img)));
+    // Cached pixmap swap
+    if (!isInverted) {
+        setIcon(invertedIcon);
+        isInverted = true;
+    }
 
     Q_EMIT SIGNAL_clicked(e);
 }

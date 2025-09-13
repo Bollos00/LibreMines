@@ -245,12 +245,12 @@ void LibreMinesGui::vNewGame(const uchar _X,
             layoutBoard->addWidget(cell.button, j, i);
 
             cell.label->resize(cellLength, cellLength);
-            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(CellValue::ZERO));
+            cell.label->setPixmapCached(fieldTheme.getPixmapFromCellValue(CellValue::ZERO));
             cell.label->setScaledContents(true);
             cell.label->show();
 
             cell.button->resize(cellLength, cellLength);
-            cell.button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
+            cell.button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
             cell.button->setIconSize(QSize(cellLength, cellLength));
             cell.button->show();
             cell.button->setEnabled(false);
@@ -356,7 +356,7 @@ void LibreMinesGui::vAttributeAllCells()
 
             cell.button->setEnabled(true);
 
-            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue
+            cell.label->setPixmapCached(fieldTheme.getPixmapFromCellValue
                                   (gameEngine->getPrincipalMatrix()[i][j].value));
 
         }
@@ -947,10 +947,10 @@ void LibreMinesGui::vAdjustInterfaceInGame()
                 gameEngine->getPrincipalMatrix()[i][j];
 
             cell.label->resize(cellLength, cellLength);
-            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(cellGE.value));
+            cell.label->setPixmapCached(fieldTheme.getPixmapFromCellValue(cellGE.value));
 
             cell.button->resize(cellLength, cellLength);
-            cell.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
+            cell.button->setIconCached(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
             cell.button->setIconSize(QSize(cellLength, cellLength));
         }
     }
@@ -1342,7 +1342,7 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::HasFlag)));
+        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::HasFlag)));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1358,7 +1358,7 @@ void LibreMinesGui::SLOT_QuestionCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapQuestion()));
+        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapQuestion()));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1373,7 +1373,7 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
+        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1449,7 +1449,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
     }
 
 
-    principalMatrix[_X][_Y].label->setPixmap(fieldTheme.getPixmapBoom());
+    principalMatrix[_X][_Y].label->setPixmapCached(fieldTheme.getPixmapBoom());
 
     for(uchar j=0; j<gameEngine->lines(); j++)
     {
@@ -1472,7 +1472,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
                          cellGE.flagState != FlagState::NoFlag)
                 {
                     cellGui.button->hide();
-                    cellGui.label->setPixmap(fieldTheme.getPixmapWrongFlag());
+                    cellGui.label->setPixmapCached(fieldTheme.getPixmapWrongFlag());
                 }
             }
         }
