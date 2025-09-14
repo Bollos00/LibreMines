@@ -60,6 +60,7 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     difficult(GameDifficulty::NONE ),
     preferences( new LibreMinesPreferencesDialog(this) ),
     dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
+    currentFaceState( FacesReaction::DEFAULT ),
     sound( new SoundEffects() )
 #ifdef USE_THREADED_SOUND_EFFECTS
     , soundThread( new QThread() )
@@ -249,8 +250,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     widgetBoardContents->setGeometry(0, 0, _X*cellLength, _Y*cellLength);
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_BEING_GENERATED));
-
+    updateFaceReaction(FacesReaction::GAME_BEING_GENERATED);
 
     const bool bCleanNeighborCellsWhenClickedOnShowedLabel =
             preferences->optionCleanNeighborCellsWhenClickedOnShowedCell();
@@ -274,12 +274,12 @@ void LibreMinesGui::vNewGame(const uchar _X,
             layoutBoard->addWidget(cell.button, j, i);
 
             cell.label->resize(cellLength, cellLength);
-            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(CellValue::ZERO));
+            cell.label->setPixmapCached(fieldTheme.getPixmapFromCellValue(CellValue::ZERO));
             cell.label->setScaledContents(true);
             cell.label->show();
 
             cell.button->resize(cellLength, cellLength);
-            cell.button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
+            cell.button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
             cell.button->setIconSize(QSize(cellLength, cellLength));
             cell.button->show();
             cell.button->setEnabled(false);
@@ -368,7 +368,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     //  of mines
     SLOT_minesLeft(gameEngine->mines());
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
+    updateFaceReaction(FacesReaction::DEFAULT);
 
     bMinefieldBeingCreated = false;
 
@@ -385,7 +385,7 @@ void LibreMinesGui::vAttributeAllCells()
 
             cell.button->setEnabled(true);
 
-            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue
+            cell.label->setPixmapCached(fieldTheme.getPixmapFromCellValue
                                   (gameEngine->getPrincipalMatrix()[i][j].value));
 
         }
@@ -976,10 +976,10 @@ void LibreMinesGui::vAdjustInterfaceInGame()
                 gameEngine->getPrincipalMatrix()[i][j];
 
             cell.label->resize(cellLength, cellLength);
-            cell.label->setPixmap(fieldTheme.getPixmapFromCellValue(cellGE.value));
+            cell.label->setPixmapCached(fieldTheme.getPixmapFromCellValue(cellGE.value));
 
             cell.button->resize(cellLength, cellLength);
-            cell.button->setIcon(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
+            cell.button->setIconCached(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
             cell.button->setIconSize(QSize(cellLength, cellLength));
         }
     }
@@ -1102,12 +1102,20 @@ void LibreMinesGui::SLOT_QuitGame()
     gameEngine.reset();
 }
 
+void LibreMinesGui::updateFaceReaction(FacesReaction::GameEvent newState)
+{
+    if (currentFaceState != newState) {
+        currentFaceState = newState;
+        labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(newState));
+    }
+}
+
 void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
 {
     if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
+    updateFaceReaction(FacesReaction::DEFAULT);
 
     // if the button is released outside its area do not treat the event
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -1146,7 +1154,7 @@ void LibreMinesGui::SLOT_OnCellButtonClicked(const QMouseEvent *const e)
     if(e->button() != Qt::LeftButton)
         return;
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::HIDDEN_CELL_PRESSED));
+    updateFaceReaction(FacesReaction::HIDDEN_CELL_PRESSED);
 }
 
 void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
@@ -1154,7 +1162,7 @@ void LibreMinesGui::SLOT_onCellLabelReleased(const QMouseEvent *const e)
     if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::DEFAULT));
+    updateFaceReaction(FacesReaction::DEFAULT);
 
     // if the button is released outside its area do not treat the event
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -1188,7 +1196,7 @@ void LibreMinesGui::SLOT_onCellLabelClicked(const QMouseEvent *const e)
     if(!gameEngine->isGameActive() || controller.isActive())
         return;
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::UNHIDDEN_CELL_PRESSED));
+    updateFaceReaction(FacesReaction::UNHIDDEN_CELL_PRESSED);
 
 }
 
@@ -1371,7 +1379,7 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::HasFlag)));
+        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::HasFlag)));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1387,7 +1395,7 @@ void LibreMinesGui::SLOT_QuestionCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapQuestion()));
+        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapQuestion()));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1402,7 +1410,7 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIcon(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
+        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
         principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
     }
 
@@ -1449,7 +1457,7 @@ void LibreMinesGui::SLOT_gameWon()
 
     controller.deactivate(this);
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_WON));
+    updateFaceReaction(FacesReaction::GAME_WON);
 
     Q_EMIT SIGNAL_playSoundEffect(SoundEffects::GAME_WON);
 }
@@ -1478,7 +1486,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
     }
 
 
-    principalMatrix[_X][_Y].label->setPixmap(fieldTheme.getPixmapBoom());
+    principalMatrix[_X][_Y].label->setPixmapCached(fieldTheme.getPixmapBoom());
 
     for(uchar j=0; j<gameEngine->lines(); j++)
     {
@@ -1501,7 +1509,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
                          cellGE.flagState != FlagState::NoFlag)
                 {
                     cellGui.button->hide();
-                    cellGui.label->setPixmap(fieldTheme.getPixmapWrongFlag());
+                    cellGui.label->setPixmapCached(fieldTheme.getPixmapWrongFlag());
                 }
             }
         }
@@ -1509,7 +1517,7 @@ void LibreMinesGui::SLOT_gameLost(const uchar _X, const uchar _Y)
 
     controller.deactivate(this);
 
-    labelFaceReactionInGame->setPixmap(facesReac.getPixmapFromGameEvent(FacesReaction::GAME_LOST));
+    updateFaceReaction(FacesReaction::GAME_LOST);
     Q_EMIT SIGNAL_playSoundEffect(SoundEffects::GAME_LOST);
 }
 
