@@ -27,9 +27,8 @@ jobs:
       
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install build-essential qt6-base-dev qt6-tools-dev cmake \
-            libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev fuse libfuse2
+          sudo apt update
+          sudo apt install build-essential qt6-base-dev cmake libqt6svg6-dev qt6-multimedia-dev qt6-l10n-tools libgl1-mesa-dev
       
       - name: Build LibreMines
         run: |
@@ -52,21 +51,26 @@ jobs:
       
       - name: Download linuxdeploy tools and AppImage runtime
         run: |
+          cd build
           wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           wget https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
           chmod +x linuxdeploy*.AppImage appimagetool-x86_64.AppImage
-      
+ 
       - name: Create AppImage
         run: |
           cd build
           export QML_SOURCES_PATHS=""
           export QMAKE=/usr/bin/qmake6
+          export EXTRA_QT_PLUGINS="multimedia;"
+          export EXTRA_QT_MODULES="multimedia;"
+          
           # Bundle Qt6 dependencies with linuxdeploy
-          ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt
+          
           # Create final AppImage with appimagetool using pre-downloaded runtime
-          ../appimagetool-x86_64.AppImage --runtime-file ../runtime-x86_64 AppDir
+          ./appimagetool-x86_64.AppImage --runtime-file runtime-x86_64 AppDir
 
       - name: Rename AppImage for Release
         if: inputs.upload_to_release
