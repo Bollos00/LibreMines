@@ -27,8 +27,24 @@ jobs:
       
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install build-essential qt6-base-dev cmake libqt6svg6-dev qt6-multimedia-dev qt6-l10n-tools libgl1-mesa-dev
+          sudo apt-get update
+          sudo apt-get install build-essential qt6-base-dev qt6-tools-dev cmake \
+            libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev fuse libfuse2
+
+          # Install GStreamer and PulseAudio dependencies for sound support
+          sudo apt-get install \
+            libunwind-dev \
+            libgstreamer1.0-dev \
+            libgstreamer-plugins-base1.0-dev \
+            libgstreamer-plugins-base1.0.0 \
+            gstreamer1.0-plugins-good \
+            gstreamer1.0-plugins-bad \
+            gstreamer1.0-pulseaudio \
+            gstreamer1.0-alsa \
+            libpulse-dev \
+            libpulse0 \
+            libasound2-dev \
+            libasound2
       
       - name: Build LibreMines
         run: |
@@ -49,28 +65,49 @@ jobs:
           cd build
           make install DESTDIR=AppDir
       
-      - name: Download linuxdeploy tools and AppImage runtime
+      - name: Download linuxdeploy tools
         run: |
-          cd build
           wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
-          wget https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
-          chmod +x linuxdeploy*.AppImage appimagetool-x86_64.AppImage
+          chmod +x linuxdeploy*.AppImage
+
+      - name: Prepare audio dependencies before linuxdeploy
+        run: |
+          cd build
+          
+          # Create directories for audio plugins
+          mkdir -p AppDir/usr/lib/gstreamer-1.0
+          mkdir -p AppDir/usr/lib/pulse-15.0/modules
+          
+          # Copy GStreamer plugins
+          find /usr/lib -name "gstreamer-1.0" -type d -exec cp -r {}/* AppDir/usr/lib/gstreamer-1.0/ \; 2>/dev/null || true
+          
+          # Copy essential audio libraries
+          cp /usr/lib/*/libgstreamer-1.0.so* AppDir/usr/lib/ 2>/dev/null || true
+          cp /usr/lib/*/libgstbase-1.0.so* AppDir/usr/lib/ 2>/dev/null || true
+          cp /usr/lib/*/libgstaudio-1.0.so* AppDir/usr/lib/ 2>/dev/null || true
+          cp /usr/lib/*/libpulse*.so* AppDir/usr/lib/ 2>/dev/null || true
+          cp /usr/lib/*/libasound*.so* AppDir/usr/lib/ 2>/dev/null || true
+          
+          # Copy PulseAudio modules if they exist
+          find /usr/lib -path "*/pulse-*/modules" -exec cp -r {} AppDir/usr/lib/pulse-15.0/ \; 2>/dev/null || true
  
       - name: Create AppImage
         run: |
           cd build
+
+          # Set environment for Qt6
           export QML_SOURCES_PATHS=""
           export QMAKE=/usr/bin/qmake6
-          export EXTRA_QT_PLUGINS="multimedia;"
-          export EXTRA_QT_MODULES="multimedia;"
           
-          # Bundle Qt6 dependencies with linuxdeploy
-          ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt
-          
-          # Create final AppImage with appimagetool using pre-downloaded runtime
-          ./appimagetool-x86_64.AppImage --runtime-file runtime-x86_64 AppDir
+          # Create AppImage with proper arguments
+          ../linuxdeploy-x86_64.AppImage --appdir AppDir \
+            --desktop-file AppDir/usr/share/applications/io.github.Bollos00.LibreMines.desktop \
+            --executable AppDir/usr/bin/libremines \
+            --icon-file AppDir/usr/share/icons/hicolor/scalable/apps/libremines.svg \
+            --plugin qt \
+            --output appimage
+
 
       - name: Rename AppImage for Release
         if: inputs.upload_to_release

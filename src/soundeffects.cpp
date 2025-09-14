@@ -74,10 +74,6 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameBegin->isMuted())
             {
-                if(soundGameBegin->isPlaying())
-                {
-                    soundGameBegin->stop();
-                }
                 soundGameBegin->play();
             }
         }break;
@@ -85,10 +81,6 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameWon->isMuted())
             {
-                if(soundGameWon->isPlaying())
-                {
-                    soundGameWon->stop();
-                }
                 soundGameWon->play();
             }
         }break;
@@ -96,10 +88,6 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameLost->isMuted())
             {
-                if(soundGameLost->isPlaying())
-                {
-                    soundGameLost->stop();
-                }
                 soundGameLost->play();
             }
         }break;
@@ -107,10 +95,6 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundKeyboardControlMove->isMuted())
             {
-                if(soundKeyboardControlMove->isPlaying())
-                {
-                    soundKeyboardControlMove->stop();
-                }
                 soundKeyboardControlMove->play();
             }
         }break;
@@ -118,10 +102,6 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundReleaseCell->isMuted())
             {
-                if(soundReleaseCell->isPlaying())
-                {
-                    soundReleaseCell->stop();
-                }
                 soundReleaseCell->play();
             }
         }break;
@@ -129,10 +109,6 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundFlagCell->isMuted())
             {
-                if(soundFlagCell->isPlaying())
-                {
-                    soundFlagCell->stop();
-                }
                 soundFlagCell->play();
             }
         }break;
