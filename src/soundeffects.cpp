@@ -42,7 +42,7 @@ void SoundEffects::SLOT_initializeSounds()
     soundsInitialized = true;
 }
 
-void SoundEffects::SLOT_setVolume(const int vol)
+void SoundEffects::SLOT_setVolume(const int vol, const bool playPreview)
 {
     if (!soundsInitialized) {
         // Avoid setting volume before initialization
@@ -54,8 +54,12 @@ void SoundEffects::SLOT_setVolume(const int vol)
         sound->setVolume(vol/100.f);
         sound->setMuted(vol == 0);
     }
+
     // Preview sound volume.
-    SLOT_playSound(RELEASE_CELL);
+    if (playPreview)
+    {
+        SLOT_playSound(RELEASE_CELL);
+    }
 }
 
 void SoundEffects::SLOT_playSound(const SoundType type)

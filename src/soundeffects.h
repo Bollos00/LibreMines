@@ -87,7 +87,7 @@ public Q_SLOTS:
      * 
      * @param vol Volume level from 0 (muted) to 100 (maximum)
      */
-    void SLOT_setVolume(const int vol);
+    void SLOT_setVolume(const int vol, const bool playPreview);
 
 private:
     QScopedPointer<QSoundEffect> soundGameBegin;         ///< Sound effect for game start

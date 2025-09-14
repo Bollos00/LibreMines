@@ -203,6 +203,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     vAdjustInterfaceInGame();
     vShowInterfaceInGame();
 
+    // Reapply sound effect volume to make sure it is properly set
+    Q_EMIT preferences->SIGNAL_setSoundEffectVolume(preferences->optionSoundVolume(), false);
+
     // Reset the controller attributes
     controller = KeyboardController();
     controller.setKeys(preferences->optionKeyboardControllerKeys());

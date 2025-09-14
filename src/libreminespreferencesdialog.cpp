@@ -314,6 +314,7 @@ void LibreMinesPreferencesDialog::setOptionSoundVolume(const int option)
     ui->labelSoundVolume->setText(QString::number(option));
 
     ui->cbSoundMute->setChecked(option == 0);
+    ui->sliderSoundVolume->setEnabled(option != 0);
 }
 
 void LibreMinesPreferencesDialog::setOptionUseQuestionMark(const QString& option)
@@ -410,12 +411,12 @@ void LibreMinesPreferencesDialog::on_cbSoundMute_stateChanged(int arg1)
     if(arg1 == Qt::Checked)
     {
         ui->sliderSoundVolume->setValue(0);
-        ui->labelSoundVolume->setText(QString::number(0));
         ui->sliderSoundVolume->setEnabled(false);
     }
     else
     {
         ui->sliderSoundVolume->setEnabled(true);
+        ui->sliderSoundVolume->setValue(50);
     }
 }
 
@@ -426,10 +427,10 @@ void LibreMinesPreferencesDialog::on_sliderSoundVolume_valueChanged(int value)
 
     ui->labelSoundVolume->setText(QString::number(value));
 
-    if(value != 0 && !firstTime)
-    {
-        Q_EMIT SIGNAL_setSoundEffectVolume(value);
-    }
+    ui->cbSoundMute->setCheckState(value == 0 ? Qt::Checked : Qt::Unchecked);
+
+    // Avoid displaying sound on application startup by using firstTime flag
+    Q_EMIT SIGNAL_setSoundEffectVolume(value, !firstTime);
 
     firstTime = false;
 }
