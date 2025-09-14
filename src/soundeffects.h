@@ -62,6 +62,14 @@ public:
 
 public Q_SLOTS:
     /**
+     * @brief Initialize sound effects after thread movement
+     * 
+     * This slot must be called after moveToThread() to ensure
+     * QSoundEffect objects are created in the correct thread context.
+     */
+    void SLOT_initializeSounds();
+
+    /**
      * @brief Play a specific sound effect
      * 
      * Triggers playback of the specified sound type. If the sound system
@@ -82,15 +90,16 @@ public Q_SLOTS:
     void SLOT_setVolume(const int vol);
 
 private:
-    QSoundEffect soundGameBegin;         ///< Sound effect for game start
-    QSoundEffect soundGameWon;           ///< Sound effect for game victory
-    QSoundEffect soundGameLost;          ///< Sound effect for game loss
+    QScopedPointer<QSoundEffect> soundGameBegin;         ///< Sound effect for game start
+    QScopedPointer<QSoundEffect> soundGameWon;           ///< Sound effect for game victory
+    QScopedPointer<QSoundEffect> soundGameLost;          ///< Sound effect for game loss
 
-    QSoundEffect soundKeyboardControllMove; ///< Sound effect for keyboard navigation
-    QSoundEffect soundReleaseCell;       ///< Sound effect for cell revealing
-    QSoundEffect soundFlagCell;          ///< Sound effect for flag operations
+    QScopedPointer<QSoundEffect> soundKeyboardControlMove; ///< Sound effect for keyboard navigation
+    QScopedPointer<QSoundEffect> soundReleaseCell;       ///< Sound effect for cell revealing
+    QScopedPointer<QSoundEffect> soundFlagCell;          ///< Sound effect for flag operations
 
     QList<QSoundEffect*> soundEffects;  ///< List of all sound effects for batch operations
+    bool soundsInitialized;              ///< Flag to track if sounds have been initialized
 };
 
 Q_DECLARE_METATYPE(SoundEffects::SoundType)

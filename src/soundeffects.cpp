@@ -4,21 +4,51 @@
 
 SoundEffects::SoundEffects(QObject* parent) :
     QObject( parent ),
-    soundEffects( {&soundGameBegin, &soundGameWon, &soundGameLost,
-                  &soundKeyboardControllMove, &soundReleaseCell, &soundFlagCell} )
+    soundEffects(),
+    soundsInitialized(false)
 {
-    soundGameBegin.setSource(QUrl("qrc:/sound_effects/clock_tick.wav"));
-    soundGameWon.setSource(QUrl("qrc:/sound_effects/game_won.wav"));
-    soundGameLost.setSource(QUrl("qrc:/sound_effects/game_lost.wav"));
+    // Sound effects will be initialized later via SLOT_initializeSounds()
+    // after the object is moved to its target thread
+}
+
+void SoundEffects::SLOT_initializeSounds()
+{
+    if (soundsInitialized) {
+        return; // Already initialized
+    }
+
+    soundGameBegin.reset(new QSoundEffect(this));
+    soundGameWon.reset(new QSoundEffect(this));
+    soundGameLost.reset(new QSoundEffect(this));
+    soundKeyboardControlMove.reset(new QSoundEffect(this));
+    soundReleaseCell.reset(new QSoundEffect(this));
+    soundFlagCell.reset(new QSoundEffect(this));
+
+    soundGameBegin->setSource(QUrl("qrc:/sound_effects/clock_tick.wav"));
+    soundGameWon->setSource(QUrl("qrc:/sound_effects/game_won.wav"));
+    soundGameLost->setSource(QUrl("qrc:/sound_effects/game_lost.wav"));
     
-    soundKeyboardControllMove.setSource(QUrl("qrc:/sound_effects/move.wav"));
-    soundReleaseCell.setSource(QUrl("qrc:/sound_effects/release_cell.wav"));
-    soundFlagCell.setSource(QUrl("qrc:/sound_effects/flag_cell.wav"));
+    soundKeyboardControlMove->setSource(QUrl("qrc:/sound_effects/move.wav"));
+    soundReleaseCell->setSource(QUrl("qrc:/sound_effects/release_cell.wav"));
+    soundFlagCell->setSource(QUrl("qrc:/sound_effects/flag_cell.wav"));
+
+    soundEffects.append(soundGameBegin.data());
+    soundEffects.append(soundGameWon.data());
+    soundEffects.append(soundGameLost.data());
+    soundEffects.append(soundKeyboardControlMove.data());
+    soundEffects.append(soundReleaseCell.data());
+    soundEffects.append(soundFlagCell.data());
     
+    soundsInitialized = true;
 }
 
 void SoundEffects::SLOT_setVolume(const int vol)
 {
+    if (!soundsInitialized) {
+        // Avoid setting volume before initialization
+        return;
+    }
+    
     for(QSoundEffect* sound : soundEffects)
     {
         sound->setVolume(vol/100.f);
@@ -30,84 +60,76 @@ void SoundEffects::SLOT_setVolume(const int vol)
 
 void SoundEffects::SLOT_playSound(const SoundType type)
 {
+    if (!soundsInitialized) {
+        // Avoid playing sound before initialization
+        return;
+    }
     switch(type)
     {
         case SoundEffects::GAME_BEGIN:
         {
-            if(!soundGameBegin.isMuted())
+            if(!soundGameBegin->isMuted())
             {
-// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-//                 if(soundGameBegin.isPlaying())
-//                 {
-//                     soundGameBegin.stop();
-//                 }
-// #endif
-                soundGameBegin.play();
+                if(soundGameBegin->isPlaying())
+                {
+                    soundGameBegin->stop();
+                }
+                soundGameBegin->play();
             }
         }break;
         case SoundEffects::GAME_WON:
         {
-            if(!soundGameWon.isMuted())
+            if(!soundGameWon->isMuted())
             {
-// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-//                 if(soundGameWon.isPlaying())
-//                 {
-//                     soundGameWon.stop();
-//                 }
-// #endif
-                soundGameWon.play();
+                if(soundGameWon->isPlaying())
+                {
+                    soundGameWon->stop();
+                }
+                soundGameWon->play();
             }
         }break;
         case SoundEffects::GAME_LOST:
         {
-            if(!soundGameLost.isMuted())
+            if(!soundGameLost->isMuted())
             {
-// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-//                 if(soundGameLost.isPlaying())
-//                 {
-//                     soundGameLost.stop();
-//                 }
-// #endif
-                soundGameLost.play();
+                if(soundGameLost->isPlaying())
+                {
+                    soundGameLost->stop();
+                }
+                soundGameLost->play();
             }
         }break;
         case SoundEffects::KEYBOARD_CONTROLLER_MOVE:
         {
-            if(!soundKeyboardControllMove.isMuted())
+            if(!soundKeyboardControlMove->isMuted())
             {
-// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-//                 if(soundKeyboardControllMove.isPlaying())
-//                 {
-//                     soundKeyboardControllMove.stop();
-//                 }
-// #endif
-                soundKeyboardControllMove.play();
+                if(soundKeyboardControlMove->isPlaying())
+                {
+                    soundKeyboardControlMove->stop();
+                }
+                soundKeyboardControlMove->play();
             }
         }break;
         case SoundEffects::RELEASE_CELL:
         {
-            if(!soundReleaseCell.isMuted())
+            if(!soundReleaseCell->isMuted())
             {
-// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-//                 if(soundReleaseCell.isPlaying())
-//                 {
-//                     soundReleaseCell.stop();
-//                 }
-// #endif
-                soundReleaseCell.play();
+                if(soundReleaseCell->isPlaying())
+                {
+                    soundReleaseCell->stop();
+                }
+                soundReleaseCell->play();
             }
         }break;
         case SoundEffects::FLAG_CELL:
         {
-            if(!soundFlagCell.isMuted())
+            if(!soundFlagCell->isMuted())
             {
-// #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-//                 if(soundFlagCell.isPlaying())
-//                 {
-//                     soundFlagCell.stop();
-//                 }
-//                 soundFlagCell.play();
-// #endif
+                if(soundFlagCell->isPlaying())
+                {
+                    soundFlagCell->stop();
+                }
+                soundFlagCell->play();
             }
         }break;
     }
