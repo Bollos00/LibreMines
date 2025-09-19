@@ -78,9 +78,9 @@ jobs:
         run: |
           mkdir build && cd build
           if ("${{ inputs.upload_to_release }}" -eq "true") {
-            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' ..
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_THREADED_SOUND_EFFECTS=OFF -DUSE_QT6='NO' ..
           } else {
-            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_QT6='NO' -DBUILD_TESTS=ON ..
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_THREADED_SOUND_EFFECTS=OFF -DUSE_QT6='NO' -DBUILD_TESTS=ON ..
           }
 
       - name: "Build"
