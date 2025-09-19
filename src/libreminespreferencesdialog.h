@@ -176,9 +176,13 @@ private Q_SLOTS:
 
     void on_sliderSoundVolume_valueChanged(int value);
 
+    void on_sliderSoundVolume_sliderReleased();
+
 Q_SIGNALS:
     void SIGNAL_optionChanged(const QString& name, const QString& value);
     void SIGNAL_visibilityChanged(const bool visible);
+
+    void SIGNAL_setSoundEffectVolume(const int v, const bool play);
 };
 
 #endif // LIBREMINESPREFERENCESDIALOG_H

@@ -32,6 +32,7 @@
 #include <QVBoxLayout>
 
 #include "common.h"
+#include "libreminesconfig.h"
 #include "libreminespreferencesdialog.h"
 #include "libreminesgameengine.h"
 #include "qlabel_adapted.h"
@@ -280,7 +281,6 @@ Q_SIGNALS:
     void SIGNAL_addOrRemoveFlag(const uchar _X, const uchar _Y);
     void SIGNAL_stopGame();
     void SIGNAL_playSoundEffect(SoundEffects::SoundType t);
-    void SIGNAL_setSoundEffectVolume(const int v);
 
 private:
 
@@ -356,6 +356,9 @@ private:
     QDir dirAppData;
 
     QScopedPointer<SoundEffects> sound;
+#ifdef USE_THREADED_SOUND_EFFECTS
+    QScopedPointer<QThread> soundThread;
+#endif
 
     bool bMinefieldBeingCreated;
 };

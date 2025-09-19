@@ -14,7 +14,7 @@
 #define SOUNDEFFECTS_H
 
 #include <QSoundEffect>
-#include <QScopedPointer>
+#include <QSharedPointer>
 
 /**
  * @brief Audio system for game sound effects
@@ -62,6 +62,14 @@ public:
 
 public Q_SLOTS:
     /**
+     * @brief Initialize sound effects after thread movement
+     * 
+     * This slot must be called after moveToThread() to ensure
+     * QSoundEffect objects are created in the correct thread context.
+     */
+    void SLOT_initializeSounds();
+
+    /**
      * @brief Play a specific sound effect
      * 
      * Triggers playback of the specified sound type. If the sound system
@@ -79,18 +87,21 @@ public Q_SLOTS:
      * 
      * @param vol Volume level from 0 (muted) to 100 (maximum)
      */
-    void SLOT_setVolume(const int vol);
+    void SLOT_setVolume(const int vol, const bool playPreview);
 
 private:
-    QSoundEffect soundGameBegin;         ///< Sound effect for game start
-    QSoundEffect soundGameWon;           ///< Sound effect for game victory
-    QSoundEffect soundGameLost;          ///< Sound effect for game loss
+    QSharedPointer<QSoundEffect> soundGameBegin;         ///< Sound effect for game start
+    QSharedPointer<QSoundEffect> soundGameWon;           ///< Sound effect for game victory
+    QSharedPointer<QSoundEffect> soundGameLost;          ///< Sound effect for game loss
 
-    QSoundEffect soundKeyboardControllMove; ///< Sound effect for keyboard navigation
-    QSoundEffect soundReleaseCell;       ///< Sound effect for cell revealing
-    QSoundEffect soundFlagCell;          ///< Sound effect for flag operations
+    QSharedPointer<QSoundEffect> soundKeyboardControlMove; ///< Sound effect for keyboard navigation
+    QSharedPointer<QSoundEffect> soundReleaseCell;       ///< Sound effect for cell revealing
+    QSharedPointer<QSoundEffect> soundFlagCell;          ///< Sound effect for flag operations
 
-    QList<QSoundEffect*> soundEffects;  ///< List of all sound effects for batch operations
+    QList<QSharedPointer<QSoundEffect>> soundEffects;  ///< List of all sound effects for batch operations
+    bool soundsInitialized;              ///< Flag to track if sounds have been initialized
 };
+
+Q_DECLARE_METATYPE(SoundEffects::SoundType)
 
 #endif // SOUNDEFFECTS_H

@@ -60,9 +60,14 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
     difficult(GameDifficulty::NONE ),
     preferences( new LibreMinesPreferencesDialog(this) ),
     dirAppData( QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) ),
-    sound( new SoundEffects() ),
-    currentFaceState( FacesReaction::DEFAULT )
+    currentFaceState( FacesReaction::DEFAULT ),
+    sound( new SoundEffects() )
+#ifdef USE_THREADED_SOUND_EFFECTS
+    , soundThread( new QThread() )
+#endif
 {
+    qRegisterMetaType<SoundEffects::SoundType>();
+
     // this->resize(800, 600);
     this->setMinimumSize(QSize(700, 500));
 
@@ -101,7 +106,31 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
         *sbCustomizedPercentageMines, *sbCustomizedX, *sbCustomizedY,
         *cbCustomizedMinesInPercentage
     );
+
+#ifdef USE_THREADED_SOUND_EFFECTS
+    // Use sound effects on a separate thread
+    sound->moveToThread(soundThread.get());
+#endif
+
+    connect(preferences, &LibreMinesPreferencesDialog::SIGNAL_setSoundEffectVolume,
+            sound.get(), &SoundEffects::SLOT_setVolume);
+    connect(this, &LibreMinesGui::SIGNAL_playSoundEffect,
+            sound.get(), &SoundEffects::SLOT_playSound);
+
+#ifdef USE_THREADED_SOUND_EFFECTS    
+    // Initialize sounds after thread is started and object is moved
+    connect(soundThread.get(), &QThread::started,
+            sound.get(), &SoundEffects::SLOT_initializeSounds);
+    
+    soundThread->start();
+#else    
+    // Initialize sounds immediately in main thread
+    sound->SLOT_initializeSounds();
+#endif
+
+
     vUpdatePreferences();
+
     fieldTheme.vSetMinefieldTheme(preferences->optionMinefieldTheme(), 0);
     facesReac.vSetFacesReactionTheme(preferences->optionFacesReaction(), 0);
 
@@ -111,10 +140,6 @@ LibreMinesGui::LibreMinesGui(QWidget *parent, const int thatWidth, const int tha
 
     bMinefieldBeingCreated = false;
 
-    connect(this, &LibreMinesGui::SIGNAL_setSoundEffectVolume,
-            sound.get(), &SoundEffects::SLOT_setVolume);
-    connect(this, &LibreMinesGui::SIGNAL_playSoundEffect,
-            sound.get(), &SoundEffects::SLOT_playSound);
 }
 
 LibreMinesGui::~LibreMinesGui()
@@ -161,6 +186,10 @@ void LibreMinesGui::resizeEvent(QResizeEvent *e)
 
 void LibreMinesGui::closeEvent(QCloseEvent *e)
 {
+#ifdef USE_THREADED_SOUND_EFFECTS
+    soundThread->quit();
+    soundThread->wait(); // Wait for thread to finish properly
+#endif
     SLOT_quitApplication();
     e->ignore();
 }
@@ -173,6 +202,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
     
     vAdjustInterfaceInGame();
     vShowInterfaceInGame();
+
+    // Reapply sound effect volume to make sure it is properly set
+    Q_EMIT preferences->SIGNAL_setSoundEffectVolume(preferences->optionSoundVolume(), false);
 
     // Reset the controller attributes
     controller = KeyboardController();
@@ -1708,6 +1740,4 @@ void LibreMinesGui::vUpdatePreferences()
         preferences->setOptionUsername(qgetenv("USER"));
 #endif
     }
-
-    sound->SLOT_setVolume(preferences->optionSoundVolume());
 }

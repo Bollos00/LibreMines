@@ -23,7 +23,6 @@
 
 #include <QStyleFactory>
 #include <QMessageBox>
-#include <QSoundEffect>
 
 #include "extrathemes.h"
 
@@ -315,6 +314,7 @@ void LibreMinesPreferencesDialog::setOptionSoundVolume(const int option)
     ui->labelSoundVolume->setText(QString::number(option));
 
     ui->cbSoundMute->setChecked(option == 0);
+    ui->sliderSoundVolume->setEnabled(option != 0);
 }
 
 void LibreMinesPreferencesDialog::setOptionUseQuestionMark(const QString& option)
@@ -411,30 +411,26 @@ void LibreMinesPreferencesDialog::on_cbSoundMute_stateChanged(int arg1)
     if(arg1 == Qt::Checked)
     {
         ui->sliderSoundVolume->setValue(0);
-        ui->labelSoundVolume->setText(QString::number(0));
         ui->sliderSoundVolume->setEnabled(false);
     }
     else
     {
         ui->sliderSoundVolume->setEnabled(true);
+        ui->sliderSoundVolume->setValue(50);
     }
 }
-
 
 void LibreMinesPreferencesDialog::on_sliderSoundVolume_valueChanged(int value)
 {
-    static bool firstTime = true;
-
     ui->labelSoundVolume->setText(QString::number(value));
 
-    if(value != 0 && !firstTime)
-    {
-        static QSoundEffect sound;
-        sound.setSource(QUrl("qrc:/sound_effects/move.wav"));
-        sound.setVolume(value/100.f);
-        sound.play();
-    }
-
-    firstTime = false;
+    ui->cbSoundMute->setCheckState(value == 0 ? Qt::Checked : Qt::Unchecked);
 }
+
+void LibreMinesPreferencesDialog::on_sliderSoundVolume_sliderReleased()
+{
+    Q_EMIT SIGNAL_setSoundEffectVolume(ui->sliderSoundVolume->value(), true);
+}
+
+
 
