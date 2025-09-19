@@ -134,16 +134,6 @@ protected:
      */
     void mousePressEvent(QMouseEvent* e);
 
-    /**
-     * @brief Override paint event to ensure icon fills entire button area
-     * 
-     * Custom paint implementation that forces the icon to scale to the full
-     * button size, fixing the AppImage issue where icons are capped at ~76px.
-     * 
-     * @param event Paint event from Qt
-     */
-    void paintEvent(QPaintEvent* event);
-
 private:
     const uchar xCell; ///< X coordinate (column) of this cell in the game grid
     const uchar yCell; ///< Y coordinate (row) of this cell in the game grid

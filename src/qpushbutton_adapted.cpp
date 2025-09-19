@@ -20,9 +20,6 @@
 
 #include "qpushbutton_adapted.h"
 #include <QMouseEvent>
-#include <QPainter>
-#include <QStyleOptionButton>
-#include <QStyle>
 
 QPushButton_adapted::QPushButton_adapted(QWidget *parent, const uchar x, const uchar y) :
     QPushButton(parent),
@@ -30,6 +27,9 @@ QPushButton_adapted::QPushButton_adapted(QWidget *parent, const uchar x, const u
     yCell(y)
 {
     setFocusPolicy(Qt::ClickFocus);
+    
+    // AppImage fix: Force button to respect icon size by removing style constraints
+    setStyleSheet("QPushButton { border: none; padding: 0px; }");
 }
 
 uchar QPushButton_adapted::getXCell()
@@ -88,20 +88,4 @@ void QPushButton_adapted::mousePressEvent(QMouseEvent *e)
     setIconInverted();
 
     Q_EMIT SIGNAL_clicked(e);
-}
-
-void QPushButton_adapted::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event);
-    
-    QPainter painter(this);
-    
-    // Get the current icon (normal or inverted)
-    QIcon currentIcon = isInverted ? invertedIcon : normalIcon;
-    
-    // Draw icon to fill entire button area
-    if (!currentIcon.isNull()) {
-        QRect iconRect = rect();
-        currentIcon.paint(&painter, iconRect);
-    }
 }
