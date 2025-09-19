@@ -74,6 +74,7 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameBegin->isMuted())
             {
+                soundGameBegin->stop();
                 soundGameBegin->play();
             }
         }break;
@@ -81,6 +82,7 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameWon->isMuted())
             {
+                soundGameWon->stop();
                 soundGameWon->play();
             }
         }break;
@@ -88,6 +90,7 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameLost->isMuted())
             {
+                soundGameLost->stop();
                 soundGameLost->play();
             }
         }break;
@@ -95,6 +98,7 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundKeyboardControlMove->isMuted())
             {
+                soundKeyboardControlMove->stop();
                 soundKeyboardControlMove->play();
             }
         }break;
@@ -102,6 +106,7 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundReleaseCell->isMuted())
             {
+                soundReleaseCell->stop();
                 soundReleaseCell->play();
             }
         }break;
@@ -109,6 +114,7 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundFlagCell->isMuted())
             {
+                soundFlagCell->stop();
                 soundFlagCell->play();
             }
         }break;
