@@ -14,7 +14,7 @@
 #define SOUNDEFFECTS_H
 
 #include <QSoundEffect>
-#include <QScopedPointer>
+#include <QSharedPointer>
 
 /**
  * @brief Audio system for game sound effects
@@ -90,15 +90,15 @@ public Q_SLOTS:
     void SLOT_setVolume(const int vol, const bool playPreview);
 
 private:
-    QScopedPointer<QSoundEffect> soundGameBegin;         ///< Sound effect for game start
-    QScopedPointer<QSoundEffect> soundGameWon;           ///< Sound effect for game victory
-    QScopedPointer<QSoundEffect> soundGameLost;          ///< Sound effect for game loss
+    QSharedPointer<QSoundEffect> soundGameBegin;         ///< Sound effect for game start
+    QSharedPointer<QSoundEffect> soundGameWon;           ///< Sound effect for game victory
+    QSharedPointer<QSoundEffect> soundGameLost;          ///< Sound effect for game loss
 
-    QScopedPointer<QSoundEffect> soundKeyboardControlMove; ///< Sound effect for keyboard navigation
-    QScopedPointer<QSoundEffect> soundReleaseCell;       ///< Sound effect for cell revealing
-    QScopedPointer<QSoundEffect> soundFlagCell;          ///< Sound effect for flag operations
+    QSharedPointer<QSoundEffect> soundKeyboardControlMove; ///< Sound effect for keyboard navigation
+    QSharedPointer<QSoundEffect> soundReleaseCell;       ///< Sound effect for cell revealing
+    QSharedPointer<QSoundEffect> soundFlagCell;          ///< Sound effect for flag operations
 
-    QList<QSoundEffect*> soundEffects;  ///< List of all sound effects for batch operations
+    QList<QSharedPointer<QSoundEffect>> soundEffects;  ///< List of all sound effects for batch operations
     bool soundsInitialized;              ///< Flag to track if sounds have been initialized
 };
 
