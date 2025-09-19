@@ -2,6 +2,7 @@
 
 #include <QFileInfo>
 #include <QDateTime>
+#include <QDebug>
 
 SoundEffects::SoundEffects(QObject* parent) :
     QObject( parent ),
@@ -75,66 +76,66 @@ void SoundEffects::SLOT_playSound(const SoundType type)
         {
             if(!soundGameBegin->isMuted())
             {
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Playing game begin sound";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Playing game begin sound";
                 soundGameBegin->stop();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Game begin sound stopped";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Game begin sound stopped";
                 soundGameBegin->play();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Game begin sound started";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Game begin sound started";
             }
         }break;
         case SoundEffects::GAME_WON:
         {
             if(!soundGameWon->isMuted())
             {
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Playing game won sound";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Playing game won sound";
                 soundGameWon->stop();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Game won sound stopped";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Game won sound stopped";
                 soundGameWon->play();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Game won sound started";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Game won sound started";
             }
         }break;
         case SoundEffects::GAME_LOST:
         {
             if(!soundGameLost->isMuted())
             {
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Playing game lost sound";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Playing game lost sound";
                 soundGameLost->stop();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Game lost sound stopped";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Game lost sound stopped";
                 soundGameLost->play();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Game lost sound started";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Game lost sound started";
             }
         }break;
         case SoundEffects::KEYBOARD_CONTROLLER_MOVE:
         {
             if(!soundKeyboardControlMove->isMuted())
             {
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Playing keyboard move sound";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Playing keyboard move sound";
                 soundKeyboardControlMove->stop();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Keyboard move sound stopped";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Keyboard move sound stopped";
                 soundKeyboardControlMove->play();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Keyboard move sound started";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Keyboard move sound started";
             }
         }break;
         case SoundEffects::RELEASE_CELL:
         {
             if(!soundReleaseCell->isMuted())
             {
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Playing release cell sound";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Playing release cell sound";
                 soundReleaseCell->stop();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Release cell sound stopped";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Release cell sound stopped";
                 soundReleaseCell->play();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Release cell sound started";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Release cell sound started";
             }
         }break;
         case SoundEffects::FLAG_CELL:
         {
             if(!soundFlagCell->isMuted())
             {
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Playing flag cell sound";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Playing flag cell sound";
                 soundFlagCell->stop();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Flag cell sound stopped";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Flag cell sound stopped";
                 soundFlagCell->play();
-                qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "Flag cell sound started";
+                qDebug() << qPrintable(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")) << "Flag cell sound started";
             }
         }break;
     }
