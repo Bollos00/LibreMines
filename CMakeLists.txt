@@ -43,7 +43,7 @@ option(USE_QT6 "Whether to use Qt5 or Qt6 libraries" TRUE)
 option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
 option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra themes for the minefield" TRUE)
 option(INSTALL_EXTRA_FACESREACTION_THEMES "Install extra themes for the faces reaction" TRUE)
-option(USE_THREADED_SOUND_EFFECTS "Use sound effects on a separate thread (default: ON, disable if audio issues occur)" ON)
+option(USE_THREADED_SOUND_EFFECTS "Use sound effects on a separate thread (default: OFF)" OFF)
 
 # Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
