@@ -1,6 +1,7 @@
 #include "soundeffects.h"
 
 #include <QFileInfo>
+#include <QDateTime>
 
 SoundEffects::SoundEffects(QObject* parent) :
     QObject( parent ),
