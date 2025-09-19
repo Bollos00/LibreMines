@@ -420,18 +420,17 @@ void LibreMinesPreferencesDialog::on_cbSoundMute_stateChanged(int arg1)
     }
 }
 
-
 void LibreMinesPreferencesDialog::on_sliderSoundVolume_valueChanged(int value)
 {
-    static bool firstTime = true;
-
     ui->labelSoundVolume->setText(QString::number(value));
 
     ui->cbSoundMute->setCheckState(value == 0 ? Qt::Checked : Qt::Unchecked);
-
-    // Avoid displaying sound on application startup by using firstTime flag
-    Q_EMIT SIGNAL_setSoundEffectVolume(value, !firstTime);
-
-    firstTime = false;
 }
+
+void LibreMinesPreferencesDialog::on_sliderSoundVolume_sliderReleased()
+{
+    Q_EMIT SIGNAL_setSoundEffectVolume(ui->sliderSoundVolume->value(), true);
+}
+
+
 
