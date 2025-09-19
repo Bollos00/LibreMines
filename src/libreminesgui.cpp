@@ -267,11 +267,8 @@ void LibreMinesGui::vNewGame(const uchar _X,
         {
             CellGui& cell = principalMatrix[i][j];
 
-//            cell.label = new QLabel_adapted(this);
-//            cell.button = new QPushButton_adapted(this);
-
             cell.label = new QLabel_adapted(widgetBoardContents, i, j);
-            cell.button = new QPushButton_adapted(widgetBoardContents, i, j);
+            cell.button = new QLabel_adapted(widgetBoardContents, i, j);
 
             layoutBoard->addWidget(cell.label, j, i);
             layoutBoard->addWidget(cell.button, j, i);
@@ -282,14 +279,14 @@ void LibreMinesGui::vNewGame(const uchar _X,
             cell.label->show();
 
             cell.button->resize(cellLength, cellLength);
-            cell.button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
-            cell.button->setIconSize(QSize(cellLength, cellLength));
+            cell.button->setPixmapCached(fieldTheme.getPixmapButton(FlagState::NoFlag));
+            cell.button->setScaledContents(true);
             cell.button->show();
             cell.button->setEnabled(false);
 
-            connect(cell.button, &QPushButton_adapted::SIGNAL_released,
+            connect(cell.button, &QLabel_adapted::SIGNAL_released,
                     this, &LibreMinesGui::SLOT_OnCellButtonReleased);
-            connect(cell.button, &QPushButton_adapted::SIGNAL_clicked,
+            connect(cell.button, &QLabel_adapted::SIGNAL_clicked,
                     this, &LibreMinesGui::SLOT_OnCellButtonClicked);
 
             if(bCleanNeighborCellsWhenClickedOnShowedLabel)
@@ -627,8 +624,13 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     connect(actionGitHubHomePage, &QAction::triggered,
             [](){ QDesktopServices::openUrl(QUrl("https://github.com/Bollos00/LibreMines")); });
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    connect(cbCustomizedMinesInPercentage, &QCheckBox::checkStateChanged,
+            [this](const int state)
+#else
     connect(cbCustomizedMinesInPercentage, &QCheckBox::stateChanged,
             [this](const int state)
+#endif
     {
        if(state == Qt::Checked)
        {
@@ -982,8 +984,7 @@ void LibreMinesGui::vAdjustInterfaceInGame()
             cell.label->setPixmapCached(fieldTheme.getPixmapFromCellValue(cellGE.value));
 
             cell.button->resize(cellLength, cellLength);
-            cell.button->setIconCached(QIcon(fieldTheme.getPixmapButton(cellGE.flagState)));
-            cell.button->setIconSize(QSize(cellLength, cellLength));
+            cell.button->setPixmapCached(fieldTheme.getPixmapButton(cellGE.flagState));
         }
     }
 }
@@ -1132,7 +1133,7 @@ void LibreMinesGui::SLOT_OnCellButtonReleased(const QMouseEvent *const e)
         return;
     }
 
-    QPushButton_adapted *buttonClicked = (QPushButton_adapted *) sender();
+    QLabel_adapted *buttonClicked = (QLabel_adapted *) sender();
 
     switch (e->button())
     {
@@ -1382,8 +1383,7 @@ void LibreMinesGui::SLOT_flagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::HasFlag)));
-        principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
+        principalMatrix[_X][_Y].button->setPixmapCached(fieldTheme.getPixmapButton(FlagState::HasFlag));
     }
 
     controller.refresh(_X, _Y, this);
@@ -1398,8 +1398,7 @@ void LibreMinesGui::SLOT_QuestionCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapQuestion()));
-        principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
+        principalMatrix[_X][_Y].button->setPixmapCached(fieldTheme.getPixmapQuestion());
     }
 
     controller.refresh(_X, _Y, this);
@@ -1413,8 +1412,7 @@ void LibreMinesGui::SLOT_unflagCell(const uchar _X, const uchar _Y)
         qDebug(Q_FUNC_INFO);
     else
     {
-        principalMatrix[_X][_Y].button->setIconCached(QIcon(fieldTheme.getPixmapButton(FlagState::NoFlag)));
-        principalMatrix[_X][_Y].button->setIconSize(QSize(cellLength, cellLength));
+        principalMatrix[_X][_Y].button->setPixmapCached(fieldTheme.getPixmapButton(FlagState::NoFlag));
     }
 
     controller.refresh(_X, _Y, this);
