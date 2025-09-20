@@ -33,7 +33,7 @@ if(APPLE AND NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
 endif()
 
 project(libremines
-    VERSION "2.1.0"
+    VERSION "2.2.0"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD, macOS and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
