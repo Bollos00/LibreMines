@@ -36,7 +36,6 @@
 #include "libreminespreferencesdialog.h"
 #include "libreminesgameengine.h"
 #include "qlabel_adapted.h"
-#include "qpushbutton_adapted.h"
 #include "minefieldtheme.h"
 #include "soundeffects.h"
 #include "facesreaction.h"
@@ -110,8 +109,8 @@ private:
          */
         CellGui();
 
-        QPushButton_adapted *button; ///< Button widget for hidden cell state (clickable for revealing)
-        QLabel_adapted *label;       ///< Label widget for revealed cell state (displays value, clickable for chording)
+        QLabel_adapted *button; ///< Button widget for hidden cell state (clickable for revealing)
+        QLabel_adapted *label;  ///< Label widget for revealed cell state (displays value, clickable for chording)
     };
 
 public:

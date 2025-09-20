@@ -177,7 +177,7 @@ set(SOURCE_FILES
     src/minefieldtheme.cpp src/minefieldtheme.h
     src/qkeyinput.cpp src/qkeyinput.h
     src/qlabel_adapted.cpp src/qlabel_adapted.h
-    src/qpushbutton_adapted.cpp src/qpushbutton_adapted.h
+
     src/soundeffects.cpp src/soundeffects.h
     share/facesreaction.qrc
     share/icons.qrc

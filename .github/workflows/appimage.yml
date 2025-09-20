@@ -21,23 +21,57 @@ on:
 jobs:
   appimage:
     runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        qt-version: [ '5.15.2', '6.8.3' ]
     
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install dependencies
+
+      - name: "Install Qt 5.15.2"
+        if: matrix.qt-version == '5.15.2'
+        uses: jurplel/install-qt-action@v4.3.0
+        with:
+          version: '5.15.2'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+
+      - name: "Install Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
+        uses: jurplel/install-qt-action@v4.3.0
+        with:
+          version: '6.8.3'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'linux_gcc_64'
+          modules: 'qtmultimedia'
+
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install build-essential qt6-base-dev qt6-tools-dev cmake \
-            libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev fuse libfuse2
+          sudo apt-get install build-essential cmake libgl1-mesa-dev fuse libfuse2
       
-      - name: Build LibreMines
+      - name: "Build LibreMines Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
         run: |
           mkdir build && cd build
           if [ "${{ inputs.upload_to_release }}" = "true" ]; then
             cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ..
           else
             cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTS=ON ..
+          fi
+          make -j$(nproc)
+
+      - name: "Build LibreMines Qt 5.15.2"
+        if: matrix.qt-version == '5.15.2'
+        run: |
+          mkdir build && cd build
+          if [ "${{ inputs.upload_to_release }}" = "true" ]; then
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6='NO' ..
+          else
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6='NO' -DBUILD_TESTS=ON ..
           fi
           make -j$(nproc)
 
@@ -58,12 +92,26 @@ jobs:
           wget https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
           chmod +x linuxdeploy*.AppImage appimagetool-x86_64.AppImage
       
-      - name: Create AppImage
+      - name: "Create AppImage Qt 6.8.3"
+        if: matrix.qt-version == '6.8.3'
         run: |
           cd build
           export QML_SOURCES_PATHS=""
-          export QMAKE=/usr/bin/qmake6
+          export QMAKE=$(which qmake6)
+          echo "qmake6 found at: $QMAKE"
           # Bundle Qt6 dependencies with linuxdeploy
+          ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt
+          # Create final AppImage with appimagetool using pre-downloaded runtime
+          ../appimagetool-x86_64.AppImage --runtime-file ../runtime-x86_64 AppDir
+
+      - name: "Create AppImage Qt 5.15.2"
+        if: matrix.qt-version == '5.15.2'
+        run: |
+          cd build
+          export QML_SOURCES_PATHS=""
+          export QMAKE=$(which qmake)
+          echo "qmake found at: $QMAKE"
+          # Bundle Qt5 dependencies with linuxdeploy
           ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt
           # Create final AppImage with appimagetool using pre-downloaded runtime
           ../appimagetool-x86_64.AppImage --runtime-file ../runtime-x86_64 AppDir
@@ -72,12 +120,16 @@ jobs:
         if: inputs.upload_to_release
         run: |
           cd build
-          mv *.AppImage "LibreMines-${{ inputs.version }}-x86_64.AppImage"
+          if [ "${{ matrix.qt-version }}" = "5.15.2" ]; then
+            mv *.AppImage "LibreMines-${{ inputs.version }}-qt5-x86_64.AppImage"
+          else
+            mv *.AppImage "LibreMines-${{ inputs.version }}-qt6-x86_64.AppImage"
+          fi
       
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
-          name: LibreMines-AppImage-x86_64
+          name: LibreMines-AppImage-qt-${{ matrix.qt-version }}-x86_64
           path: build/*.AppImage
           
       - name: Upload to Release

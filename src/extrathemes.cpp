@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QStandardPaths>
+#include <QCoreApplication>
 
 bool ExtraThemes::isValidTheme(const QString& themePath, Type type)
 {
@@ -54,33 +55,46 @@ QList<QString> ExtraThemes::getExtraThemes(Type type)
 
     QList<QString> extraThemes;
 
-    for(const QString& path :
-         QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation))
+    // Build list of paths to search
+    QStringList searchPaths = QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
+    
+#ifdef Q_OS_LINUX
+    // Add AppImage paths if we're running as AppImage
+    QString appImagePath = qgetenv("APPIMAGE");
+    if(!appImagePath.isEmpty())
     {
-        QDir dir(path);
+        QString executableDir = QCoreApplication::applicationDirPath();
+        searchPaths << executableDir + "/../share/libremines";
+    }
+#endif
 
-        // Continue if the directory does not exist
+    // Search all paths for themes
+    for(const QString& basePath : searchPaths)
+    {
+        QDir dir(basePath);
+
+        // Continue if the directory does not exist or can't navigate to theme dir
         if(!dir.exists() || !dir.cd(themeDir))
             continue;
 
-        for(const QString& themeName :
-             dir.entryList(QDir::AllDirs | QDir::NoDot | QDir::NoDotDot))
+        for(const QString& themeName : dir.entryList(QDir::AllDirs | QDir::NoDot | QDir::NoDotDot))
         {
-            // Add the new theme to the check box if it has a valid format
-            if(ExtraThemes::isValidTheme(dir.path(), themeName, type))
+            // Add theme if valid and not already found
+            if(ExtraThemes::isValidTheme(dir.path(), themeName, type) && !extraThemes.contains(themeName))
             {
                 extraThemes.append(themeName);
             }
         }
     }
 
+    // Remove duplicates
     for(int i=0; i<extraThemes.size(); ++i)
     {
         for(int j=i+1; j<extraThemes.size(); ++j)
         {
             if(extraThemes[i] == extraThemes[j])
             {
-                qWarning() << "Duplicated Minefield extra theme: " << extraThemes[j];
+                qWarning() << "Duplicated extra theme:" << extraThemes[j];
                 extraThemes.removeAt(j);
                 j--;
             }

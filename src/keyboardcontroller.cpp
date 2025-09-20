@@ -229,7 +229,7 @@ void KeyboardController::setCurrentCell(const uchar x, const uchar y, LibreMines
 
     if(cellGE.isHidden)
     {
-        cellGui.button->setIconInverted();
+        cellGui.button->setPixmapInverted();
     }
     else
     {
@@ -249,7 +249,7 @@ void KeyboardController::unsetCurrentCell(LibreMinesGui* gui)
 
     if(cellGE.isHidden)
     {
-        cellGui.button->setIconNormal();
+        cellGui.button->setPixmapNormal();
     }
     else
     {
