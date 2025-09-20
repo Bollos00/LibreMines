@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QIcon>
+#include <QCoreApplication>
 
 FacesReaction::FacesReaction()
 {
@@ -32,8 +33,21 @@ void FacesReaction::vSetFacesReactionTheme(const QString& which, const int lengt
         }
         else
         {
-            for(const QString& path :
-                 QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation))
+            // Build list of paths to search
+            QStringList searchPaths = QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
+            
+#ifdef Q_OS_LINUX
+            // Add AppImage paths if we're running as AppImage
+            QString appImagePath = qgetenv("APPIMAGE");
+            if(!appImagePath.isEmpty())
+            {
+                QString executableDir = QCoreApplication::applicationDirPath();
+                searchPaths << executableDir + "/../share/libremines";
+            }
+#endif
+
+            // Search all paths for the theme
+            for(const QString& path : searchPaths)
             {
                 QDir pathDir(path);
 

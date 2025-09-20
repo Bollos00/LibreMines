@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QIcon>
+#include <QCoreApplication>
 
 #include "extrathemes.h"
 
@@ -24,8 +25,21 @@ void MinefieldTheme::vSetMinefieldTheme(const QString& theme, const int cellLeng
     // If it is not one of the default themes, try to find it on the system.
     else
     {
-        for(const QString& path :
-            QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation))
+        // Build list of paths to search
+        QStringList searchPaths = QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
+        
+#ifdef Q_OS_LINUX
+        // Add AppImage paths if we're running as AppImage
+        QString appImagePath = qgetenv("APPIMAGE");
+        if(!appImagePath.isEmpty())
+        {
+            QString executableDir = QCoreApplication::applicationDirPath();
+            searchPaths << executableDir + "/../share/libremines";
+        }
+#endif
+
+        // Search all paths for the theme
+        for(const QString& path : searchPaths)
         {
             QDir pathDir(path);
 
