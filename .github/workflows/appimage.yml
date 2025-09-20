@@ -24,12 +24,20 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install dependencies
+
+      - name: Install Qt 6.8.3 LTS
+        uses: jurplel/install-qt-action@v4.3.0
+        with:
+          version: '6.8.3'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'linux_gcc_64'
+          modules: 'qtmultimedia'
+
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install build-essential qt6-base-dev qt6-tools-dev cmake \
-            libqt6svg6-dev qt6-multimedia-dev libgl1-mesa-dev fuse libfuse2
+          sudo apt-get install build-essential cmake libgl1-mesa-dev fuse libfuse2
       
       - name: Build LibreMines
         run: |
@@ -62,7 +70,10 @@ jobs:
         run: |
           cd build
           export QML_SOURCES_PATHS=""
-          export QMAKE=/usr/bin/qmake6
+          export QMAKE=$(which qmake6)
+          echo "qmake6 found at: $QMAKE"
+          echo "Qt installation directory: $Qt6_DIR"
+          echo "PATH contains: $PATH"
           # Bundle Qt6 dependencies with linuxdeploy
           ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt
           # Create final AppImage with appimagetool using pre-downloaded runtime
