@@ -67,6 +67,9 @@
   <url type="translate">https://github.com/Bollos00/LibreMines/blob/master/etc/translations/README.md</url>
   
   <releases>
+    <release version="2.2.0" date="2025-09-20">
+      <url type="details">https://github.com/Bollos00/LibreMines/releases/tag/v2.2.0</url>
+    </release>
     <release version="2.1.0" date="2025-08-31">
       <url type="details">https://github.com/Bollos00/LibreMines/releases/tag/v2.1.0</url>
     </release>
