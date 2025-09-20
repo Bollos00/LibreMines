@@ -45,7 +45,6 @@ set(LIBREMINES_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/extrathemes.cpp
     ${PROJECT_SOURCE_DIR}/src/qkeyinput.cpp
     ${PROJECT_SOURCE_DIR}/src/qlabel_adapted.cpp
-    ${PROJECT_SOURCE_DIR}/src/qpushbutton_adapted.cpp
 )
 
 # Create core library for testing
