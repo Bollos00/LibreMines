@@ -56,7 +56,7 @@ Pre-built binaries are available for multiple platforms. Download the latest rel
 
 | Platform    | Format      | Qt Version | Architecture    | Notes                              |
 |-------------|-------------|------------|-----------------|------------------------------------|
-| **Linux**   | AppImage    | Qt6        | x86_64          | Portable, no installation required |
+| **Linux**   | AppImage    | Qt5/Qt6    | x86_64          | Portable, no installation required |
 | **macOS**   | .app Bundle | Qt5/Qt6    | Intel & ARM64   | Native macOS application bundles   |
 | **Windows** | ZIP Archive | Qt5/Qt6    | x64             | Includes all dependencies          |
 
