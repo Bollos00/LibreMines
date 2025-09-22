@@ -30,7 +30,7 @@ LibreMinesViewScoresDialog::LibreMinesViewScoresDialog(QWidget *parent):
     layoutGlobal = new QVBoxLayout(this);
     tabWidget = new QTabWidget(this);
 
-    for(QString n : {tr("Easy"), tr("Medium"), tr("Hard")})
+    for(QString n : {tr("Easy"), tr("Medium"), tr("Hard"), tr("Easy (No Guess)"), tr("Medium (No Guess)"), tr("Hard (No Guess)")})
         vCreateTab(n);
 
     layoutGlobal->addWidget(tabWidget);
@@ -52,12 +52,38 @@ void LibreMinesViewScoresDialog::setScores(const QList<LibreMinesScore>& scores)
         {
             tabs[tr("Hard")].scores.append(s);
         }
-        else
+        else if(s.gameDifficulty == GameDifficulty::EASY_NOGUESS)
+        {
+            tabs[tr("Easy (No Guess)")].scores.append(s);
+        }
+        else if(s.gameDifficulty == GameDifficulty::MEDIUM_NOGUESS)
+        {
+            tabs[tr("Medium (No Guess)")].scores.append(s);
+        }
+        else if(s.gameDifficulty == GameDifficulty::HARD_NOGUESS)
+        {
+            tabs[tr("Hard (No Guess)")].scores.append(s);
+        }
+        else if(s.gameDifficulty == GameDifficulty::CUSTOMIZED)
         {
             QString strDifficulty;
             strDifficulty += QString::number(s.width) + " x ";
             strDifficulty += QString::number(s.height) + " : ";
             strDifficulty += QString::number(s.mines);
+
+            if(!tabs.contains(strDifficulty))
+            {
+                vCreateTab(strDifficulty);
+            }
+
+            tabs[strDifficulty].scores.append(s);
+        }
+        else if(s.gameDifficulty == GameDifficulty::CUSTOMIZED_NOGUESS)
+        {
+            QString strDifficulty;
+            strDifficulty += QString::number(s.width) + " x ";
+            strDifficulty += QString::number(s.height) + " : ";
+            strDifficulty += QString::number(s.mines) + " (No Guess)";
 
             if(!tabs.contains(strDifficulty))
             {

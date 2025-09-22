@@ -82,169 +82,176 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                 cell.value = CellValue::ZERO;
                 cell.isHidden = true;
                 cell.flagState = FlagState::NoFlag;
-
-//                qApp->processEvents();
             }
         }
     }
 
-    // Add mines on random places until the number of mines is correct
-    while(i_nMines_ > 0)
+    if (bRemakingGame && bNoGuessMode)
     {
-        uchar i = QRandomGenerator::global()->bounded(0, iX);
-        uchar j = QRandomGenerator::global()->bounded(0, iY);
-
-        // Avoid cells neighbor of clean cell when remaking the game
-        if(bRemakingGame && i <= i_X_Clean+1 && i >= i_X_Clean-1 && j <= i_Y_Clean+1 && j >= i_Y_Clean-1)
-        {
-            continue;
-        }
-
-        CellGameEngine& cell = principalMatrix[i][j];
-
-        if(cell.value == CellValue::ZERO)
-        {
-            i_nMines_--;
-            cell.value = CellValue::MINE;
-        }
+        // TODO: Create a no guess game from i_X_Clean and i_Y_Clean position
+        qDebug() << "Should create no guess game";
     }
-
-    // Update the state of all cells
-    for(uchar j=0; j<iY; j++)
+    else
     {
-        for (uchar i=0; i<iX; i++)
+        // Add mines on random places until the number of mines is correct
+        while(i_nMines_ > 0)
         {
+            uchar i = QRandomGenerator::global()->bounded(0, iX);
+            uchar j = QRandomGenerator::global()->bounded(0, iY);
+
+            // Avoid cells neighbor of clean cell when remaking the game
+            if(bRemakingGame && i <= i_X_Clean+1 && i >= i_X_Clean-1 && j <= i_Y_Clean+1 && j >= i_Y_Clean-1)
+            {
+                continue;
+            }
+
             CellGameEngine& cell = principalMatrix[i][j];
 
             if(cell.value == CellValue::ZERO)
             {
-                iHiddenCells++;
+                i_nMines_--;
+                cell.value = CellValue::MINE;
+            }
+        }
 
-                uchar minesNeighbors = 0;
+        // Update the state of all cells
+        for(uchar j=0; j<iY; j++)
+        {
+            for (uchar i=0; i<iX; i++)
+            {
+                CellGameEngine& cell = principalMatrix[i][j];
 
-                if(i == 0 &&
-                   j == 0)
+                if(cell.value == CellValue::ZERO)
                 {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == 0 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j==0)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == 0 &&
-                        j > 0 &&
-                        j < iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j >0 &&
-                        j < iY-1)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i > 0 &&
-                        i < iX-1 &&
-                        j == 0){
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i > 0 &&
-                        i < iX-1 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else
-                {
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
+                    iHiddenCells++;
 
-                cell.value = (CellValue)minesNeighbors;
+                    uchar minesNeighbors = 0;
+
+                    if(i == 0 &&
+                        j == 0)
+                    {
+                        if(principalMatrix[i+1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+                    else if(i == 0 &&
+                             j == iY-1)
+                    {
+                        if(principalMatrix[i+1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+                    else if(i == iX-1 &&
+                             j==0)
+                    {
+                        if(principalMatrix[i-1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+                    else if(i == iX-1 &&
+                             j == iY-1)
+                    {
+                        if(principalMatrix[i-1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+                    else if(i == 0 &&
+                             j > 0 &&
+                             j < iY-1)
+                    {
+                        if(principalMatrix[i+1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+                    else if(i == iX-1 &&
+                             j >0 &&
+                             j < iY-1)
+                    {
+                        if(principalMatrix[i-1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+                    else if(i > 0 &&
+                             i < iX-1 &&
+                             j == 0){
+                        if(principalMatrix[i-1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+                    else if(i > 0 &&
+                             i < iX-1 &&
+                             j == iY-1)
+                    {
+                        if(principalMatrix[i+1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+                    else
+                    {
+                        if(principalMatrix[i-1][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i-1][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j-1].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j].value == CellValue::MINE)
+                            minesNeighbors++;
+                        if(principalMatrix[i+1][j+1].value == CellValue::MINE)
+                            minesNeighbors++;
+                    }
+
+                    cell.value = (CellValue)minesNeighbors;
+                }
             }
         }
     }
+
     iCellsToUnlock = iHiddenCells;
     bGameActive = true;
 
@@ -541,10 +548,17 @@ void LibreMinesGameEngine::setUseQuestionMark(const bool x)
     bUseQuestionMark = x;
 }
 
+void LibreMinesGameEngine::setNoGuessMode(const bool x)
+{
+    bNoGuessMode = x;
+}
+
 
 void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 {
-    if(bFirst && bFirstCellClean && principalMatrix[_X][_Y].value != CellValue::ZERO)
+    // Remake the game if it's the first click and the user asked for a clean first cell
+    // On No Guess mode, always remake the game on first click
+    if(bFirst && bFirstCellClean && (principalMatrix[_X][_Y].value != CellValue::ZERO || bNoGuessMode))
     {
         // Check if it's impossible to place all mines while keeping the clicked cell and its neighbors clean
         // This prevents infinite loop when nMines > (total cells - 9)
