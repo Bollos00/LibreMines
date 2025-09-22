@@ -54,11 +54,11 @@ Pre-built binaries are available for multiple platforms. Download the latest rel
 
 ### Available Formats
 
-| Platform    | Format      | Qt Version | Architecture    | Notes                              |
-|-------------|-------------|------------|-----------------|------------------------------------|
-| **Linux**   | AppImage    | Qt5/Qt6    | x86_64          | Portable, no installation required |
-| **macOS**   | .app Bundle | Qt5/Qt6    | Intel & ARM64   | Native macOS application bundles   |
-| **Windows** | ZIP Archive | Qt5/Qt6    | x64             | Includes all dependencies          |
+| Platform    | Format      | Qt Version | Architecture    | Notes                                                                    |
+|-------------|-------------|------------|-----------------|--------------------------------------------------------------------------|
+| **Linux**   | AppImage    | Qt5/Qt6    | x86_64          | Make executable with `chmod +x LibreMines*.AppImage` and run directly    |
+| **macOS**   | .app Bundle | Qt5/Qt6    | Intel & ARM64   | Right-click `libremines.app` and select "Open" to prevent signing issues |
+| **Windows** | ZIP Archive | Qt5/Qt6    | x64             | Extract the ZIP archive to any folder and run `libremines.exe`           |
 
 ## Compiling from the source code
 
