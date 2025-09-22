@@ -137,6 +137,7 @@ public:
     AskToSaveMatchScore optionAskToSaveMatchScoreBehaviour()const;
     int optionSoundVolume()const;
     bool optionUseQuestionMark()const;
+    bool optionNoGuessMode()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
@@ -154,6 +155,7 @@ public:
     void setOptionAskToSaveMatchScoreBehaviour(const uchar option);
     void setOptionSoundVolume(const int option);
     void setOptionUseQuestionMark(const QString& option);
+    void setOptionNoGuessMode(const QString& option);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;
@@ -177,6 +179,8 @@ private Q_SLOTS:
     void on_sliderSoundVolume_valueChanged(int value);
 
     void on_sliderSoundVolume_sliderReleased();
+
+    void on_cbFirstCellClean_checkStateChanged(const Qt::CheckState &arg1);
 
 Q_SIGNALS:
     void SIGNAL_optionChanged(const QString& name, const QString& value);

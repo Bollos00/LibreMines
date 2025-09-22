@@ -202,6 +202,11 @@ bool LibreMinesPreferencesDialog::optionUseQuestionMark() const
     return ui->cbUseQuestionMark->isChecked();
 }
 
+bool LibreMinesPreferencesDialog::optionNoGuessMode() const
+{
+    return ui->cbNoGuessMode->isChecked();
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -322,6 +327,11 @@ void LibreMinesPreferencesDialog::setOptionUseQuestionMark(const QString& option
     ui->cbUseQuestionMark->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
 }
 
+void LibreMinesPreferencesDialog::setOptionNoGuessMode(const QString& option)
+{
+    ui->cbNoGuessMode->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
+}
+
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
 {
     return
@@ -432,5 +442,17 @@ void LibreMinesPreferencesDialog::on_sliderSoundVolume_sliderReleased()
     Q_EMIT SIGNAL_setSoundEffectVolume(ui->sliderSoundVolume->value(), true);
 }
 
-
+void LibreMinesPreferencesDialog::on_cbFirstCellClean_checkStateChanged(const Qt::CheckState &arg1)
+{
+    // Ensure No Guess option is also disabled if FirstCellClean option has been disabled
+    if (arg1 == Qt::Unchecked)
+    {
+        ui->cbNoGuessMode->setCheckState(Qt::Unchecked);
+        ui->cbNoGuessMode->setEnabled(false);
+    }
+    else if (arg1 == Qt::Checked)
+    {
+        ui->cbNoGuessMode->setEnabled(true);
+    }
+}
 
