@@ -122,7 +122,7 @@ if(APPLE)
     # App bundle identification
     set(MACOSX_BUNDLE_BUNDLE_NAME "LibreMines")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright (C) 2020-2025 Bruno Bollos Correa")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.bollos00.libremines")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "io.github.Bollos00.LibreMines")
     
     # App bundle executable and display names
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "libremines")
