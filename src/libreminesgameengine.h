@@ -38,6 +38,8 @@
 #include "common.h"
 #include "libreminesscore.h"
 
+#define SOLVERS_COUNT 4
+
 /**
  * @brief Core minesweeper game engine
  * 
