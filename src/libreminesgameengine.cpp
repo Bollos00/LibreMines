@@ -97,10 +97,17 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                 {
                     solver->interrupt();
                 }
+
+                for (QSharedPointer<LibreMinesSolver>& solver : solvers)
+                {
+                    solver->wait();
+                }
                 break;
             }
-
-            QThread::msleep(100);
+            else
+            {
+                QThread::msleep(100);
+            }
         }
     }
     else

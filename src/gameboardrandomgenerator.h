@@ -21,7 +21,7 @@
  * @file gameboardrandomgenerator.h
  * @brief Random game board generation utilities for LibreMines
  * @author Bruno Bollos Correa
- * @date 2020-12-12
+ * @date 2025-09-27
  * 
  * This file contains the GameBoardRandomGenerator class responsible for
  * generating random minesweeper game boards with proper mine placement
