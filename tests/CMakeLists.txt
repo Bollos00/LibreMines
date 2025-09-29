@@ -31,20 +31,22 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 # Create a static library with all source files (excluding main.cpp)
 # This allows tests to link against the core functionality
 set(LIBREMINES_CORE_SOURCES
-    ${PROJECT_SOURCE_DIR}/src/libreminesgameengine.cpp
-    ${PROJECT_SOURCE_DIR}/src/libreminesscore.cpp
-    ${PROJECT_SOURCE_DIR}/src/minefieldtheme.cpp
-    ${PROJECT_SOURCE_DIR}/src/soundeffects.cpp
+    ${PROJECT_SOURCE_DIR}/src/extrathemes.cpp
     ${PROJECT_SOURCE_DIR}/src/facesreaction.cpp
+    ${PROJECT_SOURCE_DIR}/src/gameboardrandomgenerator.cpp
     ${PROJECT_SOURCE_DIR}/src/keyboardcontroller.cpp
+    ${PROJECT_SOURCE_DIR}/src/libreminesapptheme.cpp
+    ${PROJECT_SOURCE_DIR}/src/libreminesgameengine.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminespreferencesdialog.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminespreferencessaver.cpp
+    ${PROJECT_SOURCE_DIR}/src/libreminesscore.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminesscoresdialog.cpp
+    ${PROJECT_SOURCE_DIR}/src/libreminessolver.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminesviewscoresdialog.cpp
-    ${PROJECT_SOURCE_DIR}/src/libreminesapptheme.cpp
-    ${PROJECT_SOURCE_DIR}/src/extrathemes.cpp
+    ${PROJECT_SOURCE_DIR}/src/minefieldtheme.cpp
     ${PROJECT_SOURCE_DIR}/src/qkeyinput.cpp
     ${PROJECT_SOURCE_DIR}/src/qlabel_adapted.cpp
+    ${PROJECT_SOURCE_DIR}/src/soundeffects.cpp
 )
 
 # Create core library for testing
