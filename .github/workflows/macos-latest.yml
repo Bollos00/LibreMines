@@ -33,8 +33,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-13, macos-15]
+        os: [macos-15-intel, macos-15]
         qt-version: [5, 6]
 
     steps:

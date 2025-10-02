@@ -23,11 +23,11 @@ cmake_minimum_required(VERSION 3.10.0)
 # Qt 5 officially requires macOS 10.15+
 if(APPLE AND NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
     if(NOT DEFINED USE_QT6 OR USE_QT6)
-        # Qt 6 minimum requirement
+        # Qt 6 minimum requirement (https://doc.qt.io/qt-6.8/macos.html)
         set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum macOS deployment target for Qt 6")
     else()
-        # Qt 5 can support older versions
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum macOS deployment target for Qt 5")
+        # Qt 5 can support older versions (https://doc.qt.io/archives/qt-5.15/macos.html)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS deployment target for Qt 5")
     endif()
     message(STATUS "Setting macOS deployment target to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 endif()
