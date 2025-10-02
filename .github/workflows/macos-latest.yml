@@ -110,7 +110,7 @@ jobs:
         run: |
           cd build
           # Determine architecture based on the macOS version
-          if [ "${{ matrix.os }}" = "macos-13" ]; then
+          if [ "${{ matrix.os }}" = "macos-15-intel" ]; then
             ARCH="intel"
           else
             ARCH="arm64"
@@ -118,11 +118,46 @@ jobs:
           # Use ditto to create a proper macOS app bundle archive that preserves symlinks
           ditto -c -k --sequesterRsrc --keepParent libremines.app "libremines-${{ inputs.version }}-macos-${ARCH}-qt${{ matrix.qt-version }}.app.zip"
 
+      - name: Create DMG for distribution
+        run: |
+          cd build
+          # Determine architecture based on the macOS version
+          if [ "${{ matrix.os }}" = "macos-15-intel" ]; then
+            ARCH="intel"
+          else
+            ARCH="arm64"
+          fi
+          
+          # Set DMG filename
+          if [ "${{ inputs.upload_to_release }}" = "true" ]; then
+            DMG_NAME="libremines-${{ inputs.version }}-macos-${ARCH}-qt${{ matrix.qt-version }}.dmg"
+          else
+            DMG_NAME="libremines-macos-${ARCH}-qt${{ matrix.qt-version }}.dmg"
+          fi
+          
+          # Create temporary directory for DMG contents
+          mkdir -p dmg-temp
+          cp -R libremines.app dmg-temp/
+          
+          # Create a symbolic link to Applications folder for easy installation
+          ln -s /Applications dmg-temp/Applications
+          
+          # Create DMG using hdiutil
+          hdiutil create -volname "LibreMines" \
+            -srcfolder dmg-temp \
+            -ov -format UDZO \
+            -fs HFS+ \
+            "${DMG_NAME}"
+          
+          # Clean up temporary directory
+          rm -rf dmg-temp
+
       - name: Prepare artifact directory structure
         run: |
           cd build
           mkdir -p artifact-temp
           cp -R libremines.app artifact-temp/
+          cp *.dmg artifact-temp/ 2>/dev/null || true
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
