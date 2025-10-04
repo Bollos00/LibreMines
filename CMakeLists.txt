@@ -20,17 +20,18 @@ cmake_minimum_required(VERSION 3.10.0)
 
 # Set macOS deployment target before project() to ensure compatibility with older macOS versions
 # Qt 6 officially requires macOS 12+
-# Qt 5 officially requires macOS 10.15+
+# Qt 5 officially requires macOS 10.13+
 if(APPLE AND NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
     if(NOT DEFINED USE_QT6 OR USE_QT6)
-        # Qt 6 minimum requirement (https://doc.qt.io/qt-6.8/macos.html) After tested on 12.0 it did not work. Minimum is actually 13
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum macOS deployment target for Qt 6")
+        # Qt 6 minimum requirement (https://doc.qt.io/qt-6.8/macos.html)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum macOS deployment target for Qt 6")
     else()
         # Qt 5 can support older versions (https://doc.qt.io/archives/qt-5.15/macos.html)
         set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS deployment target for Qt 5")
     endif()
-    message(STATUS "Setting macOS deployment target to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 endif()
+    
+message(STATUS "Setting macOS deployment target to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 
 project(libremines
     VERSION "2.2.0"

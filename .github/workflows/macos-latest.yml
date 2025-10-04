@@ -60,9 +60,9 @@ jobs:
         run: |
           mkdir build && cd build
           if [ "${{ inputs.upload_to_release }}" = "true" ]; then
-            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. -DCMAKE_OSX_DEPLOYMENT_TARGET='14.0'
           else
-            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON ..
+            cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON .. -DCMAKE_OSX_DEPLOYMENT_TARGET='14.0'
           fi
 
       - name: "Create build directory and run CMake Qt 5"
