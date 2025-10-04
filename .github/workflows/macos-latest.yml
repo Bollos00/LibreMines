@@ -105,19 +105,6 @@ jobs:
           cp -r ../share/faces_reaction/twemoji-color ./libremines.app/Contents/Resources/facesreaction_extra_themes/
           cp -r ../share/faces_reaction/SecularSteve_custom ./libremines.app/Contents/Resources/facesreaction_extra_themes/
 
-      - name: Create ZIP for Release using ditto
-        if: inputs.upload_to_release
-        run: |
-          cd build
-          # Determine architecture based on the macOS version
-          if [ "${{ matrix.os }}" = "macos-15-intel" ]; then
-            ARCH="intel"
-          else
-            ARCH="arm64"
-          fi
-          # Use ditto to create a proper macOS app bundle archive that preserves symlinks
-          ditto -c -k --sequesterRsrc --keepParent libremines.app "libremines-${{ inputs.version }}-macos-${ARCH}-qt${{ matrix.qt-version }}.app.zip"
-
       - name: Create DMG for distribution
         run: |
           cd build
@@ -169,4 +156,4 @@ jobs:
         if: inputs.upload_to_release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/*.zip
+          files: build/*.dmg

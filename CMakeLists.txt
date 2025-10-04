@@ -34,7 +34,7 @@ endif()
 message(STATUS "Setting macOS deployment target to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 
 project(libremines
-    VERSION "2.2.0"
+    VERSION "2.2.1"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD, macOS and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
