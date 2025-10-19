@@ -171,6 +171,7 @@ set(SOURCE_FILES
     src/extrathemes.cpp src/extrathemes.h
     src/main.cpp
     src/facesreaction.h src/facesreaction.cpp
+    src/gameboardrandomgenerator.h src/gameboardrandomgenerator.cpp
     src/keyboardcontroller.h src/keyboardcontroller.cpp
     src/libreminesapptheme.cpp src/libreminesapptheme.h
     src/libreminesgameengine.cpp src/libreminesgameengine.h
@@ -179,6 +180,7 @@ set(SOURCE_FILES
     src/libreminespreferencessaver.cpp src/libreminespreferencessaver.h
     src/libreminesscore.cpp src/libreminesscore.h
     src/libreminesscoresdialog.cpp src/libreminesscoresdialog.h
+    src/libreminessolver.h src/libreminessolver.cpp
     src/libreminesviewscoresdialog.cpp src/libreminesviewscoresdialog.h
     src/minefieldtheme.cpp src/minefieldtheme.h
     src/qkeyinput.cpp src/qkeyinput.h

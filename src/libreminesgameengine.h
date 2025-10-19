@@ -38,6 +38,8 @@
 #include "common.h"
 #include "libreminesscore.h"
 
+#define SOLVERS_COUNT 1
+
 /**
  * @brief Core minesweeper game engine
  * 
@@ -195,6 +197,20 @@ public:
      */
     void setUseQuestionMark(const bool x);
 
+    /**
+     * @brief Set whether no-guess mode is enabled
+     * 
+     * When enabled, no-guess mode ensures that the generated minesweeper
+     * puzzle can always be solved through logical deduction without requiring
+     * guessing. This mode may adjust mine placement algorithms to guarantee
+     * that every move can be determined through analysis of revealed numbers
+     * and their relationships to neighboring cells.
+     * 
+     * @param x true to enable no-guess mode, false to allow traditional puzzles
+     * @since v3.0
+     */
+    void setNoGuessMode(const bool x);
+
 private:
     /**
      * @brief Reset the game matrix to initial state
@@ -266,6 +282,7 @@ private:
     bool bFirstCellClean;   ///< Whether first clicked cell should be guaranteed safe
 
     bool bUseQuestionMark;  ///< Whether question mark flags are enabled
+    bool bNoGuessMode;      ///< Whether no-guess mode is enabled for logical-only puzzles
 
     bool bGameActive;       ///< Whether the game is currently in progress
 

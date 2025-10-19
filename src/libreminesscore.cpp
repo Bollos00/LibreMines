@@ -49,6 +49,18 @@ LibreMinesScore::operator QString() const
                            " x " + QString::number(this->height) + " : " +
                            QString::number(this->mines);
     }
+    else if (this->gameDifficulty == GameDifficulty::EASY_NOGUESS)
+        strGameDiffuclty = "Easy (No Guess)";
+    else if(this->gameDifficulty == GameDifficulty::MEDIUM_NOGUESS)
+        strGameDiffuclty = "Medium (No Guess)";
+    else if(this->gameDifficulty == GameDifficulty::HARD_NOGUESS)
+        strGameDiffuclty = "Hard (No Guess)";
+    else if(this->gameDifficulty == GameDifficulty::CUSTOMIZED_NOGUESS)
+    {
+        strGameDiffuclty = "Customized " + QString::number(this->width) +
+                           " x " + QString::number(this->height) + " : " +
+                           QString::number(this->mines) + " (No Guess)";
+    }
 
 
     return  QString(this->username + '\n'

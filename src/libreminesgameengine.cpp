@@ -19,6 +19,8 @@
 
 
 #include "libreminesgameengine.h"
+#include "gameboardrandomgenerator.h"
+#include "libreminessolver.h"
 
 #include <QRandomGenerator>
 #include <QTimer>
@@ -48,8 +50,6 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
     nMines = i_nMines_;
     iMinesLeft = i_nMines_;
 
-    iHiddenCells = 0;
-
     // Check if we are just remaking the game with one cell clean
     const bool bRemakingGame = (i_X_Clean != 255 && i_Y_Clean != 255);
 
@@ -57,195 +57,65 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
     {
         bGameActive = false;
         bFirst = true;
-        principalMatrix = std::vector<std::vector<CellGameEngine>> (iX, std::vector<CellGameEngine>(iY));
     }
 
-
-    if(bRemakingGame)
+    principalMatrix.clear();
+    
+    if (bRemakingGame && bNoGuessMode)
     {
-        for(std::vector<CellGameEngine>& i: principalMatrix)
+        QVector<QSharedPointer<LibreMinesSolver>> solvers(SOLVERS_COUNT);
+
+        // Start the solvers
+        for (QSharedPointer<LibreMinesSolver>& solver : solvers)
         {
-            for(CellGameEngine& j: i)
+            solver.reset(new LibreMinesSolver());
+            solver->setRows(iY);
+            solver->setCols(iX);
+            solver->setNMines(i_nMines_);
+            solver->setSafeX(i_X_Clean);
+            solver->setSafeY(i_Y_Clean);
+            solver->start();
+        }
+
+        // Keeps checking if any solver finished
+        while (true)
+        {
+            for (const QSharedPointer<LibreMinesSolver>& solver : solvers)
             {
-                j.value = CellValue::ZERO;
+                // If any solver finished, get its matrix and stop checking
+                if (solver->getSolverState() == LibreMinesSolver::SolverState::Finished)
+                {
+                    principalMatrix = solver->getBoard();
+                    break;
+                }
+            }
+
+            // If we got a matrix, interrupt all solvers and break the outer loop
+            if (!principalMatrix.empty())
+            {
+                for (QSharedPointer<LibreMinesSolver>& solver : solvers)
+                {
+                    solver->interrupt();
+                }
+
+                for (QSharedPointer<LibreMinesSolver>& solver : solvers)
+                {
+                    solver->wait();
+                }
+                break;
+            }
+            else
+            {
+                QThread::msleep(100);
             }
         }
     }
     else
     {
-        for(uchar j=0; j<iY; j++)
-        {
-            for (uchar i=0; i<iX; i++)
-            {
-                CellGameEngine& cell = principalMatrix[i][j];
-
-                cell.value = CellValue::ZERO;
-                cell.isHidden = true;
-                cell.flagState = FlagState::NoFlag;
-
-//                qApp->processEvents();
-            }
-        }
+        principalMatrix = GameBoardRandomGenerator::vGenerate(iX, iY, i_nMines_, i_X_Clean, i_Y_Clean);
     }
-
-    // Add mines on random places until the number of mines is correct
-    while(i_nMines_ > 0)
-    {
-        uchar i = QRandomGenerator::global()->bounded(0, iX);
-        uchar j = QRandomGenerator::global()->bounded(0, iY);
-
-        // Avoid cells neighbor of clean cell when remaking the game
-        if(bRemakingGame && i <= i_X_Clean+1 && i >= i_X_Clean-1 && j <= i_Y_Clean+1 && j >= i_Y_Clean-1)
-        {
-            continue;
-        }
-
-        CellGameEngine& cell = principalMatrix[i][j];
-
-        if(cell.value == CellValue::ZERO)
-        {
-            i_nMines_--;
-            cell.value = CellValue::MINE;
-        }
-    }
-
-    // Update the state of all cells
-    for(uchar j=0; j<iY; j++)
-    {
-        for (uchar i=0; i<iX; i++)
-        {
-            CellGameEngine& cell = principalMatrix[i][j];
-
-            if(cell.value == CellValue::ZERO)
-            {
-                iHiddenCells++;
-
-                uchar minesNeighbors = 0;
-
-                if(i == 0 &&
-                   j == 0)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == 0 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j==0)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == 0 &&
-                        j > 0 &&
-                        j < iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j >0 &&
-                        j < iY-1)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i > 0 &&
-                        i < iX-1 &&
-                        j == 0){
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i > 0 &&
-                        i < iX-1 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else
-                {
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-
-                cell.value = (CellValue)minesNeighbors;
-            }
-        }
-    }
-    iCellsToUnlock = iHiddenCells;
+    
+    iHiddenCells = iCellsToUnlock = iY*iX - nMines;
     bGameActive = true;
 
     if(bRemakingGame)
@@ -279,144 +149,23 @@ bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y, const bool
         // If the state of the cell is CellValue::ZERO, unlock all neighbor cells
         if(principalMatrix[_X][_Y].value == CellValue::ZERO)
         {
-            if(_X == 0 &&
-               _Y == 0)
+            for(short i = _X - 1; i <= _X + 1; i++)
             {
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    bCleanCell(_X+1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    bCleanCell(_X, _Y+1);
-                if(principalMatrix[_X+1][_Y+1].isHidden)
-                    bCleanCell(_X+1, _Y+1);
-            }
-            else if(_X == 0 &&
-                    _Y == iY-1)
-            {
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    bCleanCell(_X+1, _Y);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    bCleanCell(_X, _Y-1);
-                if(principalMatrix[_X+1][_Y-1].isHidden)
-                    bCleanCell(_X+1, _Y-1);
-            }
-            else if(_X == iX-1 &&
-                    _Y == 0)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    bCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    bCleanCell(_X, _Y+1);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    bCleanCell(_X-1, _Y+1);
-            }
-            else if(_X == iX-1 &&
-                    _Y == iY-1)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    bCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    bCleanCell(_X, _Y-1);
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    bCleanCell(_X-1, _Y-1);
-            }
-            else if(_X == iX-1 &&
-                    _Y == 0)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    bCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    bCleanCell(_X, _Y+1);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    bCleanCell(_X-1, _Y+1);
-            }
-            else if(_X == iX-1 &&
-                    _Y == iY-1)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    bCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    bCleanCell(_X, _Y-1);
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    bCleanCell(_X-1, _Y-1);
-            }
-            else if(_X == 0 &&
-                    _Y > 0 &&
-                    _Y < iY-1)
-            {
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    bCleanCell(_X+1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    bCleanCell(_X, _Y+1);
-                if(principalMatrix[_X+1][_Y+1].isHidden)
-                    bCleanCell(_X+1, _Y+1);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    bCleanCell(_X, _Y-1);
-                if(principalMatrix[_X+1][_Y-1].isHidden)
-                    bCleanCell(_X+1, _Y-1);
-            }
-            else if(_X == iX-1 &&
-                    _Y > 0 &&
-                    _Y < iY-1)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    bCleanCell(_X-1, _Y);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    bCleanCell(_X, _Y+1);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    bCleanCell(_X-1, _Y+1);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    bCleanCell(_X, _Y-1);
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    bCleanCell(_X-1, _Y-1);
-            }
-            else if(_X > 0 &&
-                    _X < iX-1 &&
-                    _Y == 0)
-            {
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    bCleanCell(_X-1, _Y);
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    bCleanCell(_X+1, _Y);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    bCleanCell(_X-1, _Y+1);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    bCleanCell(_X, _Y+1);
-                if(principalMatrix[_X+1][_Y+1].isHidden)
-                    bCleanCell(_X+1, _Y+1);
-            }
-            else if(_X > 0 &&
-                    _X < iX-1 &&
-                    _Y == iY-1)
-            {
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    bCleanCell(_X+1, _Y);
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    bCleanCell(_X-1, _Y);
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    bCleanCell(_X-1, _Y-1);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    bCleanCell(_X, _Y-1);
-                if(principalMatrix[_X+1][_Y-1].isHidden)
-                    bCleanCell(_X+1, _Y-1);
-            }
-            else
-            {
-                if(principalMatrix[_X-1][_Y-1].isHidden)
-                    bCleanCell(_X-1, _Y-1);
-                if(principalMatrix[_X-1][_Y].isHidden)
-                    bCleanCell(_X-1, _Y);
-                if(principalMatrix[_X-1][_Y+1].isHidden)
-                    bCleanCell(_X-1, _Y+1);
-                if(principalMatrix[_X][_Y-1].isHidden)
-                    bCleanCell(_X, _Y-1);
-                if(principalMatrix[_X][_Y+1].isHidden)
-                    bCleanCell(_X, _Y+1);
-                if(principalMatrix[_X+1][_Y-1].isHidden)
-                    bCleanCell(_X+1, _Y-1);
-                if(principalMatrix[_X+1][_Y].isHidden)
-                    bCleanCell(_X+1, _Y);
-                if(principalMatrix[_X+1][_Y+1].isHidden)
-                    bCleanCell(_X+1, _Y+1);
+                if(i < 0 || i >= iX)
+                    continue;
+                    
+                for(short j = _Y - 1; j <= _Y + 1; j++)
+                {
+                    if(j < 0 || j >= iY)
+                        continue;
+                        
+                    // Skip the center cell
+                    if(i == _X && j == _Y)
+                        continue;
+                        
+                    if(principalMatrix[i][j].isHidden)
+                        bCleanCell(i, j);
+                }
             }
         }
 
@@ -541,10 +290,17 @@ void LibreMinesGameEngine::setUseQuestionMark(const bool x)
     bUseQuestionMark = x;
 }
 
+void LibreMinesGameEngine::setNoGuessMode(const bool x)
+{
+    bNoGuessMode = x;
+}
+
 
 void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 {
-    if(bFirst && bFirstCellClean && principalMatrix[_X][_Y].value != CellValue::ZERO)
+    // Remake the game if it's the first click and the user asked for a clean first cell
+    // On No Guess mode, always remake the game on first click
+    if(bFirst && bFirstCellClean && (principalMatrix[_X][_Y].value != CellValue::ZERO || bNoGuessMode))
     {
         // Check if it's impossible to place all mines while keeping the clicked cell and its neighbors clean
         // This prevents infinite loop when nMines > (total cells - 9)
