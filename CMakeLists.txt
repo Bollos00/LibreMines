@@ -20,20 +20,21 @@ cmake_minimum_required(VERSION 3.10.0)
 
 # Set macOS deployment target before project() to ensure compatibility with older macOS versions
 # Qt 6 officially requires macOS 12+
-# Qt 5 officially requires macOS 10.15+
+# Qt 5 officially requires macOS 10.13+
 if(APPLE AND NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
     if(NOT DEFINED USE_QT6 OR USE_QT6)
-        # Qt 6 minimum requirement
+        # Qt 6 minimum requirement (https://doc.qt.io/qt-6.8/macos.html)
         set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum macOS deployment target for Qt 6")
     else()
-        # Qt 5 can support older versions
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum macOS deployment target for Qt 5")
+        # Qt 5 can support older versions (https://doc.qt.io/archives/qt-5.15/macos.html)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS deployment target for Qt 5")
     endif()
-    message(STATUS "Setting macOS deployment target to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 endif()
+    
+message(STATUS "Setting macOS deployment target to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 
 project(libremines
-    VERSION "2.2.0"
+    VERSION "2.2.1"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD, macOS and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
@@ -55,6 +56,11 @@ if(USE_QT6)
     #  to generate the QM Files
     if(UPDATE_TRANSLATIONS)
         find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+    endif()
+
+    # Ensure QtDBus.framework are included on Macos Qt 6 builds (#96)
+    if(APPLE)
+        find_package(Qt6 REQUIRED COMPONENTS DBus)
     endif()
 else()
     find_package(Qt5 REQUIRED COMPONENTS Widgets)
@@ -122,7 +128,7 @@ if(APPLE)
     # App bundle identification
     set(MACOSX_BUNDLE_BUNDLE_NAME "LibreMines")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright (C) 2020-2025 Bruno Bollos Correa")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.bollos00.libremines")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "io.github.Bollos00.LibreMines")
     
     # App bundle executable and display names
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "libremines")
@@ -223,6 +229,10 @@ if(USE_QT6)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Svg)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Multimedia)
+    # Ensure QtDBus.framework are included on Macos Qt 6 builds (#96)
+    if(APPLE)
+        target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::DBus)
+    endif()
 else()
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
