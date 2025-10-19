@@ -231,8 +231,8 @@ private:
     std::vector<std::vector<SolverCellState>> solverBoard;  ///< Parallel board tracking solver's knowledge of each cell
     QSet<QPair<uchar, uchar>> cellsNeedingTreatment;  ///< Set of safe cells requiring further constraint analysis
     
-    uchar rows;     ///< Number of rows in the board
     uchar cols;     ///< Number of columns in the board
+    uchar rows;     ///< Number of rows in the board
     short nMines;   ///< Total number of mines to place
 
     uchar safeX;    ///< X coordinate of guaranteed safe starting cell
@@ -290,6 +290,143 @@ private:
      */
     bool cleanBasic(uchar x, uchar y);
 
+    /**
+     * @brief Apply advanced pattern recognition algorithms to a cell
+     * 
+     * Implements sophisticated minesweeper solving patterns that go beyond
+     * basic constraint satisfaction. These patterns are based on common
+     * minesweeper solving techniques that experienced players use.
+     * 
+     * Currently supports:
+     * - 1-2-X pattern detection and resolution
+     * - 1-1-X pattern detection and resolution
+     * 
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if any pattern-based deductions were made
+     * @see detect12XPattern()
+     * @see detect11XPattern()
+     */
+    bool cleanBasicPatterns(uchar x, uchar y);
+
+    // TODO: Implement more advanced patterns
+    // 1-3-X
+    // 1-4-X
+    // 1-X-1
+    // 2-3-X
+    // 2-2-X
+    // 2-4-X
+    // 1-3-1 corner
+    // 1-2-1 corner
+    // T-pattern
+    // bool cleanAdvancedPatterns(uchar x, uchar y);
+
+    /**
+     * @brief Detect 1-2-X mine pattern in the vicinity of a cell
+     * 
+     * Identifies the classic 1-2-X minesweeper pattern where a cell with
+     * 2 remaining mines is adjacent to a cell with 1 remaining mine.
+     * This pattern allows for logical deduction of mine locations.
+     * 
+     * The pattern works as follows:
+     * - Cell A has 1 remaining mine among its unknown neighbors
+     * - Cell B has 2 remaining mines among its unknown neighbors  
+     * - Cells A and B share exactly 2 unknown neighbors
+     * - The unique neighbor of cell B (not shared with A) must contain a mine
+     * 
+     * Searches in all four directions (horizontal and vertical) from the
+     * given cell position to find this pattern.
+     * 
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if a 1-2-X pattern was detected and processed
+     * @see apply12XPatternLogic()
+     */
+    bool detect12XPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect 1-1-X mine pattern in the vicinity of a cell
+     * 
+     * Identifies the 1-1-X minesweeper pattern where two adjacent cells
+     * each have exactly 1 remaining mine among their unknown neighbors.
+     * This pattern allows for logical deduction of safe cell locations.
+     * 
+     * The pattern works as follows:
+     * - Cell A has 1 remaining mine among its unknown neighbors
+     * - Cell B has 1 remaining mine among its unknown neighbors
+     * - If all unknown neighbors of cell B are also neighbors of cell A
+     * - Then the unique neighbors of cell A (not shared with B) are safe
+     * 
+     * This is a powerful pattern that can reveal safe cells that would
+     * otherwise require guessing. Searches in all four directions from
+     * the given cell position to find this pattern.
+     * 
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if a 1-1-X pattern was detected and processed
+     * @see apply11XPatternLogic()
+     */
+    bool detect11XPattern(uchar x, uchar y);
+
+    /**
+     * @brief Calculate the number of remaining mines for a numbered cell
+     * 
+     * Determines how many mines are still needed to satisfy a numbered cell's
+     * constraint. This is calculated as the cell's value minus the number
+     * of mines already identified in its neighborhood.
+     * 
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return Number of remaining mines needed (0 if all mines found, negative if over-flagged)
+     */
+    int countRemainingMines(uchar x, uchar y) const;
+
+    /**
+     * @brief Apply 1-2-X pattern deduction logic to identified cells
+     * 
+     * Implements the logical deduction for the 1-2-X pattern where:
+     * - The middle cell has 2 remaining mines
+     * - The adjacent cell has 1 remaining mine
+     * - They share exactly 2 unknown neighbors
+     * 
+     * The deduction rule states that the unique neighbor of the middle cell
+     * (not shared with the adjacent cell) must contain a mine, since the
+     * shared neighbors can only contain 1 mine (from the adjacent cell's
+     * constraint), leaving 1 mine for the middle cell's unique neighbor.
+     * 
+     * @param middleX X coordinate of the cell with 2 remaining mines
+     * @param middleY Y coordinate of the cell with 2 remaining mines
+     * @param adjacentX X coordinate of the cell with 1 remaining mine
+     * @param adjacentY Y coordinate of the cell with 1 remaining mine
+     * @return true if the pattern logic was successfully applied
+     */
+    bool apply12XPatternLogic(uchar middleX, uchar middleY, uchar adjacentX, uchar adjacentY);
+
+    /**
+     * @brief Apply 1-1-X pattern deduction logic to identified cells
+     * 
+     * Implements the logical deduction for the 1-1-X pattern where:
+     * - Cell 1 has 1 remaining mine among its unknown neighbors
+     * - Cell 2 has 1 remaining mine among its unknown neighbors
+     * - All unknown neighbors of cell 2 are also neighbors of cell 1
+     * 
+     * The deduction rule states that the unique neighbors of cell 1
+     * (not shared with cell 2) must be safe, since cell 2's mine
+     * must be among its own neighbors, and if all of cell 2's neighbors
+     * are also neighbors of cell 1, then cell 1's mine must be among
+     * the shared neighbors, making cell 1's unique neighbors safe.
+     * 
+     * @param middleX X coordinate of the first cell with 1 remaining mine
+     * @param middleY Y coordinate of the first cell with 1 remaining mine
+     * @param adjX X coordinate of the second cell with 1 remaining mine
+     * @param adjY Y coordinate of the second cell with 1 remaining mine
+     * @return true if the pattern logic was successfully applied
+     */
+    bool apply11XPatternLogic(uchar middleX, uchar middleY, uchar adjX, uchar adjY);
+
+    bool checkForInterrupt();
+
+    void setInternalState(SolverState newState);
 signals:
 };
 

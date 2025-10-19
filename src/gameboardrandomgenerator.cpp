@@ -20,10 +20,10 @@
 #include "gameboardrandomgenerator.h"
 #include <QRandomGenerator>
 
-std::vector<std::vector<LibreMinesGameEngine::CellGameEngine>> GameBoardRandomGenerator::vGenerate(const uchar lines, const uchar rows, short nMines, const uchar xClean, const uchar yClean)
+std::vector<std::vector<LibreMinesGameEngine::CellGameEngine>> GameBoardRandomGenerator::vGenerate(const uchar cols, const uchar rows, short nMines, const uchar xClean, const uchar yClean)
 {
     std::vector<std::vector<LibreMinesGameEngine::CellGameEngine>> 
-    result(rows, std::vector<LibreMinesGameEngine::CellGameEngine>(lines));
+    result(cols, std::vector<LibreMinesGameEngine::CellGameEngine>(rows));
     
     // Check if we need to avoid a clean area
     const bool bHasCleanArea = (xClean != 255 && yClean != 255);
@@ -32,8 +32,8 @@ std::vector<std::vector<LibreMinesGameEngine::CellGameEngine>> GameBoardRandomGe
     short minesToPlace = nMines;
     while (minesToPlace > 0)
     {
-        uchar i = QRandomGenerator::global()->bounded(0, rows);
-        uchar j = QRandomGenerator::global()->bounded(0, lines);
+        uchar i = QRandomGenerator::global()->bounded(0, cols);
+        uchar j = QRandomGenerator::global()->bounded(0, rows);
         
         // Avoid cells neighboring the clean cell when specified
         if (bHasCleanArea && i <= xClean + 1 && i >= xClean - 1 && j <= yClean + 1 && j >= yClean - 1)
@@ -52,15 +52,15 @@ std::vector<std::vector<LibreMinesGameEngine::CellGameEngine>> GameBoardRandomGe
     }
     
     // Calculate adjacent mine counts for all non-mine cells
-    for (uchar j = 0; j < lines; j++)
+    for (uchar j = 0; j < rows; j++)
     {
-        for (uchar i = 0; i < rows; i++)
+        for (uchar i = 0; i < cols; i++)
         {
             LibreMinesGameEngine::CellGameEngine& cell = result[i][j];
             
             if (cell.value == CellValue::ZERO)
             {
-                uchar minesCount = countAdjacentMines(result, i, j, rows - 1, lines - 1);
+                uchar minesCount = countAdjacentMines(result, i, j, cols - 1, rows - 1);
                 cell.value = static_cast<CellValue>(minesCount);
             }
         }

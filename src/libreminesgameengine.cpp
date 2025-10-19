@@ -112,7 +112,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
     }
     else
     {
-        principalMatrix = GameBoardRandomGenerator::vGenerate(iY, iX, i_nMines_, i_X_Clean, i_Y_Clean);
+        principalMatrix = GameBoardRandomGenerator::vGenerate(iX, iY, i_nMines_, i_X_Clean, i_Y_Clean);
     }
     
     iHiddenCells = iCellsToUnlock = iY*iX - nMines;

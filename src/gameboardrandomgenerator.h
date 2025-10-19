@@ -68,8 +68,8 @@ public:
      * 3. Calculates adjacent mine counts for all non-mine cells
      * 4. Returns the completed board with statistics
      * 
-     * @param lines Height of the game board (number of rows)
-     * @param rows Width of the game board (number of columns)
+     * @param cols Width of the game board (number of columns)
+     * @param rows Height of the game board (number of rows)
      * @param nMines Total number of mines to place on the board
      * @param xClean X coordinate of cell to keep mine-free (255 = none)
      * @param yClean Y coordinate of cell to keep mine-free (255 = none)
@@ -81,7 +81,7 @@ public:
      *       board boundaries appropriately
      */
     static std::vector<std::vector<LibreMinesGameEngine::CellGameEngine>> vGenerate(
-        const uchar lines,
+        const uchar cols,
         const uchar rows,
         short nMines,
         const uchar xClean = 255,
