@@ -96,6 +96,7 @@ private slots:
     void testActualGameLossbyHittingMine();
     void testWinConditionEdgeCases();
     void testGameStateAfterWinLoss();
+    void testNoWinAfterLossFromCleaningLastNeighbors();
     
     // First click safety tests (High Priority)
     void testFirstClickSafety();
@@ -1441,6 +1442,50 @@ void TestGameEngine::testGameStateTransitions()
     
     QVERIFY(!engine->isGameActive());
     QVERIFY(gameLostSpy.count() >= 1);
+}
+
+void TestGameEngine::testNoWinAfterLossFromCleaningLastNeighbors()
+{
+    // Regression test for issue #99:
+    // Cleaning the last neighbors of a mine after losing should not trigger a win.
+    //
+    // 1 1 1
+    // 1 * 1
+    // 1 1 1
+
+    // On above board, if the user clicks on the lower-left cell (already revealed) after cleaning
+    //  all others except the mine mine and the cell on left of the mine, the user must lose.
+
+    // 1 1 1
+    // = = 1
+    // 1 1 1
+
+
+    engine->setFirstCellClean(false);
+
+    while (true)
+    {
+        engine->vNewGame(3, 3, 1);
+
+        if (engine->getPrincipalMatrix()[1][1].value == CellValue::MINE)
+        {
+            break;
+        }
+    }
+
+    for (QPair<uchar, uchar> cell : QList<QPair<uchar, uchar>>{ {0,0}, {0, 1}, {0,2}, {1,2}, {2,0}, {2, 1}, {2,2} })
+    {
+        engine->SLOT_cleanCell(cell.first, cell.second);
+    }
+
+    QSignalSpy gameWonSpy(engine, &LibreMinesGameEngine::SIGNAL_gameWon);
+    QSignalSpy gameLostSpy(engine, &LibreMinesGameEngine::SIGNAL_gameLost);
+
+    engine->SLOT_cleanNeighborCells(2, 0);
+
+    QVERIFY(gameWonSpy.count() == 0);
+    QVERIFY(gameLostSpy.count() >= 1);
+
 }
 
 void TestGameEngine::testOperationsOnInactiveGame()
