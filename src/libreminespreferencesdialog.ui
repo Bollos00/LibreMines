@@ -147,28 +147,18 @@ Animation</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
-         <widget class="QLabel" name="labelMinefieldTheme">
+         <widget class="QLabel" name="labelGameplayCustomization">
           <property name="text">
-           <string>Minefield theme:</string>
+           <string>Gameplay customization:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBoxMinefieldTheme"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_13">
-        <item>
-         <widget class="QLabel" name="labelFacesReaction">
+         <widget class="QPushButton" name="pbGameplayCustomization">
           <property name="text">
-           <string>Faces reaction:</string>
+           <string>...</string>
           </property>
          </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBoxFacesReaction"/>
         </item>
        </layout>
       </item>
@@ -214,8 +204,8 @@ Animation</string>
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>570</width>
-           <height>264</height>
+           <width>569</width>
+           <height>306</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -330,7 +320,7 @@ Animation</string>
            <number>100</number>
           </property>
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Orientation::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -379,7 +369,7 @@ Animation</string>
            <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -412,7 +402,7 @@ Animation</string>
            <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -445,7 +435,7 @@ Animation</string>
            <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -478,7 +468,7 @@ Animation</string>
            <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -511,7 +501,7 @@ Animation</string>
            <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -544,7 +534,7 @@ Animation</string>
            <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -577,7 +567,7 @@ Animation</string>
            <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>

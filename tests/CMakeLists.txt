@@ -45,6 +45,8 @@ set(LIBREMINES_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/extrathemes.cpp
     ${PROJECT_SOURCE_DIR}/src/qkeyinput.cpp
     ${PROJECT_SOURCE_DIR}/src/qlabel_adapted.cpp
+    ${PROJECT_SOURCE_DIR}/src/gameplaythemechooser.cpp
+    ${PROJECT_SOURCE_DIR}/src/minefieldthemepreview.cpp
 )
 
 # Create core library for testing
