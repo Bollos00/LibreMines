@@ -17,8 +17,8 @@ class MinefieldThemePreview : public QWidget
 public:
     explicit MinefieldThemePreview(QWidget *parent = nullptr);
     ~MinefieldThemePreview();
-
-    void vSetMinefieldTheme(QString theme);
+    
+    void vSetMinefieldTheme(const QString& theme, int lenght);
 
 private:
     Ui::MinefieldThemePreview *ui;

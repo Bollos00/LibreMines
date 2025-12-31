@@ -31,16 +31,16 @@ MinefieldThemePreview::~MinefieldThemePreview()
     delete ui;
 }
 
-void MinefieldThemePreview::vSetMinefieldTheme(QString theme)
+void MinefieldThemePreview::vSetMinefieldTheme(const QString& theme, int lenght)
 {
-    iCellLength = 30;
+    iCellLength = lenght;
 
     QString themeKey = theme;
-    if (theme.compare("Classic Dark",Qt::CaseInsensitive) == 0)
+    if (theme.compare("Classic Dark", Qt::CaseInsensitive) == 0)
     {
         themeKey = "ClassicDark";
     }
-    else if (theme.compare("Classic Light",Qt::CaseInsensitive) == 0)
+    else if (theme.compare("Classic Light", Qt::CaseInsensitive) == 0)
     {
         themeKey = "ClassicLight";
     }
@@ -55,7 +55,7 @@ void MinefieldThemePreview::vSetMinefieldTheme(QString theme)
         lb->setText("");
     }
 
-    ui->lbThemeName->setText(theme);
+    // ui->lbThemeName->setText(theme);
     ui->lbNoFlag->setPixmapCached(minefieldTheme.getPixmapButton(FlagState::NoFlag));
     ui->lbFlag->setPixmapCached(minefieldTheme.getPixmapButton(FlagState::HasFlag));
     ui->lbQuestionFlag->setPixmapCached(minefieldTheme.getPixmapButton(FlagState::Question));

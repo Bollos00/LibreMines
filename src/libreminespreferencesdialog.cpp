@@ -87,6 +87,13 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     connect(ui->comboBoxLanguage, &QComboBox::currentTextChanged,
             this, &LibreMinesPreferencesDialog::SLOT_updateLanguage);
 
+    connect(gameplayThemeChooser, &GameplayThemeChooser::SIGNAL_visibilityChanged,
+            this, [this](bool visible)
+    {
+        this->setEnabled(!visible);
+        gameplayThemeChooser->setEnabled(true);
+    });
+
     ui->keyInputMoveLeft->setKey(Qt::Key_A);
     ui->keyInputMoveUp->setKey(Qt::Key_W);
     ui->keyInputMoveRight->setKey(Qt::Key_D);

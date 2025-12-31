@@ -36,6 +36,7 @@ set(LIBREMINES_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/minefieldtheme.cpp
     ${PROJECT_SOURCE_DIR}/src/soundeffects.cpp
     ${PROJECT_SOURCE_DIR}/src/facesreaction.cpp
+    ${PROJECT_SOURCE_DIR}/src/facesreactionpreview.cpp
     ${PROJECT_SOURCE_DIR}/src/keyboardcontroller.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminespreferencesdialog.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminespreferencessaver.cpp

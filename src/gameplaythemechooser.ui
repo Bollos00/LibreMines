@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Gameplay Theme Chooser</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -34,7 +34,17 @@
            <height>158</height>
           </rect>
          </property>
-         <layout class="QFormLayout" name="scrollAreaMinefieldWidgetContentsLayout"/>
+         <layout class="QFormLayout" name="scrollAreaMinefieldWidgetContentsLayout">
+          <property name="horizontalSpacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+         </layout>
         </widget>
        </widget>
       </item>
@@ -61,7 +71,14 @@
            <height>157</height>
           </rect>
          </property>
-         <layout class="QFormLayout" name="scrollAreaFacesReactionWidgetContentsLayout"/>
+         <layout class="QFormLayout" name="scrollAreaFacesReactionWidgetContentsLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+         </layout>
         </widget>
        </widget>
       </item>

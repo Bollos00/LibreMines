@@ -171,6 +171,7 @@ set(SOURCE_FILES
     src/extrathemes.cpp src/extrathemes.h
     src/main.cpp
     src/facesreaction.h src/facesreaction.cpp
+    src/facesreactionpreview.h src/facesreactionpreview.cpp src/facesreactionpreview.ui
     src/keyboardcontroller.h src/keyboardcontroller.cpp
     src/libreminesapptheme.cpp src/libreminesapptheme.h
     src/libreminesgameengine.cpp src/libreminesgameengine.h

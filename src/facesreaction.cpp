@@ -17,12 +17,12 @@ void FacesReaction::vSetFacesReactionTheme(const QString& which, const int lengt
 {
     if(which.compare("Disable", Qt::CaseInsensitive) == 0)
     {
-        pmDizzyFace.reset( new QPixmap() );
-        pmGrimacingFace.reset( new QPixmap() );
-        pmGrinningFace.reset( new QPixmap() );
-        pmOpenMouthFace.reset( new QPixmap() );
-        pmSleepingFace.reset( new QPixmap() );
-        pmSmillingFace.reset( new QPixmap() );
+        pmDizzyFace.reset( new QPixmap(length, length) );
+        pmGrimacingFace.reset( new QPixmap(length, length) );
+        pmGrinningFace.reset( new QPixmap(length, length) );
+        pmOpenMouthFace.reset( new QPixmap(length, length) );
+        pmSleepingFace.reset( new QPixmap(length, length) );
+        pmSmillingFace.reset( new QPixmap(length, length) );
     }
     else
     {
