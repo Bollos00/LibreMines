@@ -20,7 +20,11 @@ public:
     explicit GameplayThemeChooser(QWidget *parent = nullptr);
     ~GameplayThemeChooser();
 
-    void vInitialize();
+    QString optionMinefieldTheme()const;
+    QString optionFacesReaction()const;
+
+    void setOptionMinefieldTheme(const QString& option);
+    void setOptionFacesReaction(const QString& option);
 
 protected:
     void closeEvent(QCloseEvent* e);

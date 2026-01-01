@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>757</width>
-    <height>441</height>
+    <width>1222</width>
+    <height>451</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,8 +30,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>713</width>
-           <height>158</height>
+           <width>1178</width>
+           <height>163</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="scrollAreaMinefieldWidgetContentsLayout">
@@ -67,8 +67,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>713</width>
-           <height>157</height>
+           <width>1178</width>
+           <height>162</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="scrollAreaFacesReactionWidgetContentsLayout">

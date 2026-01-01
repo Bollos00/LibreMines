@@ -132,18 +132,12 @@ QString LibreMinesPreferencesDialog::optionApplicationStyle() const
 
 QString LibreMinesPreferencesDialog::optionMinefieldTheme() const
 {
-    // QString s = ui->comboBoxMinefieldTheme->currentText();
-    // s.remove(" ", Qt::CaseInsensitive);
-    // return s;
-    return "";
+    return gameplayThemeChooser->optionMinefieldTheme();
 }
 
 QString LibreMinesPreferencesDialog::optionFacesReaction() const
 {
-    // QString s = ui->comboBoxFacesReaction->currentText();
-    // s.remove(" ", Qt::CaseInsensitive);
-    // return s;
-    return "";
+    return gameplayThemeChooser->optionFacesReaction();
 }
 
 QString LibreMinesPreferencesDialog::optionUsername() const
@@ -238,19 +232,12 @@ void LibreMinesPreferencesDialog::setOptionApplicationStyle(const QString &optio
 
 void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &option)
 {
-    QString s = option;
-    if(option.compare("ClassicLight", Qt::CaseInsensitive) == 0){ s = "Classic Light"; }
-    else if(option.compare("ClassicDark", Qt::CaseInsensitive) == 0){ s = "Classic Dark"; }
-
-    // ui->comboBoxMinefieldTheme->setCurrentText(s);
+    gameplayThemeChooser->setOptionMinefieldTheme(option);
 }
 
 void LibreMinesPreferencesDialog::setOptionFacesReaction(const QString &option)
 {
-    QString s = option;
-    if(option.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0){ s = "Open Emoji Colored"; }
-
-    // ui->comboBoxFacesReaction->setCurrentText(s);
+    gameplayThemeChooser->setOptionFacesReaction(option);
 }
 
 void LibreMinesPreferencesDialog::setOptionUsername(const QString &username)

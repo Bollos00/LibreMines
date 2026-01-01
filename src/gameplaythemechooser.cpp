@@ -37,6 +37,9 @@ GameplayThemeChooser::GameplayThemeChooser(QWidget *parent)
         vAddFacesReactionTheme(theme);
     }
 
+    // Set first theme checked by default
+    listMinefieldPreview.first().first->setChecked(true);
+    listFacesReactionPreview.first().first->setChecked(true);
 }
 
 GameplayThemeChooser::~GameplayThemeChooser()
@@ -44,10 +47,76 @@ GameplayThemeChooser::~GameplayThemeChooser()
     delete ui;
 }
 
-void GameplayThemeChooser::vInitialize()
+QString GameplayThemeChooser::optionMinefieldTheme()const
 {
-    // listMinefieldThemePreview.append(
-    //     {});
+    QAbstractButton* checkedButton = btngMinefield->checkedButton();
+    if (checkedButton) {
+        QString key = checkedButton->text();
+
+        if (key.compare("Classic Dark", Qt::CaseInsensitive) == 0)
+        {
+            key = "ClassicDark";
+        }
+        else if (key.compare("Classic Light", Qt::CaseInsensitive) == 0)
+        {
+            key = "ClassicLight";
+        }
+
+        return key;
+    }
+    return "";
+}
+
+QString GameplayThemeChooser::optionFacesReaction()const
+{
+    QAbstractButton* checkedButton = btngFacesReaction->checkedButton();
+    if (checkedButton) {
+        QString key = checkedButton->text();
+
+        if (key.compare("Open Emoji Colored", Qt::CaseInsensitive) == 0)
+        {
+            key = "OpenEmojiColored";
+        }
+
+        return key;
+    }
+    return "";
+}
+
+void GameplayThemeChooser::setOptionMinefieldTheme(const QString& option)
+{
+    QString key = option;
+    if (key.compare("ClassicDark", Qt::CaseInsensitive) == 0)
+    {
+        key = "Classic Dark";
+    }
+    else if (key.compare("ClassicLight", Qt::CaseInsensitive) == 0)
+    {
+        key = "Classic Light";
+    }
+
+    for (const QPair<QRadioButton*, MinefieldThemePreview*>& pair : listMinefieldPreview) {
+        if (pair.first->text() == key) {
+            pair.first->setChecked(true);
+            return;
+        }
+    }
+}
+
+void GameplayThemeChooser::setOptionFacesReaction(const QString& option)
+{
+    QString key = option;
+    if (key.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0)
+    {
+        key = "Open Emoji Colored";
+    }
+
+    for (const QPair<QRadioButton*, FacesReactionPreview*>& pair : listFacesReactionPreview) {
+        if (pair.first->text() == key) {
+            pair.first->setChecked(true);
+            return;
+        }
+    }
 }
 
 void GameplayThemeChooser::closeEvent(QCloseEvent* e)
