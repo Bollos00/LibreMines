@@ -36,6 +36,7 @@ set(LIBREMINES_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/minefieldtheme.cpp
     ${PROJECT_SOURCE_DIR}/src/soundeffects.cpp
     ${PROJECT_SOURCE_DIR}/src/facesreaction.cpp
+    ${PROJECT_SOURCE_DIR}/src/facesreactionpreview.cpp
     ${PROJECT_SOURCE_DIR}/src/keyboardcontroller.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminespreferencesdialog.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminespreferencessaver.cpp
@@ -45,6 +46,8 @@ set(LIBREMINES_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/extrathemes.cpp
     ${PROJECT_SOURCE_DIR}/src/qkeyinput.cpp
     ${PROJECT_SOURCE_DIR}/src/qlabel_adapted.cpp
+    ${PROJECT_SOURCE_DIR}/src/gameplaythemechooser.cpp
+    ${PROJECT_SOURCE_DIR}/src/minefieldthemepreview.cpp
 )
 
 # Create core library for testing

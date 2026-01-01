@@ -29,7 +29,8 @@
 LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LibreMinesPreferencesDialog),
-    updateLanguageDialog(true)
+    updateLanguageDialog(true),
+    gameplayThemeChooser(new GameplayThemeChooser(this))
 {
     ui->setupUi(this);
 
@@ -43,11 +44,11 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     ui->comboBoxApplicationStyle->addItems(QStyleFactory::keys());
 
     // Default Minefield themes
-    ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
-    ui->comboBoxMinefieldTheme->addItems(ExtraThemes::getExtraThemes(ExtraThemes::Minefield));
+    // ui->comboBoxMinefieldTheme->addItems({"Classic Dark", "Classic Light"});
+    // ui->comboBoxMinefieldTheme->addItems(ExtraThemes::getExtraThemes(ExtraThemes::Minefield));
 
-    ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Disable"});
-    ui->comboBoxFacesReaction->addItems(ExtraThemes::getExtraThemes(ExtraThemes::FacesReaction));
+    // ui->comboBoxFacesReaction->addItems({"Open Emoji Colored", "Disable"});
+    // ui->comboBoxFacesReaction->addItems(ExtraThemes::getExtraThemes(ExtraThemes::FacesReaction));
 
 
     ui->comboBoxWhenCtrlIsPressed->addItems({tr("Go to the Edge"), tr("Jump 3 Cells"),
@@ -71,12 +72,12 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
         Q_EMIT SIGNAL_optionChanged("ApplicationTheme", text);
     });
 
-    connect(ui->comboBoxMinefieldTheme, &QComboBox::currentTextChanged,
-            this, [this](QString text)
-    {
-        text.remove(" ", Qt::CaseInsensitive);
-        Q_EMIT SIGNAL_optionChanged("MinefieldTheme", text);
-    });
+    // connect(ui->comboBoxMinefieldTheme, &QComboBox::currentTextChanged,
+    //         this, [this](QString text)
+    // {
+    //     text.remove(" ", Qt::CaseInsensitive);
+    //     Q_EMIT SIGNAL_optionChanged("MinefieldTheme", text);
+    // });
 
     connect(ui->sbMinimumCellLength, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &LibreMinesPreferencesDialog::SLOT_updateCellLengthParameters);
@@ -85,6 +86,13 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
 
     connect(ui->comboBoxLanguage, &QComboBox::currentTextChanged,
             this, &LibreMinesPreferencesDialog::SLOT_updateLanguage);
+
+    connect(gameplayThemeChooser, &GameplayThemeChooser::SIGNAL_visibilityChanged,
+            this, [this](bool visible)
+    {
+        this->setEnabled(!visible);
+        gameplayThemeChooser->setEnabled(true);
+    });
 
     ui->keyInputMoveLeft->setKey(Qt::Key_A);
     ui->keyInputMoveUp->setKey(Qt::Key_W);
@@ -124,16 +132,12 @@ QString LibreMinesPreferencesDialog::optionApplicationStyle() const
 
 QString LibreMinesPreferencesDialog::optionMinefieldTheme() const
 {
-    QString s = ui->comboBoxMinefieldTheme->currentText();
-    s.remove(" ", Qt::CaseInsensitive);
-    return s;
+    return gameplayThemeChooser->optionMinefieldTheme();
 }
 
 QString LibreMinesPreferencesDialog::optionFacesReaction() const
 {
-    QString s = ui->comboBoxFacesReaction->currentText();
-    s.remove(" ", Qt::CaseInsensitive);
-    return s;
+    return gameplayThemeChooser->optionFacesReaction();
 }
 
 QString LibreMinesPreferencesDialog::optionUsername() const
@@ -228,19 +232,12 @@ void LibreMinesPreferencesDialog::setOptionApplicationStyle(const QString &optio
 
 void LibreMinesPreferencesDialog::setOptionMinefieldTheme(const QString &option)
 {
-    QString s = option;
-    if(option.compare("ClassicLight", Qt::CaseInsensitive) == 0){ s = "Classic Light"; }
-    else if(option.compare("ClassicDark", Qt::CaseInsensitive) == 0){ s = "Classic Dark"; }
-
-    ui->comboBoxMinefieldTheme->setCurrentText(s);
+    gameplayThemeChooser->setOptionMinefieldTheme(option);
 }
 
 void LibreMinesPreferencesDialog::setOptionFacesReaction(const QString &option)
 {
-    QString s = option;
-    if(option.compare("OpenEmojiColored", Qt::CaseInsensitive) == 0){ s = "Open Emoji Colored"; }
-
-    ui->comboBoxFacesReaction->setCurrentText(s);
+    gameplayThemeChooser->setOptionFacesReaction(option);
 }
 
 void LibreMinesPreferencesDialog::setOptionUsername(const QString &username)
@@ -433,4 +430,10 @@ void LibreMinesPreferencesDialog::on_sliderSoundVolume_sliderReleased()
 }
 
 
+
+
+void LibreMinesPreferencesDialog::on_pbGameplayCustomization_clicked()
+{
+    gameplayThemeChooser->show();
+}
 

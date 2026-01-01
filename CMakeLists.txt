@@ -171,6 +171,7 @@ set(SOURCE_FILES
     src/extrathemes.cpp src/extrathemes.h
     src/main.cpp
     src/facesreaction.h src/facesreaction.cpp
+    src/facesreactionpreview.h src/facesreactionpreview.cpp src/facesreactionpreview.ui
     src/keyboardcontroller.h src/keyboardcontroller.cpp
     src/libreminesapptheme.cpp src/libreminesapptheme.h
     src/libreminesgameengine.cpp src/libreminesgameengine.h
@@ -201,7 +202,9 @@ else()
     # For other platforms, no additional resources needed
 endif()
 
-add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${SOURCE_FILES}
+    src/gameplaythemechooser.h src/gameplaythemechooser.cpp src/gameplaythemechooser.ui
+    src/minefieldthemepreview.h src/minefieldthemepreview.cpp src/minefieldthemepreview.ui)
 
 include_directories(src)
 include_directories(include)
