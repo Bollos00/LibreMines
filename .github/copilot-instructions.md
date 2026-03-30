@@ -130,7 +130,7 @@ Follow these C++ coding standards and patterns that are established in the Libre
   ```cpp
   /*****************************************************************************
    * LibreMines                                                                *
-   * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
+   * Copyright (C) 2020-2026  Bruno Bollos Correa                              *
    *                                                                           *
    * This program is free software: you can redistribute it and/or modify      *
    * it under the terms of the GNU General Public License as published by      *
@@ -293,7 +293,7 @@ LibreMines follows comprehensive JavaDoc/Doxygen-style documentation practices f
 
 ### Historical Accuracy Requirements
 - **@date field**: Use actual file creation date from Git history in ISO 8601 format (YYYY-MM-DD)
-  - **NEVER use generic ranges** like "2020-2025"
+  - **NEVER use generic ranges** like "2020-2026"
   - **Research Git history**: `git log --follow --format=%ad --date=short -- filename.h | tail -1`
 - **@since field**: Use actual version when class/feature was first introduced
   - **Research release tags**: Check Git tags and release history

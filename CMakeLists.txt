@@ -1,6 +1,6 @@
 #############################################################################
 # LibreMines                                                                #
-# Copyright (C) 2020-2025  Bruno Bollos Correa                              #
+# Copyright (C) 2020-2026  Bruno Bollos Correa                              #
 # This program is free software: you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
 # the Free Software Foundation, either version 3 of the License, or         #
@@ -127,7 +127,7 @@ if(APPLE)
     
     # App bundle identification
     set(MACOSX_BUNDLE_BUNDLE_NAME "LibreMines")
-    set(MACOSX_BUNDLE_COPYRIGHT "Copyright (C) 2020-2025 Bruno Bollos Correa")
+    set(MACOSX_BUNDLE_COPYRIGHT "Copyright (C) 2020-2026 Bruno Bollos Correa")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "io.github.Bollos00.LibreMines")
     
     # App bundle executable and display names
