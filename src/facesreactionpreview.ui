@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -97,7 +97,7 @@
           <number>0</number>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lost&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string notr="true">Lost</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -127,7 +127,7 @@
           <number>0</number>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unhidden&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string notr="true">Unhidden</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -157,7 +157,7 @@
           <number>0</number>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Won&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string notr="true">Won</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -187,7 +187,7 @@
           <number>0</number>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Hidden&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string notr="true">Hidden</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -217,7 +217,7 @@
           <number>0</number>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Generating&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string notr="true">Generating</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -247,7 +247,7 @@
           <number>0</number>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Default&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string notr="true">Default</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>

@@ -7,3 +7,6 @@ build_test
 # AppImage build tools
 *.AppImage
 runtime-x86_64
+
+# IDE files
+.vscode
