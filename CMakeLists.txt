@@ -45,6 +45,8 @@ option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
 option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra themes for the minefield" TRUE)
 option(INSTALL_EXTRA_FACESREACTION_THEMES "Install extra themes for the faces reaction" TRUE)
 option(USE_THREADED_SOUND_EFFECTS "Use sound effects on a separate thread (default: OFF)" OFF)
+option(BUILD_TESTS "Build the test suite" OFF)
+option(BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
 
 # Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
@@ -308,9 +310,12 @@ elseif(WIN32)
 
 endif()
 
-# Add tests (optional - can be disabled)
-option(BUILD_TESTS "Build the test suite" OFF)
+# Add test  (optional)
 if(BUILD_TESTS)
-    enable_testing()
     add_subdirectory(tests)
+endif()
+
+# Add Doxygen documentation generation (optional)
+if(BUILD_DOCUMENTATION)
+    add_subdirectory(docs)
 endif()
