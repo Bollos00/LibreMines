@@ -1,6 +1,6 @@
 #############################################################################
 # LibreMines Test Suite                                                     #
-# Copyright (C) 2020-2025  Bruno Bollos Correa                              #
+# Copyright (C) 2020-2026  Bruno Bollos Correa                              #
 # This program is free software: you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
 # the Free Software Foundation, either version 3 of the License, or         #
@@ -34,6 +34,7 @@ set(LIBREMINES_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/extrathemes.cpp
     ${PROJECT_SOURCE_DIR}/src/facesreaction.cpp
     ${PROJECT_SOURCE_DIR}/src/gameboardrandomgenerator.cpp
+    ${PROJECT_SOURCE_DIR}/src/facesreactionpreview.cpp
     ${PROJECT_SOURCE_DIR}/src/keyboardcontroller.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminesapptheme.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminesgameengine.cpp
@@ -47,6 +48,8 @@ set(LIBREMINES_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/qkeyinput.cpp
     ${PROJECT_SOURCE_DIR}/src/qlabel_adapted.cpp
     ${PROJECT_SOURCE_DIR}/src/soundeffects.cpp
+    ${PROJECT_SOURCE_DIR}/src/gameplaythemechooser.cpp
+    ${PROJECT_SOURCE_DIR}/src/minefieldthemepreview.cpp
 )
 
 # Create core library for testing

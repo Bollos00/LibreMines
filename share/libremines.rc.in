@@ -21,7 +21,7 @@ BEGIN
             VALUE "FileDescription",  "LibreMines - A Free/Libre Minesweeper Game"
             VALUE "FileVersion",      "@PROJECT_VERSION@.0"
             VALUE "InternalName",     "@PROJECT_NAME@"
-            VALUE "LegalCopyright",   "Copyright (C) 2020-2025 Bruno Bollos Correa"
+            VALUE "LegalCopyright",   "Copyright (C) 2020-2026 Bruno Bollos Correa"
             VALUE "OriginalFilename", "@PROJECT_NAME@.exe"
             VALUE "ProductName",      "LibreMines"
             VALUE "ProductVersion",   "@PROJECT_VERSION@"

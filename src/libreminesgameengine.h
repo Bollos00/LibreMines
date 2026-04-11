@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2026  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -230,7 +230,7 @@ private:
      * @param _X X coordinate of the cell to clear
      * @param _Y Y coordinate of the cell to clear
      * @param recursive Indicates this cell is being cleared as part of a chain reaction
-     * @return true if cell was successfully cleared, false otherwise
+     * @return false if a mine was triggered (game lost), true otherwise
      */
     bool bCleanCell(const uchar _X, const uchar _Y, const bool recursive=true);
     

@@ -306,7 +306,7 @@ as Image</source>
     </message>
     <message>
         <location filename="../../src/libreminesgui.cpp" line="1523"/>
-        <source>Copyright (C) 2020-2025  Bruno Bollos Correa
+        <source>Copyright (C) 2020-2026  Bruno Bollos Correa
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

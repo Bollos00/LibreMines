@@ -1,6 +1,6 @@
 #############################################################################
 # LibreMines                                                                #
-# Copyright (C) 2020-2025  Bruno Bollos Correa                              #
+# Copyright (C) 2020-2026  Bruno Bollos Correa                              #
 # This program is free software: you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
 # the Free Software Foundation, either version 3 of the License, or         #
@@ -34,7 +34,7 @@ endif()
 message(STATUS "Setting macOS deployment target to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 
 project(libremines
-    VERSION "2.2.1"
+    VERSION "2.3.0"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD, macOS and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
@@ -127,7 +127,7 @@ if(APPLE)
     
     # App bundle identification
     set(MACOSX_BUNDLE_BUNDLE_NAME "LibreMines")
-    set(MACOSX_BUNDLE_COPYRIGHT "Copyright (C) 2020-2025 Bruno Bollos Correa")
+    set(MACOSX_BUNDLE_COPYRIGHT "Copyright (C) 2020-2026 Bruno Bollos Correa")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "io.github.Bollos00.LibreMines")
     
     # App bundle executable and display names
@@ -172,6 +172,7 @@ set(SOURCE_FILES
     src/main.cpp
     src/facesreaction.h src/facesreaction.cpp
     src/gameboardrandomgenerator.h src/gameboardrandomgenerator.cpp
+    src/facesreactionpreview.h src/facesreactionpreview.cpp src/facesreactionpreview.ui
     src/keyboardcontroller.h src/keyboardcontroller.cpp
     src/libreminesapptheme.cpp src/libreminesapptheme.h
     src/libreminesgameengine.cpp src/libreminesgameengine.h
@@ -203,7 +204,9 @@ else()
     # For other platforms, no additional resources needed
 endif()
 
-add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${SOURCE_FILES}
+    src/gameplaythemechooser.h src/gameplaythemechooser.cpp src/gameplaythemechooser.ui
+    src/minefieldthemepreview.h src/minefieldthemepreview.cpp src/minefieldthemepreview.ui)
 
 include_directories(src)
 include_directories(include)

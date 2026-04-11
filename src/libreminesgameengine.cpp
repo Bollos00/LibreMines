@@ -1,6 +1,6 @@
 /*****************************************************************************
  * LibreMines                                                                *
- * Copyright (C) 2020-2025  Bruno Bollos Correa                              *
+ * Copyright (C) 2020-2026  Bruno Bollos Correa                              *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -164,17 +164,19 @@ bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y, const bool
                         continue;
                         
                     if(principalMatrix[i][j].isHidden)
-                        bCleanCell(i, j);
+                    {
+                        const bool bCleaned = bCleanCell(i, j);
+                        if (!bCleaned)
+                        {
+                            // Return false since recursively game lost
+                            return false;
+                        }
+                    }
                 }
             }
         }
 
         iHiddenCells--;
-        if(iHiddenCells == 0)
-        {
-            // If there is none hidden cells left, the user wins
-            vGameWon();
-        }
     }
 
     return true;
@@ -322,7 +324,16 @@ void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
         SLOT_startTimer();
         bFirst = false;
     }
-    bCleanCell(_X, _Y, false);
+
+    const bool bCleaned = bCleanCell(_X, _Y, false);
+
+    // Issue #99 - check game won condition after calls on bCleanCell to avoid premature win detection
+    if(bCleaned && iHiddenCells == 0)
+    {
+        // If there is none hidden cells left, the user wins
+        vGameWon();
+    }
+
 }
 
 void LibreMinesGameEngine::SLOT_changeFlagState(const uchar _X, const uchar _Y)
@@ -405,6 +416,13 @@ void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _
                 recursive = true;
             }
         }
+    }
+
+    // Issue #99 - check game won condition after calls on bCleanCell to avoid premature win detection
+    if(iHiddenCells == 0)
+    {
+        // If there is none hidden cells left, the user wins
+        vGameWon();
     }
 }
 
