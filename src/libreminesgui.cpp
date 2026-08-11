@@ -1704,7 +1704,7 @@ void LibreMinesGui::SLOT_saveMinefieldAsImage()
     if(picturesDirPAth.isEmpty())
         picturesDirPAth = QDir::currentPath();
 
-    QString fileName = "libremines_screeshoot" + QDateTime::currentDateTime().toString(Qt::ISODate).replace(':', '_') + ".png";
+    QString fileName = "libremines_screenshot" + QDateTime::currentDateTime().toString(Qt::ISODate).replace(':', '_') + ".png";
 
     QString fullFileName = QFileDialog::getSaveFileName(
                            this,
