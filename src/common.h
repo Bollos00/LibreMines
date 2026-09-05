@@ -70,7 +70,11 @@ enum class GameDifficulty: uchar{
     EASY,         ///< Easy difficulty (9x9 board, 10 mines)
     MEDIUM,       ///< Medium difficulty (16x16 board, 40 mines)
     HARD,         ///< Hard difficulty (30x16 board, 99 mines)
-    CUSTOMIZED    ///< Custom difficulty with user-defined parameters
+    CUSTOMIZED,   ///< Custom difficulty with user-defined parameters
+    EASY_NOGUESS,          ///< Easy difficulty with No Guess enabled (9x9 board, 10 mines) @since v3.0
+    MEDIUM_NOGUESS,        ///< Medium difficulty with No Guess enabled (16x16 board, 40 mines) @since v3.0
+    HARD_NOGUESS,          ///< Hard difficulty with No Guess enabled (30x16 board, 99 mines) @since v3.0
+    CUSTOMIZED_NOGUESS     ///< Custom difficulty with user-defined parameters and No Guess enabled @since v3.0
 };
 
 /**

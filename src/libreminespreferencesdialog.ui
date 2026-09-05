@@ -31,6 +31,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="cbNoGuessMode">
+        <property name="text">
+         <string>No Guess Mode</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="cbCleanNeighborCellsWhenClickedOnShowedCell">
         <property name="text">
          <string>Clean neighbor cells when

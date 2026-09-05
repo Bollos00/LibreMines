@@ -234,6 +234,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
 
     gameEngine->setFirstCellClean(preferences->optionFirstCellClean());
     gameEngine->setUseQuestionMark(preferences->optionUseQuestionMark());
+    gameEngine->setNoGuessMode(preferences->optionNoGuessMode());
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
     // Set the length of each cell
@@ -831,7 +832,7 @@ void LibreMinesGui::SLOT_Easy()
     vHideMainMenu();
     vNewGame(8, 8, 10);
 
-    difficult = GameDifficulty::EASY;
+    difficult = preferences->optionNoGuessMode() ? GameDifficulty::EASY_NOGUESS : GameDifficulty::EASY;
 }
 
 void LibreMinesGui::SLOT_Medium()
@@ -839,7 +840,7 @@ void LibreMinesGui::SLOT_Medium()
     vHideMainMenu();
     vNewGame(16, 16, 40);
 
-    difficult = GameDifficulty::MEDIUM;
+    difficult = preferences->optionNoGuessMode() ? GameDifficulty::MEDIUM_NOGUESS : GameDifficulty::MEDIUM;
 
 }
 
@@ -848,7 +849,7 @@ void LibreMinesGui::SLOT_Hard()
     vHideMainMenu();
     vNewGame(30, 16, 99);
 
-    difficult = GameDifficulty::HARD;
+    difficult = preferences->optionNoGuessMode() ? GameDifficulty::HARD_NOGUESS : GameDifficulty::HARD;
 
 }
 
@@ -857,7 +858,7 @@ void LibreMinesGui::SLOT_Customized()
     vHideMainMenu();
     vNewGame(sbCustomizedX->value(), sbCustomizedY->value(), sbCustomizedNumbersOfMines->value());
 
-    difficult = GameDifficulty::CUSTOMIZED;
+    difficult = preferences->optionNoGuessMode() ? GameDifficulty::CUSTOMIZED_NOGUESS : GameDifficulty::CUSTOMIZED;
 
 }
 
@@ -1314,6 +1315,19 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             else if(score.gameDifficulty == GameDifficulty::CUSTOMIZED)
             {
                 strGameDiffuclty = tr("Customized %1 x %2 : %3")
+                                   .arg(score.width)
+                                   .arg(score.height)
+                                   .arg(score.mines);
+            }
+            else if(score.gameDifficulty == GameDifficulty::EASY_NOGUESS)
+                strGameDiffuclty = tr("Easy (No Guess)");
+            else if(score.gameDifficulty == GameDifficulty::MEDIUM_NOGUESS)
+                strGameDiffuclty = tr("Medium (No Guess)");
+            else if(score.gameDifficulty == GameDifficulty::HARD_NOGUESS)
+                strGameDiffuclty = tr("Hard (No Guess)");
+            else if(score.gameDifficulty == GameDifficulty::CUSTOMIZED_NOGUESS)
+            {
+                strGameDiffuclty = tr("Customized %1 x %2 : %3 (No Guess)")
                                    .arg(score.width)
                                    .arg(score.height)
                                    .arg(score.mines);
