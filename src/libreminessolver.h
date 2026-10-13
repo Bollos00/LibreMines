@@ -341,9 +341,72 @@ private:
      * @param x X coordinate of the cell to analyze
      * @param y Y coordinate of the cell to analyze
      * @return true if an N-(N-1)-X pattern was detected and processed
-     * @see detect1NXPattern()
+     * @see detectMNXPattern()
      */
     bool detect12XPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect 1-1-X mine pattern in the vicinity of a cell
+     * 
+     * Identifies two adjacent cells each with exactly 1 remaining mine
+     * and applies the 1-1-X deduction when they share unknown neighbors.
+     *
+     * The pattern works as follows:
+     * - Cell A has 1 remaining mine among its unknown neighbors
+     * - Cell B has 1 remaining mine among its unknown neighbors
+     * - If all unknown neighbors of cell B are also neighbors of cell A
+     * - Then the unique neighbors of cell A (not shared with B) are safe
+     *
+     * Searches in all four directions from the given cell position to find this pattern.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if a 1-1-X pattern was detected and processed
+     * @see applyNNXPatternLogic()
+     */
+    bool detect11XPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect 2-2-X mine pattern in the vicinity of a cell
+     * 
+     * Identifies two adjacent cells each with exactly 2 remaining mines
+     * and applies the 2-2-X deduction when they share unknown neighbors.
+     *
+     * The pattern works as follows:
+     * - Cell A has 2 remaining mines among its unknown neighbors
+     * - Cell B has 2 remaining mines among its unknown neighbors
+     * - If all unknown neighbors of cell B are also neighbors of cell A
+     * - Then the unique neighbors of cell A (not shared with B) are safe
+     *
+     * Searches in all four directions from the given cell position to find this pattern.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if a 2-2-X pattern was detected and processed
+     * @see applyNNXPatternLogic()
+     */
+    bool detect22XPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect 3-3-X mine pattern in the vicinity of a cell
+     * 
+     * Identifies two adjacent cells each with exactly 3 remaining mines
+     * and applies the 3-3-X deduction when they share unknown neighbors.
+     *
+     * The pattern works as follows:
+     * - Cell A has 3 remaining mines among its unknown neighbors
+     * - Cell B has 3 remaining mines among its unknown neighbors
+     * - If all unknown neighbors of cell B are also neighbors of cell A
+     * - Then the unique neighbors of cell A (not shared with B) are safe
+     *
+     * Searches in all four directions from the given cell position to find this pattern.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if a 3-3-X pattern was detected and processed
+     * @see applyNNXPatternLogic()
+     */
+    bool detect33XPattern(uchar x, uchar y);
 
     /**
      * @brief Detect the 1-3-X mine pattern in the vicinity of a cell
@@ -372,28 +435,71 @@ private:
     bool detect14XPattern(uchar x, uchar y);
 
     /**
-     * @brief Detect a 1-N-X mine pattern in the vicinity of a cell
+     * @brief Detect the 2-3-X mine pattern in the vicinity of a cell
      *
-     * Checks the four orthogonally adjacent cells for one with 1 remaining
-     * mine, then applies the 1-N-X deduction for N in the range 2 through 4.
+     * Finds an adjacent cell with 2 remaining mines and applies the deduction
+     * when this cell has 3 remaining mines and exactly 2 unique unknown
+     * neighbors, with all unknown neighbors of the adjacent cell shared.
      *
      * @param x X coordinate of the cell to analyze
      * @param y Y coordinate of the cell to analyze
+     * @return true if the pattern was detected and processed
+     */
+    bool detect23XPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect the 2-4-X mine pattern in the vicinity of a cell
+     *
+     * Finds an adjacent cell with 2 remaining mines and applies the deduction
+     * when this cell has 4 remaining mines and exactly 3 unique unknown
+     * neighbors, with all unknown neighbors of the adjacent cell shared.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if the pattern was detected and processed
+     */
+    bool detect24XPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect the 3-4-X mine pattern in the vicinity of a cell
+     *
+     * Finds an adjacent cell with 3 remaining mines and applies the deduction
+     * when this cell has 4 remaining mines and exactly 3 unique unknown
+     * neighbors, with all unknown neighbors of the adjacent cell shared.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if the pattern was detected and processed
+     */
+    bool detect34XPattern(uchar x, uchar y);
+
+
+    /**
+     * @brief Detect a M-N-X mine pattern in the vicinity of a cell
+     *
+     * Checks the four orthogonally adjacent cells for one with M remaining
+     * mines, then applies the M-N-X deduction for N in the range 2 through 4.
+     * 
+     * This method is a generalized implementation of the 1-2-X, 1-3-X, 1-4-X, 2-3-X, 2-4-X, and 3-4-X patterns.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @param adjacentMines Remaining mines required by the adjacent cell (M)
      * @param remainingMines Remaining mines required by the analyzed cell (N)
      * @return true if the pattern was detected and processed
      */
-    bool detect1NXPattern(uchar x, uchar y, int remainingMines);
+    bool detectMNXPattern(uchar x, uchar y, int adjacentMines, int remainingMines);
 
     /**
-     * @brief Detect 1-1-X mine pattern in the vicinity of a cell
+     * @brief Detect N-N-X mine pattern in the vicinity of a cell
      * 
-     * Identifies the 1-1-X minesweeper pattern where two adjacent cells
-     * each have exactly 1 remaining mine among their unknown neighbors.
+     * Identifies the N-N-X minesweeper pattern where two adjacent cells
+     * each have exactly N remaining mines among their unknown neighbors.
      * This pattern allows for logical deduction of safe cell locations.
      * 
      * The pattern works as follows:
-     * - Cell A has 1 remaining mine among its unknown neighbors
-     * - Cell B has 1 remaining mine among its unknown neighbors
+     * - Cell A has N remaining mines among its unknown neighbors
+     * - Cell B has N remaining mines among its unknown neighbors
      * - If all unknown neighbors of cell B are also neighbors of cell A
      * - Then the unique neighbors of cell A (not shared with B) are safe
      * 
@@ -401,12 +507,15 @@ private:
      * otherwise require guessing. Searches in all four directions from
      * the given cell position to find this pattern.
      * 
+     * This can be used to detect 1-1-X, 2-2-X, and 3-3-X patterns.
+     * 
      * @param x X coordinate of the cell to analyze
      * @param y Y coordinate of the cell to analyze
-     * @return true if a 1-1-X pattern was detected and processed
-     * @see apply11XPatternLogic()
+     * @param remainingMines Remaining mines required by both cells (N)
+     * @return true if a N-N-X pattern was detected and processed
+     * @see applyNNXPatternLogic()
      */
-    bool detect11XPattern(uchar x, uchar y);
+    bool detectNNXPattern(uchar x, uchar y, int remainingMines);
 
     /**
      * @brief Calculate the number of remaining mines for a numbered cell
@@ -422,27 +531,28 @@ private:
     int countRemainingMines(uchar x, uchar y) const;
 
     /**
-     * @brief Apply 1-N-X pattern deduction logic to identified cells
+     * @brief Apply M-N-X pattern deduction logic to identified cells
      *
-     * If the analyzed cell has N remaining mines, the adjacent cell has 1,
-     * and the analyzed cell has exactly N-1 unknown neighbors not shared with
+     * If the analyzed cell has N remaining mines, the adjacent cell has M,
+     * and the analyzed cell has exactly N-M unknown neighbors not shared with
      * the adjacent cell, those unique neighbors must all be mines.
      *
      * @param middleX X coordinate of the cell with N remaining mines
      * @param middleY Y coordinate of the cell with N remaining mines
      * @param adjacentX X coordinate of the adjacent cell with 1 remaining mine
      * @param adjacentY Y coordinate of the adjacent cell with 1 remaining mine
+     * @param adjacentMines M, the remaining-mine count of the adjacent cell
      * @param remainingMines N, the remaining-mine count of the analyzed cell
      * @return true if the pattern logic was successfully applied
      */
-    bool apply1NXPatternLogic(uchar middleX, uchar middleY, uchar adjacentX, uchar adjacentY, int remainingMines);
+    bool applyMNXPatternLogic(uchar middleX, uchar middleY, uchar adjacentX, uchar adjacentY, int adjacentMines, int remainingMines);
 
     /**
-     * @brief Apply 1-1-X pattern deduction logic to identified cells
+     * @brief Apply N-N-X pattern deduction logic to identified cells
      * 
-     * Implements the logical deduction for the 1-1-X pattern where:
-     * - Cell 1 has 1 remaining mine among its unknown neighbors
-     * - Cell 2 has 1 remaining mine among its unknown neighbors
+     * Implements the logical deduction for the N-N-X pattern where:
+     * - Cell 1 has N remaining mine among its unknown neighbors
+     * - Cell 2 has N remaining mine among its unknown neighbors
      * - All unknown neighbors of cell 2 are also neighbors of cell 1
      * 
      * The deduction rule states that the unique neighbors of cell 1
@@ -451,13 +561,14 @@ private:
      * are also neighbors of cell 1, then cell 1's mine must be among
      * the shared neighbors, making cell 1's unique neighbors safe.
      * 
-     * @param middleX X coordinate of the first cell with 1 remaining mine
-     * @param middleY Y coordinate of the first cell with 1 remaining mine
-     * @param adjX X coordinate of the second cell with 1 remaining mine
-     * @param adjY Y coordinate of the second cell with 1 remaining mine
+     * @param middleX X coordinate of the first cell with N remaining mines
+     * @param middleY Y coordinate of the first cell with N remaining mines
+     * @param adjX X coordinate of the second cell with N remaining mines
+     * @param adjY Y coordinate of the second cell with N remaining mines
+     * @param remainingMines N, the remaining-mine count of both cells
      * @return true if the pattern logic was successfully applied
      */
-    bool apply11XPatternLogic(uchar middleX, uchar middleY, uchar adjX, uchar adjY);
+    bool applyNNXPatternLogic(uchar middleX, uchar middleY, uchar adjX, uchar adjY, int remainingMines);
 
     bool checkForInterrupt();
 
