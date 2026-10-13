@@ -316,13 +316,25 @@ private:
     bool cleanBasicPatterns(uchar x, uchar y);
 
     // TODO: Implement more advanced patterns
+    // mine count solving at the end
     // 1-X-1
-    // 2-2-X
-    // 2-4-X
     // 1-3-1 corner
     // 1-2-1 corner
     // T-pattern
-    // bool cleanAdvancedPatterns(uchar x, uchar y);
+    // 
+    
+    /**
+     * @brief Apply advanced pattern recognition algorithms to a cell
+     * 
+     * Implements sophisticated minesweeper solving patterns that go beyond
+     * basic constraint satisfaction. These patterns are based on common
+     * minesweeper solving techniques that experienced players use.
+     * 
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if any pattern-based deductions were made
+     */
+    bool cleanAdvancedPatterns(uchar x, uchar y);
 
     /**
      * @brief Detect 1-2-X mine pattern in the vicinity of a cell

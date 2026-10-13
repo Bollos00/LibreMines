@@ -95,7 +95,7 @@ bool LibreMinesSolver::solve()
         globalChanges = false;
 
 #if LIBREMINES_SOLVER_DEBUG
-        qDebug() << "Applying basic cleaning:";
+        qDebug() << "Applying basic cleaning...";
 #endif
 
         // Process all cells currently in the treatment set
@@ -117,7 +117,7 @@ bool LibreMinesSolver::solve()
         if (!globalChanges)
         {
 #if LIBREMINES_SOLVER_DEBUG
-            qDebug() << "Applying pattern cleaning:";
+            qDebug() << "Applying basic pattern cleaning...";
 #endif
             QSet<QPair<uchar, uchar>> patternTreatmentSet = cellsNeedingTreatment;
             
@@ -133,6 +133,29 @@ bool LibreMinesSolver::solve()
                     // Keep the cell in treatment set as patterns might reveal more info
                 }
             }
+        }
+
+        // If bsic and pattern cleaning didn't make progress, try advanced patterns
+        if (!globalChanges)
+        {
+#if LIBREMINES_SOLVER_DEBUG
+            qDebug() << "Applying advanced pattern cleaning...";
+#endif
+            QSet<QPair<uchar, uchar>> advancedPatternTreatmentSet = cellsNeedingTreatment;
+
+            for (const QPair<uchar, uchar>& cellCoord : advancedPatternTreatmentSet)
+            {
+                uchar x = cellCoord.first;
+                uchar y = cellCoord.second;
+                
+                // Apply advanced pattern recognition to this cell
+                if (cleanAdvancedPatterns(x, y))
+                {
+                    globalChanges = true;
+                    // Keep the cell in treatment set as patterns might reveal more info
+                }
+            }
+
         }
 
 #if LIBREMINES_SOLVER_DEBUG
@@ -208,11 +231,8 @@ bool LibreMinesSolver::cleanZero(uchar x, uchar y)
             uchar ny = y + dy;
             if (nx < cols && ny < rows)
             {
-                if (board[nx][ny].value == CellValue::ZERO && solverBoard[nx][ny] == SolverCellState::Unknown)
-                {
-                    cleanZero(nx, ny);  // Recursively clear if the neighbor is also zero
-                }
-                else if (solverBoard[nx][ny] == SolverCellState::Unknown)
+                // If unable to clean as zero, this cell was not zero, so mark it as safe and add to treatment set
+                if (!cleanZero(nx, ny))
                 {
                     // Mark as safe if not zero and add to treatment set
                     solverBoard[nx][ny] = SolverCellState::Safe;
@@ -282,14 +302,12 @@ bool LibreMinesSolver::cleanBasic(uchar x, uchar y)
                 uchar ny = y + dy;
                 if (nx < cols && ny < rows && solverBoard[nx][ny] == SolverCellState::Unknown)
                 {
-                    if (board[nx][ny].value != CellValue::ZERO)
+                    // If unable to clean as zero, this cell was not zero, so mark it as safe and add to treatment set
+                    if (!cleanZero(nx, ny))
                     {
-                        cellsNeedingTreatment.insert({nx, ny});
+                        // Mark as safe if not zero and add to treatment set
                         solverBoard[nx][ny] = SolverCellState::Safe;
-                    }
-                    else
-                    {
-                        cleanZero(nx, ny);  // Recursively clear zero cells
+                        cellsNeedingTreatment.insert({nx, ny});
                     }
                 }
             }
@@ -358,31 +376,44 @@ bool LibreMinesSolver::cleanBasicPatterns(uchar x, uchar y)
         changes = true;
     }
 
-    // 5. Try 2-3-X pattern detection
+    return changes;
+}
+
+bool LibreMinesSolver::cleanAdvancedPatterns(uchar x, uchar y)
+{
+    if (solverBoard[x][y] != SolverCellState::Safe)
+    {
+        return false;
+    }
+
+    // Try different pattern recognition algorithms
+    bool changes = false;
+
+    // 1. Try 2-3-X pattern detection
     if (detect23XPattern(x, y))
     {
         changes = true;
     }
 
-    // 6. Try 2-4-X pattern detection
+    // 2. Try 2-4-X pattern detection
     if (detect24XPattern(x, y))
     {
         changes = true;
     }
 
-    // 7. Try 3-4-X pattern detection
+    // 3. Try 3-4-X pattern detection
     if (detect34XPattern(x, y))
     {
         changes = true;
     }
 
-    // 8. Try 2-2-X pattern detection
+    // 4. Try 2-2-X pattern detection
     if (detect22XPattern(x, y))
     {
         changes = true;
     }
 
-    // 9. Try 3-3-X pattern detection
+    // 5. Try 3-3-X pattern detection
     if (detect33XPattern(x, y))
     {
         changes = true;
@@ -688,8 +719,13 @@ bool LibreMinesSolver::applyNNXPatternLogic(uchar middleX, uchar middleY, uchar 
     {
         for (const QPair<uchar, uchar>& cell : midUniqueNeighbors)
         {
-            solverBoard[cell.first][cell.second] = SolverCellState::Safe;
-            cellsNeedingTreatment.insert(cell);
+            // If unable to clean as zero, this cell was not zero, so mark it as safe and add to treatment set
+            if (!cleanZero(cell.first, cell.second))
+            {
+                // Mark as safe if not zero and add to treatment set
+                solverBoard[cell.first][cell.second] = SolverCellState::Safe;
+                cellsNeedingTreatment.insert(cell);
+            }
         }
         return true;
     }
