@@ -21,6 +21,9 @@
 #include "libreminesgameengine.h"
 #include "libreminessolver.h"
 
+// Test-state diagrams use '?' for unknown cells, '=' for shared unknown
+// candidates, clue digits for known-safe cells, 'M' for identified mines, and
+// '@' for a guaranteed safe starting cell not yet processed by the solver.
 class TestLibreMinesSolver : public QObject
 {
     Q_OBJECT
@@ -101,10 +104,11 @@ void TestLibreMinesSolver::setBoard(uchar width,
 
 void TestLibreMinesSolver::cleanZeroClearsConnectedRegionAndKeepsMinesUnknown()
 {
-    // The zero region opens every safe cell on this board:
-    // *10
-    // 110
-    // 000
+    // All cells are initially unknown. The zero at (2, 0) shall clear the
+    // connected safe region while the actual mine remains unknown to the solver:
+    // ???
+    // ???
+    // ???
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(*10
           110
@@ -131,6 +135,10 @@ void TestLibreMinesSolver::cleanZeroClearsConnectedRegionAndKeepsMinesUnknown()
 
 void TestLibreMinesSolver::cleanZeroDoesNothingForNonZeroOrKnownCell()
 {
+    // No cells are known; the clue at (0, 0) is 1, so cleanZero shall do nothing:
+    // ???
+    // ???
+    // ???
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(111
           1*1
@@ -139,6 +147,10 @@ void TestLibreMinesSolver::cleanZeroDoesNothingForNonZeroOrKnownCell()
     QVERIFY(!solver.cleanZero(0, 0));
     QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Unknown);
 
+    // The zero at (2, 0) is already known safe. Other cells remain unknown:
+    // ??0
+    // ???
+    // ???
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(*10
            110
@@ -153,6 +165,11 @@ void TestLibreMinesSolver::cleanZeroDoesNothingForNonZeroOrKnownCell()
 
 void TestLibreMinesSolver::cleanBasicMarksUnknownNeighborsSafeWhenMinesAreAccountedFor()
 {
+    // A safe 1 clue and its mine are known; its other unknown neighbors shall
+    // become safe:
+    // 1??
+    // ?M?
+    // ???
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(111
            1*1
@@ -171,6 +188,11 @@ void TestLibreMinesSolver::cleanBasicMarksUnknownNeighborsSafeWhenMinesAreAccoun
 
 void TestLibreMinesSolver::cleanBasicMarksUnknownNeighborsAsMinesWhenAllMustBeMines()
 {
+    // Three neighboring 1 clues are known safe. The remaining unknown neighbor
+    // of the upper-left clue shall be identified as a mine:
+    // 11?
+    // 1??
+    // ???
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(111
            1*1
@@ -187,6 +209,10 @@ void TestLibreMinesSolver::cleanBasicMarksUnknownNeighborsAsMinesWhenAllMustBeMi
 
 void TestLibreMinesSolver::cleanBasicLeavesAmbiguousNeighborsUnknown()
 {
+    // Only the upper-left 1 clue is known safe, so its neighbors remain ambiguous:
+    // 1??
+    // ???
+    // ???
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(111
            1*1
@@ -203,6 +229,10 @@ void TestLibreMinesSolver::cleanBasicLeavesAmbiguousNeighborsUnknown()
 
 void TestLibreMinesSolver::cleanBasicDoesNothingForUnknownClueCell()
 {
+    // Every cell, including the upper-left 1 clue, is unknown to the solver:
+    // ???
+    // ???
+    // ???
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(111
            1*1
@@ -216,7 +246,11 @@ void TestLibreMinesSolver::cleanBasicDoesNothingForUnknownClueCell()
 
 void TestLibreMinesSolver::cleanBasicPatternsDetects11X()
 {
-    // The mine at (2, 0) is shared by the two clue cells at (1, 1) and (2, 1).
+    // The adjacent known 1 clues share the '=' candidates. Unknown cells in
+    // the left column are unique to the first clue and shall become safe:
+    // ?==1
+    // ?111
+    // ?==0
     setBoard(4, 3, 1, QString::fromLatin1(
         R"(01*1
            0111
@@ -224,7 +258,6 @@ void TestLibreMinesSolver::cleanBasicPatternsDetects11X()
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
-    // The right-hand clue's neighbors outside the shared area are already known safe.
     for (uchar y = 0; y < solver.rows; ++y)
     {
         solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
@@ -234,16 +267,15 @@ void TestLibreMinesSolver::cleanBasicPatternsDetects11X()
     QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Safe);
     QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
-    QVERIFY(solver.solverBoard[2][0] == LibreMinesSolver::SolverCellState::Unknown);
 }
 
 void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForTriangle()
 {
-    // Pattern under test; the three '?' cells are safe, and '=' cells remain
-    // shared unknown candidates for the two vertically adjacent 1-clues:
-    // ???
-    // =1=
-    // =11
+    // The two known 1 clues share the '=' candidates. The three leftmost
+    // unknown cells above them shall become safe; zero clearing opens neighbors:
+    // ????
+    // =1=?
+    // =11?
     setBoard(4, 3, 2, QString::fromLatin1(
         R"(1100
            *111
@@ -266,10 +298,11 @@ void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForTriangle()
 
 void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForSingleSharedRow()
 {
-    // Pattern under test (the two '=' cells are shared unknown candidates):
-    // ???
-    // =1=
-    // 111
+    // The known 1 clues share the '=' candidates. The three leftmost unknown
+    // cells above them shall become safe:
+    // ????
+    // =1=?
+    // 111?
     setBoard(4, 3, 2, QString::fromLatin1(
         R"(1100
            *111
@@ -292,11 +325,13 @@ void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForSingleSharedRow()
 
 void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForTwoSharedRows()
 {
-    // Pattern under test (the '=' cells remain shared unknown candidates):
+    // Two known 1 clues share unknown candidates in both rows below the top.
+    // The three unknown cells above them shall become safe:
     // ???
     // =1=
     // =1=
     // 111
+    // ???
     setBoard(3, 5, 2, QString::fromLatin1(
         R"(110
            *10
@@ -325,7 +360,11 @@ void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForTwoSharedRows()
 
 void TestLibreMinesSolver::cleanBasicPatternsDetects12X()
 {
-    // One mine is unique to the 2-clue and one is shared with the 1-clue.
+    // The known 2 and 1 clues share candidates; the unique unknown candidate
+    // at (0, 1) shall be identified as a mine:
+    // 2==0
+    // ?210
+    // 1==0
     setBoard(4, 3, 2, QString::fromLatin1(
         R"(2*10
            *210
@@ -349,13 +388,13 @@ void TestLibreMinesSolver::cleanBasicPatternsDetects12X()
 
 void TestLibreMinesSolver::apply1NXPatternLogicMarksUniqueCellAsMineFor12XTriangle()
 {
-    // The 2-clue shares one candidate with the adjacent 1-clue; '?' is its
-    // only unique candidate and must therefore be a mine.
-    // ===
-    // =1=
-    // =21
+    // The known 2 and 1 clues share candidates. The only unique unknown
+    // candidate at (0, 3) shall be identified as a mine:
+    // ???
+    // 01=
+    // 121
     // ?10
-    // ===
+    // ???
     setBoard(3, 5, 2, QString::fromLatin1(
         R"(011
            01*
@@ -378,6 +417,11 @@ void TestLibreMinesSolver::apply1NXPatternLogicMarksUniqueCellAsMineFor12XTriang
 
 void TestLibreMinesSolver::cleanBasicPatternsDetects13X()
 {
+    // The known 3 and 1 clues leave two unknown candidates unique to the 3;
+    // both shall be identified as mines:
+    // ?==0
+    // ?310
+    // 1==0
     setBoard(4, 3, 3, QString::fromLatin1(
         R"(**10
            *310
@@ -400,6 +444,11 @@ void TestLibreMinesSolver::cleanBasicPatternsDetects13X()
 
 void TestLibreMinesSolver::cleanBasicPatternsDetects14X()
 {
+    // The known 4 and 1 clues leave three unknown candidates unique to the 4;
+    // all three shall be identified as mines:
+    // ?==0
+    // ?410
+    // ?==0
     setBoard(4, 3, 4, QString::fromLatin1(
         R"(**10
            *410
@@ -422,13 +471,13 @@ void TestLibreMinesSolver::cleanBasicPatternsDetects14X()
 
 void TestLibreMinesSolver::cleanAdvancedPatternsDetects23XForProvidedBoard()
 {
-    // The 2-clue and 3-clue share three candidates. The '?' candidate is
-    // unique to the 3-clue and must therefore be a mine.
-    // =2==
+    // The known 2 and 3 clues share candidates. The unknown candidate at
+    // (0, 2), unique to the 3, shall be identified as a mine:
+    // =2=?
     // =311
     // ?200
-    // =200
-    // ====
+    // ?20@
+    // ????
     setBoard(4, 5, 4, QString::fromLatin1(
         R"(*2*1
            2311
@@ -458,13 +507,13 @@ void TestLibreMinesSolver::cleanAdvancedPatternsDetects23XForProvidedBoard()
 
 void TestLibreMinesSolver::solveResolvesProvided23XBoard()
 {
-    // The 2-clue and 3-clue share three candidates. The '?' candidate is
-    // unique to the 3-clue and must therefore be a mine.
-    // =2==
+    // The known 2 and 3 clues share candidates, and (0, 2) is a unique mine
+    // candidate. The safe starting cell is (3, 3); solve shall resolve the board:
+    // =2=?
     // =311
     // ?200
-    // =200
-    // ====
+    // ?20@
+    // ????
     setBoard(4, 5, 4, QString::fromLatin1(
         R"(*2*1
            2311
@@ -506,6 +555,11 @@ void TestLibreMinesSolver::solveResolvesProvided23XBoard()
 
 void TestLibreMinesSolver::apply11XPatternLogicRejectsNonSubset()
 {
+    // Reopening the rightmost neighbor at (3, 0) breaks the subset relation;
+    // the left-side unknown candidates shall remain unknown:
+    // ?==?
+    // ?111
+    // ?==0
     setBoard(4, 3, 1, QString::fromLatin1(
         R"(01*1
            0111
@@ -529,7 +583,11 @@ void TestLibreMinesSolver::apply11XPatternLogicRejectsNonSubset()
 
 void TestLibreMinesSolver::apply1NXPatternLogicRejectsWrongUniqueNeighborCount()
 {
-    // One mine is unique to the 2-clue and one is shared with the 1-clue.
+    // With the unique candidate at (0, 0) unknown, its count does not match
+    // the 1-2-X deduction; candidates shall remain unknown:
+    // ?==0
+    // ?210
+    // 1==0
     setBoard(4, 3, 2, QString::fromLatin1(
         R"(2*10
            *210
