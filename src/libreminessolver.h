@@ -227,6 +227,8 @@ protected:
     void run() override;
 
 private:
+    friend class TestLibreMinesSolver;
+
     std::vector<std::vector<LibreMinesGameEngine::CellGameEngine>> board;  ///< Generated game board with actual mine locations
     std::vector<std::vector<SolverCellState>> solverBoard;  ///< Parallel board tracking solver's knowledge of each cell
     QSet<QPair<uchar, uchar>> cellsNeedingTreatment;  ///< Set of safe cells requiring further constraint analysis
