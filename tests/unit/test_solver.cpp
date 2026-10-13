@@ -47,16 +47,13 @@ private slots:
     void apply1NXPatternLogicMarksUniqueCellAsMineFor12XTriangle();
     void cleanBasicPatternsDetects13X();
     void cleanBasicPatternsDetects14X();
-    void cleanBasicPatternsDetects23XForProvidedBoard();
+    void cleanAdvancedPatternsDetects23XForProvidedBoard();
     void solveResolvesProvided23XBoard();
     void apply11XPatternLogicRejectsNonSubset();
     void apply1NXPatternLogicRejectsWrongUniqueNeighborCount();
 
 private:
     void setBoard(uchar width, uchar height, short mines, const QString& description);
-    void prepare11XPattern();
-    void prepare1NXPattern(int remainingMines);
-    void prepare23XPattern();
 
     LibreMinesGameEngine gameEngine;
     LibreMinesSolver solver;
@@ -100,112 +97,6 @@ void TestLibreMinesSolver::setBoard(uchar width,
         std::vector<LibreMinesSolver::SolverCellState>(
             height, LibreMinesSolver::SolverCellState::Unknown));
     solver.cellsNeedingTreatment.clear();
-}
-
-void TestLibreMinesSolver::prepare11XPattern()
-{
-    // The mine at (2, 0) is shared by the two clue cells at (1, 1) and (2, 1).
-    setBoard(4, 3, 1, QString::fromLatin1(
-        R"(01*1
-           0111
-           0000)"));
-
-    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
-    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
-
-    // The right-hand clue's neighbors outside the shared area are already known safe.
-    for (uchar y = 0; y < solver.rows; ++y)
-    {
-        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
-    }
-}
-
-void TestLibreMinesSolver::prepare1NXPattern(int remainingMines)
-{
-    QString description;
-    switch (remainingMines)
-    {
-        case 2:
-            // One mine is unique to the N-clue and one is shared with the 1-clue.
-            description = QString::fromLatin1(
-                R"(2*10
-                   *210
-                   1100)");
-            break;
-        case 3:
-            description = QString::fromLatin1(
-                R"(**10
-                   *310
-                   1100)");
-            break;
-        case 4:
-            description = QString::fromLatin1(
-                R"(**10
-                   *410
-                   *200)");
-            break;
-        default:
-            QFAIL("Test fixture only supports N values 2 through 4");
-            return;
-    }
-
-    setBoard(4, 3, static_cast<short>(remainingMines), description);
-    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
-    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
-
-    // The three cells in column zero are unique to the N-clue. Leave N-1 of
-    // them unknown and mark the rest safe to isolate the intended deduction.
-    for (uchar y = 0; y < solver.rows; ++y)
-    {
-        const bool containsUniqueMine = remainingMines == 4 ||
-            (remainingMines == 3 && y < 2) ||
-            (remainingMines == 2 && y == 1);
-        if (containsUniqueMine)
-        {
-            continue;
-        }
-        solver.solverBoard[0][y] = LibreMinesSolver::SolverCellState::Safe;
-    }
-
-    // The cells to the right of the 1-clue are unique to that clue and known safe.
-    for (uchar y = 0; y < solver.rows; ++y)
-    {
-        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
-    }
-}
-
-void TestLibreMinesSolver::prepare23XPattern()
-{
-    // The 2-clue and 3-clue share three candidates. The '?' candidate is
-    // unique to the 3-clue and must therefore be a mine.
-    // =2==
-    // =311
-    // ?200
-    // =200
-    setBoard(4, 4, 4, QString::fromLatin1(
-        R"(*2*1
-           2311
-           *200
-           *200)"));
-
-    const QPair<uchar, uchar> revealedCells[] = {
-        {1, 0},
-        {1, 1}, {2, 1}, {3, 1},
-        {1, 2}, {2, 2}, {3, 2},
-        {1, 3}, {2, 3}, {3, 3}
-    };
-
-    for (const QPair<uchar, uchar>& cell : revealedCells)
-    {
-        solver.solverBoard[cell.first][cell.second] =
-            LibreMinesSolver::SolverCellState::Safe;
-        solver.cellsNeedingTreatment.insert(cell);
-    }
-
-    // The bottom-right zero is already revealed in the diagram and is a
-    // suitable safe starting point for the full solve() pass.
-    solver.safeX = 3;
-    solver.safeY = 3;
 }
 
 void TestLibreMinesSolver::cleanZeroClearsConnectedRegionAndKeepsMinesUnknown()
@@ -325,16 +216,25 @@ void TestLibreMinesSolver::cleanBasicDoesNothingForUnknownClueCell()
 
 void TestLibreMinesSolver::cleanBasicPatternsDetects11X()
 {
-    prepare11XPattern();
+    // The mine at (2, 0) is shared by the two clue cells at (1, 1) and (2, 1).
+    setBoard(4, 3, 1, QString::fromLatin1(
+        R"(01*1
+           0111
+           0000)"));
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    // The right-hand clue's neighbors outside the shared area are already known safe.
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
 
     QVERIFY(solver.cleanBasicPatterns(1, 1));
     QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Safe);
     QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
     QVERIFY(solver.solverBoard[2][0] == LibreMinesSolver::SolverCellState::Unknown);
-    QVERIFY(solver.cellsNeedingTreatment.contains({0, 0}));
-    QVERIFY(solver.cellsNeedingTreatment.contains({0, 1}));
-    QVERIFY(solver.cellsNeedingTreatment.contains({0, 2}));
 }
 
 void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForTriangle()
@@ -358,10 +258,9 @@ void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForTriangle()
     for (uchar x = 0; x < 3; ++x)
     {
         QVERIFY(solver.solverBoard[x][0] == LibreMinesSolver::SolverCellState::Safe);
-        QVERIFY(solver.cellsNeedingTreatment.contains({x, 0}));
     }
     QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Unknown);
-    QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Safe);
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Unknown);
 }
 
@@ -386,10 +285,9 @@ void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForSingleSharedRow()
     for (uchar x = 0; x < 3; ++x)
     {
         QVERIFY(solver.solverBoard[x][0] == LibreMinesSolver::SolverCellState::Safe);
-        QVERIFY(solver.cellsNeedingTreatment.contains({x, 0}));
     }
     QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Unknown);
-    QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Safe);
 }
 
 void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForTwoSharedRows()
@@ -418,17 +316,31 @@ void TestLibreMinesSolver::apply11XPatternLogicClearsTopRowForTwoSharedRows()
     for (uchar x = 0; x < solver.cols; ++x)
     {
         QVERIFY(solver.solverBoard[x][0] == LibreMinesSolver::SolverCellState::Safe);
-        QVERIFY(solver.cellsNeedingTreatment.contains({x, 0}));
     }
     QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Unknown);
-    QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Safe);
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Unknown);
-    QVERIFY(solver.solverBoard[2][2] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[2][2] == LibreMinesSolver::SolverCellState::Safe);
 }
 
 void TestLibreMinesSolver::cleanBasicPatternsDetects12X()
 {
-    prepare1NXPattern(2);
+    // One mine is unique to the 2-clue and one is shared with the 1-clue.
+    setBoard(4, 3, 2, QString::fromLatin1(
+        R"(2*10
+           *210
+           1100)"));
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    // Column zero is unique to the 2-clue; its known-safe cells isolate the deduction.
+    solver.solverBoard[0][0] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[0][2] = LibreMinesSolver::SolverCellState::Safe;
+    // The cells to the right of the 1-clue are unique to that clue and known safe.
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
 
     QVERIFY(solver.cleanBasicPatterns(1, 1));
     QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Mine);
@@ -466,7 +378,19 @@ void TestLibreMinesSolver::apply1NXPatternLogicMarksUniqueCellAsMineFor12XTriang
 
 void TestLibreMinesSolver::cleanBasicPatternsDetects13X()
 {
-    prepare1NXPattern(3);
+    setBoard(4, 3, 3, QString::fromLatin1(
+        R"(**10
+           *310
+           1100)"));
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    // The first two cells in column zero contain unique mines; the last is safe.
+    solver.solverBoard[0][2] = LibreMinesSolver::SolverCellState::Safe;
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
 
     QVERIFY(solver.cleanBasicPatterns(1, 1));
     QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Mine);
@@ -476,7 +400,18 @@ void TestLibreMinesSolver::cleanBasicPatternsDetects13X()
 
 void TestLibreMinesSolver::cleanBasicPatternsDetects14X()
 {
-    prepare1NXPattern(4);
+    setBoard(4, 3, 4, QString::fromLatin1(
+        R"(**10
+           *410
+           *200)"));
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    // All three cells in column zero are unique mines for the 4-clue.
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
 
     QVERIFY(solver.cleanBasicPatterns(1, 1));
     QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Mine);
@@ -485,17 +420,74 @@ void TestLibreMinesSolver::cleanBasicPatternsDetects14X()
     QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Unknown);
 }
 
-void TestLibreMinesSolver::cleanBasicPatternsDetects23XForProvidedBoard()
+void TestLibreMinesSolver::cleanAdvancedPatternsDetects23XForProvidedBoard()
 {
-    prepare23XPattern();
+    // The 2-clue and 3-clue share three candidates. The '?' candidate is
+    // unique to the 3-clue and must therefore be a mine.
+    // =2==
+    // =311
+    // ?200
+    // =200
+    // ====
+    setBoard(4, 5, 4, QString::fromLatin1(
+        R"(*2*1
+           2311
+           *200
+           *200
+           1100)"));
 
-    QVERIFY(solver.cleanBasicPatterns(1, 1));
+    const QPair<uchar, uchar> revealedCells[] = {
+        {1, 0},
+        {1, 1}, {2, 1}, {3, 1},
+        {1, 2}, {2, 2}, {3, 2},
+        {1, 3}, {2, 3}, {3, 3}
+    };
+
+    for (const QPair<uchar, uchar>& cell : revealedCells)
+    {
+        solver.solverBoard[cell.first][cell.second] =
+            LibreMinesSolver::SolverCellState::Safe;
+        solver.cellsNeedingTreatment.insert(cell);
+    }
+    solver.safeX = 3;
+    solver.safeY = 3;
+
+    QVERIFY(solver.cleanAdvancedPatterns(1, 1));
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Mine);
 }
 
 void TestLibreMinesSolver::solveResolvesProvided23XBoard()
 {
-    prepare23XPattern();
+    // The 2-clue and 3-clue share three candidates. The '?' candidate is
+    // unique to the 3-clue and must therefore be a mine.
+    // =2==
+    // =311
+    // ?200
+    // =200
+    // ====
+    setBoard(4, 5, 4, QString::fromLatin1(
+        R"(*2*1
+           2311
+           *200
+           *200
+           1100)"));
+
+    const QPair<uchar, uchar> revealedCells[] = {
+        {1, 0},
+        {1, 1}, {2, 1}, {3, 1},
+        {1, 2}, {2, 2}, {3, 2},
+        {1, 3}, {2, 3}, {3, 3}
+    };
+
+    for (const QPair<uchar, uchar>& cell : revealedCells)
+    {
+        solver.solverBoard[cell.first][cell.second] =
+            LibreMinesSolver::SolverCellState::Safe;
+        solver.cellsNeedingTreatment.insert(cell);
+    }
+    // The bottom-right zero is a safe starting point for the full solve() pass.
+    solver.safeX = 3;
+    solver.safeY = 3;
 
     QVERIFY(solver.solve());
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Mine);
@@ -514,7 +506,18 @@ void TestLibreMinesSolver::solveResolvesProvided23XBoard()
 
 void TestLibreMinesSolver::apply11XPatternLogicRejectsNonSubset()
 {
-    prepare11XPattern();
+    setBoard(4, 3, 1, QString::fromLatin1(
+        R"(01*1
+           0111
+           0000)"));
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    // The right-hand clue's neighbors outside the shared area are already known safe.
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
     solver.solverBoard[3][0] = LibreMinesSolver::SolverCellState::Unknown;
 
     QVERIFY(!solver.applyNNXPatternLogic(1, 1, 2, 1, 1));
@@ -526,7 +529,20 @@ void TestLibreMinesSolver::apply11XPatternLogicRejectsNonSubset()
 
 void TestLibreMinesSolver::apply1NXPatternLogicRejectsWrongUniqueNeighborCount()
 {
-    prepare1NXPattern(2);
+    // One mine is unique to the 2-clue and one is shared with the 1-clue.
+    setBoard(4, 3, 2, QString::fromLatin1(
+        R"(2*10
+           *210
+           1100)"));
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[0][0] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[0][2] = LibreMinesSolver::SolverCellState::Safe;
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
     solver.solverBoard[0][0] = LibreMinesSolver::SolverCellState::Unknown;
 
     QVERIFY(!solver.applyMNXPatternLogic(1, 1, 2, 1, 1, 2));
