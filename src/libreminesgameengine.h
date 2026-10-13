@@ -120,6 +120,29 @@ public:
                   const uchar i_Y_Clean = 255);
 
     /**
+     * @brief Start a deterministic game from a textual minefield description
+     *
+     * The minefield string contains one row per line. Use '*' for a mine and
+     * '0' through '8' for the adjacent mine count of a safe cell. For example:
+     * Leading and trailing whitespace on each row is ignored, so rows may be
+     * indented for readability.
+     * @code
+     * 111
+     * 1*1
+     * 111
+     * @endcode
+     * The dimensions, mine count, valid characters, and clue values are
+     * validated before the current game state is changed.
+     *
+     * @throws std::invalid_argument if the description does not match the
+     *         supplied dimensions, mine count, or Minesweeper rules
+     */
+    void vNewGameForTest(const uchar _X,
+                         const uchar _Y,
+                         short i_nMines_,
+                         const QString& minefieldString);
+
+    /**
      * @brief Get read-only access to the game matrix
      * 
      * Provides const access to the internal game matrix for querying

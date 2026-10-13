@@ -1462,16 +1462,10 @@ void TestGameEngine::testNoWinAfterLossFromCleaningLastNeighbors()
 
 
     engine->setFirstCellClean(false);
-
-    while (true)
-    {
-        engine->vNewGame(3, 3, 1);
-
-        if (engine->getPrincipalMatrix()[1][1].value == CellValue::MINE)
-        {
-            break;
-        }
-    }
+    engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
+R"(111
+   1*1
+   111)"));
 
     for (QPair<uchar, uchar> cell : QList<QPair<uchar, uchar>>{ {0,0}, {0, 1}, {0,2}, {1,2}, {2,0}, {2, 1}, {2,2} })
     {
