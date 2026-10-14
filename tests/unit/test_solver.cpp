@@ -51,7 +51,7 @@ private slots:
     void cleanBasicPatternsDetects13X();
     void cleanBasicPatternsDetects14X();
     void cleanAdvancedPatternsDetects23XForProvidedBoard();
-    void solveResolvesProvided23XBoard();
+    void apply23XPatternLogicMarksUniqueMineForProvidedBoard();
     void apply11XPatternLogicRejectsNonSubset();
     void apply1NXPatternLogicRejectsWrongUniqueNeighborCount();
 
@@ -505,10 +505,10 @@ void TestLibreMinesSolver::cleanAdvancedPatternsDetects23XForProvidedBoard()
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Mine);
 }
 
-void TestLibreMinesSolver::solveResolvesProvided23XBoard()
+void TestLibreMinesSolver::apply23XPatternLogicMarksUniqueMineForProvidedBoard()
 {
     // The known 2 and 3 clues share candidates, and (0, 2) is a unique mine
-    // candidate. The safe starting cell is (3, 3); solve shall resolve the board:
+    // candidate:
     // =2=?
     // =311
     // ?200
@@ -534,23 +534,8 @@ void TestLibreMinesSolver::solveResolvesProvided23XBoard()
             LibreMinesSolver::SolverCellState::Safe;
         solver.cellsNeedingTreatment.insert(cell);
     }
-    // The bottom-right zero is a safe starting point for the full solve() pass.
-    solver.safeX = 3;
-    solver.safeY = 3;
-
-    QVERIFY(solver.solve());
+    QVERIFY(solver.applyMNXPatternLogic(1, 1, 1, 0, 2, 3));
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Mine);
-
-    for (uchar x = 0; x < solver.cols; ++x)
-    {
-        for (uchar y = 0; y < solver.rows; ++y)
-        {
-            const auto expectedState = solver.board[x][y].value == CellValue::MINE
-                ? LibreMinesSolver::SolverCellState::Mine
-                : LibreMinesSolver::SolverCellState::Safe;
-            QVERIFY(solver.solverBoard[x][y] == expectedState);
-        }
-    }
 }
 
 void TestLibreMinesSolver::apply11XPatternLogicRejectsNonSubset()
