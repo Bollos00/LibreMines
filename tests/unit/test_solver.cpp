@@ -51,6 +51,9 @@ private slots:
     void cleanBasicPatternsDetects13X();
     void cleanBasicPatternsDetects14X();
     void cleanAdvancedPatternsDetects23XForProvidedBoard();
+    void cleanAdvancedPatternsDetects121Corner();
+    void cleanAdvancedPatternsDetects131CornerMine();
+    void cleanAdvancedPatternsDetects1X1();
     void apply23XPatternLogicMarksUniqueMineForProvidedBoard();
     void apply11XPatternLogicRejectsNonSubset();
     void apply1NXPatternLogicRejectsWrongUniqueNeighborCount();
@@ -503,6 +506,99 @@ void TestLibreMinesSolver::cleanAdvancedPatternsDetects23XForProvidedBoard()
 
     QVERIFY(solver.cleanAdvancedPatterns(1, 1));
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Mine);
+}
+
+void TestLibreMinesSolver::cleanAdvancedPatternsDetects121Corner()
+{
+    // The two outer 1 clues account for both mines required by the center 2.
+    // The center-only candidate at (2, 0) shall therefore become safe:
+    // ==?
+    // 12=
+    // 01=
+    setBoard(3, 3, 2, QString::fromLatin1(
+        R"(*21
+           12*
+           011)"));
+
+    // The zero region reveals the clue corner while leaving the candidates on
+    // its right side unresolved.
+    QVERIFY(solver.cleanZero(0, 2));
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][2] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[2][0] == LibreMinesSolver::SolverCellState::Unknown);
+
+    QVERIFY(solver.cleanAdvancedPatterns(1, 1));
+    QVERIFY(solver.solverBoard[2][0] == LibreMinesSolver::SolverCellState::Safe);
+}
+
+void TestLibreMinesSolver::cleanAdvancedPatternsDetects131CornerMine()
+{
+    // The two outer 1 clues account for two of the three mines required by
+    // the center 3, so its sole remaining candidate is a mine:
+    // ==?
+    // 13=
+    // 01=
+    setBoard(3, 3, 3, QString::fromLatin1(
+        R"(1**
+           133
+           01*)"));
+
+    QVERIFY(solver.cleanZero(0, 2));
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][2] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[2][0] == LibreMinesSolver::SolverCellState::Unknown);
+
+    QVERIFY(solver.cleanAdvancedPatterns(1, 1));
+    QVERIFY(solver.solverBoard[2][0] == LibreMinesSolver::SolverCellState::Mine);
+}
+
+void TestLibreMinesSolver::cleanAdvancedPatternsDetects1X1()
+{
+    // The 1 clues at (1, 2) and (3, 2) share unknown candidates (2, 1) and
+    // (2, 2). The unknown cells unique to the first clue shall become safe:
+    // ??**
+    // ??=3
+    // ?1=1
+    // ?222
+    // ?1=1
+    setBoard(4, 5, 4, QString::fromLatin1(
+        R"(01**
+           0233
+           01*1
+           0222
+           01*1)"));
+
+    solver.solverBoard[2][0] = LibreMinesSolver::SolverCellState::Mine;
+    solver.solverBoard[3][0] = LibreMinesSolver::SolverCellState::Mine;
+
+    const QPair<uchar, uchar> knownSafeCells[] = {
+        {3, 1},
+        {1, 2}, {3, 2},
+        {1, 3}, {2, 3}, {3, 3},
+        {1, 4}, {3, 4}
+    };
+    for (const QPair<uchar, uchar>& cell : knownSafeCells)
+    {
+        solver.solverBoard[cell.first][cell.second] =
+            LibreMinesSolver::SolverCellState::Safe;
+    }
+
+    QVERIFY(solver.cleanAdvancedPatterns(1, 2));
+
+    const QPair<uchar, uchar> uniqueCells[] = {
+        {0, 1}, {1, 1}, {0, 2}, {0, 3}
+    };
+    for (const QPair<uchar, uchar>& cell : uniqueCells)
+    {
+        QVERIFY(solver.solverBoard[cell.first][cell.second] ==
+                LibreMinesSolver::SolverCellState::Safe);
+    }
+
+    QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[2][2] == LibreMinesSolver::SolverCellState::Unknown);
 }
 
 void TestLibreMinesSolver::apply23XPatternLogicMarksUniqueMineForProvidedBoard()

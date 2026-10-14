@@ -317,9 +317,7 @@ private:
 
     // TODO: Implement more advanced patterns
     // mine count solving at the end
-    // 1-X-1
     // 1-3-1 corner
-    // 1-2-1 corner
     // T-pattern
     // 
     
@@ -333,6 +331,8 @@ private:
      * @param x X coordinate of the cell to analyze
      * @param y Y coordinate of the cell to analyze
      * @return true if any pattern-based deductions were made
+     * @see detect121CornerPattern()
+     * @see detect131CornerPattern()
      */
     bool cleanAdvancedPatterns(uchar x, uchar y);
 
@@ -485,6 +485,70 @@ private:
      */
     bool detect34XPattern(uchar x, uchar y);
 
+    /**
+     * @brief Detect the 1-X-1 mine pattern in the vicinity of a cell
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if the pattern was detected and processed
+     */
+    bool detect1X1Pattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect the 2-X-2 mine pattern in the vicinity of a cell
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if the pattern was detected and processed
+     */
+    bool detect2X2Pattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect and apply the generic 1-2-1 corner deduction
+     *
+     * Searches the four L-shaped orientations around a known-safe center
+     * clue with two remaining mines. If the perpendicular outer clues each
+     * have one remaining mine, and their disjoint unknown-neighbor sets are
+     * subsets of the center clue's unknown neighbors, the center-only
+     * candidates are safe.
+     *
+     * @param x X coordinate of the center clue
+     * @param y Y coordinate of the center clue
+     * @return true if any center-only candidates were marked safe
+     * @see apply1N1CornerPatternLogic()
+     */
+    bool detect121CornerPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect and apply the 1-3-1 corner deduction
+     *
+     * Searches the four L-shaped orientations around a known-safe center
+     * clue with three remaining mines. If the perpendicular outer clues each
+     * have one remaining mine, and their disjoint unknown-neighbor sets are
+     * subsets of the center clue's unknown neighbors, the sole center-only
+     * candidate is a mine.
+     *
+     * @param x X coordinate of the center clue
+     * @param y Y coordinate of the center clue
+     * @return true if the center-only candidate was marked as a mine
+     * @see detect1N1CornerPattern()
+     */
+    bool detect131CornerPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect an L-shaped corner pattern with two outer 1 clues
+     *
+     * Searches all four perpendicular pairs around a safe center clue with
+     * two or three remaining mines and applies the corresponding safe-cell or
+     * mine deduction when the candidate sets satisfy the pattern.
+     *
+     * @param x X coordinate of the center clue
+     * @param y Y coordinate of the center clue
+     * @param middleRemainingMines Remaining mines required by the center clue
+     * @return true if the corner pattern was detected and processed
+     * @see apply1N1CornerPatternLogic()
+     */
+    bool detect1N1CornerPattern(uchar x, uchar y, int middleRemainingMines);
 
     /**
      * @brief Detect a M-N-X mine pattern in the vicinity of a cell
@@ -528,6 +592,23 @@ private:
      * @see applyNNXPatternLogic()
      */
     bool detectNNXPattern(uchar x, uchar y, int remainingMines);
+
+    /**
+     * @brief Detect an N-X-N mine pattern in the vicinity of a cell
+     *
+     * Checks cells two spaces apart horizontally and vertically for a second
+     * clue with the same remaining-mine count. If the second clue's unknown
+     * neighbors are a subset of this cell's unknown neighbors, the existing
+     * N-N-X deduction marks this cell's unique neighbors safe.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @param remainingMines Remaining mines required by both clues (N)
+     * @return true if an N-X-N pattern was detected and processed
+     * @see detectNNXPattern()
+     * @see applyNNXPatternLogic()
+     */
+    bool detectNXNPattern(uchar x, uchar y, int remainingMines);
 
     /**
      * @brief Calculate the number of remaining mines for a numbered cell
@@ -581,6 +662,31 @@ private:
      * @return true if the pattern logic was successfully applied
      */
     bool applyNNXPatternLogic(uchar middleX, uchar middleY, uchar adjX, uchar adjY, int remainingMines);
+
+    /**
+     * @brief Apply a corner deduction to three known-safe clues
+     *
+     * When the center clue has two remaining mines, marks its sole unique
+     * unknown neighbor safe. When it has three remaining mines, marks that
+     * neighbor as a mine. In both cases, the two outer 1 clues must have
+     * disjoint unknown-neighbor sets contained in the center clue's set.
+     *
+     * @param middleX X coordinate of the center clue
+     * @param middleY Y coordinate of the center clue
+     * @param firstX X coordinate of the first outer 1 clue
+     * @param firstY Y coordinate of the first outer 1 clue
+     * @param secondX X coordinate of the second outer 1 clue
+     * @param secondY Y coordinate of the second outer 1 clue
+     * @param middleRemainingMines Remaining mines required by the center clue
+     * @return true if the center-only candidate was deduced
+     */
+    bool apply1N1CornerPatternLogic(uchar middleX,
+                                   uchar middleY,
+                                   uchar firstX,
+                                   uchar firstY,
+                                   uchar secondX,
+                                   uchar secondY,
+                                   int middleRemainingMines);
 
     bool checkForInterrupt();
 

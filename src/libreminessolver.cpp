@@ -419,6 +419,30 @@ bool LibreMinesSolver::cleanAdvancedPatterns(uchar x, uchar y)
         changes = true;
     }
 
+    // 6. Try the 1-X-1 pattern detection
+    if (detect1X1Pattern(x, y))
+    {
+        changes = true;
+    }
+
+    // 7. Try the 2-X-2 pattern detection
+    if (detect2X2Pattern(x, y))
+    {
+        changes = true;
+    }
+
+    // 8. Try the generic 1-2-1 corner pattern
+    if (detect121CornerPattern(x, y))
+    {
+        changes = true;
+    }
+
+    // 9. Try the 1-3-1 corner pattern
+    if (detect131CornerPattern(x, y))
+    {
+        changes = true;
+    }
+
     return changes;
 }
 
@@ -465,6 +489,78 @@ bool LibreMinesSolver::detect24XPattern(uchar x, uchar y)
 bool LibreMinesSolver::detect34XPattern(uchar x, uchar y)
 {
     return detectMNXPattern(x, y, 3, 4);
+}
+
+bool LibreMinesSolver::detect1X1Pattern(uchar x, uchar y)
+{
+    return detectNXNPattern(x, y, 1);
+}
+
+bool LibreMinesSolver::detect2X2Pattern(uchar x, uchar y)
+{
+    return detectNXNPattern(x, y, 2);
+}
+
+bool LibreMinesSolver::detect121CornerPattern(uchar x, uchar y)
+{
+    return detect1N1CornerPattern(x, y, 2);
+}
+
+bool LibreMinesSolver::detect131CornerPattern(uchar x, uchar y)
+{
+    return detect1N1CornerPattern(x, y, 3);
+}
+
+bool LibreMinesSolver::detect1N1CornerPattern(uchar x, uchar y, int middleRemainingMines)
+{
+    if (solverBoard[x][y] != SolverCellState::Safe ||
+        countRemainingMines(x, y) != middleRemainingMines)
+    {
+        return false;
+    }
+
+    // Check the four perpendicular pairs of neighboring clues.
+    if (x >= 1 && y >= 1 &&
+        solverBoard[x - 1][y] == SolverCellState::Safe &&
+        solverBoard[x][y - 1] == SolverCellState::Safe &&
+        countRemainingMines(x - 1, y) == 1 &&
+        countRemainingMines(x, y - 1) == 1 &&
+        apply1N1CornerPatternLogic(x, y, x - 1, y, x, y - 1, middleRemainingMines))
+    {
+        return true;
+    }
+
+    if (x < cols - 1 && y >= 1 &&
+        solverBoard[x + 1][y] == SolverCellState::Safe &&
+        solverBoard[x][y - 1] == SolverCellState::Safe &&
+        countRemainingMines(x + 1, y) == 1 &&
+        countRemainingMines(x, y - 1) == 1 &&
+        apply1N1CornerPatternLogic(x, y, x + 1, y, x, y - 1, middleRemainingMines))
+    {
+        return true;
+    }
+
+    if (x >= 1 && y < rows - 1 &&
+        solverBoard[x - 1][y] == SolverCellState::Safe &&
+        solverBoard[x][y + 1] == SolverCellState::Safe &&
+        countRemainingMines(x - 1, y) == 1 &&
+        countRemainingMines(x, y + 1) == 1 &&
+        apply1N1CornerPatternLogic(x, y, x - 1, y, x, y + 1, middleRemainingMines))
+    {
+        return true;
+    }
+
+    if (x < cols - 1 && y < rows - 1 &&
+        solverBoard[x + 1][y] == SolverCellState::Safe &&
+        solverBoard[x][y + 1] == SolverCellState::Safe &&
+        countRemainingMines(x + 1, y) == 1 &&
+        countRemainingMines(x, y + 1) == 1 &&
+        apply1N1CornerPatternLogic(x, y, x + 1, y, x, y + 1, middleRemainingMines))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 bool LibreMinesSolver::detectMNXPattern(uchar x, uchar y, int adjacentMines, int remainingMines)
@@ -606,6 +702,52 @@ bool LibreMinesSolver::detectNNXPattern(uchar x, uchar y, int remainingMines)
     return false;
 }
 
+bool LibreMinesSolver::detectNXNPattern(uchar x, uchar y, int remainingMines)
+{
+    if (countRemainingMines(x, y) != remainingMines)
+    {
+        return false;
+    }
+
+    // Look for N-X-N pattern in horizontal direction (left).
+    if (x >= 2 && countRemainingMines(x - 2, y) == remainingMines)
+    {
+        if (applyNNXPatternLogic(x, y, x - 2, y, remainingMines))
+        {
+            return true;
+        }
+    }
+
+    // Look for N-X-N pattern in horizontal direction (right).
+    if (x + 2 < cols && countRemainingMines(x + 2, y) == remainingMines)
+    {
+        if (applyNNXPatternLogic(x, y, x + 2, y, remainingMines))
+        {
+            return true;
+        }
+    }
+
+    // Look for N-X-N pattern in vertical direction (top).
+    if (y >= 2 && countRemainingMines(x, y - 2) == remainingMines)
+    {
+        if (applyNNXPatternLogic(x, y, x, y - 2, remainingMines))
+        {
+            return true;
+        }
+    }
+
+    // Look for N-X-N pattern in vertical direction (bottom).
+    if (y + 2 < rows && countRemainingMines(x, y + 2) == remainingMines)
+    {
+        if (applyNNXPatternLogic(x, y, x, y + 2, remainingMines))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 int LibreMinesSolver::countRemainingMines(uchar x, uchar y) const
 {
     const int cellValue = static_cast<int>(board[x][y].value);
@@ -731,6 +873,95 @@ bool LibreMinesSolver::applyNNXPatternLogic(uchar middleX, uchar middleY, uchar 
     }
 
     return false;
+}
+
+bool LibreMinesSolver::apply1N1CornerPatternLogic(uchar middleX,
+                                                  uchar middleY,
+                                                  uchar firstX,
+                                                  uchar firstY,
+                                                  uchar secondX,
+                                                  uchar secondY,
+                                                  int middleRemainingMines)
+{
+    if ((middleRemainingMines != 2 && middleRemainingMines != 3) ||
+        solverBoard[middleX][middleY] != SolverCellState::Safe ||
+        solverBoard[firstX][firstY] != SolverCellState::Safe ||
+        solverBoard[secondX][secondY] != SolverCellState::Safe ||
+        countRemainingMines(middleX, middleY) != middleRemainingMines ||
+        countRemainingMines(firstX, firstY) != 1 ||
+        countRemainingMines(secondX, secondY) != 1)
+    {
+        return false;
+    }
+
+    QSet<QPair<uchar, uchar>> middleNeighbors;
+    QSet<QPair<uchar, uchar>> firstNeighbors;
+    QSet<QPair<uchar, uchar>> secondNeighbors;
+
+    for (int dx = -1; dx <= 1; ++dx)
+    {
+        for (int dy = -1; dy <= 1; ++dy)
+        {
+            if (dx == 0 && dy == 0)
+            {
+                continue;
+            }
+
+            uchar nx = middleX + dx;
+            uchar ny = middleY + dy;
+            if (nx < cols && ny < rows && solverBoard[nx][ny] == SolverCellState::Unknown)
+            {
+                middleNeighbors.insert({nx, ny});
+            }
+
+            nx = firstX + dx;
+            ny = firstY + dy;
+            if (nx < cols && ny < rows && solverBoard[nx][ny] == SolverCellState::Unknown)
+            {
+                firstNeighbors.insert({nx, ny});
+            }
+
+            nx = secondX + dx;
+            ny = secondY + dy;
+            if (nx < cols && ny < rows && solverBoard[nx][ny] == SolverCellState::Unknown)
+            {
+                secondNeighbors.insert({nx, ny});
+            }
+        }
+    }
+
+    if (firstNeighbors.isEmpty() || secondNeighbors.isEmpty() ||
+        !(firstNeighbors & secondNeighbors).isEmpty() ||
+        !(firstNeighbors - middleNeighbors).isEmpty() ||
+        !(secondNeighbors - middleNeighbors).isEmpty())
+    {
+        return false;
+    }
+
+    const QSet<QPair<uchar, uchar>> middleUniqueNeighbors = middleNeighbors - firstNeighbors - secondNeighbors;
+
+    if (middleUniqueNeighbors.isEmpty() || middleUniqueNeighbors.size() != 1)
+    {
+        return false;
+    }
+
+    const QPair<uchar, uchar>& cell = *middleUniqueNeighbors.cbegin();
+
+    if (middleRemainingMines == 2)
+    {
+        if (!cleanZero(cell.first, cell.second))
+        {
+            solverBoard[cell.first][cell.second] = SolverCellState::Safe;
+            cellsNeedingTreatment.insert(cell);
+        }
+    }
+    else
+    {
+        solverBoard[cell.first][cell.second] = SolverCellState::Mine;
+        cellsNeedingTreatment.remove(cell);
+    }
+
+    return true;
 }
 
 bool LibreMinesSolver::checkForInterrupt()
