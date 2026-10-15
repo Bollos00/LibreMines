@@ -134,6 +134,7 @@ void LibreMinesGameEngine::vNewGameForTest(const uchar _X,
                                            const QString& minefieldString)
 {
     QString normalizedMinefield = minefieldString;
+    normalizedMinefield.replace(QStringLiteral(" "), QStringLiteral(""));
     normalizedMinefield.replace(QStringLiteral("\r\n"), QStringLiteral("\n"));
     normalizedMinefield.replace(QLatin1Char('\r'), QLatin1Char('\n'));
     normalizedMinefield = normalizedMinefield.trimmed();

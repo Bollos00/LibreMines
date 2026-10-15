@@ -87,7 +87,7 @@ public:
         Running     = 1,  ///< Solver is currently executing and generating boards
         Finished    = 2,  ///< Solver has completed successfully and found a solvable board
         Interrupted = 3,  ///< Solver was interrupted before completion
-        Failed      = 4   ///< Solver encountered an error or was terminated
+        Failed      = 4   ///< Solver could not complete because of an error
     };
 
     /**
@@ -258,10 +258,11 @@ private:
     bool solve();
 
     /**
-     * @brief Initialize solving by clearing the safe starting cell
+     * @brief Apply the initial zero-cell expansion
      * 
-     * Performs the initial step of revealing the guaranteed safe cell
-     * and its neighbors, establishing the foundation for further solving.
+     * Invokes cleanZero() at the configured safe starting position. If the
+     * starting cell has no adjacent mines, it and the connected safe area are
+     * marked safe; a numbered starting cell is not changed by this method.
      */
     void initialStep();
 
@@ -293,11 +294,10 @@ private:
     bool cleanBasic(uchar x, uchar y);
 
     /**
-     * @brief Apply advanced pattern recognition algorithms to a cell
+     * @brief Apply basic pattern recognition rules to a cell
      * 
-     * Implements sophisticated minesweeper solving patterns that go beyond
-     * basic constraint satisfaction. These patterns are based on common
-     * minesweeper solving techniques that experienced players use.
+     * Applies the basic pattern deductions supported by the solver, in
+     * addition to the direct constraint rules handled by cleanBasic().
      * 
      * Currently supports:
      * - 1-2-X pattern detection and resolution
@@ -317,24 +317,57 @@ private:
 
     // TODO: Implement more advanced patterns
     // mine count solving at the end
-    // 1-3-1 corner
     // T-pattern
     // 
     
     /**
-     * @brief Apply advanced pattern recognition algorithms to a cell
+     * @brief Apply advanced pattern recognition rules to a cell
      * 
-     * Implements sophisticated minesweeper solving patterns that go beyond
-     * basic constraint satisfaction. These patterns are based on common
-     * minesweeper solving techniques that experienced players use.
+     * Tries the 2-3-X, 2-4-X, 3-4-X, 2-2-X, and 3-3-X deductions, the
+     * 1-X-1 and 2-X-2 deductions, and the 2-2-2 and 1-3-1 corner deductions.
      * 
      * @param x X coordinate of the cell to analyze
      * @param y Y coordinate of the cell to analyze
      * @return true if any pattern-based deductions were made
-     * @see detect121CornerPattern()
+     * @see detect23XPattern()
+     * @see detect24XPattern()
+     * @see detect34XPattern()
+     * @see detect22XPattern()
+     * @see detect33XPattern()
+     * @see detect1X1Pattern()
+     * @see detect2X2Pattern()
+     * @see detect222CornerPattern()
      * @see detect131CornerPattern()
      */
     bool cleanAdvancedPatterns(uchar x, uchar y);
+
+    /**
+     * @brief Detect and apply the 1-3-1 corner deduction
+     *
+     * Searches for a safe cell with three remaining mines and two
+     * perpendicular safe neighbors with one remaining mine each. Applies the
+     * corner deduction when their unknown-neighbor sets support it.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if the corner deduction was applied
+     * @see apply131CornerPatternLogic()
+     */
+    bool detect131CornerPattern(uchar x, uchar y);
+
+    /**
+     * @brief Detect and apply the 2-2-2 corner deduction
+     *
+     * Searches for a safe cell and two perpendicular safe neighbors, each
+     * with two remaining mines, and applies the corner deduction when their
+     * unknown-neighbor sets support it.
+     *
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @return true if the corner deduction was applied
+     * @see apply222CornerPatternLogic()
+     */
+    bool detect222CornerPattern(uchar x, uchar y);
 
     /**
      * @brief Detect 1-2-X mine pattern in the vicinity of a cell
@@ -502,54 +535,6 @@ private:
      * @return true if the pattern was detected and processed
      */
     bool detect2X2Pattern(uchar x, uchar y);
-
-    /**
-     * @brief Detect and apply the generic 1-2-1 corner deduction
-     *
-     * Searches the four L-shaped orientations around a known-safe center
-     * clue with two remaining mines. If the perpendicular outer clues each
-     * have one remaining mine, and their disjoint unknown-neighbor sets are
-     * subsets of the center clue's unknown neighbors, the center-only
-     * candidates are safe.
-     *
-     * @param x X coordinate of the center clue
-     * @param y Y coordinate of the center clue
-     * @return true if any center-only candidates were marked safe
-     * @see apply1N1CornerPatternLogic()
-     */
-    bool detect121CornerPattern(uchar x, uchar y);
-
-    /**
-     * @brief Detect and apply the 1-3-1 corner deduction
-     *
-     * Searches the four L-shaped orientations around a known-safe center
-     * clue with three remaining mines. If the perpendicular outer clues each
-     * have one remaining mine, and their disjoint unknown-neighbor sets are
-     * subsets of the center clue's unknown neighbors, the sole center-only
-     * candidate is a mine.
-     *
-     * @param x X coordinate of the center clue
-     * @param y Y coordinate of the center clue
-     * @return true if the center-only candidate was marked as a mine
-     * @see detect1N1CornerPattern()
-     */
-    bool detect131CornerPattern(uchar x, uchar y);
-
-    /**
-     * @brief Detect an L-shaped corner pattern with two outer 1 clues
-     *
-     * Searches all four perpendicular pairs around a safe center clue with
-     * two or three remaining mines and applies the corresponding safe-cell or
-     * mine deduction when the candidate sets satisfy the pattern.
-     *
-     * @param x X coordinate of the center clue
-     * @param y Y coordinate of the center clue
-     * @param middleRemainingMines Remaining mines required by the center clue
-     * @return true if the corner pattern was detected and processed
-     * @see apply1N1CornerPatternLogic()
-     */
-    bool detect1N1CornerPattern(uchar x, uchar y, int middleRemainingMines);
-
     /**
      * @brief Detect a M-N-X mine pattern in the vicinity of a cell
      *
@@ -632,8 +617,8 @@ private:
      *
      * @param middleX X coordinate of the cell with N remaining mines
      * @param middleY Y coordinate of the cell with N remaining mines
-     * @param adjacentX X coordinate of the adjacent cell with 1 remaining mine
-     * @param adjacentY Y coordinate of the adjacent cell with 1 remaining mine
+     * @param adjacentX X coordinate of the adjacent cell
+     * @param adjacentY Y coordinate of the adjacent cell
      * @param adjacentMines M, the remaining-mine count of the adjacent cell
      * @param remainingMines N, the remaining-mine count of the analyzed cell
      * @return true if the pattern logic was successfully applied
@@ -664,32 +649,65 @@ private:
     bool applyNNXPatternLogic(uchar middleX, uchar middleY, uchar adjX, uchar adjY, int remainingMines);
 
     /**
-     * @brief Apply a corner deduction to three known-safe clues
+     * @brief Apply the 1-3-1 corner deduction to three safe clues
      *
-     * When the center clue has two remaining mines, marks its sole unique
-     * unknown neighbor safe. When it has three remaining mines, marks that
-     * neighbor as a mine. In both cases, the two outer 1 clues must have
-     * disjoint unknown-neighbor sets contained in the center clue's set.
+     * When the middle clue has three remaining mines and each perpendicular
+     * outer clue has one, marks the sole unknown neighbor unique to the middle
+     * clue as a mine and the outer clues' unique unknown neighbors as safe.
+     * The outer clues' unknown-neighbor sets must be disjoint.
      *
-     * @param middleX X coordinate of the center clue
-     * @param middleY Y coordinate of the center clue
-     * @param firstX X coordinate of the first outer 1 clue
-     * @param firstY Y coordinate of the first outer 1 clue
-     * @param secondX X coordinate of the second outer 1 clue
-     * @param secondY Y coordinate of the second outer 1 clue
-     * @param middleRemainingMines Remaining mines required by the center clue
-     * @return true if the center-only candidate was deduced
+     * @param middleX X coordinate of the middle clue
+     * @param middleY Y coordinate of the middle clue
+     * @param firstX X coordinate of the first outer clue
+     * @param firstY Y coordinate of the first outer clue
+     * @param secondX X coordinate of the second outer clue
+     * @param secondY Y coordinate of the second outer clue
+     * @return true if the deduction was applied
      */
-    bool apply1N1CornerPatternLogic(uchar middleX,
+    bool apply131CornerPatternLogic(uchar middleX,
                                    uchar middleY,
                                    uchar firstX,
                                    uchar firstY,
                                    uchar secondX,
-                                   uchar secondY,
-                                   int middleRemainingMines);
+                                   uchar secondY);
 
+    /**
+     * @brief Apply the 2-2-2 corner deduction to three safe clues
+     *
+     * When all three clues have two remaining mines and the two outer clues'
+     * unknown-neighbor sets are disjoint, marks the sole unknown neighbor
+     * unique to the middle clue safe. An outer clue's sole unique unknown
+     * neighbor is marked as a mine.
+     *
+     * @param middleX X coordinate of the middle clue
+     * @param middleY Y coordinate of the middle clue
+     * @param firstX X coordinate of the first outer clue
+     * @param firstY Y coordinate of the first outer clue
+     * @param secondX X coordinate of the second outer clue
+     * @param secondY Y coordinate of the second outer clue
+     * @return true if the deduction was applied
+     */
+    bool apply222CornerPatternLogic(uchar middleX,
+                                   uchar middleY,
+                                   uchar firstX,
+                                   uchar firstY,
+                                   uchar secondX,
+                                   uchar secondY);
+
+    /**
+     * @brief Check whether an interruption has been requested
+     *
+     * Reads the pending solver command while holding the command mutex.
+     *
+     * @return true if the solver has received an interrupt command
+     */
     bool checkForInterrupt();
 
+    /**
+     * @brief Update the solver state while holding its mutex
+     *
+     * @param newState State to assign to the solver
+     */
     void setInternalState(SolverState newState);
 signals:
 };
