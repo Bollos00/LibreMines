@@ -239,6 +239,9 @@ private:
 
     uchar safeX;    ///< X coordinate of guaranteed safe starting cell
     uchar safeY;    ///< Y coordinate of guaranteed safe starting cell
+
+    quint32 nCellsMarkedSafe = 0;  ///< Number of cells currently marked safe on the solver board
+    quint32 nCellsMarkedMine = 0;  ///< Number of cells currently marked as mines on the solver board
     
     SolverState state;              ///< Current state of the solver thread
     mutable QMutex stateMutex;      ///< Mutex for thread-safe state access
@@ -256,6 +259,30 @@ private:
      * @return true if board is solvable, false otherwise
      */
     bool solve();
+
+    /**
+     * @brief Mark a cell as safe or as a mine
+     *
+     * For safe cells, first attempts zero expansion; otherwise updates the
+     * solver board, treatment set, and marked-cell counters through
+     * updateCellState(). Marking a cell already in the requested state does
+     * not change counters.
+     *
+     * @param cell Coordinates of the cell to mark
+     * @param newState New solver state; must be Safe or Mine
+     */
+    void markCell(const QPair<uchar, uchar>& cell, SolverCellState newState);
+
+    /**
+     * @brief Update a cell's solver state, treatment membership, and counter
+     *
+     * Applies the state update without attempting zero expansion. This is
+     * used by cleanZero() for the zero cell currently being expanded.
+     *
+     * @param cell Coordinates of the cell to update
+     * @param newState New solver state; must be Safe or Mine
+     */
+    void updateCellState(const QPair<uchar, uchar>& cell, SolverCellState newState);
 
     /**
      * @brief Apply the initial zero-cell expansion
@@ -376,9 +403,9 @@ private:
      * exactly 2 remaining mines, then applies the 1-2-X deduction.
      *
      * The pattern works as follows:
-     * - The middle cell has N remaining mines and the adjacent cell has N-1
-     * - The cells share exactly 2 unknown neighbors
-     * - The middle cell has exactly 1 unique unknown neighbor, which is a mine
+     * - The middle cell has N remaining mines and the adjacent cell has M, where N > M
+     * - If the middle-only unknown neighbors number N-M, they are all mines
+     * - Unknown neighbors unique to the adjacent cell are safe
      *
      * Searches in all four directions (horizontal and vertical) from the
      * given cell position to find this pattern.
@@ -596,11 +623,26 @@ private:
     bool detectNXNPattern(uchar x, uchar y, int remainingMines);
 
     /**
-     * @brief Calculate the number of remaining mines for a numbered cell
+     * @brief Count neighboring cells in a given solver state
      * 
-     * Determines how many mines are still needed to satisfy a numbered cell's
-     * constraint. This is calculated as the cell's value minus the number
-     * of mines already identified in its neighborhood.
+     * Counts the neighbors of a cell whose solver state matches the requested
+     * state, optionally collecting their coordinates.
+     * 
+     * @param x X coordinate of the cell to analyze
+     * @param y Y coordinate of the cell to analyze
+     * @param cellState Solver state of the neighbors to count
+     * @param outSet Optional output set to receive the matching neighbor coordinates
+     * @return Number of neighboring cells in the requested state
+     */
+    int countRemainingNeighbors(uchar x, uchar y, SolverCellState cellState, QSet<QPair<uchar, uchar>>* outSet = nullptr) const;
+
+
+    /**
+     * @brief Count the number of remaining mines adjacent to a cell
+     * 
+     * Calculates how many mines are still needed to satisfy a numbered cell's
+     * constraint. This is determined by subtracting the number of already
+     * identified mines from the cell's value.
      * 
      * @param x X coordinate of the cell to analyze
      * @param y Y coordinate of the cell to analyze
