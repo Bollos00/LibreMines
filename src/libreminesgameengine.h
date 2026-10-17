@@ -38,6 +38,8 @@
 #include "common.h"
 #include "libreminesscore.h"
 
+#define SOLVERS_COUNT 1
+
 /**
  * @brief Core minesweeper game engine
  * 
@@ -118,6 +120,29 @@ public:
                   const uchar i_Y_Clean = 255);
 
     /**
+     * @brief Start a deterministic game from a textual minefield description
+     *
+     * The minefield string contains one row per line. Use '*' for a mine and
+     * '0' through '8' for the adjacent mine count of a safe cell. For example:
+     * Leading and trailing whitespace on each row is ignored, so rows may be
+     * indented for readability.
+     * @code
+     * 111
+     * 1*1
+     * 111
+     * @endcode
+     * The dimensions, mine count, valid characters, and clue values are
+     * validated before the current game state is changed.
+     *
+     * @throws std::invalid_argument if the description does not match the
+     *         supplied dimensions, mine count, or Minesweeper rules
+     */
+    void vNewGameForTest(const uchar _X,
+                         const uchar _Y,
+                         short i_nMines_,
+                         const QString& minefieldString);
+
+    /**
      * @brief Get read-only access to the game matrix
      * 
      * Provides const access to the internal game matrix for querying
@@ -195,6 +220,20 @@ public:
      */
     void setUseQuestionMark(const bool x);
 
+    /**
+     * @brief Set whether no-guess mode is enabled
+     * 
+     * When enabled, no-guess mode ensures that the generated minesweeper
+     * puzzle can always be solved through logical deduction without requiring
+     * guessing. This mode may adjust mine placement algorithms to guarantee
+     * that every move can be determined through analysis of revealed numbers
+     * and their relationships to neighboring cells.
+     * 
+     * @param x true to enable no-guess mode, false to allow traditional puzzles
+     * @since v3.0
+     */
+    void setNoGuessMode(const bool x);
+
 private:
     /**
      * @brief Reset the game matrix to initial state
@@ -266,6 +305,7 @@ private:
     bool bFirstCellClean;   ///< Whether first clicked cell should be guaranteed safe
 
     bool bUseQuestionMark;  ///< Whether question mark flags are enabled
+    bool bNoGuessMode;      ///< Whether no-guess mode is enabled for logical-only puzzles
 
     bool bGameActive;       ///< Whether the game is currently in progress
 

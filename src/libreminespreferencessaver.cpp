@@ -204,6 +204,13 @@ void LibreMinesPreferencesSaver::vLastSessionLoadConfigurationFile(
 
                 preferences.setOptionUseQuestionMark(terms.at(1));
             }
+            else if(terms.at(0).compare("NoGuessMode", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionNoGuessMode(terms.at(1));
+            }
         }
     }
 
@@ -262,7 +269,9 @@ void LibreMinesPreferencesSaver::vLastSessionSaveConfigurationFile(
                << (uchar)preferences.optionAskToSaveMatchScoreBehaviour() << '\n'
                << "SoundVolume" << ' ' << preferences.optionSoundVolume() << '\n'
                << "QuestionMark" << ' '
-               << (preferences.optionUseQuestionMark() ? "On" : "Off") << '\n';
+               << (preferences.optionUseQuestionMark() ? "On" : "Off") << '\n'
+               << "NoGuessMode" << ' '
+               << (preferences.optionNoGuessMode() ? "On" : "Off") << '\n';
     }
 
     QScopedPointer<QFile> fileLanguage

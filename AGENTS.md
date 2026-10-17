@@ -57,12 +57,6 @@ LibreMines is a Free/Libre and Open Source Qt6-based Minesweeper clone available
   4. Check that the executable is created in the build directory
   5. Verify installation works if relevant to your changes
 
-### No Automated Testing Available
-- **CRITICAL**: There are NO unit tests or automated test suites in this repository
-- **CRITICAL**: There are NO linting or code formatting tools configured
-- All validation must be done manually using the commands above
-- The GitHub Actions workflows (.github/workflows/) test building on Ubuntu, Arch Linux, and Windows
-
 ## Common Tasks
 
 ### Build Targets and Timing
@@ -119,7 +113,7 @@ The application consists of several main components:
 - **Arch Linux workflow**: Tests on Arch Linux with latest packages
 - All workflows follow the same build pattern: dependencies → cmake → make
 
-**REMEMBER**: Always validate your changes using the manual testing procedures above since there are no automated tests to catch regressions.
+**REMEMBER**: Always validate your changes using the manual testing procedures above.
 
 ## C++ Coding Best Practices
 

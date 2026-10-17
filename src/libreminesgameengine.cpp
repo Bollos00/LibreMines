@@ -19,9 +19,15 @@
 
 
 #include "libreminesgameengine.h"
+#include "gameboardrandomgenerator.h"
+#include "libreminessolver.h"
 
 #include <QRandomGenerator>
 #include <QTimer>
+
+#include <algorithm>
+#include <stdexcept>
+#include <utility>
 
 LibreMinesGameEngine::CellGameEngine::CellGameEngine():
     value(CellValue::ZERO),
@@ -48,8 +54,6 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
     nMines = i_nMines_;
     iMinesLeft = i_nMines_;
 
-    iHiddenCells = 0;
-
     // Check if we are just remaking the game with one cell clean
     const bool bRemakingGame = (i_X_Clean != 255 && i_Y_Clean != 255);
 
@@ -57,201 +61,181 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
     {
         bGameActive = false;
         bFirst = true;
-        principalMatrix = std::vector<std::vector<CellGameEngine>> (iX, std::vector<CellGameEngine>(iY));
     }
 
-
-    if(bRemakingGame)
+    principalMatrix.clear();
+    
+    if (bRemakingGame && bNoGuessMode)
     {
-        for(std::vector<CellGameEngine>& i: principalMatrix)
+        QVector<QSharedPointer<LibreMinesSolver>> solvers(SOLVERS_COUNT);
+
+        // Start the solvers
+        for (QSharedPointer<LibreMinesSolver>& solver : solvers)
         {
-            for(CellGameEngine& j: i)
+            solver.reset(new LibreMinesSolver());
+            solver->setRows(iY);
+            solver->setCols(iX);
+            solver->setNMines(i_nMines_);
+            solver->setSafeX(i_X_Clean);
+            solver->setSafeY(i_Y_Clean);
+            solver->setStrategies(LibreMinesSolver::SolverStrategy::AllStrategies); // TODO: Make strategies configurable via GUI
+            solver->start();
+        }
+
+        // Keeps checking if any solver finished
+        while (true)
+        {
+            for (const QSharedPointer<LibreMinesSolver>& solver : solvers)
             {
-                j.value = CellValue::ZERO;
+                // If any solver finished, get its matrix and stop checking
+                if (solver->getSolverState() == LibreMinesSolver::SolverState::Finished)
+                {
+                    principalMatrix = solver->getBoard();
+                    break;
+                }
+            }
+
+            // If we got a matrix, interrupt all solvers and break the outer loop
+            if (!principalMatrix.empty())
+            {
+                for (QSharedPointer<LibreMinesSolver>& solver : solvers)
+                {
+                    solver->interrupt();
+                }
+
+                for (QSharedPointer<LibreMinesSolver>& solver : solvers)
+                {
+                    solver->wait();
+                }
+                break;
+            }
+            else
+            {
+                QThread::msleep(100);
             }
         }
     }
     else
     {
-        for(uchar j=0; j<iY; j++)
-        {
-            for (uchar i=0; i<iX; i++)
-            {
-                CellGameEngine& cell = principalMatrix[i][j];
-
-                cell.value = CellValue::ZERO;
-                cell.isHidden = true;
-                cell.flagState = FlagState::NoFlag;
-
-//                qApp->processEvents();
-            }
-        }
+        principalMatrix = GameBoardRandomGenerator::vGenerate(iX, iY, i_nMines_, i_X_Clean, i_Y_Clean);
     }
-
-    // Add mines on random places until the number of mines is correct
-    while(i_nMines_ > 0)
-    {
-        uchar i = QRandomGenerator::global()->bounded(0, iX);
-        uchar j = QRandomGenerator::global()->bounded(0, iY);
-
-        // Avoid cells neighbor of clean cell when remaking the game
-        if(bRemakingGame && i <= i_X_Clean+1 && i >= i_X_Clean-1 && j <= i_Y_Clean+1 && j >= i_Y_Clean-1)
-        {
-            continue;
-        }
-
-        CellGameEngine& cell = principalMatrix[i][j];
-
-        if(cell.value == CellValue::ZERO)
-        {
-            i_nMines_--;
-            cell.value = CellValue::MINE;
-        }
-    }
-
-    // Update the state of all cells
-    for(uchar j=0; j<iY; j++)
-    {
-        for (uchar i=0; i<iX; i++)
-        {
-            CellGameEngine& cell = principalMatrix[i][j];
-
-            if(cell.value == CellValue::ZERO)
-            {
-                iHiddenCells++;
-
-                uchar minesNeighbors = 0;
-
-                if(i == 0 &&
-                   j == 0)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == 0 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j==0)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == 0 &&
-                        j > 0 &&
-                        j < iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i == iX-1 &&
-                        j >0 &&
-                        j < iY-1)
-                {
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i > 0 &&
-                        i < iX-1 &&
-                        j == 0){
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else if(i > 0 &&
-                        i < iX-1 &&
-                        j == iY-1)
-                {
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-                else
-                {
-                    if(principalMatrix[i-1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i-1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j-1].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j].value == CellValue::MINE)
-                        minesNeighbors++;
-                    if(principalMatrix[i+1][j+1].value == CellValue::MINE)
-                        minesNeighbors++;
-                }
-
-                cell.value = (CellValue)minesNeighbors;
-            }
-        }
-    }
-    iCellsToUnlock = iHiddenCells;
+    
+    iHiddenCells = iCellsToUnlock = iY*iX - nMines;
     bGameActive = true;
 
     if(bRemakingGame)
     {
         Q_EMIT SIGNAL_remakeGame();
     }
+}
+
+void LibreMinesGameEngine::vNewGameForTest(const uchar _X,
+                                           const uchar _Y,
+                                           short i_nMines_,
+                                           const QString& minefieldString)
+{
+    QString normalizedMinefield = minefieldString;
+    normalizedMinefield.replace(QStringLiteral(" "), QStringLiteral(""));
+    normalizedMinefield.replace(QStringLiteral("\r\n"), QStringLiteral("\n"));
+    normalizedMinefield.replace(QLatin1Char('\r'), QLatin1Char('\n'));
+    normalizedMinefield = normalizedMinefield.trimmed();
+
+    QStringList rows = normalizedMinefield.split(QLatin1Char('\n'), Qt::KeepEmptyParts);
+    if (_X == 0 || _Y == 0 || rows.size() != _Y)
+    {
+        throw std::invalid_argument("Minefield row count or dimensions do not match the supplied board size");
+    }
+
+    for (QString& row : rows)
+    {
+        row = row.trimmed();
+    }
+
+    if (i_nMines_ < 0 || i_nMines_ > static_cast<int>(_X) * static_cast<int>(_Y))
+    {
+        throw std::invalid_argument("Mine count is outside the board dimensions");
+    }
+
+    for (const QString& row : rows)
+    {
+        if (row.size() != _X)
+        {
+            throw std::invalid_argument("Minefield row width does not match the supplied board size");
+        }
+    }
+
+    int mineCount = 0;
+    for (const QString& row : rows)
+    {
+        for (const QChar cell : row)
+        {
+            if (cell == QLatin1Char('*'))
+            {
+                ++mineCount;
+            }
+            else if (cell.unicode() < QLatin1Char('0').unicode() ||
+                     cell.unicode() > QLatin1Char('8').unicode())
+            {
+                throw std::invalid_argument("Minefield contains an invalid character; use '*' or digits 0 through 8");
+            }
+        }
+    }
+
+    if (mineCount != i_nMines_)
+    {
+        throw std::invalid_argument("Minefield mine count does not match the supplied mine count");
+    }
+
+    std::vector<std::vector<CellGameEngine>> parsedBoard(
+        _X, std::vector<CellGameEngine>(_Y));
+
+    for (int y = 0; y < _Y; ++y)
+    {
+        for (int x = 0; x < _X; ++x)
+        {
+            const QChar cell = rows[y][x];
+            if (cell == QLatin1Char('*'))
+            {
+                parsedBoard[x][y].value = CellValue::MINE;
+                continue;
+            }
+
+            int adjacentMines = 0;
+            for (int neighborY = std::max(0, y - 1);
+                 neighborY <= std::min(static_cast<int>(_Y) - 1, y + 1);
+                 ++neighborY)
+            {
+                for (int neighborX = std::max(0, x - 1);
+                     neighborX <= std::min(static_cast<int>(_X) - 1, x + 1);
+                     ++neighborX)
+                {
+                    if (rows[neighborY][neighborX] == QLatin1Char('*'))
+                    {
+                        ++adjacentMines;
+                    }
+                }
+            }
+
+            if (cell.digitValue() != adjacentMines)
+            {
+                throw std::invalid_argument("Minefield clue does not match adjacent mine positions");
+            }
+
+            parsedBoard[x][y].value = static_cast<CellValue>(adjacentMines);
+        }
+    }
+
+    // Match the initial state established by vNewGame, but use the validated
+    // deterministic board instead of invoking a board generator.
+    iX = _X;
+    iY = _Y;
+    nMines = i_nMines_;
+    iMinesLeft = i_nMines_;
+    bGameActive = false;
+    bFirst = true;
+    principalMatrix = std::move(parsedBoard);
+    iHiddenCells = iCellsToUnlock = iY * iX - nMines;
+    bGameActive = true;
 }
 
 void LibreMinesGameEngine::vResetPrincipalMatrix()
@@ -422,10 +406,17 @@ void LibreMinesGameEngine::setUseQuestionMark(const bool x)
     bUseQuestionMark = x;
 }
 
+void LibreMinesGameEngine::setNoGuessMode(const bool x)
+{
+    bNoGuessMode = x;
+}
+
 
 void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 {
-    if(bFirst && bFirstCellClean && principalMatrix[_X][_Y].value != CellValue::ZERO)
+    // Remake the game if it's the first click and the user asked for a clean first cell
+    // On No Guess mode, always remake the game on first click
+    if(bFirst && bFirstCellClean && (principalMatrix[_X][_Y].value != CellValue::ZERO || bNoGuessMode))
     {
         // Check if it's impossible to place all mines while keeping the clicked cell and its neighbors clean
         // This prevents infinite loop when nMines > (total cells - 9)
