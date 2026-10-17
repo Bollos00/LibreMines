@@ -117,6 +117,55 @@ public:
         Safe    = 1,    ///< Cell is confirmed safe through logical deduction
         Mine    = 2     ///< Cell is confirmed to contain a mine through logical deduction
     };
+    
+    /**
+     * @brief Bit flags identifying the deduction strategies used by the solver
+     *
+     * Each concrete detection strategy has its own bit so strategies can be
+     * combined in a single value.
+     */
+    enum class SolverStrategy : quint64 {
+        None            = 0,              ///< No strategy
+        Pattern12X      = 1ULL << 0,      ///< 1-2-X pattern
+        Pattern11X      = 1ULL << 1,      ///< 1-1-X pattern
+        Pattern13X      = 1ULL << 2,      ///< 1-3-X pattern
+        Pattern14X      = 1ULL << 3,      ///< 1-4-X pattern
+        Pattern23X      = 1ULL << 4,      ///< 2-3-X pattern
+        Pattern24X      = 1ULL << 5,      ///< 2-4-X pattern
+        Pattern34X      = 1ULL << 6,      ///< 3-4-X pattern
+        Pattern22X      = 1ULL << 7,      ///< 2-2-X pattern
+        Pattern33X      = 1ULL << 8,      ///< 3-3-X pattern
+        Pattern1X1      = 1ULL << 9,      ///< 1-X-1 pattern
+        Pattern2X2      = 1ULL << 10,     ///< 2-X-2 pattern
+        Pattern222Corner = 1ULL << 11,    ///< 2-2-2 corner pattern
+        Pattern131Corner = 1ULL << 12,    ///< 1-3-1 corner pattern
+        PairRule        = 1ULL << 13,      ///< General pair rule
+
+        BasicPatterns     = Pattern12X | Pattern11X | Pattern13X | Pattern14X,  ///< Basic patterns only
+        AdvancedPatterns  = Pattern23X | Pattern24X | Pattern34X | Pattern22X
+            | Pattern33X | Pattern1X1 | Pattern2X2 | Pattern222Corner | Pattern131Corner,  ///< Advanced patterns only
+        BasicAndAdvancedPatterns = BasicPatterns | AdvancedPatterns,  ///< Basic and advanced patterns combined
+        AllStrategies     = BasicAndAdvancedPatterns | PairRule  ///< All strategies enabled
+    };
+
+    /**
+     * @brief Get the enabled solver strategies
+     * @return Bitwise combination of enabled strategies
+     */
+    SolverStrategy getStrategies() const;
+
+    /**
+     * @brief Set the enabled solver strategies
+     * @param newStrategies Bitwise combination of strategies to enable
+     */
+    void setStrategies(SolverStrategy newStrategies);
+
+    /**
+     * @brief Check whether a solver strategy is enabled
+     * @param strategy Strategy flag to check
+     * @return true if the strategy flag is enabled
+     */
+    bool isStrategyEnabled(SolverStrategy strategy) const;
 
     /**
      * @brief Constructor for the minesweeper solver
@@ -240,11 +289,13 @@ private:
     uchar safeX;    ///< X coordinate of guaranteed safe starting cell
     uchar safeY;    ///< Y coordinate of guaranteed safe starting cell
 
-    quint32 nCellsMarkedSafe = 0;  ///< Number of cells currently marked safe on the solver board
-    quint32 nCellsMarkedMine = 0;  ///< Number of cells currently marked as mines on the solver board
-    
+    quint32 nCellsMarkedSafe;  ///< Number of cells currently marked safe on the solver board
+    quint32 nCellsMarkedMine;  ///< Number of cells currently marked as mines on the solver board
+
     SolverState state;              ///< Current state of the solver thread
     mutable QMutex stateMutex;      ///< Mutex for thread-safe state access
+
+    SolverStrategy strategies;  ///< Enabled deduction strategies
 
     SolverCommand cmd;              ///< Current command for controlling solver execution
     mutable QMutex cmdMutex;        ///< Mutex for thread-safe command access
@@ -272,6 +323,8 @@ private:
      * @param newState New solver state; must be Safe or Mine
      */
     void markCell(const QPair<uchar, uchar>& cell, SolverCellState newState);
+
+    bool markAllCells(const QSet<QPair<uchar, uchar>>& cells, SolverCellState newState);
 
     /**
      * @brief Update a cell's solver state, treatment membership, and counter
@@ -367,6 +420,8 @@ private:
      * @see detect131CornerPattern()
      */
     bool cleanAdvancedPatterns(uchar x, uchar y);
+
+    bool cleanGeneralPairRule(uchar x, uchar y);
 
     /**
      * @brief Detect and apply the 1-3-1 corner deduction
@@ -562,6 +617,9 @@ private:
      * @return true if the pattern was detected and processed
      */
     bool detect2X2Pattern(uchar x, uchar y);
+
+    bool detectPairRule(uchar x, uchar y);
+
     /**
      * @brief Detect a M-N-X mine pattern in the vicinity of a cell
      *
@@ -735,6 +793,8 @@ private:
                                    uchar firstY,
                                    uchar secondX,
                                    uchar secondY);
+
+    bool applyPairRule(uchar ax, uchar ay, uchar bx, uchar by);
 
     /**
      * @brief Check whether an interruption has been requested

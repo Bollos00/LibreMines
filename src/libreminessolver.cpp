@@ -34,7 +34,7 @@ void printSolverBoard(const std::vector<std::vector<LibreMinesSolver::SolverCell
 #endif
 
 LibreMinesSolver::LibreMinesSolver(QObject *parent)
-    : QThread{parent}, state(SolverState::NotStarted)
+    : QThread{parent}, state(SolverState::NotStarted), cmd(SolverCommand::CmdNone), strategies(SolverStrategy::None)
 {}
 
 void LibreMinesSolver::run()
@@ -105,11 +105,8 @@ bool LibreMinesSolver::solve()
 
         for (const QPair<uchar, uchar>& cellCoord : currentTreatmentSet)
         {
-            uchar x = cellCoord.first;
-            uchar y = cellCoord.second;
-            
             // Apply basic cleaning logic to this cell
-            if (cleanBasic(x, y))
+            if (cleanBasic(cellCoord.first, cellCoord.second))
             {
                 globalChanges = true;
             }
@@ -124,12 +121,9 @@ bool LibreMinesSolver::solve()
             QSet<QPair<uchar, uchar>> patternTreatmentSet = cellsNeedingTreatment;
             
             for (const QPair<uchar, uchar>& cellCoord : patternTreatmentSet)
-            {
-                uchar x = cellCoord.first;
-                uchar y = cellCoord.second;
-                
+            {   
                 // Apply pattern recognition to this cell
-                if (cleanBasicPatterns(x, y))
+                if (cleanBasicPatterns(cellCoord.first, cellCoord.second))
                 {
                     globalChanges = true;
                     // Keep the cell in treatment set as patterns might reveal more info
@@ -137,7 +131,7 @@ bool LibreMinesSolver::solve()
             }
         }
 
-        // If bsic and pattern cleaning didn't make progress, try advanced patterns
+        // If basic and pattern cleaning didn't make progress, try advanced patterns
         if (!globalChanges)
         {
 #if LIBREMINES_SOLVER_DEBUG
@@ -146,18 +140,34 @@ bool LibreMinesSolver::solve()
             QSet<QPair<uchar, uchar>> advancedPatternTreatmentSet = cellsNeedingTreatment;
 
             for (const QPair<uchar, uchar>& cellCoord : advancedPatternTreatmentSet)
-            {
-                uchar x = cellCoord.first;
-                uchar y = cellCoord.second;
-                
+            {   
                 // Apply advanced pattern recognition to this cell
-                if (cleanAdvancedPatterns(x, y))
+                if (cleanAdvancedPatterns(cellCoord.first, cellCoord.second))
                 {
                     globalChanges = true;
                     // Keep the cell in treatment set as patterns might reveal more info
                 }
             }
 
+        }
+
+        if (!globalChanges)
+        {
+#if LIBREMINES_SOLVER_DEBUG
+            qDebug() << "Applying general pair rule cleaning...";
+#endif
+            QSet<QPair<uchar, uchar>> pairRuleTreatmentSet = cellsNeedingTreatment;
+
+            for (const QPair<uchar, uchar>& cellCoord : pairRuleTreatmentSet)
+            {
+
+                // Apply general pair rule to this cell
+                if (cleanGeneralPairRule(cellCoord.first, cellCoord.second))
+                {
+                    globalChanges = true;
+                    // Keep the cell in treatment set as patterns might reveal more info
+                }
+            }
         }
 
 #if LIBREMINES_SOLVER_DEBUG
@@ -175,7 +185,8 @@ bool LibreMinesSolver::solve()
     }
 
     const quint32 totalCells = static_cast<quint32>(cols) * static_cast<quint32>(rows);
-    const bool result = nCellsMarkedSafe + nCellsMarkedMine == totalCells;
+    // If it has released all safe cells or marks all mines, the board is considered solved
+    const bool result = (nCellsMarkedSafe == totalCells - nMines) || (nCellsMarkedMine == nMines);
 
 #if LIBREMINES_SOLVER_DEBUG
     if (result)
@@ -217,6 +228,21 @@ void LibreMinesSolver::markCell(const QPair<uchar, uchar>& cell, SolverCellState
     }
 
     updateCellState(cell, newState);
+}
+
+bool LibreMinesSolver::markAllCells(const QSet<QPair<uchar, uchar>> &cells, SolverCellState newState)
+{
+    bool changed = false;
+    for (const QPair<uchar, uchar>& cell : cells)
+    {
+        if (solverBoard[cell.first][cell.second] != SolverCellState::Unknown)
+        {
+            continue;
+        }
+        markCell(cell, newState);
+        changed = true;
+    }
+    return changed;
 }
 
 void LibreMinesSolver::updateCellState(const QPair<uchar, uchar>& cell, SolverCellState newState)
@@ -348,33 +374,32 @@ bool LibreMinesSolver::cleanBasicPatterns(uchar x, uchar y)
     }
 
     // Try different pattern recognition algorithms
-    bool changes = false;
     
     // 1. Try 1-2-X pattern detection
     if (detect12XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
     
     // 2. Try 1-1-X pattern detection
     if (detect11XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 3. Try 1-3-X pattern detection
     if (detect13XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 4. Try 1-4-X pattern detection
     if (detect14XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
-    return changes;
+    return false;
 }
 
 bool LibreMinesSolver::cleanAdvancedPatterns(uchar x, uchar y)
@@ -385,122 +410,179 @@ bool LibreMinesSolver::cleanAdvancedPatterns(uchar x, uchar y)
     }
 
     // Try different pattern recognition algorithms
-    bool changes = false;
 
     // 1. Try 2-3-X pattern detection
     if (detect23XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 2. Try 2-4-X pattern detection
     if (detect24XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 3. Try 3-4-X pattern detection
     if (detect34XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 4. Try 2-2-X pattern detection
     if (detect22XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 5. Try 3-3-X pattern detection
     if (detect33XPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 6. Try the 1-X-1 pattern detection
     if (detect1X1Pattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 7. Try the 2-X-2 pattern detection
     if (detect2X2Pattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 8. Try the generic 2-2-2 corner pattern
     if (detect222CornerPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
     // 9. Try the 1-3-1 corner pattern
     if (detect131CornerPattern(x, y))
     {
-        changes = true;
+        return true;
     }
 
-    return changes;
+    return false;
+}
+
+bool LibreMinesSolver::cleanGeneralPairRule(uchar x, uchar y)
+{
+    if (solverBoard[x][y] != SolverCellState::Safe)
+    {
+        return false;
+    }
+
+    if (detectPairRule(x, y))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 bool LibreMinesSolver::detect12XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern12X)) return false;
     return detectMNXPattern(x, y, 1, 2);
 }
 
 bool LibreMinesSolver::detect11XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern11X)) return false;
     return detectNNXPattern(x, y, 1);
 }
 
 bool LibreMinesSolver::detect22XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern22X)) return false;
     return detectNNXPattern(x, y, 2);
 }
 
 bool LibreMinesSolver::detect33XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern33X)) return false;
     return detectNNXPattern(x, y, 3);
 }
 
 bool LibreMinesSolver::detect13XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern13X)) return false;
     return detectMNXPattern(x, y, 1, 3);
 }
 
 bool LibreMinesSolver::detect14XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern14X)) return false;
     return detectMNXPattern(x, y, 1, 4);
 }
 
 bool LibreMinesSolver::detect23XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern23X)) return false;
     return detectMNXPattern(x, y, 2, 3);
 }
 
 bool LibreMinesSolver::detect24XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern24X)) return false;
     return detectMNXPattern(x, y, 2, 4);
 }
 
 bool LibreMinesSolver::detect34XPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern34X)) return false;
     return detectMNXPattern(x, y, 3, 4);
 }
 
 bool LibreMinesSolver::detect1X1Pattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern1X1)) return false;
     return detectNXNPattern(x, y, 1);
 }
 
 bool LibreMinesSolver::detect2X2Pattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern2X2)) return false;
     return detectNXNPattern(x, y, 2);
+}
+
+bool LibreMinesSolver::detectPairRule(uchar x, uchar y)
+{
+    if (!isStrategyEnabled(SolverStrategy::PairRule)) return false;
+
+    if (solverBoard[x][y] != SolverCellState::Safe)
+    {
+        return false;
+    }
+
+    // Clues share unknown cells only if they are within 2 cells of each other
+    // in both axes, so a 5x5 window covers every useful partner.
+    for (int dy = -2; dy <= 2; ++dy)
+    {
+        for (int dx = -2; dx <= 2; ++dx)
+        {
+            if (dx == 0 && dy == 0) continue;
+
+            const uchar nx = x + dx;
+            const uchar ny = y + dy;
+            if (nx >= cols || ny >= rows) continue;
+
+            if (applyPairRule(x, y, nx, ny))
+            {
+                return true;   // state changed: clue data is stale, let the outer loop re-run
+            }
+        }
+    }
+    return false;
 }
 
 bool LibreMinesSolver::detect131CornerPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern131Corner)) return false;
+
     if (solverBoard[x][y] != SolverCellState::Safe ||
         countRemainingMines(x, y) != 3)
     {
@@ -538,6 +620,8 @@ bool LibreMinesSolver::detect131CornerPattern(uchar x, uchar y)
 
 bool LibreMinesSolver::detect222CornerPattern(uchar x, uchar y)
 {
+    if (!isStrategyEnabled(SolverStrategy::Pattern222Corner)) return false;
+
     if (solverBoard[x][y] != SolverCellState::Safe ||
         countRemainingMines(x, y) != 2)
     {
@@ -944,6 +1028,67 @@ bool LibreMinesSolver::apply222CornerPatternLogic(uchar middleX,
     return true;
 }
 
+bool LibreMinesSolver::applyPairRule(uchar ax, uchar ay, uchar bx, uchar by)
+{
+    if (solverBoard[ax][ay] != SolverCellState::Safe ||
+        solverBoard[bx][by] != SolverCellState::Safe)
+    {
+        return false;
+    }
+
+    QSet<QPair<uchar, uchar>> unknownA;
+    QSet<QPair<uchar, uchar>> unknownB;
+    countRemainingNeighbors(ax, ay, SolverCellState::Unknown, &unknownA);
+    countRemainingNeighbors(bx, by, SolverCellState::Unknown, &unknownB);
+
+    const QSet<QPair<uchar, uchar>> common = unknownA & unknownB;
+    if (common.isEmpty())
+    {
+        return false;   // no shared cells: a pair can't add anything beyond the basic rules
+    }
+
+    const QSet<QPair<uchar, uchar>> onlyA = unknownA - common;
+    const QSet<QPair<uchar, uchar>> onlyB = unknownB - common;
+    if (onlyA.isEmpty() && onlyB.isEmpty())
+    {
+        return false;   // identical unknown sets: nothing to separate
+    }
+
+    const int kA = countRemainingMines(ax, ay);
+    const int kB = countRemainingMines(bx, by);
+    const int d  = kA - kB;                       // mines(onlyA) - mines(onlyB)
+    const int nA = static_cast<int>(onlyA.size());
+    const int nB = static_cast<int>(onlyB.size());
+
+    const int aMin = std::max(0, d);
+    const int aMax = std::min(nA, d + nB);
+    const int bMin = std::max(0, -d);
+    const int bMax = std::min(nB, nA - d);
+
+    bool changed = false;
+
+    if (nA > 0)
+    {
+        if (aMax == 0)         changed |= markAllCells(onlyA, SolverCellState::Safe);
+        else if (aMin == nA)   changed |= markAllCells(onlyA, SolverCellState::Mine);
+    }
+
+    if (nB > 0)
+    {
+        if (bMax == 0)         changed |= markAllCells(onlyB, SolverCellState::Safe);
+        else if (bMin == nB)   changed |= markAllCells(onlyB, SolverCellState::Mine);
+    }
+
+#if LIBREMINES_SOLVER_DEBUG
+    if (changed)
+    {
+        qDebug() << "Pair rule applied between (" << ax << "," << ay << ") and (" << bx << "," << by << ").";
+    }
+#endif
+
+    return changed;
+}
+
 bool LibreMinesSolver::checkForInterrupt()
 {
     QMutexLocker locker(&cmdMutex);
@@ -1009,6 +1154,21 @@ uchar LibreMinesSolver::getRows() const
 void LibreMinesSolver::setRows(uchar newRows)
 {
     rows = newRows;
+}
+
+LibreMinesSolver::SolverStrategy LibreMinesSolver::getStrategies() const
+{
+    return strategies;
+}
+
+void LibreMinesSolver::setStrategies(SolverStrategy newStrategies)
+{
+    strategies = newStrategies;
+}
+
+bool LibreMinesSolver::isStrategyEnabled(SolverStrategy strategy) const
+{
+    return (static_cast<quint64>(strategies) & static_cast<quint64>(strategy)) != 0;
 }
 
 LibreMinesSolver::SolverState LibreMinesSolver::getSolverState() const

@@ -78,6 +78,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
             solver->setNMines(i_nMines_);
             solver->setSafeX(i_X_Clean);
             solver->setSafeY(i_Y_Clean);
+            solver->setStrategies(LibreMinesSolver::SolverStrategy::AllStrategies); // TODO: Make strategies configurable via GUI
             solver->start();
         }
 

@@ -458,6 +458,7 @@ void TestLibreMinesSolver::runBasic11XBoard(PatternTestRoute route)
         R"(0 1 * 1
            0 1 1 1
            0 0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern11X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
@@ -486,6 +487,7 @@ void TestLibreMinesSolver::runBasic11XTriangle(PatternTestRoute route)
         R"(1 1 0 0
            * 1 1 1
            1 1 1 *)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern11X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[1][2] = LibreMinesSolver::SolverCellState::Safe;
@@ -508,6 +510,7 @@ void TestLibreMinesSolver::runBasic11XSingleSharedRow(PatternTestRoute route)
         R"(1 1 0 0
            * 1 1 1
            1 1 1 *)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern11X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[1][2] = LibreMinesSolver::SolverCellState::Safe;
@@ -535,6 +538,7 @@ void TestLibreMinesSolver::runBasic11XTwoSharedRows(PatternTestRoute route)
            1 1 0
            1 1 1
            1 * 1)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern11X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[1][2] = LibreMinesSolver::SolverCellState::Safe;
@@ -562,6 +566,7 @@ void TestLibreMinesSolver::runBasic12XBoard(PatternTestRoute route)
         R"(2 * 1 0
            * 2 1 0
            1 1 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern12X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
@@ -594,6 +599,7 @@ void TestLibreMinesSolver::runBasic12XTriangle(PatternTestRoute route)
            1 2 1
            * 1 0
            1 1 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern12X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[1][2] = LibreMinesSolver::SolverCellState::Safe;
@@ -621,6 +627,7 @@ void TestLibreMinesSolver::runBasic13X(PatternTestRoute route)
         R"(* * 1 0
            * 3 1 0
            1 1 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern13X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
@@ -649,6 +656,7 @@ void TestLibreMinesSolver::runBasic14X(PatternTestRoute route)
         R"(* * 1 0
            * 4 1 0
            * 2 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern14X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
@@ -681,6 +689,7 @@ void TestLibreMinesSolver::runAdvanced23X(PatternTestRoute route)
            * 2 0 0
            * 2 0 0
            1 1 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern23X);
 
     const QPair<uchar, uchar> revealedCells[] = {
         {1, 0},
@@ -720,6 +729,7 @@ void TestLibreMinesSolver::runAdvanced222Corner(PatternTestRoute route)
            * 2 0 0 2 *
            1 2 2 2 2 1
            0 1 * * 1 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern222Corner);
 
     QVERIFY(solver.cleanZero(2, 2));
     for (uchar x = 1; x <= 4; ++x)
@@ -755,6 +765,7 @@ void TestLibreMinesSolver::runAdvanced131Corner(PatternTestRoute route)
            1 1 0 1 1
            1 1 1 1 1
            * 1 1 * 1)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern131Corner);
 
     QVERIFY(solver.cleanZero(2, 2));
 
@@ -781,6 +792,7 @@ void TestLibreMinesSolver::runAdvanced1X1(PatternTestRoute route)
            0 1 * 1
            0 2 2 2
            0 1 * 1)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern1X1);
 
     solver.solverBoard[2][0] = LibreMinesSolver::SolverCellState::Mine;
     solver.solverBoard[3][0] = LibreMinesSolver::SolverCellState::Mine;
@@ -822,6 +834,7 @@ void TestLibreMinesSolver::basicPattern11XRejectsNonSubsetViaDirectApply()
         R"(0 1 * 1
            0 1 1 1
            0 0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern11X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
@@ -848,6 +861,7 @@ void TestLibreMinesSolver::basicPattern12XRejectsWrongUniqueNeighborCountViaDire
         R"(2 * 1 0
            * 2 1 0
            1 1 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern12X);
 
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
@@ -892,6 +906,7 @@ void TestLibreMinesSolver::runBasic12XTwoSidedCandidates(PatternTestRoute route)
            11322
            1*2*1
            11211)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern12X);
 
     const QPair<uchar, uchar> unknownCells[] = {
         {3, 0}, {3, 1}, {3, 2}, {3, 3}, {3, 4}
