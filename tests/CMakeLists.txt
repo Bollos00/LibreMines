@@ -79,6 +79,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+# Pre-create the output directory for JUnit XML reports
+# (Qt Test cannot create intermediate directories itself)
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/test-results")
+
 # Function to create a test executable
 function(add_libremines_test test_name test_source)
     add_executable(${test_name} ${test_source})
@@ -100,9 +104,14 @@ function(add_libremines_test test_name test_source)
         )
     endif()
     
-    # Add test to CTest
-    add_test(NAME ${test_name} COMMAND ${test_name})
-    
+    # Add test to CTest — write JUnit XML alongside plain console output
+    add_test(
+        NAME ${test_name}
+        COMMAND ${test_name}
+            -o "${CMAKE_BINARY_DIR}/test-results/${test_name}.xml,junitxml"
+            -o -,txt
+    )
+
     # Set test properties
     set_tests_properties(${test_name} PROPERTIES
         TIMEOUT 30

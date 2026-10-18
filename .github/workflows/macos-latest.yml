@@ -26,6 +26,9 @@ on:
 #   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
 #   BUILD_TYPE: Release
 
+permissions:
+  checks: write
+  pull-requests: write
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -81,6 +84,22 @@ jobs:
       - name: "Run tests"
         if: inputs.upload_to_release != true
         run: "cd build && ctest --verbose --progress --output-on-failure"
+
+      - name: "Publish Test Report"
+        uses: mikepenz/action-junit-report@v6
+        if: (success() || failure()) && inputs.upload_to_release != true
+        with:
+          report_paths: 'build/test-results/*.xml'
+          check_name: "Test Results (macOS ${{ matrix.os }} Qt ${{ matrix.qt-version }})"
+          fail_on_failure: true
+
+      - name: "Upload test results (XML)"
+        uses: actions/upload-artifact@v4
+        if: (success() || failure()) && inputs.upload_to_release != true
+        with:
+          name: test-results-macos-${{ matrix.os }}-qt-${{ matrix.qt-version }}
+          path: build/test-results/*.xml
+          retention-days: 7
 
       - name: Prepare build artifacts
         run: |

@@ -45,6 +45,7 @@ option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
 option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra themes for the minefield" TRUE)
 option(INSTALL_EXTRA_FACESREACTION_THEMES "Install extra themes for the faces reaction" TRUE)
 option(USE_THREADED_SOUND_EFFECTS "Use sound effects on a separate thread (default: OFF)" OFF)
+option(LIBREMINES_SOLVER_DEBUG "Enable debug output for the solver (default: OFF)" OFF)
 
 # Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)

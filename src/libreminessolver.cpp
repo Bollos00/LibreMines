@@ -1,11 +1,10 @@
 #include "libreminessolver.h"
 
 #include "gameboardrandomgenerator.h"
+#include "libreminesconfig.h"
 #include <QMutexLocker>
 #include <QQueue>
 #include "libreminesconstraintenumerator.hpp"
-
-#define LIBREMINES_SOLVER_DEBUG 0
 
 QString ToString(LibreMinesSolver::SolverStrategy strategy)
 {
