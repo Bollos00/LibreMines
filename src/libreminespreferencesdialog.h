@@ -140,8 +140,31 @@ public:
     AskToSaveMatchScore optionAskToSaveMatchScoreBehaviour()const;
     int optionSoundVolume()const;
     bool optionUseQuestionMark()const;
+
+    /**
+     * @brief Check whether No Guess mode is enabled
+     *
+     * @return true when generated boards must be solvable without guessing
+     * @since v3.0.0
+     */
     bool optionNoGuessMode()const;
+
+    /**
+     * @brief Get the deduction strategies enabled for the No Guess solver
+     *
+     * @return Bit mask of LibreMinesSolver::SolverStrategy values
+     * @see AdvancedSolverOptionsDialog::optionSolverStrategies()
+     * @since v3.0.0
+     */
     LibreMinesSolver::SolverStrategy optionSolverStrategies()const;
+
+    /**
+     * @brief Get the clue limit used by the solver enumeration tier
+     *
+     * @return Maximum number of clues considered by one enumeration; 0 means no limit
+     * @see AdvancedSolverOptionsDialog::optionMaxEnumerationClues()
+     * @since v3.0.0
+     */
     int optionMaxEnumerationClues()const;
 
     void setOptionFirstCellClean(const QString& option);
@@ -160,8 +183,31 @@ public:
     void setOptionAskToSaveMatchScoreBehaviour(const uchar option);
     void setOptionSoundVolume(const int option);
     void setOptionUseQuestionMark(const QString& option);
+
+    /**
+     * @brief Enable or disable No Guess mode
+     *
+     * @param option "On" to enable No Guess mode, any other value disables it
+     * @since v3.0.0
+     */
     void setOptionNoGuessMode(const QString& option);
+
+    /**
+     * @brief Set the deduction strategies used by the No Guess solver
+     *
+     * @param strategies Bit mask of LibreMinesSolver::SolverStrategy values
+     * @see AdvancedSolverOptionsDialog::setOptionSolverStrategies()
+     * @since v3.0.0
+     */
     void setOptionSolverStrategies(const LibreMinesSolver::SolverStrategy strategies);
+
+    /**
+     * @brief Set the clue limit used by the solver enumeration tier
+     *
+     * @param clues Clue limit; 0 disables the limit and negative values are treated as 0
+     * @see AdvancedSolverOptionsDialog::setOptionMaxEnumerationClues()
+     * @since v3.0.0
+     */
     void setOptionMaxEnumerationClues(const int clues);
 
     QList<int> optionKeyboardControllerKeys()const;
@@ -179,7 +225,7 @@ private:
 
     GameplayThemeChooser* gameplayThemeChooser;
 
-    AdvancedSolverOptionsDialog* advancedSolverOptions;
+    AdvancedSolverOptionsDialog* advancedSolverOptions;  ///< Dialog holding the No Guess solver strategy options
 
 private Q_SLOTS:
     void SLOT_updateCellLengthParameters();
@@ -193,6 +239,12 @@ private Q_SLOTS:
 
     void on_pbGameplayCustomization_clicked();
 
+    /**
+     * @brief Open the advanced No Guess solver options dialog
+     *
+     * @see AdvancedSolverOptionsDialog
+     * @since v3.0.0
+     */
     void on_pbAdvancedSolverOptions_clicked();
 
 Q_SIGNALS:

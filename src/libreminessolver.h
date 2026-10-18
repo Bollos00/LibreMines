@@ -123,6 +123,8 @@ public:
      *
      * Each concrete detection strategy has its own bit so strategies can be
      * combined in a single value.
+     *
+     * @since v3.0.0
      */
     enum class SolverStrategy : quint64 {
         None             = 0,              ///< No strategy
@@ -332,8 +334,16 @@ private:
 
     int maxEnumerationClues;  ///< Clue limit of one enumeration window (0 = unlimited)
     
-    /// Search node limit for one enumeration. Exceeding it discards that enumeration (never a wrong deduction)
+    /**
+     * @brief Search node limit for one enumeration
+     *
+     * Protects the solver against rare, very large constraint problems. When
+     * the limit is exceeded the enumeration is discarded, which can only lose
+     * deductions and never produce a wrong one.
+     */
     static constexpr quint64 EnumerationNodeBudget = 200000;
+
+    QMap<SolverStrategy, quint64> strategyCounters;  ///< Counters for how many times each strategy was applied
 
     SolverCommand cmd;              ///< Current command for controlling solver execution
     mutable QMutex cmdMutex;        ///< Mutex for thread-safe command access
@@ -374,6 +384,18 @@ private:
      */
     void markCell(const QPair<uchar, uchar>& cell, SolverCellState newState);
 
+    /**
+     * @brief Mark every still-undetermined cell of a set as safe or as a mine
+     *
+     * Cells that already have a decided state are skipped, so the call is safe
+     * to repeat with overlapping sets. Each remaining cell is handed to
+     * markCell(), which also applies zero expansion for safe cells.
+     *
+     * @param cells Coordinates of the cells to mark
+     * @param newState New solver state; must be Safe or Mine
+     * @return true if at least one cell changed state
+     * @see markCell()
+     */
     bool markAllCells(const QSet<QPair<uchar, uchar>>& cells, SolverCellState newState);
 
     /**
@@ -466,6 +488,19 @@ private:
      */
     bool cleanAdvancedPatterns(uchar x, uchar y);
 
+    /**
+     * @brief Apply the general pair rule to a revealed clue
+     *
+     * Entry point of the SolverStrategy::PairRule tier. The cell must already
+     * be marked Safe and the strategy flag must be enabled; the actual search
+     * for a partner clue is done by detectPairRule().
+     *
+     * @param x X coordinate of the clue to analyze
+     * @param y Y coordinate of the clue to analyze
+     * @return true if the pair rule marked at least one cell
+     * @see detectPairRule()
+     * @see applyPairRule()
+     */
     bool cleanGeneralPairRule(uchar x, uchar y);
 
     /**
@@ -703,6 +738,20 @@ private:
      */
     bool detect2X2Pattern(uchar x, uchar y);
 
+    /**
+     * @brief Search for a second clue that can be paired with the given one
+     *
+     * Two clues can only share unknown neighbours when they are at most two
+     * cells apart in both axes, so a 5x5 window around the given clue covers
+     * every possible partner. applyPairRule() is tried for each other safe
+     * clue; the search stops at the first successful deduction because the
+     * clue data is stale afterwards.
+     *
+     * @param x X coordinate of the clue to analyze
+     * @param y Y coordinate of the clue to analyze
+     * @return true if a pair rule deduction was applied
+     * @see applyPairRule()
+     */
     bool detectPairRule(uchar x, uchar y);
 
     /**
@@ -879,6 +928,27 @@ private:
                                    uchar secondX,
                                    uchar secondY);
 
+    /**
+     * @brief Apply the general pair rule to two revealed clues
+     *
+     * Let onlyA and onlyB be the unknown neighbours exclusive to each clue and
+     * d = kA - kB the difference between their remaining mine counts. Then
+     * mines(onlyA) - mines(onlyB) = d, so the number of mines in onlyA lies
+     * between max(0, d) and min(|onlyA|, d + |onlyB|), and symmetrically for
+     * onlyB. When a bound forces a region to contain no mines it is marked
+     * safe; when it forces the region to be completely filled it is marked as
+     * mines.
+     *
+     * Both clues must already be marked Safe and share at least one unknown
+     * neighbour, and their exclusive neighbour sets must not both be empty.
+     *
+     * @param ax X coordinate of the first clue
+     * @param ay Y coordinate of the first clue
+     * @param bx X coordinate of the second clue
+     * @param by Y coordinate of the second clue
+     * @return true if any cell was marked
+     * @see cleanGeneralPairRule()
+     */
     bool applyPairRule(uchar ax, uchar ay, uchar bx, uchar by);
 
 
@@ -966,7 +1036,6 @@ private:
      * @param newState State to assign to the solver
      */
     void setInternalState(SolverState newState);
-signals:
 };
 
 #endif // LIBREMINESSOLVER_H

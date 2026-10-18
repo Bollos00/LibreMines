@@ -50,7 +50,7 @@
  * - Adjacent mine counting for numbered cells
  * - Edge case handling for board boundaries
  * 
- * @since v3.0
+ * @since v3.0.0
  */
 class GameBoardRandomGenerator
 {
@@ -66,14 +66,17 @@ public:
      * 1. Creates an empty board matrix
      * 2. Randomly places mines while avoiding clean areas
      * 3. Calculates adjacent mine counts for all non-mine cells
-     * 4. Returns the completed board with statistics
+     * 4. Returns the completed board
      * 
      * @param cols Width of the game board (number of columns)
      * @param rows Height of the game board (number of rows)
-     * @param nMines Total number of mines to place on the board
+     * @param nMines Total number of mines to place; it must fit in the board
+     *        outside the protected clean area
      * @param xClean X coordinate of cell to keep mine-free (255 = none)
      * @param yClean Y coordinate of cell to keep mine-free (255 = none)
-     * @return GeneratedBoard containing the complete game board and metadata
+     * @return Matrix of generated cells, indexed first by column and then by
+     *         row, with mines placed and every other cell holding its adjacent
+     *         mine count
      * 
      * @note If xClean and yClean are provided, that cell and its 8 neighbors
      *       will be guaranteed to be mine-free for safe first click

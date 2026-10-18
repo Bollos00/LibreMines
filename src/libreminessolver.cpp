@@ -5,7 +5,33 @@
 #include <QQueue>
 #include "libreminesconstraintenumerator.hpp"
 
-#define LIBREMINES_SOLVER_DEBUG 1
+#define LIBREMINES_SOLVER_DEBUG 0
+
+QString ToString(LibreMinesSolver::SolverStrategy strategy)
+{
+    switch (strategy)
+    {
+        case LibreMinesSolver::SolverStrategy::None: return "None";
+        case LibreMinesSolver::SolverStrategy::Pattern12X: return "Pattern12X";
+        case LibreMinesSolver::SolverStrategy::Pattern11X: return "Pattern11X";
+        case LibreMinesSolver::SolverStrategy::Pattern13X: return "Pattern13X";
+        case LibreMinesSolver::SolverStrategy::Pattern14X: return "Pattern14X";
+        case LibreMinesSolver::SolverStrategy::Pattern23X: return "Pattern23X";
+        case LibreMinesSolver::SolverStrategy::Pattern24X: return "Pattern24X";
+        case LibreMinesSolver::SolverStrategy::Pattern34X: return "Pattern34X";
+        case LibreMinesSolver::SolverStrategy::Pattern22X: return "Pattern22X";
+        case LibreMinesSolver::SolverStrategy::Pattern33X: return "Pattern33X";
+        case LibreMinesSolver::SolverStrategy::Pattern1X1: return "Pattern1X1";
+        case LibreMinesSolver::SolverStrategy::Pattern2X2: return "Pattern2X2";
+        case LibreMinesSolver::SolverStrategy::Pattern222Corner: return "Pattern222Corner";
+        case LibreMinesSolver::SolverStrategy::Pattern131Corner: return "Pattern131Corner";
+        case LibreMinesSolver::SolverStrategy::PairRule: return "PairRule";
+        case LibreMinesSolver::SolverStrategy::Enumeration: return "Enumeration";
+        case LibreMinesSolver::SolverStrategy::MineCounting: return "MineCounting";
+    }
+
+    return QString("Unknown Strategy (%1)").arg(static_cast<quint64>(strategy));
+}
 
 #if LIBREMINES_SOLVER_DEBUG
 void printSolverBoard(const std::vector<std::vector<LibreMinesSolver::SolverCellState>>& solverBoard,
@@ -238,6 +264,10 @@ bool LibreMinesSolver::solve()
     qDebug() << "Cells marked as mines:" << nCellsMarkedMine << "/" << nMines;
     qDebug() << "Solved " << ((nCellsMarkedSafe + nCellsMarkedMine) * 100.0 / totalCells) << "\% of the board.";
     qDebug() << "Final cellsNeedingTreatment: " << cellsNeedingTreatment;
+    for (QMap<SolverStrategy, quint64>::const_iterator it = strategyCounters.constBegin(); it != strategyCounters.constEnd(); ++it)
+    {
+        qDebug() << "Strategy" << ToString(it.key()) << "was applied" << it.value() << "times.";
+    }
 #endif
 
     return result;
@@ -411,24 +441,28 @@ bool LibreMinesSolver::cleanBasicPatterns(uchar x, uchar y)
     // 1. Try 1-2-X pattern detection
     if (detect12XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern12X]++;
         return true;
     }
     
     // 2. Try 1-1-X pattern detection
     if (detect11XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern11X]++;
         return true;
     }
 
     // 3. Try 1-3-X pattern detection
     if (detect13XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern13X]++;
         return true;
     }
 
     // 4. Try 1-4-X pattern detection
     if (detect14XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern14X]++;
         return true;
     }
 
@@ -447,54 +481,63 @@ bool LibreMinesSolver::cleanAdvancedPatterns(uchar x, uchar y)
     // 1. Try 2-3-X pattern detection
     if (detect23XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern23X]++;
         return true;
     }
 
     // 2. Try 2-4-X pattern detection
     if (detect24XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern24X]++;
         return true;
     }
 
     // 3. Try 3-4-X pattern detection
     if (detect34XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern34X]++;
         return true;
     }
 
     // 4. Try 2-2-X pattern detection
     if (detect22XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern22X]++;
         return true;
     }
 
     // 5. Try 3-3-X pattern detection
     if (detect33XPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern33X]++;
         return true;
     }
 
     // 6. Try the 1-X-1 pattern detection
     if (detect1X1Pattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern1X1]++;
         return true;
     }
 
     // 7. Try the 2-X-2 pattern detection
     if (detect2X2Pattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern2X2]++;
         return true;
     }
 
     // 8. Try the generic 2-2-2 corner pattern
     if (detect222CornerPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern222Corner]++;
         return true;
     }
 
     // 9. Try the 1-3-1 corner pattern
     if (detect131CornerPattern(x, y))
     {
+        strategyCounters[SolverStrategy::Pattern131Corner]++;
         return true;
     }
 
@@ -510,6 +553,7 @@ bool LibreMinesSolver::cleanGeneralPairRule(uchar x, uchar y)
 
     if (detectPairRule(x, y))
     {
+        strategyCounters[SolverStrategy::PairRule]++;
         return true;
     }
 
@@ -567,6 +611,7 @@ bool LibreMinesSolver::cleanEnumeration()
             // Small enough: solve the whole group at once
             if (enumerateClueSubset(clues, group))
             {
+                strategyCounters[SolverStrategy::Enumeration]++;
                 changed = true;
             }
         }
@@ -580,6 +625,7 @@ bool LibreMinesSolver::cleanEnumeration()
                 const QVector<int> window = collectConnectedClues(windowSeed, maxEnumerationClues, clues, cluesByCell);
                 if (enumerateClueSubset(clues, window))
                 {
+                    strategyCounters[SolverStrategy::Enumeration]++;
                     changed = true;
                 }
             }
@@ -648,6 +694,7 @@ bool LibreMinesSolver::cleanMineCounting()
             qDebug() << "Mine counting: cell (" << cell.first << "," << cell.second << ") is"
                      << (state == SolverCellState::Safe ? "safe" : "a mine") << "(no other option left).";
 #endif
+            strategyCounters[SolverStrategy::MineCounting]++;
             markCell(cell, state);
             changed = true;
         }
@@ -809,6 +856,7 @@ bool LibreMinesSolver::cleanMineCounting()
         qDebug() << "Mine counting: cell (" << cell.first << "," << cell.second << ") is"
                  << (state == SolverCellState::Safe ? "safe" : "a mine") << "in every layout that fits the mine counter.";
 #endif
+        strategyCounters[SolverStrategy::MineCounting]++;
         markCell(cell, state);
         changed = true;
     };

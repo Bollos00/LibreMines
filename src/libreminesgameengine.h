@@ -38,6 +38,12 @@
 #include "common.h"
 #include "libreminesscore.h"
 
+/**
+ * @brief Number of solver threads started for one No Guess board generation
+ *
+ * Several independent solvers race to find a solvable board; the first one to
+ * finish provides the matrix and the others are interrupted.
+ */
 #define SOLVERS_COUNT 1
 
 /**
@@ -134,8 +140,13 @@ public:
      * The dimensions, mine count, valid characters, and clue values are
      * validated before the current game state is changed.
      *
+     * @param _X Board width (number of columns)
+     * @param _Y Board height (number of rows)
+     * @param i_nMines_ Number of mines the description must contain
+     * @param minefieldString Textual board description
      * @throws std::invalid_argument if the description does not match the
      *         supplied dimensions, mine count, or Minesweeper rules
+     * @since v3.0.0
      */
     void vNewGameForTest(const uchar _X,
                          const uchar _Y,
@@ -230,7 +241,7 @@ public:
      * and their relationships to neighboring cells.
      * 
      * @param x true to enable no-guess mode, false to allow traditional puzzles
-     * @since v3.0
+     * @since v3.0.0
      */
     void setNoGuessMode(const bool x);
 
@@ -244,7 +255,7 @@ public:
      *
      * @param strategies Bit mask of LibreMinesSolver::SolverStrategy values
      * @see LibreMinesSolver::SolverStrategy
-     * @since v3.0
+     * @since v3.0.0
      */
     void setSolverStrategies(const quint64 strategies);
 
@@ -256,7 +267,7 @@ public:
      *
      * @param clues Clue limit of one enumeration window
      * @see LibreMinesSolver::setMaxEnumerationClues()
-     * @since v3.0
+     * @since v3.0.0
      */
     void setMaxEnumerationClues(const int clues);
 

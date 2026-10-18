@@ -52,12 +52,17 @@
  * auto r = LibreMinesConstraintEnumerator().run(in, 100000);
  * // exactly one layout survives: b and d are mines, a and c are safe
  * @endcode
+ *
+ * @see LibreMinesSolver::cleanEnumeration()
+ * @since v3.0.0
  */
 class LibreMinesConstraintEnumerator
 {
 public:
     /**
      * @brief Problem description handed to the enumerator
+     *
+     * @since v3.0.0
      */
     struct Input
     {
@@ -76,6 +81,8 @@ public:
      *
      * Only trust canBeMine/canBeSafe when budgetExceeded is false: a search that
      * was cut short has not seen every layout, so "always a mine" proves nothing.
+     *
+     * @since v3.0.0
      */
     struct Result
     {
@@ -95,16 +102,46 @@ public:
         QVector<bool> mineAtTotal;         ///< flat table [t * nCells + i]: cell i is a mine in some t-mine layout
         QVector<bool> safeAtTotal;         ///< flat table [t * nCells + i]: cell i is safe in some t-mine layout
 
-        /** @return true if some valid layout with exactly `total` mines has cell i as a mine */
+        /**
+         * @brief Query mine possibility for a given mine total
+         *
+         * @param total Number of mines the layout must have
+         * @param i Cell index
+         * @return true if some valid layout with exactly @p total mines has
+         *         cell @p i as a mine
+         * @note Only meaningful when run() was called with
+         *       recordMineCounts = true and budgetExceeded is false
+         */
         bool canBeMineWithTotal(int total, int i) const { return mineAtTotal[total * nCells + i]; }
 
-        /** @return true if some valid layout with exactly `total` mines has cell i as safe */
+        /**
+         * @brief Query safe possibility for a given mine total
+         *
+         * @param total Number of mines the layout must have
+         * @param i Cell index
+         * @return true if some valid layout with exactly @p total mines has
+         *         cell @p i as safe
+         * @note Only meaningful when run() was called with
+         *       recordMineCounts = true and budgetExceeded is false
+         */
         bool canBeSafeWithTotal(int total, int i) const { return safeAtTotal[total * nCells + i]; }
 
-        /** @return true if cell i is a mine in every valid layout */
+        /**
+         * @brief Check whether a cell is a mine in every valid layout
+         *
+         * @param i Cell index
+         * @return true if cell @p i is a mine in every valid layout
+         * @note Only trustworthy when budgetExceeded is false
+         */
         bool isMineInAllSolutions(int i) const { return canBeMine[i] && !canBeSafe[i]; }
 
-        /** @return true if cell i is safe in every valid layout */
+        /**
+         * @brief Check whether a cell is safe in every valid layout
+         *
+         * @param i Cell index
+         * @return true if cell @p i is safe in every valid layout
+         * @note Only trustworthy when budgetExceeded is false
+         */
         bool isSafeInAllSolutions(int i) const { return canBeSafe[i] && !canBeMine[i]; }
     };
 
@@ -117,6 +154,7 @@ public:
      *                    with that many mines say about each cell. This needs every layout, so the
      *                    early stop (see Result::saturated) is disabled.
      * @return Per-cell mine/safe possibilities (see Result for when they can be trusted)
+     * @since v3.0.0
      */
     Result run(const Input& input, quint64 nodeBudget, bool recordMineCounts = false)
     {
