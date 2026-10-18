@@ -80,6 +80,37 @@ private slots:
     void advancedPattern131CornerResolvesCellsViaCleanAdvancedPatterns();
     void advancedPattern1X1MarksUniqueCellsSafeViaDirectApply();
     void advancedPattern1X1MarksUniqueCellsSafeViaCleanAdvancedPatterns();
+    void advancedPattern22XMarksUniqueCellsSafeViaDirectApply();
+    void advancedPattern22XMarksUniqueCellsSafeViaCleanAdvancedPatterns();
+    void advancedPattern33XMarksUniqueCellsSafeViaDirectApply();
+    void advancedPattern33XMarksUniqueCellsSafeViaCleanAdvancedPatterns();
+    void advancedPattern2X2ResolvesCellsViaDirectApply();
+    void advancedPattern2X2ResolvesCellsViaCleanAdvancedPatterns();
+    void advancedPattern24XMarksUniqueCellsAsMinesViaDirectApply();
+    void advancedPattern24XMarksUniqueCellsAsMinesViaCleanAdvancedPatterns();
+    void advancedPattern34XMarksUniqueCellsAsMinesViaDirectApply();
+    void advancedPattern34XMarksUniqueCellsAsMinesViaCleanAdvancedPatterns();
+
+    // General Pair Rule
+    void generalPairRuleMarksUniqueCellsSafeViaDirectApply();
+    void generalPairRuleMarksUniqueCellsSafeViaCleanGeneralPairRule();
+    void generalPairRuleMarksUniqueCellsAsMinesViaDirectApply();
+    void generalPairRuleMarksUniqueCellsAsMinesViaCleanGeneralPairRule();
+    void generalPairRuleMarksOnlyBUniqueCellsViaDirectApply();
+    void generalPairRuleMarksOnlyBUniqueCellsViaCleanGeneralPairRule();
+
+    // Enumeration
+    void enumerationResolvesCellsAcrossConnectedClues();
+    void enumerationRespectsMaxEnumerationCluesWindows();
+
+    // Mine Counting
+    void mineCountingMarksAllUnknownCellsSafeWhenNoMinesLeft();
+    void mineCountingMarksAllUnknownCellsAsMinesWhenAllRemainingAreMines();
+    void mineCountingMarksFreeCellsSafeWhenGroupsUseAllMines();
+    void mineCountingRejectsInconsistentMineCount();
+    void mineCountingDoesNothingWhenStrategyDisabled();
+
+    // Rejection paths
     void basicPattern11XRejectsNonSubsetViaDirectApply();
     void basicPattern12XRejectsWrongUniqueNeighborCountViaDirectApply();
 
@@ -103,6 +134,14 @@ private:
     void runAdvanced222Corner(PatternTestRoute route);
     void runAdvanced131Corner(PatternTestRoute route);
     void runAdvanced1X1(PatternTestRoute route);
+    void runAdvanced22X(PatternTestRoute route);
+    void runAdvanced33X(PatternTestRoute route);
+    void runAdvanced2X2(PatternTestRoute route);
+    void runAdvanced24X(PatternTestRoute route);
+    void runAdvanced34X(PatternTestRoute route);
+    void runGeneralPairRuleOnlyASafe(PatternTestRoute route);
+    void runGeneralPairRuleOnlyAMine(PatternTestRoute route);
+    void runGeneralPairRuleOnlyBMine(PatternTestRoute route);
 
     LibreMinesGameEngine gameEngine;
     LibreMinesSolver solver;
@@ -826,6 +865,512 @@ void TestLibreMinesSolver::runAdvanced1X1(PatternTestRoute route)
     }
     QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Unknown);
     QVERIFY(solver.solverBoard[2][2] == LibreMinesSolver::SolverCellState::Unknown);
+}
+
+void TestLibreMinesSolver::advancedPattern22XMarksUniqueCellsSafeViaDirectApply()
+{
+    runAdvanced22X(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::advancedPattern22XMarksUniqueCellsSafeViaCleanAdvancedPatterns()
+{
+    runAdvanced22X(PatternTestRoute::Cleaner);
+}
+
+void TestLibreMinesSolver::advancedPattern33XMarksUniqueCellsSafeViaDirectApply()
+{
+    runAdvanced33X(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::advancedPattern33XMarksUniqueCellsSafeViaCleanAdvancedPatterns()
+{
+    runAdvanced33X(PatternTestRoute::Cleaner);
+}
+
+void TestLibreMinesSolver::advancedPattern2X2ResolvesCellsViaDirectApply()
+{
+    runAdvanced2X2(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::advancedPattern2X2ResolvesCellsViaCleanAdvancedPatterns()
+{
+    runAdvanced2X2(PatternTestRoute::Cleaner);
+}
+
+void TestLibreMinesSolver::advancedPattern24XMarksUniqueCellsAsMinesViaDirectApply()
+{
+    runAdvanced24X(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::advancedPattern24XMarksUniqueCellsAsMinesViaCleanAdvancedPatterns()
+{
+    runAdvanced24X(PatternTestRoute::Cleaner);
+}
+
+void TestLibreMinesSolver::advancedPattern34XMarksUniqueCellsAsMinesViaDirectApply()
+{
+    runAdvanced34X(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::advancedPattern34XMarksUniqueCellsAsMinesViaCleanAdvancedPatterns()
+{
+    runAdvanced34X(PatternTestRoute::Cleaner);
+}
+
+void TestLibreMinesSolver::runAdvanced22X(PatternTestRoute route)
+{
+    // Two adjacent 2 clues share candidates; the unique cells of the first are safe:
+    // S = = 0 =
+    // S 2 2 0 =
+    // S = = 0 =
+    setBoard(5, 3, 2, QString::fromLatin1(
+        R"(1 * 1 0 0
+           2 2 2 0 0
+           1 * 1 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern22X);
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyNNXPatternLogic(1, 1, 2, 1, 2)
+        : solver.cleanAdvancedPatterns(1, 1);
+    QVERIFY(changed);
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Unknown);
+}
+
+void TestLibreMinesSolver::runAdvanced33X(PatternTestRoute route)
+{
+    // Two adjacent 3 clues share candidates; the unique cells of the first are safe:
+    // S = = 1 =
+    // S 3 3 1 =
+    // S = = 0 =
+    setBoard(5, 3, 3, QString::fromLatin1(
+        R"(1 * * 1 0
+           2 3 3 1 0
+           1 * 1 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern33X);
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyNNXPatternLogic(1, 1, 2, 1, 3)
+        : solver.cleanAdvancedPatterns(1, 1);
+    QVERIFY(changed);
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Unknown);
+}
+
+void TestLibreMinesSolver::runAdvanced2X2(PatternTestRoute route)
+{
+    // The two 2 clues are two cells apart and share candidates; the unique cells of
+    // the left clue are safe:
+    // S S = 1 0
+    // S 2 = 2 0
+    // S S = 1 0
+    setBoard(5, 3, 2, QString::fromLatin1(
+        R"(0 1 * 1 0
+           0 2 2 2 0
+           0 1 * 1 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern2X2);
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[3][1] = LibreMinesSolver::SolverCellState::Safe;
+    const QPair<uchar, uchar> knownSafeCells[] = {
+        {3, 0}, {4, 0}, {4, 1}, {3, 2}, {4, 2}
+    };
+    for (const QPair<uchar, uchar>& cell : knownSafeCells)
+    {
+        solver.solverBoard[cell.first][cell.second] = LibreMinesSolver::SolverCellState::Safe;
+    }
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyNNXPatternLogic(1, 1, 3, 1, 2)
+        : solver.cleanAdvancedPatterns(1, 1);
+    QVERIFY(changed);
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][2] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Unknown);
+}
+
+void TestLibreMinesSolver::runAdvanced24X(PatternTestRoute route)
+{
+    // The 4 and 2 clues share candidates; the two unique cells of the 4 are mines:
+    // M = = 1 =
+    // 3 4 2 1 =
+    // M = = 0 =
+    setBoard(5, 3, 4, QString::fromLatin1(
+        R"(* * * 1 0
+           3 4 2 1 0
+           * 1 0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern24X);
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[0][1] = LibreMinesSolver::SolverCellState::Safe;
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyMNXPatternLogic(1, 1, 2, 1, 2, 4)
+        : solver.cleanAdvancedPatterns(1, 1);
+    QVERIFY(changed);
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Mine);
+    QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Mine);
+    QVERIFY(solver.solverBoard[2][2] == LibreMinesSolver::SolverCellState::Unknown);
+}
+
+void TestLibreMinesSolver::runAdvanced34X(PatternTestRoute route)
+{
+    // The 4 and 3 clues share candidates; the sole unique cell of the 4 is a mine:
+    // 2 = = 1 =
+    // M 4 3 1 =
+    // 2 = = 0 =
+    setBoard(5, 3, 4, QString::fromLatin1(
+        R"(2 * * 1 0
+           * 4 3 1 0
+           2 * 1 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern34X);
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[0][0] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[0][2] = LibreMinesSolver::SolverCellState::Safe;
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyMNXPatternLogic(1, 1, 2, 1, 3, 4)
+        : solver.cleanAdvancedPatterns(1, 1);
+    QVERIFY(changed);
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Mine);
+    QVERIFY(solver.solverBoard[2][2] == LibreMinesSolver::SolverCellState::Unknown);
+}
+
+void TestLibreMinesSolver::generalPairRuleMarksUniqueCellsSafeViaDirectApply()
+{
+    runGeneralPairRuleOnlyASafe(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::generalPairRuleMarksUniqueCellsSafeViaCleanGeneralPairRule()
+{
+    runGeneralPairRuleOnlyASafe(PatternTestRoute::Cleaner);
+}
+
+void TestLibreMinesSolver::generalPairRuleMarksUniqueCellsAsMinesViaDirectApply()
+{
+    runGeneralPairRuleOnlyAMine(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::generalPairRuleMarksUniqueCellsAsMinesViaCleanGeneralPairRule()
+{
+    runGeneralPairRuleOnlyAMine(PatternTestRoute::Cleaner);
+}
+
+void TestLibreMinesSolver::generalPairRuleMarksOnlyBUniqueCellsViaDirectApply()
+{
+    runGeneralPairRuleOnlyBMine(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::generalPairRuleMarksOnlyBUniqueCellsViaCleanGeneralPairRule()
+{
+    runGeneralPairRuleOnlyBMine(PatternTestRoute::Cleaner);
+}
+
+void TestLibreMinesSolver::runGeneralPairRuleOnlyASafe(PatternTestRoute route)
+{
+    // Both 2 clues need two more mines. Every unknown neighbor of the second clue is
+    // shared with the first, so the first clue's unique cells must be safe:
+    // S = = 0 =
+    // S 2 2 0 =
+    // S = = 0 =
+    setBoard(5, 3, 2, QString::fromLatin1(
+        R"(1 * 1 0 0
+           2 2 2 0 0
+           1 * 1 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::PairRule);
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyPairRule(1, 1, 2, 1)
+        : solver.cleanGeneralPairRule(1, 1);
+    QVERIFY(changed);
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
+}
+
+void TestLibreMinesSolver::runGeneralPairRuleOnlyAMine(PatternTestRoute route)
+{
+    // The 4 clue needs two more mines than the 2 clue and has exactly two unique
+    // unknown neighbors, so they must both be mines:
+    // M = = 1 =
+    // 3 4 2 1 =
+    // M = = 0 =
+    setBoard(5, 3, 4, QString::fromLatin1(
+        R"(* * * 1 0
+           3 4 2 1 0
+           * 1 0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::PairRule);
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[0][1] = LibreMinesSolver::SolverCellState::Safe;
+    for (uchar y = 0; y < solver.rows; ++y)
+    {
+        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
+    }
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyPairRule(1, 1, 2, 1)
+        : solver.cleanGeneralPairRule(1, 1);
+    QVERIFY(changed);
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Mine);
+    QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Mine);
+}
+
+void TestLibreMinesSolver::runGeneralPairRuleOnlyBMine(PatternTestRoute route)
+{
+    // The 3 clue needs two more mines than the 1 clue and has exactly two unique
+    // unknown neighbors, so they must both be mines while the 1 clue's unique cells
+    // stay safe:
+    // S = = M =
+    // S 1 3 2 =
+    // S = = M =
+    setBoard(5, 3, 3, QString::fromLatin1(
+        R"(1 * 2 * 1
+           1 1 3 2 2
+           0 0 1 * 1)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::PairRule);
+
+    solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
+    solver.solverBoard[3][1] = LibreMinesSolver::SolverCellState::Safe;
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyPairRule(2, 1, 1, 1)
+        : solver.cleanGeneralPairRule(2, 1);
+    QVERIFY(changed);
+    QVERIFY(solver.solverBoard[3][0] == LibreMinesSolver::SolverCellState::Mine);
+    QVERIFY(solver.solverBoard[3][2] == LibreMinesSolver::SolverCellState::Mine);
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
+}
+
+void TestLibreMinesSolver::enumerationResolvesCellsAcrossConnectedClues()
+{
+    // The connected 1-2-1 clues leave (1, 0) and (1, 2) safe in every valid layout:
+    // = S =
+    // 1 2 1
+    // = S =
+    setBoard(3, 3, 2, QString::fromLatin1(
+        R"(* 2 *
+           1 2 1
+           0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Enumeration);
+
+    solver.updateCellState({0, 1}, LibreMinesSolver::SolverCellState::Safe);
+    solver.updateCellState({1, 1}, LibreMinesSolver::SolverCellState::Safe);
+    solver.updateCellState({2, 1}, LibreMinesSolver::SolverCellState::Safe);
+
+    QVERIFY(solver.cleanEnumeration());
+    QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][2] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[2][0] == LibreMinesSolver::SolverCellState::Unknown);
+}
+
+void TestLibreMinesSolver::enumerationRespectsMaxEnumerationCluesWindows()
+{
+    // The same 1-2-1 board: limiting one enumeration to a single clue breaks the
+    // group into windows that each deduce nothing, so no cell is resolved until the
+    // limit is lifted:
+    // = = =
+    // 1 2 1
+    // = = =
+    setBoard(3, 3, 2, QString::fromLatin1(
+        R"(* 2 *
+           1 2 1
+           0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Enumeration);
+    solver.setMaxEnumerationClues(1);
+
+    solver.updateCellState({0, 1}, LibreMinesSolver::SolverCellState::Safe);
+    solver.updateCellState({1, 1}, LibreMinesSolver::SolverCellState::Safe);
+    solver.updateCellState({2, 1}, LibreMinesSolver::SolverCellState::Safe);
+
+    QVERIFY(!solver.cleanEnumeration());
+    QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[1][2] == LibreMinesSolver::SolverCellState::Unknown);
+
+    solver.setMaxEnumerationClues(0);
+
+    // Lifting the limit restores the whole-group deduction:
+    // = S =
+    // 1 2 1
+    // = S =
+    QVERIFY(solver.cleanEnumeration());
+    QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][2] == LibreMinesSolver::SolverCellState::Safe);
+}
+
+void TestLibreMinesSolver::mineCountingMarksAllUnknownCellsSafeWhenNoMinesLeft()
+{
+    // Every mine is already flagged, so every remaining unknown cell must be safe:
+    // * S S
+    // S S S
+    // S S S
+    setBoard(3, 3, 1, QString::fromLatin1(
+        R"(* 1 0
+           1 1 0
+           0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::MineCounting);
+    solver.nMines = 1;
+    solver.updateCellState({0, 0}, LibreMinesSolver::SolverCellState::Mine);
+
+    QVERIFY(solver.cleanMineCounting());
+    QCOMPARE(solver.nCellsMarkedSafe, quint32(8));
+    QCOMPARE(solver.nCellsMarkedMine, quint32(1));
+    for (uchar x = 0; x < solver.cols; ++x)
+    {
+        for (uchar y = 0; y < solver.rows; ++y)
+        {
+            const auto expected = (x == 0 && y == 0)
+                ? LibreMinesSolver::SolverCellState::Mine
+                : LibreMinesSolver::SolverCellState::Safe;
+            QVERIFY(solver.solverBoard[x][y] == expected);
+        }
+    }
+}
+
+void TestLibreMinesSolver::mineCountingMarksAllUnknownCellsAsMinesWhenAllRemainingAreMines()
+{
+    // The two unknown cells are exactly the two mines still hidden:
+    // M M 1
+    // 2 2 1
+    // 0 0 0
+    setBoard(3, 3, 2, QString::fromLatin1(
+        R"(* * 1
+           2 2 1
+           0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::MineCounting);
+    solver.nMines = 2;
+
+    for (uchar x = 0; x < solver.cols; ++x)
+    {
+        for (uchar y = 0; y < solver.rows; ++y)
+        {
+            if ((x == 0 && y == 0) || (x == 1 && y == 0))
+            {
+                continue;
+            }
+            solver.solverBoard[x][y] = LibreMinesSolver::SolverCellState::Safe;
+        }
+    }
+    solver.nCellsMarkedSafe = 7;
+
+    QVERIFY(solver.cleanMineCounting());
+    QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Mine);
+    QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Mine);
+    QCOMPARE(solver.nCellsMarkedMine, quint32(2));
+}
+
+void TestLibreMinesSolver::mineCountingMarksFreeCellsSafeWhenGroupsUseAllMines()
+{
+    // The single clue must contain the only mine, so the cells that touch no clue
+    // ("free" cells) cannot contain any and are all safe:
+    // 1 = S
+    // = = S
+    // S S S
+    setBoard(3, 3, 1, QString::fromLatin1(
+        R"(1 1 1
+           1 * 1
+           1 1 1)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::MineCounting);
+    solver.nMines = 1;
+    solver.updateCellState({0, 0}, LibreMinesSolver::SolverCellState::Safe);
+
+    QVERIFY(solver.cleanMineCounting());
+
+    const QPair<uchar, uchar> freeCells[] = {
+        {2, 0}, {2, 1}, {0, 2}, {1, 2}, {2, 2}
+    };
+    for (const QPair<uchar, uchar>& cell : freeCells)
+    {
+        QVERIFY(solver.solverBoard[cell.first][cell.second] == LibreMinesSolver::SolverCellState::Safe);
+    }
+    QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[1][1] == LibreMinesSolver::SolverCellState::Unknown);
+}
+
+void TestLibreMinesSolver::mineCountingRejectsInconsistentMineCount()
+{
+    // More mines are flagged than the board contains, so the mine counter is
+    // inconsistent and nothing may be deduced:
+    // * * =
+    // = = =
+    // = = =
+    setBoard(3, 3, 2, QString::fromLatin1(
+        R"(* * 1
+           2 2 1
+           0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::MineCounting);
+    solver.nMines = 1;
+    solver.updateCellState({0, 0}, LibreMinesSolver::SolverCellState::Mine);
+    solver.updateCellState({1, 0}, LibreMinesSolver::SolverCellState::Mine);
+
+    QTest::ignoreMessage(QtWarningMsg,
+        "LibreMinesSolver: mine count is inconsistent with the solver board");
+    QVERIFY(!solver.cleanMineCounting());
+    QCOMPARE(solver.nCellsMarkedMine, quint32(2));
+}
+
+void TestLibreMinesSolver::mineCountingDoesNothingWhenStrategyDisabled()
+{
+    // The strategy is disabled, so the board must be left untouched:
+    // * = =
+    // = = =
+    // = = =
+    setBoard(3, 3, 1, QString::fromLatin1(
+        R"(* 1 0
+           1 1 0
+           0 0 0)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::None);
+    solver.nMines = 1;
+    solver.updateCellState({0, 0}, LibreMinesSolver::SolverCellState::Mine);
+
+    QVERIFY(!solver.cleanMineCounting());
+    QCOMPARE(solver.nCellsMarkedSafe, quint32(0));
+    QCOMPARE(solver.nCellsMarkedMine, quint32(1));
 }
 
 void TestLibreMinesSolver::basicPattern11XRejectsNonSubsetViaDirectApply()
