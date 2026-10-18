@@ -37,7 +37,9 @@ LibreMinesGameEngine::CellGameEngine::CellGameEngine():
 
 }
 
-LibreMinesGameEngine::LibreMinesGameEngine()
+LibreMinesGameEngine::LibreMinesGameEngine():
+    solverStrategies(static_cast<quint64>(LibreMinesSolver::SolverStrategy::AllStrategies)),
+    maxEnumerationClues(LibreMinesSolver::DefaultMaxEnumerationClues)
 {
 
 }
@@ -78,7 +80,8 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
             solver->setNMines(i_nMines_);
             solver->setSafeX(i_X_Clean);
             solver->setSafeY(i_Y_Clean);
-            solver->setStrategies(LibreMinesSolver::SolverStrategy::AllStrategies); // TODO: Make strategies configurable via GUI
+            solver->setStrategies(static_cast<LibreMinesSolver::SolverStrategy>(solverStrategies));
+            solver->setMaxEnumerationClues(maxEnumerationClues);
             solver->start();
         }
 
@@ -409,6 +412,16 @@ void LibreMinesGameEngine::setUseQuestionMark(const bool x)
 void LibreMinesGameEngine::setNoGuessMode(const bool x)
 {
     bNoGuessMode = x;
+}
+
+void LibreMinesGameEngine::setSolverStrategies(const quint64 strategies)
+{
+    solverStrategies = strategies;
+}
+
+void LibreMinesGameEngine::setMaxEnumerationClues(const int clues)
+{
+    maxEnumerationClues = qMax(0, clues);
 }
 
 

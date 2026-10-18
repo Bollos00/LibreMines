@@ -211,6 +211,21 @@ void LibreMinesPreferencesSaver::vLastSessionLoadConfigurationFile(
 
                 preferences.setOptionNoGuessMode(terms.at(1));
             }
+            else if(terms.at(0).compare("SolverStrategies", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionSolverStrategies(
+                    static_cast<LibreMinesSolver::SolverStrategy>(terms.at(1).toULongLong()));
+            }
+            else if(terms.at(0).compare("MaxEnumerationClues", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionMaxEnumerationClues(terms.at(1).toInt());
+            }
         }
     }
 
@@ -271,7 +286,11 @@ void LibreMinesPreferencesSaver::vLastSessionSaveConfigurationFile(
                << "QuestionMark" << ' '
                << (preferences.optionUseQuestionMark() ? "On" : "Off") << '\n'
                << "NoGuessMode" << ' '
-               << (preferences.optionNoGuessMode() ? "On" : "Off") << '\n';
+               << (preferences.optionNoGuessMode() ? "On" : "Off") << '\n'
+               << "SolverStrategies" << ' '
+               << static_cast<qulonglong>(preferences.optionSolverStrategies()) << '\n'
+               << "MaxEnumerationClues" << ' '
+               << preferences.optionMaxEnumerationClues() << '\n';
     }
 
     QScopedPointer<QFile> fileLanguage

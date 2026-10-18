@@ -31,6 +31,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 # Create a static library with all source files (excluding main.cpp)
 # This allows tests to link against the core functionality
 set(LIBREMINES_CORE_SOURCES
+    ${PROJECT_SOURCE_DIR}/src/advancedsolveroptionsdialog.cpp
     ${PROJECT_SOURCE_DIR}/src/extrathemes.cpp
     ${PROJECT_SOURCE_DIR}/src/facesreaction.cpp
     ${PROJECT_SOURCE_DIR}/src/gameboardrandomgenerator.cpp

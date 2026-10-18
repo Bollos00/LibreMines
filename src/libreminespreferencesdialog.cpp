@@ -21,6 +21,8 @@
 #include "libreminespreferencesdialog.h"
 #include "ui_libreminespreferencesdialog.h"
 
+#include "advancedsolveroptionsdialog.h"
+
 #include <QStyleFactory>
 #include <QMessageBox>
 
@@ -30,7 +32,8 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LibreMinesPreferencesDialog),
     updateLanguageDialog(true),
-    gameplayThemeChooser(new GameplayThemeChooser(this))
+    gameplayThemeChooser(new GameplayThemeChooser(this)),
+    advancedSolverOptions(new AdvancedSolverOptionsDialog(this))
 {
     ui->setupUi(this);
 
@@ -93,6 +96,46 @@ LibreMinesPreferencesDialog::LibreMinesPreferencesDialog(QWidget *parent) :
         this->setEnabled(!visible);
         gameplayThemeChooser->setEnabled(true);
     });
+
+    connect(advancedSolverOptions, &AdvancedSolverOptionsDialog::SIGNAL_visibilityChanged,
+            this, [this](bool visible)
+    {
+        this->setEnabled(!visible);
+        advancedSolverOptions->setEnabled(true);
+    });
+
+    // No Guess mode and First Cell Clean are related options. If First Cell Clean is disabled, No Guess mode must also be disabled
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    connect(ui->cbFirstCellClean, &QCheckBox::checkStateChanged,
+#else
+    connect(ui->cbFirstCellClean, &QCheckBox::stateChanged,
+#endif
+        this, [this](const int state)
+    {
+        // Ensure No Guess option is also disabled if FirstCellClean option has been disabled
+        if (state == Qt::Unchecked)
+        {
+            ui->cbNoGuessMode->setChecked(false);
+        }
+    });
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    connect(ui->cbNoGuessMode, &QCheckBox::checkStateChanged,
+#else
+    connect(ui->cbNoGuessMode, &QCheckBox::stateChanged,
+#endif
+        this, [this](const int state)
+    {
+        // The advanced solver options only make sense when No Guess is enabled
+        ui->pbAdvancedSolverOptions->setEnabled(state == Qt::Checked);
+
+        if (state == Qt::Checked)
+        {
+            ui->cbFirstCellClean->setChecked(true);
+        }
+    });
+
+    ui->pbAdvancedSolverOptions->setEnabled(ui->cbNoGuessMode->isChecked());
 
     ui->keyInputMoveLeft->setKey(Qt::Key_A);
     ui->keyInputMoveUp->setKey(Qt::Key_W);
@@ -209,6 +252,16 @@ bool LibreMinesPreferencesDialog::optionUseQuestionMark() const
 bool LibreMinesPreferencesDialog::optionNoGuessMode() const
 {
     return ui->cbNoGuessMode->isChecked();
+}
+
+LibreMinesSolver::SolverStrategy LibreMinesPreferencesDialog::optionSolverStrategies() const
+{
+    return advancedSolverOptions->optionSolverStrategies();
+}
+
+int LibreMinesPreferencesDialog::optionMaxEnumerationClues() const
+{
+    return advancedSolverOptions->optionMaxEnumerationClues();
 }
 
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
@@ -329,6 +382,16 @@ void LibreMinesPreferencesDialog::setOptionNoGuessMode(const QString& option)
     ui->cbNoGuessMode->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
 }
 
+void LibreMinesPreferencesDialog::setOptionSolverStrategies(const LibreMinesSolver::SolverStrategy strategies)
+{
+    advancedSolverOptions->setOptionSolverStrategies(strategies);
+}
+
+void LibreMinesPreferencesDialog::setOptionMaxEnumerationClues(const int clues)
+{
+    advancedSolverOptions->setOptionMaxEnumerationClues(clues);
+}
+
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const
 {
     return
@@ -439,23 +502,14 @@ void LibreMinesPreferencesDialog::on_sliderSoundVolume_sliderReleased()
     Q_EMIT SIGNAL_setSoundEffectVolume(ui->sliderSoundVolume->value(), true);
 }
 
-void LibreMinesPreferencesDialog::on_cbFirstCellClean_checkStateChanged(const Qt::CheckState &arg1)
-{
-    // Ensure No Guess option is also disabled if FirstCellClean option has been disabled
-    if (arg1 == Qt::Unchecked)
-    {
-        ui->cbNoGuessMode->setCheckState(Qt::Unchecked);
-        ui->cbNoGuessMode->setEnabled(false);
-    }
-    else if (arg1 == Qt::Checked)
-    {
-        ui->cbNoGuessMode->setEnabled(true);
-    }
-}
-
-
 void LibreMinesPreferencesDialog::on_pbGameplayCustomization_clicked()
 {
     gameplayThemeChooser->show();
+}
+
+
+void LibreMinesPreferencesDialog::on_pbAdvancedSolverOptions_clicked()
+{
+    advancedSolverOptions->show();
 }
 

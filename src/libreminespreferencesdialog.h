@@ -33,6 +33,7 @@
 #define LIBREMINESPREFERENCESDIALOG_H
 
 #include "gameplaythemechooser.h"
+#include "advancedsolveroptionsdialog.h"
 
 #include <QDialog>
 #include <QtCore>
@@ -140,6 +141,8 @@ public:
     int optionSoundVolume()const;
     bool optionUseQuestionMark()const;
     bool optionNoGuessMode()const;
+    LibreMinesSolver::SolverStrategy optionSolverStrategies()const;
+    int optionMaxEnumerationClues()const;
 
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
@@ -158,6 +161,8 @@ public:
     void setOptionSoundVolume(const int option);
     void setOptionUseQuestionMark(const QString& option);
     void setOptionNoGuessMode(const QString& option);
+    void setOptionSolverStrategies(const LibreMinesSolver::SolverStrategy strategies);
+    void setOptionMaxEnumerationClues(const int clues);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;
@@ -174,6 +179,8 @@ private:
 
     GameplayThemeChooser* gameplayThemeChooser;
 
+    AdvancedSolverOptionsDialog* advancedSolverOptions;
+
 private Q_SLOTS:
     void SLOT_updateCellLengthParameters();
     void SLOT_updateLanguage();
@@ -184,8 +191,9 @@ private Q_SLOTS:
 
     void on_sliderSoundVolume_sliderReleased();
 
-    void on_cbFirstCellClean_checkStateChanged(const Qt::CheckState &arg1);
     void on_pbGameplayCustomization_clicked();
+
+    void on_pbAdvancedSolverOptions_clicked();
 
 Q_SIGNALS:
     void SIGNAL_optionChanged(const QString& name, const QString& value);

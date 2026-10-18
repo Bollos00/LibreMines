@@ -234,6 +234,32 @@ public:
      */
     void setNoGuessMode(const bool x);
 
+    /**
+     * @brief Set the deduction strategies offered to the No Guess solver
+     *
+     * The value is a bit mask of LibreMinesSolver::SolverStrategy flags. It is
+     * passed to every solver instance created for the next generated puzzle.
+     * The parameter is a plain integer to avoid a circular include between the
+     * game engine and the solver.
+     *
+     * @param strategies Bit mask of LibreMinesSolver::SolverStrategy values
+     * @see LibreMinesSolver::SolverStrategy
+     * @since v3.0
+     */
+    void setSolverStrategies(const quint64 strategies);
+
+    /**
+     * @brief Set the maximum number of clues considered by one enumeration
+     *
+     * Passed to every solver instance created for the next generated puzzle.
+     * 0 disables the limit, negative values are treated as 0.
+     *
+     * @param clues Clue limit of one enumeration window
+     * @see LibreMinesSolver::setMaxEnumerationClues()
+     * @since v3.0
+     */
+    void setMaxEnumerationClues(const int clues);
+
 private:
     /**
      * @brief Reset the game matrix to initial state
@@ -306,6 +332,9 @@ private:
 
     bool bUseQuestionMark;  ///< Whether question mark flags are enabled
     bool bNoGuessMode;      ///< Whether no-guess mode is enabled for logical-only puzzles
+
+    quint64 solverStrategies;   ///< Bit mask of LibreMinesSolver::SolverStrategy flags used in No Guess mode
+    int maxEnumerationClues;    ///< Clue limit of one enumeration window (0 = unlimited)
 
     bool bGameActive;       ///< Whether the game is currently in progress
 

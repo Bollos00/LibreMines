@@ -31,14 +31,25 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="cbNoGuessMode">
-        <property name="text">
-         <string>No Guess Mode</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QCheckBox" name="cbNoGuessMode">
+          <property name="text">
+           <string>No Guess Mode</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbAdvancedSolverOptions">
+          <property name="text">
+           <string>Advanced Solver Options...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QCheckBox" name="cbCleanNeighborCellsWhenClickedOnShowedCell">
@@ -215,7 +226,7 @@ Animation</string>
            <x>0</x>
            <y>0</y>
            <width>569</width>
-           <height>306</height>
+           <height>268</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">

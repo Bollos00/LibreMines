@@ -206,6 +206,7 @@ else()
 endif()
 
 add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${SOURCE_FILES}
+    src/advancedsolveroptionsdialog.h src/advancedsolveroptionsdialog.cpp src/advancedsolveroptionsdialog.ui
     src/gameplaythemechooser.h src/gameplaythemechooser.cpp src/gameplaythemechooser.ui
     src/minefieldthemepreview.h src/minefieldthemepreview.cpp src/minefieldthemepreview.ui)
 
