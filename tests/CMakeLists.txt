@@ -37,6 +37,7 @@ set(LIBREMINES_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/src/facesreactionpreview.cpp
     ${PROJECT_SOURCE_DIR}/src/keyboardcontroller.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminesapptheme.cpp
+    ${PROJECT_SOURCE_DIR}/src/libreminesconstraintenumerator.hpp
     ${PROJECT_SOURCE_DIR}/src/libreminesgameengine.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminespreferencesdialog.cpp
     ${PROJECT_SOURCE_DIR}/src/libreminespreferencessaver.cpp

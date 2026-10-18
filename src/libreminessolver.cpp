@@ -2,6 +2,7 @@
 
 #include "gameboardrandomgenerator.h"
 #include <QMutexLocker>
+#include "libreminesconstraintenumerator.hpp"
 
 #define LIBREMINES_SOLVER_DEBUG 1
 
@@ -33,8 +34,12 @@ void printSolverBoard(const std::vector<std::vector<LibreMinesSolver::SolverCell
 }
 #endif
 
-LibreMinesSolver::LibreMinesSolver(QObject *parent)
-    : QThread{parent}, state(SolverState::NotStarted), cmd(SolverCommand::CmdNone), strategies(SolverStrategy::None)
+LibreMinesSolver::LibreMinesSolver(QObject *parent) : 
+    QThread{parent},
+    state(SolverState::NotStarted),
+    cmd(SolverCommand::CmdNone),
+    strategies(SolverStrategy::None),
+    maxEnumerationClues(DefaultMaxEnumerationClues)
 {}
 
 void LibreMinesSolver::run()
@@ -169,6 +174,20 @@ bool LibreMinesSolver::solve()
                 }
             }
         }
+
+        // If no pattern made progress either, try exhaustive enumeration of the frontier.
+        // This is the most expensive tier, so it only runs when everything cheaper has stalled.
+        if (!globalChanges)
+        {
+#if LIBREMINES_SOLVER_DEBUG
+            qDebug() << "Applying enumeration...";
+#endif
+            if (cleanEnumeration())
+            {
+                globalChanges = true;
+            }
+        }
+
 
 #if LIBREMINES_SOLVER_DEBUG
         // Debug output for each iteration
@@ -482,6 +501,113 @@ bool LibreMinesSolver::cleanGeneralPairRule(uchar x, uchar y)
 
     return false;
 }
+
+bool LibreMinesSolver::cleanEnumeration()
+{
+    if (!isStrategyEnabled(SolverStrategy::Enumeration)) return false;
+
+    // The cheaper tiers look at patterns made of two or three clues. This tier
+    // treats the whole frontier as a constraint problem instead:
+    //   - variables:   unknown cells that touch at least one revealed number
+    //   - constraints: each revealed number ("exactly N of my unknown neighbours are mines")
+    // Every mine layout satisfying all constraints is enumerated. A cell that is a
+    // mine (or safe) in ALL layouts is a certain deduction.
+
+    // --- Step 1: gather the clues -------------------------------------------
+    // The board is scanned instead of cellsNeedingTreatment so the order is deterministic.
+    QVector<EnumerationClue> clues;
+    for (int x = 0; x < cols; ++x)
+    {
+        for (int y = 0; y < rows; ++y)
+        {
+            if (solverBoard[x][y] != SolverCellState::Safe)
+            {
+                continue;
+            }
+
+            QSet<QPair<uchar, uchar>> unknownNeighbors;
+            if (countRemainingNeighbors(x, y, SolverCellState::Unknown, &unknownNeighbors) == 0)
+            {
+                continue;   // nothing left to learn from this number
+            }
+
+            EnumerationClue clue;
+            clue.remainingMines = countRemainingMines(x, y);   // the number minus mines already found around it
+            for (const QPair<uchar, uchar>& neighbor : unknownNeighbors)
+            {
+                clue.unknownCells.append(cellIndex(neighbor.first, neighbor.second));
+            }
+            clues.append(clue);
+        }
+    }
+
+    if (clues.isEmpty())
+    {
+        return false;
+    }
+
+    // --- Step 2: index which clues touch each unknown cell ------------------
+    QHash<int, QVector<int>> cluesByCell;
+    for (int clueId = 0; clueId < clues.size(); ++clueId)
+    {
+        for (int cellId : clues[clueId].unknownCells)
+        {
+            cluesByCell[cellId].append(clueId);
+        }
+    }
+
+    // --- Step 3: solve each group of connected clues ------------------------
+    // Groups that share no unknown cell cannot influence each other, so they are
+    // solved separately. This keeps every search small.
+    bool changed = false;
+    QVector<bool> alreadyGrouped(clues.size(), false);
+
+    for (int seed = 0; seed < clues.size(); ++seed)
+    {
+        if (alreadyGrouped[seed])
+        {
+            continue;
+        }
+
+        if (checkForInterrupt())
+        {
+            return changed;   // solve() notices the interruption on its next iteration
+        }
+
+        // limit = 0: collect the complete group of connected clues
+        const QVector<int> group = collectConnectedClues(seed, 0, clues, cluesByCell);
+        for (int clueId : group)
+        {
+            alreadyGrouped[clueId] = true;
+        }
+
+        if (maxEnumerationClues <= 0 || group.size() <= maxEnumerationClues)
+        {
+            // Small enough: solve the whole group at once
+            if (enumerateClueSubset(clues, group))
+            {
+                changed = true;
+            }
+        }
+        else
+        {
+            // Too large: solve one window per clue, each made of that clue and its nearest
+            // neighbours. Windows ignore the clues outside them, which can only lose
+            // deductions, never produce wrong ones.
+            for (int windowSeed : group)
+            {
+                const QVector<int> window = collectConnectedClues(windowSeed, maxEnumerationClues, clues, cluesByCell);
+                if (enumerateClueSubset(clues, window))
+                {
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    return changed;
+}
+
 
 bool LibreMinesSolver::detect12XPattern(uchar x, uchar y)
 {
@@ -1089,6 +1215,127 @@ bool LibreMinesSolver::applyPairRule(uchar ax, uchar ay, uchar bx, uchar by)
     return changed;
 }
 
+bool LibreMinesSolver::enumerateClueSubset(const QVector<EnumerationClue>& clues, const QVector<int>& subset)
+{
+    // Translate the board cells used by these clues into compact local numbers
+    // 0..n-1, which is what the enumerator works with.
+    QHash<int, int> localIndex;   // board cell id -> local number
+    QVector<int> cellIds;         // local number  -> board cell id
+
+    LibreMinesConstraintEnumerator::Input input;
+    for (int clueId : subset)
+    {
+        std::vector<int> localCells;
+        for (int cellId : clues[clueId].unknownCells)
+        {
+            if (!localIndex.contains(cellId))
+            {
+                localIndex.insert(cellId, cellIds.size());
+                cellIds.append(cellId);
+            }
+            localCells.push_back(localIndex.value(cellId));
+        }
+        input.clueCells.push_back(localCells);
+        input.clueMines.append(clues[clueId].remainingMines);
+    }
+    input.nCells = cellIds.size();
+
+    const LibreMinesConstraintEnumerator::Result result = LibreMinesConstraintEnumerator().run(input, EnumerationNodeBudget);
+
+    // A search cut short has not seen every layout, so "always a mine / always safe"
+    // proves nothing. Discard it entirely.
+    if (result.budgetExceeded)
+    {
+        return false;
+    }
+
+    // A real board always has at least one valid layout (the true one). Finding none
+    // means a previous deduction was wrong: report it instead of marking anything.
+    if (result.solutions == 0 && !result.saturated)
+    {
+        qWarning() << "LibreMinesSolver: enumeration found no valid layout; the solver board is inconsistent";
+        return false;
+    }
+
+    bool changed = false;
+    for (int local = 0; local < cellIds.size(); ++local)
+    {
+        const QPair<uchar, uchar> cell = cellFromIndex(cellIds[local]);
+
+        // Marking a safe zero cell can reveal other cells of this subset as a side
+        // effect, so skip cells that are no longer unknown.
+        if (solverBoard[cell.first][cell.second] != SolverCellState::Unknown)
+        {
+            continue;
+        }
+
+        if (result.isMineInAllSolutions(local))
+        {
+#if LIBREMINES_SOLVER_DEBUG
+            qDebug() << "Enumeration: cell (" << cell.first << "," << cell.second << ") is a mine in all solutions.";
+#endif
+            markCell(cell, SolverCellState::Mine);
+            changed = true;
+        }
+        else if (result.isSafeInAllSolutions(local))
+        {
+#if LIBREMINES_SOLVER_DEBUG
+            qDebug() << "Enumeration: cell (" << cell.first << "," << cell.second << ") is safe in all solutions.";
+#endif
+            markCell(cell, SolverCellState::Safe);
+            changed = true;
+        }
+    }
+
+    return changed;
+}
+
+QVector<int> LibreMinesSolver::collectConnectedClues(int seed,
+                                                     int limit,
+                                                     const QVector<EnumerationClue>& clues,
+                                                     const QHash<int, QVector<int>>& cluesByCell) const
+{
+    // Breadth-first walk over clues: two clues are neighbours when they share an
+    // unknown cell. Visiting order = distance from the seed, so a limited result
+    // is the group of clues closest to it.
+    QVector<int> collected;
+    QSet<int> seen;
+    QQueue<int> pending;
+
+    seen.insert(seed);
+    pending.enqueue(seed);
+
+    while (!pending.isEmpty() && (limit <= 0 || collected.size() < limit))
+    {
+        const int current = pending.dequeue();
+        collected.append(current);
+
+        for (int cellId : clues[current].unknownCells)
+        {
+            for (int other : cluesByCell.value(cellId))
+            {
+                if (!seen.contains(other))
+                {
+                    seen.insert(other);
+                    pending.enqueue(other);
+                }
+            }
+        }
+    }
+
+    return collected;
+}
+
+int LibreMinesSolver::cellIndex(uchar x, uchar y) const
+{
+    return static_cast<int>(x) * rows + y;
+}
+
+QPair<uchar, uchar> LibreMinesSolver::cellFromIndex(int index) const
+{
+    return QPair<uchar, uchar>(static_cast<uchar>(index / rows), static_cast<uchar>(index % rows));
+}
+
 bool LibreMinesSolver::checkForInterrupt()
 {
     QMutexLocker locker(&cmdMutex);
@@ -1175,6 +1422,16 @@ LibreMinesSolver::SolverState LibreMinesSolver::getSolverState() const
 {
     QMutexLocker locker(&stateMutex);
     return state;
+}
+
+int LibreMinesSolver::getMaxEnumerationClues() const
+{
+    return maxEnumerationClues;
+}
+
+void LibreMinesSolver::setMaxEnumerationClues(int newMaxEnumerationClues)
+{
+    maxEnumerationClues = qMax(0, newMaxEnumerationClues);
 }
 
 void LibreMinesSolver::interrupt()

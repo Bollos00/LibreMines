@@ -125,27 +125,28 @@ public:
      * combined in a single value.
      */
     enum class SolverStrategy : quint64 {
-        None            = 0,              ///< No strategy
-        Pattern12X      = 1ULL << 0,      ///< 1-2-X pattern
-        Pattern11X      = 1ULL << 1,      ///< 1-1-X pattern
-        Pattern13X      = 1ULL << 2,      ///< 1-3-X pattern
-        Pattern14X      = 1ULL << 3,      ///< 1-4-X pattern
-        Pattern23X      = 1ULL << 4,      ///< 2-3-X pattern
-        Pattern24X      = 1ULL << 5,      ///< 2-4-X pattern
-        Pattern34X      = 1ULL << 6,      ///< 3-4-X pattern
-        Pattern22X      = 1ULL << 7,      ///< 2-2-X pattern
-        Pattern33X      = 1ULL << 8,      ///< 3-3-X pattern
-        Pattern1X1      = 1ULL << 9,      ///< 1-X-1 pattern
-        Pattern2X2      = 1ULL << 10,     ///< 2-X-2 pattern
+        None             = 0,              ///< No strategy
+        Pattern12X       = 1ULL << 0,      ///< 1-2-X pattern
+        Pattern11X       = 1ULL << 1,      ///< 1-1-X pattern
+        Pattern13X       = 1ULL << 2,      ///< 1-3-X pattern
+        Pattern14X       = 1ULL << 3,      ///< 1-4-X pattern
+        Pattern23X       = 1ULL << 4,      ///< 2-3-X pattern
+        Pattern24X       = 1ULL << 5,      ///< 2-4-X pattern
+        Pattern34X       = 1ULL << 6,      ///< 3-4-X pattern
+        Pattern22X       = 1ULL << 7,      ///< 2-2-X pattern
+        Pattern33X       = 1ULL << 8,      ///< 3-3-X pattern
+        Pattern1X1       = 1ULL << 9,      ///< 1-X-1 pattern
+        Pattern2X2       = 1ULL << 10,     ///< 2-X-2 pattern
         Pattern222Corner = 1ULL << 11,    ///< 2-2-2 corner pattern
         Pattern131Corner = 1ULL << 12,    ///< 1-3-1 corner pattern
-        PairRule        = 1ULL << 13,      ///< General pair rule
+        PairRule         = 1ULL << 13,      ///< General pair rule
+        Enumeration      = 1ULL << 14,     ///< Constraint enumeration
 
         BasicPatterns     = Pattern12X | Pattern11X | Pattern13X | Pattern14X,  ///< Basic patterns only
         AdvancedPatterns  = Pattern23X | Pattern24X | Pattern34X | Pattern22X
             | Pattern33X | Pattern1X1 | Pattern2X2 | Pattern222Corner | Pattern131Corner,  ///< Advanced patterns only
         BasicAndAdvancedPatterns = BasicPatterns | AdvancedPatterns,  ///< Basic and advanced patterns combined
-        AllStrategies     = BasicAndAdvancedPatterns | PairRule  ///< All strategies enabled
+        AllStrategies     = BasicAndAdvancedPatterns | PairRule | Enumeration  ///< All strategies enabled
     };
 
     /**
@@ -246,7 +247,38 @@ public:
      * @see SolverState
      */
     SolverState getSolverState() const;
-    
+   
+    /**
+    * @brief Default value of the enumeration clue limit
+    * @see setMaxEnumerationClues()
+    */
+    static constexpr int DefaultMaxEnumerationClues = 8;
+
+    /**
+     * @brief Get the maximum number of clues considered by one enumeration
+     * @return Clue limit; 0 means "no limit"
+     * @see setMaxEnumerationClues()
+     */
+    int getMaxEnumerationClues() const;
+   
+    /**
+    * @brief Set the maximum number of clues considered by one enumeration
+    *
+    * The enumeration tier (see cleanEnumeration()) splits the frontier into
+    * groups of connected clues. A group with more clues than this limit is
+    * not solved as a whole; instead, windows of at most this many neighbouring
+    * clues are solved one by one. A smaller limit is faster but may miss
+    * deductions that need many clues at once; a larger limit finds more
+    * deductions but searches more. Ignoring clues can only lose deductions,
+    * never produce wrong ones.
+    *
+    * Must be called before the solver thread is started.
+    *
+    * @param newMaxEnumerationClues Clue limit; 0 disables the limit, negative values are treated as 0
+    */
+    void setMaxEnumerationClues(int newMaxEnumerationClues);
+
+
     /**
      * @brief Request interruption of the solving process
      * 
@@ -297,8 +329,25 @@ private:
 
     SolverStrategy strategies;  ///< Enabled deduction strategies
 
+    int maxEnumerationClues;  ///< Clue limit of one enumeration window (0 = unlimited)
+    
+    /// Search node limit for one enumeration. Exceeding it discards that enumeration (never a wrong deduction)
+    static constexpr quint64 EnumerationNodeBudget = 200000;
+
     SolverCommand cmd;              ///< Current command for controlling solver execution
     mutable QMutex cmdMutex;        ///< Mutex for thread-safe command access
+
+    /**
+    * @brief A revealed number that still has unknown neighbours
+    *
+    * Describes the constraint "exactly remainingMines of unknownCells are mines".
+    */
+   struct EnumerationClue
+   {
+       QVector<int> unknownCells;  ///< Ids (see cellIndex()) of the unknown neighbours
+       int remainingMines = 0;     ///< Cell value minus the mines already found around it
+   };
+
 
     /**
      * @brief Core solving algorithm implementation
@@ -394,11 +443,6 @@ private:
      * @see detect11XPattern()
      */
     bool cleanBasicPatterns(uchar x, uchar y);
-
-    // TODO: Implement more advanced patterns
-    // mine count solving at the end
-    // T-pattern
-    // 
     
     /**
      * @brief Apply advanced pattern recognition rules to a cell
@@ -422,6 +466,24 @@ private:
     bool cleanAdvancedPatterns(uchar x, uchar y);
 
     bool cleanGeneralPairRule(uchar x, uchar y);
+
+    /**
+     * @brief Deduce cells by exhaustively enumerating the layouts allowed by the clues
+     *
+     * Last tier of solve(), used when basic rules and patterns make no progress.
+     * Gathers every clue on the board, groups clues that share unknown cells,
+     * and for each group enumerates all mine layouts that satisfy every clue
+     * (see LibreMinesConstraintEnumerator). A cell that is a mine in all layouts
+     * is marked as a mine; a cell that is safe in all layouts is marked safe.
+     * Groups with more than maxEnumerationClues clues are solved in windows.
+     *
+     * This subsumes every pattern based on the numbers around the frontier
+     * (1-2-1, 1-3-1, 2-2-2, T-pattern, longer chains, ...).
+     *
+     * @return true if at least one cell was marked
+     * @see setMaxEnumerationClues()
+     */
+    bool cleanEnumeration();
 
     /**
      * @brief Detect and apply the 1-3-1 corner deduction
@@ -795,6 +857,47 @@ private:
                                    uchar secondY);
 
     bool applyPairRule(uchar ax, uchar ay, uchar bx, uchar by);
+
+
+    /**
+     * @brief Enumerate the layouts allowed by a subset of the clues and mark the certain cells
+     *
+     * Using only some of the clues is safe: dropping a clue removes a
+     * restriction, so every deduction that holds without it still holds with it.
+     *
+     * @param clues  All clues collected by cleanEnumeration()
+     * @param subset Indices (into clues) of the clues to use
+     * @return true if at least one cell was marked
+     */
+    bool enumerateClueSubset(const QVector<EnumerationClue>& clues, const QVector<int>& subset);
+
+    /**
+     * @brief Collect clues connected to a seed clue, nearest first
+     *
+     * Two clues are connected when they share an unknown cell. The search is
+     * breadth-first from the seed, so the result is the seed followed by the
+     * closest connected clues.
+     *
+     * @param seed        Index of the first clue
+     * @param limit       Maximum number of clues to return; 0 or less means all connected clues
+     * @param clues       All clues collected by cleanEnumeration()
+     * @param cluesByCell For every unknown cell id, the indices of the clues that contain it
+     * @return Indices (into clues) of the collected clues
+     */
+    QVector<int> collectConnectedClues(int seed,
+                                       int limit,
+                                       const QVector<EnumerationClue>& clues,
+                                       const QHash<int, QVector<int>>& cluesByCell) const;
+
+    /**
+     * @brief Convert board coordinates to a single integer id (used as hash key)
+     */
+    int cellIndex(uchar x, uchar y) const;
+
+    /**
+     * @brief Convert an id created by cellIndex() back to board coordinates
+     */
+    QPair<uchar, uchar> cellFromIndex(int index) const;
 
     /**
      * @brief Check whether an interruption has been requested

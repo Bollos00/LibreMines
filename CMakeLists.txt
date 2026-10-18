@@ -175,6 +175,7 @@ set(SOURCE_FILES
     src/facesreactionpreview.h src/facesreactionpreview.cpp src/facesreactionpreview.ui
     src/keyboardcontroller.h src/keyboardcontroller.cpp
     src/libreminesapptheme.cpp src/libreminesapptheme.h
+    src/libreminesconstraintenumerator.hpp
     src/libreminesgameengine.cpp src/libreminesgameengine.h
     src/libreminesgui.cpp src/libreminesgui.h
     src/libreminespreferencesdialog.cpp src/libreminespreferencesdialog.h src/libreminespreferencesdialog.ui
