@@ -141,12 +141,13 @@ public:
         Pattern131Corner = 1ULL << 12,    ///< 1-3-1 corner pattern
         PairRule         = 1ULL << 13,      ///< General pair rule
         Enumeration      = 1ULL << 14,     ///< Constraint enumeration
+        MineCounting     = 1ULL << 15,     ///< Global mine counter combined with the enumerated layouts
 
         BasicPatterns     = Pattern12X | Pattern11X | Pattern13X | Pattern14X,  ///< Basic patterns only
         AdvancedPatterns  = Pattern23X | Pattern24X | Pattern34X | Pattern22X
             | Pattern33X | Pattern1X1 | Pattern2X2 | Pattern222Corner | Pattern131Corner,  ///< Advanced patterns only
         BasicAndAdvancedPatterns = BasicPatterns | AdvancedPatterns,  ///< Basic and advanced patterns combined
-        AllStrategies     = BasicAndAdvancedPatterns | PairRule | Enumeration  ///< All strategies enabled
+        AllStrategies     = BasicAndAdvancedPatterns | PairRule | Enumeration | MineCounting  ///< All strategies enabled
     };
 
     /**
@@ -484,6 +485,28 @@ private:
      * @see setMaxEnumerationClues()
      */
     bool cleanEnumeration();
+
+    /**
+     * @brief Deduce cells by combining the enumerated layouts with the global mine counter
+     *
+     * Last tier of solve(), used when everything else (including enumeration) has
+     * stalled. The mine counter says how many mines are still hidden among all
+     * unknown cells. Every layout of a group of connected clues has a certain
+     * number of mines; layouts whose totals cannot add up to the mines left are
+     * impossible, and whatever is the same in all remaining layouts is certain.
+     * The unknown cells that touch no clue ("free" cells) may hold any number of
+     * mines, so they are what absorbs the difference. Also covers the simple cases
+     * (no mines left, or as many mines as unknown cells).
+     *
+     * Needs every layout of a group, so it enumerates whole groups: the
+     * maxEnumerationClues limit does not apply. A group too large for the search
+     * budget is skipped and treated as free cells, which only loses deductions.
+     * Independent of the Enumeration strategy flag.
+     *
+     * @return true if at least one cell was marked
+     * @see SolverStrategy::MineCounting
+     */
+    bool cleanMineCounting();
 
     /**
      * @brief Detect and apply the 1-3-1 corner deduction
@@ -898,6 +921,35 @@ private:
      * @brief Convert an id created by cellIndex() back to board coordinates
      */
     QPair<uchar, uchar> cellFromIndex(int index) const;
+
+    /**
+     * @brief Collect every clue on the board (shared by the enumeration and mine counting tiers)
+     *
+     * A clue is a revealed number that still has unknown neighbours.
+     *
+     * @param[out] clues       The clues found, in board order (deterministic)
+     * @param[out] cluesByCell For every unknown cell id, the indices of the clues that contain it
+     */
+    void collectEnumerationClues(QVector<EnumerationClue>& clues,
+                                 QHash<int, QVector<int>>& cluesByCell) const;
+
+    /**
+     * @brief Translate a subset of the clues into the enumerator's input format
+     *
+     * The board cells used by the clues are renumbered 0..n-1, which is what the
+     * enumerator works with.
+     *
+     * @param clues            All clues collected by collectEnumerationClues()
+     * @param subset           Indices (into clues) of the clues to translate
+     * @param[out] clueCells   For each clue, the local numbers of its cells
+     * @param[out] clueMines   For each clue, the mines it still needs
+     * @param[out] cellIds     Local number -> board cell id (see cellIndex())
+     */
+    void buildEnumerationInput(const QVector<EnumerationClue>& clues,
+                               const QVector<int>& subset,
+                               std::vector<std::vector<int>>& clueCells,
+                               QVector<int>& clueMines,
+                               QVector<int>& cellIds) const;
 
     /**
      * @brief Check whether an interruption has been requested

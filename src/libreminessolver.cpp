@@ -2,6 +2,7 @@
 
 #include "gameboardrandomgenerator.h"
 #include <QMutexLocker>
+#include <QQueue>
 #include "libreminesconstraintenumerator.hpp"
 
 #define LIBREMINES_SOLVER_DEBUG 1
@@ -183,6 +184,19 @@ bool LibreMinesSolver::solve()
             qDebug() << "Applying enumeration...";
 #endif
             if (cleanEnumeration())
+            {
+                globalChanges = true;
+            }
+        }
+
+        // Last resort: use the global mine counter to discard impossible layouts.
+        // It enumerates every group completely, so it only runs when enumeration stalled too.
+        if (!globalChanges)
+        {
+#if LIBREMINES_SOLVER_DEBUG
+            qDebug() << "Applying mine counting...";
+#endif
+            if (cleanMineCounting())
             {
                 globalChanges = true;
             }
@@ -513,47 +527,14 @@ bool LibreMinesSolver::cleanEnumeration()
     // Every mine layout satisfying all constraints is enumerated. A cell that is a
     // mine (or safe) in ALL layouts is a certain deduction.
 
-    // --- Step 1: gather the clues -------------------------------------------
-    // The board is scanned instead of cellsNeedingTreatment so the order is deterministic.
+    // --- Steps 1 and 2: gather the clues and index them by unknown cell -----
     QVector<EnumerationClue> clues;
-    for (int x = 0; x < cols; ++x)
-    {
-        for (int y = 0; y < rows; ++y)
-        {
-            if (solverBoard[x][y] != SolverCellState::Safe)
-            {
-                continue;
-            }
-
-            QSet<QPair<uchar, uchar>> unknownNeighbors;
-            if (countRemainingNeighbors(x, y, SolverCellState::Unknown, &unknownNeighbors) == 0)
-            {
-                continue;   // nothing left to learn from this number
-            }
-
-            EnumerationClue clue;
-            clue.remainingMines = countRemainingMines(x, y);   // the number minus mines already found around it
-            for (const QPair<uchar, uchar>& neighbor : unknownNeighbors)
-            {
-                clue.unknownCells.append(cellIndex(neighbor.first, neighbor.second));
-            }
-            clues.append(clue);
-        }
-    }
+    QHash<int, QVector<int>> cluesByCell;
+    collectEnumerationClues(clues, cluesByCell);
 
     if (clues.isEmpty())
     {
         return false;
-    }
-
-    // --- Step 2: index which clues touch each unknown cell ------------------
-    QHash<int, QVector<int>> cluesByCell;
-    for (int clueId = 0; clueId < clues.size(); ++clueId)
-    {
-        for (int cellId : clues[clueId].unknownCells)
-        {
-            cluesByCell[cellId].append(clueId);
-        }
     }
 
     // --- Step 3: solve each group of connected clues ------------------------
@@ -608,6 +589,311 @@ bool LibreMinesSolver::cleanEnumeration()
     return changed;
 }
 
+
+bool LibreMinesSolver::cleanMineCounting()
+{
+    if (!isStrategyEnabled(SolverStrategy::MineCounting)) return false;
+
+    // The mine counter tells how many mines are still hidden among ALL unknown cells.
+    // Two ideas use it:
+    //  1. No mines left -> every unknown cell is safe. As many mines as unknown cells -> all mines.
+    //  2. Every valid layout of a group of connected clues has a certain number of mines. A
+    //     combination of layouts whose totals cannot add up to the mines left is impossible.
+    //     What is the same in all the remaining combinations is certain.
+
+    // --- Step 1: the unknown cells and the mines still hidden ---------------
+    QVector<int> unknownCells;
+    for (int x = 0; x < cols; ++x)
+    {
+        for (int y = 0; y < rows; ++y)
+        {
+            if (solverBoard[x][y] == SolverCellState::Unknown)
+            {
+                unknownCells.append(cellIndex(x, y));
+            }
+        }
+    }
+
+    const int unknownTotal = unknownCells.size();
+    const int minesLeft = static_cast<int>(nMines) - static_cast<int>(nCellsMarkedMine);
+
+    if (unknownTotal == 0)
+    {
+        return false;
+    }
+
+    // A real board never has fewer unknown cells than hidden mines (or a negative count)
+    if (minesLeft < 0 || minesLeft > unknownTotal)
+    {
+        qWarning() << "LibreMinesSolver: mine count is inconsistent with the solver board";
+        return false;
+    }
+
+    // --- Step 2: the simple cases -------------------------------------------
+    if (minesLeft == 0 || minesLeft == unknownTotal)
+    {
+        const SolverCellState state = (minesLeft == 0) ? SolverCellState::Safe : SolverCellState::Mine;
+        bool changed = false;
+        for (int cellId : unknownCells)
+        {
+            const QPair<uchar, uchar> cell = cellFromIndex(cellId);
+
+            // Marking a safe zero cell can reveal other cells as a side effect
+            if (solverBoard[cell.first][cell.second] != SolverCellState::Unknown)
+            {
+                continue;
+            }
+
+#if LIBREMINES_SOLVER_DEBUG
+            qDebug() << "Mine counting: cell (" << cell.first << "," << cell.second << ") is"
+                     << (state == SolverCellState::Safe ? "safe" : "a mine") << "(no other option left).";
+#endif
+            markCell(cell, state);
+            changed = true;
+        }
+        return changed;
+    }
+
+    // --- Step 3: enumerate every group of connected clues -------------------
+    // Unlike cleanEnumeration(), each group is enumerated completely (no clue limit) and
+    // the number of mines of every layout is recorded.
+    QVector<EnumerationClue> clues;
+    QHash<int, QVector<int>> cluesByCell;
+    collectEnumerationClues(clues, cluesByCell);
+
+    struct Group
+    {
+        QVector<int> cellIds;                              // local number -> board cell id
+        LibreMinesConstraintEnumerator::Result layouts;    // every layout, filed by number of mines
+    };
+
+    QVector<Group> groups;
+    QSet<int> groupedCells;                  // cells that belong to an enumerated group
+    QVector<bool> alreadyGrouped(clues.size(), false);
+
+    for (int seed = 0; seed < clues.size(); ++seed)
+    {
+        if (alreadyGrouped[seed])
+        {
+            continue;
+        }
+
+        if (checkForInterrupt())
+        {
+            return false;   // solve() notices the interruption on its next iteration
+        }
+
+        const QVector<int> clueGroup = collectConnectedClues(seed, 0, clues, cluesByCell);
+        for (int clueId : clueGroup)
+        {
+            alreadyGrouped[clueId] = true;
+        }
+
+        Group group;
+        LibreMinesConstraintEnumerator::Input input;
+        buildEnumerationInput(clues, clueGroup, input.clueCells, input.clueMines, group.cellIds);
+        input.nCells = group.cellIds.size();
+        input.maxMines = minesLeft;   // a layout with more mines than are left is impossible: skip it
+
+        group.layouts = LibreMinesConstraintEnumerator().run(input, EnumerationNodeBudget, true);
+
+        // Too large for the search budget. Its cells simply stay among the "free" cells
+        // below (their clues are ignored), which can only lose deductions.
+        if (group.layouts.budgetExceeded)
+        {
+            continue;
+        }
+
+        if (group.layouts.solutions == 0)
+        {
+            qWarning() << "LibreMinesSolver: mine counting found a group with no valid layout; the solver board is inconsistent";
+            return false;
+        }
+
+        for (int cellId : group.cellIds)
+        {
+            groupedCells.insert(cellId);
+        }
+        groups.append(group);
+    }
+
+    if (groups.isEmpty())
+    {
+        return false;   // no frontier: the mine counter alone says nothing more
+    }
+
+    // --- Step 4: which combinations of group totals fit the mine counter? ---
+    // "Free" cells are the unknown cells outside the enumerated groups. Nothing constrains
+    // them, so together they can hold any number of mines from 0 to freeCells. The mines
+    // left must equal (sum of the groups' totals) + (mines among the free cells).
+    const int freeCells = unknownTotal - groupedCells.size();
+    const int nGroups = groups.size();
+
+    // Adds one group to a set of reachable sums: sums[s] -> result[s + t] for every
+    // total t the group can have. Sums above minesLeft are useless and dropped.
+    auto addGroup = [minesLeft](const QVector<bool>& sums, const QVector<bool>& totals)
+    {
+        QVector<bool> result(minesLeft + 1, false);
+        for (int sum = 0; sum <= minesLeft; ++sum)
+        {
+            if (!sums[sum])
+            {
+                continue;
+            }
+            for (int total = 0; total < totals.size() && sum + total <= minesLeft; ++total)
+            {
+                if (totals[total])
+                {
+                    result[sum + total] = true;
+                }
+            }
+        }
+        return result;
+    };
+
+    // prefix[i]: sums reachable by groups 0..i-1.  suffix[i]: sums reachable by groups i..end.
+    QVector<QVector<bool>> prefix(nGroups + 1);
+    QVector<QVector<bool>> suffix(nGroups + 1);
+    prefix[0] = QVector<bool>(minesLeft + 1, false);
+    prefix[0][0] = true;
+    suffix[nGroups] = prefix[0];
+    for (int i = 0; i < nGroups; ++i)
+    {
+        prefix[i + 1] = addGroup(prefix[i], groups[i].layouts.mineTotalPossible);
+    }
+    for (int i = nGroups - 1; i >= 0; --i)
+    {
+        suffix[i] = addGroup(suffix[i + 1], groups[i].layouts.mineTotalPossible);
+    }
+
+    // The free cells can absorb whatever the groups do not use, as long as it fits
+    auto freeCellsCanHold = [minesLeft, freeCells](int groupsSum)
+    {
+        const int rest = minesLeft - groupsSum;
+        return rest >= 0 && rest <= freeCells;
+    };
+
+    // How many mines the free cells can hold in the combinations that fit the counter
+    int minFreeMines = freeCells + 1;
+    int maxFreeMines = -1;
+    for (int sum = 0; sum <= minesLeft; ++sum)
+    {
+        if (prefix[nGroups][sum] && freeCellsCanHold(sum))
+        {
+            minFreeMines = qMin(minFreeMines, minesLeft - sum);
+            maxFreeMines = qMax(maxFreeMines, minesLeft - sum);
+        }
+    }
+
+    // A real board always fits (the true layout does). If nothing fits, a previous deduction was wrong.
+    if (maxFreeMines < 0)
+    {
+        qWarning() << "LibreMinesSolver: no combination of layouts fits the mine counter; the solver board is inconsistent";
+        return false;
+    }
+
+    // --- Step 5: deduce ------------------------------------------------------
+    bool changed = false;
+
+    auto markIfUnknown = [this, &changed](int cellId, SolverCellState state)
+    {
+        const QPair<uchar, uchar> cell = cellFromIndex(cellId);
+
+        // Marking a safe zero cell can reveal other cells as a side effect
+        if (solverBoard[cell.first][cell.second] != SolverCellState::Unknown)
+        {
+            return;
+        }
+
+#if LIBREMINES_SOLVER_DEBUG
+        qDebug() << "Mine counting: cell (" << cell.first << "," << cell.second << ") is"
+                 << (state == SolverCellState::Safe ? "safe" : "a mine") << "in every layout that fits the mine counter.";
+#endif
+        markCell(cell, state);
+        changed = true;
+    };
+
+    // 5a. Cells inside the groups: keep only the totals that fit with the other groups
+    for (int i = 0; i < nGroups; ++i)
+    {
+        const LibreMinesConstraintEnumerator::Result& layouts = groups[i].layouts;
+
+        // Sums reachable by all the OTHER groups together
+        QVector<bool> others(minesLeft + 1, false);
+        for (int a = 0; a <= minesLeft; ++a)
+        {
+            if (!prefix[i][a])
+            {
+                continue;
+            }
+            for (int b = 0; a + b <= minesLeft; ++b)
+            {
+                if (suffix[i + 1][b])
+                {
+                    others[a + b] = true;
+                }
+            }
+        }
+
+        // Totals of this group that fit with at least one combination of the others
+        QVector<bool> totalFits(layouts.mineTotalPossible.size(), false);
+        for (int total = 0; total < totalFits.size(); ++total)
+        {
+            if (!layouts.mineTotalPossible[total])
+            {
+                continue;
+            }
+            for (int othersSum = 0; othersSum + total <= minesLeft; ++othersSum)
+            {
+                if (others[othersSum] && freeCellsCanHold(othersSum + total))
+                {
+                    totalFits[total] = true;
+                    break;
+                }
+            }
+        }
+
+        // A cell is certain if it has the same value in every layout with a total that fits
+        for (int local = 0; local < groups[i].cellIds.size(); ++local)
+        {
+            bool canBeMine = false;
+            bool canBeSafe = false;
+            for (int total = 0; total < totalFits.size(); ++total)
+            {
+                if (!totalFits[total])
+                {
+                    continue;
+                }
+                canBeMine = canBeMine || layouts.canBeMineWithTotal(total, local);
+                canBeSafe = canBeSafe || layouts.canBeSafeWithTotal(total, local);
+            }
+
+            if (canBeMine && !canBeSafe)
+            {
+                markIfUnknown(groups[i].cellIds[local], SolverCellState::Mine);
+            }
+            else if (canBeSafe && !canBeMine)
+            {
+                markIfUnknown(groups[i].cellIds[local], SolverCellState::Safe);
+            }
+        }
+    }
+
+    // 5b. Free cells: if they must hold no mines they are all safe; if they must be full they are all mines
+    if (freeCells > 0 && (maxFreeMines == 0 || minFreeMines == freeCells))
+    {
+        const SolverCellState state = (maxFreeMines == 0) ? SolverCellState::Safe : SolverCellState::Mine;
+        for (int cellId : unknownCells)
+        {
+            if (!groupedCells.contains(cellId))
+            {
+                markIfUnknown(cellId, state);
+            }
+        }
+    }
+
+    return changed;
+}
 
 bool LibreMinesSolver::detect12XPattern(uchar x, uchar y)
 {
@@ -1215,14 +1501,59 @@ bool LibreMinesSolver::applyPairRule(uchar ax, uchar ay, uchar bx, uchar by)
     return changed;
 }
 
-bool LibreMinesSolver::enumerateClueSubset(const QVector<EnumerationClue>& clues, const QVector<int>& subset)
+void LibreMinesSolver::collectEnumerationClues(QVector<EnumerationClue>& clues,
+                                               QHash<int, QVector<int>>& cluesByCell) const
+{
+    // The board is scanned instead of cellsNeedingTreatment so the order is deterministic.
+    clues.clear();
+    cluesByCell.clear();
+
+    for (int x = 0; x < cols; ++x)
+    {
+        for (int y = 0; y < rows; ++y)
+        {
+            if (solverBoard[x][y] != SolverCellState::Safe)
+            {
+                continue;
+            }
+
+            QSet<QPair<uchar, uchar>> unknownNeighbors;
+            if (countRemainingNeighbors(x, y, SolverCellState::Unknown, &unknownNeighbors) == 0)
+            {
+                continue;   // nothing left to learn from this number
+            }
+
+            EnumerationClue clue;
+            clue.remainingMines = countRemainingMines(x, y);   // the number minus mines already found around it
+            for (const QPair<uchar, uchar>& neighbor : unknownNeighbors)
+            {
+                clue.unknownCells.append(cellIndex(neighbor.first, neighbor.second));
+            }
+            clues.append(clue);
+        }
+    }
+
+    // Index which clues touch each unknown cell
+    for (int clueId = 0; clueId < clues.size(); ++clueId)
+    {
+        for (int cellId : clues[clueId].unknownCells)
+        {
+            cluesByCell[cellId].append(clueId);
+        }
+    }
+}
+
+void LibreMinesSolver::buildEnumerationInput(const QVector<EnumerationClue>& clues,
+                                             const QVector<int>& subset,
+                                             std::vector<std::vector<int>>& clueCells,
+                                             QVector<int>& clueMines,
+                                             QVector<int>& cellIds) const
 {
     // Translate the board cells used by these clues into compact local numbers
     // 0..n-1, which is what the enumerator works with.
     QHash<int, int> localIndex;   // board cell id -> local number
-    QVector<int> cellIds;         // local number  -> board cell id
+    cellIds.clear();
 
-    LibreMinesConstraintEnumerator::Input input;
     for (int clueId : subset)
     {
         std::vector<int> localCells;
@@ -1235,9 +1566,17 @@ bool LibreMinesSolver::enumerateClueSubset(const QVector<EnumerationClue>& clues
             }
             localCells.push_back(localIndex.value(cellId));
         }
-        input.clueCells.push_back(localCells);
-        input.clueMines.append(clues[clueId].remainingMines);
+        clueCells.push_back(localCells);
+        clueMines.append(clues[clueId].remainingMines);
     }
+}
+
+bool LibreMinesSolver::enumerateClueSubset(const QVector<EnumerationClue>& clues, const QVector<int>& subset)
+{
+    // Translate the clues into the enumerator's input (cells renumbered 0..n-1)
+    LibreMinesConstraintEnumerator::Input input;
+    QVector<int> cellIds;         // local number -> board cell id
+    buildEnumerationInput(clues, subset, input.clueCells, input.clueMines, cellIds);
     input.nCells = cellIds.size();
 
     const LibreMinesConstraintEnumerator::Result result = LibreMinesConstraintEnumerator().run(input, EnumerationNodeBudget);

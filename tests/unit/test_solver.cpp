@@ -21,9 +21,12 @@
 #include "libreminesgameengine.h"
 #include "libreminessolver.h"
 
-// Test-state diagrams use '?' for unknown cells, '=' for shared unknown
-// candidates, clue digits for known-safe cells, 'M' for identified mines, and
-// '@' for a guaranteed safe starting cell not yet processed by the solver.
+// Test-state diagrams use:
+// - "0", "1", "2", "3", "4", "5", "6", "7", "8" for known clue cells
+// - "*" for known mine cells
+// - '=' for unknown cells
+// - "M" for unknown cells that are expected to be marked as mines
+// - "S" for unknown cells that are expected to be marked as safe
 class TestLibreMinesSolver : public QObject
 {
     Q_OBJECT
@@ -190,9 +193,9 @@ void TestLibreMinesSolver::cleanZeroClearsConnectedRegionAndKeepsMinesUnknown()
 {
     // All cells are initially unknown. The zero at (2, 0) shall clear the
     // connected safe region while the actual mine remains unknown to the solver:
-    // ? ? 0
-    // ? ? ?
-    // ? ? ?
+    // = S S
+    // = S S
+    // S S S
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(* 1 0
            1 1 0
@@ -220,9 +223,9 @@ void TestLibreMinesSolver::cleanZeroClearsConnectedRegionAndKeepsMinesUnknown()
 void TestLibreMinesSolver::cleanZeroDoesNothingForNonZeroOrKnownCell()
 {
     // No cells are known; the clue at (0, 0) is 1, so cleanZero shall do nothing:
-    // ? ? ?
-    // ? ? ?
-    // ? ? ?
+    // = = =
+    // = = =
+    // = = =
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(1 1 1
            1 * 1
@@ -232,9 +235,9 @@ void TestLibreMinesSolver::cleanZeroDoesNothingForNonZeroOrKnownCell()
     QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Unknown);
 
     // The zero at (2, 0) is already known safe. Other cells remain unknown:
-    // ? ? 0
-    // ? ? ?
-    // ? ? ?
+    // = = 0
+    // = = =
+    // = = =
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(* 1 0
            1 1 0
@@ -251,9 +254,9 @@ void TestLibreMinesSolver::cleanBasicMarksUnknownNeighborsSafeWhenMinesAreAccoun
 {
     // A safe 1 clue and its mine are known; its other unknown neighbors shall
     // become safe:
-    // 1 ? ?
-    // ? M ?
-    // ? ? ?
+    // 1 S =
+    // S * =
+    // = = =
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(1 1 1
            1 * 1
@@ -274,9 +277,9 @@ void TestLibreMinesSolver::cleanBasicMarksUnknownNeighborsAsMinesWhenAllMustBeMi
 {
     // Three neighboring 1 clues are known safe. The remaining unknown neighbor
     // of the upper-left clue shall be identified as a mine:
-    // 1 1 ?
-    // 1 ? ?
-    // ? ? ?
+    // 1 1 =
+    // 1 M =
+    // = = =
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(1 1 1
            1 * 1
@@ -294,9 +297,9 @@ void TestLibreMinesSolver::cleanBasicMarksUnknownNeighborsAsMinesWhenAllMustBeMi
 void TestLibreMinesSolver::cleanBasicLeavesAmbiguousNeighborsUnknown()
 {
     // Only the upper-left 1 clue is known safe, so its neighbors remain ambiguous:
-    // 1 ? ?
-    // ? ? ?
-    // ? ? ?
+    // 1 = =
+    // = = =
+    // = = =
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(1 1 1
            1 * 1
@@ -314,9 +317,9 @@ void TestLibreMinesSolver::cleanBasicLeavesAmbiguousNeighborsUnknown()
 void TestLibreMinesSolver::cleanBasicDoesNothingForUnknownClueCell()
 {
     // Every cell, including the upper-left 1 clue, is unknown to the solver:
-    // ? ? ?
-    // ? ? ?
-    // ? ? ?
+    // = = =
+    // = = =
+    // = = =
     setBoard(3, 3, 1, QString::fromLatin1(
         R"(1 1 1
            1 * 1
@@ -451,9 +454,9 @@ void TestLibreMinesSolver::advancedPattern1X1MarksUniqueCellsSafeViaCleanAdvance
 void TestLibreMinesSolver::runBasic11XBoard(PatternTestRoute route)
 {
     // Unknown cells in the left column are unique to the first known 1 clue:
-    // ? = = 1
-    // ? 1 1 1
-    // ? = = 0
+    // S = = 1
+    // S 1 1 1
+    // S = = 0
     setBoard(4, 3, 1, QString::fromLatin1(
         R"(0 1 * 1
            0 1 1 1
@@ -480,9 +483,9 @@ void TestLibreMinesSolver::runBasic11XBoard(PatternTestRoute route)
 void TestLibreMinesSolver::runBasic11XTriangle(PatternTestRoute route)
 {
     // The two known 1 clues share candidates; the top row becomes safe:
-    // ? ? ? ?
-    // = 1 = ?
-    // = 1 1 ?
+    // = S = =
+    // = 1 = =
+    // = 1 1 =
     setBoard(4, 3, 2, QString::fromLatin1(
         R"(1 1 0 0
            * 1 1 1
@@ -503,9 +506,9 @@ void TestLibreMinesSolver::runBasic11XTriangle(PatternTestRoute route)
 void TestLibreMinesSolver::runBasic11XSingleSharedRow(PatternTestRoute route)
 {
     // The lower clue's unique neighbors are known safe, leaving one shared row:
-    // ? ? ? ?
-    // = 1 = ?
-    // 1 1 1 ?
+    // = S = =
+    // = 1 = =
+    // 1 1 1 =
     setBoard(4, 3, 2, QString::fromLatin1(
         R"(1 1 0 0
            * 1 1 1
@@ -527,11 +530,11 @@ void TestLibreMinesSolver::runBasic11XSingleSharedRow(PatternTestRoute route)
 void TestLibreMinesSolver::runBasic11XTwoSharedRows(PatternTestRoute route)
 {
     // Two known 1 clues share candidates in both rows below the top:
-    // ? ? ?
+    // S S S
     // = 1 =
     // = 1 =
     // 1 1 1
-    // ? ? ?
+    // = = =
     setBoard(3, 5, 2, QString::fromLatin1(
         R"(1 1 0
            * 1 0
@@ -560,7 +563,7 @@ void TestLibreMinesSolver::runBasic12XBoard(PatternTestRoute route)
 {
     // The 2 and 1 clues share candidates; (0, 1) is a unique mine:
     // 2 = = 0
-    // ? 2 1 0
+    // M 2 1 0
     // 1 = = 0
     setBoard(4, 3, 2, QString::fromLatin1(
         R"(2 * 1 0
@@ -587,12 +590,12 @@ void TestLibreMinesSolver::runBasic12XBoard(PatternTestRoute route)
 
 void TestLibreMinesSolver::runBasic12XTriangle(PatternTestRoute route)
 {
-    // The 2 and 1 clues share candidates; (0, 3) is a unique mine:
-    // ? ? ?
-    // 0 1 =
-    // 1 2 1
-    // ? 1 0
-    // ? ? ?
+    // The 2 and 1 clues share candidates; (0, 3) is a unique mine, while the cells unique to the 1 clue are known safe:
+    // = = =
+    // 0 1 M
+    // = 2 1
+    // = 1 =
+    // S S S
     setBoard(3, 5, 2, QString::fromLatin1(
         R"(0 1 1
            0 1 *
@@ -601,28 +604,29 @@ void TestLibreMinesSolver::runBasic12XTriangle(PatternTestRoute route)
            1 1 0)"));
     solver.setStrategies(LibreMinesSolver::SolverStrategy::Pattern12X);
 
+    solver.solverBoard[0][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[1][2] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][2] = LibreMinesSolver::SolverCellState::Safe;
-    solver.solverBoard[0][1] = LibreMinesSolver::SolverCellState::Safe;
-    solver.solverBoard[0][2] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[1][3] = LibreMinesSolver::SolverCellState::Safe;
-    solver.solverBoard[2][3] = LibreMinesSolver::SolverCellState::Safe;
 
     const bool changed = route == PatternTestRoute::DirectApply
-        ? solver.applyMNXPatternLogic(1, 2, 0, 2, 1, 2)
+        ? solver.applyMNXPatternLogic(1, 2, 1, 3, 1, 2)
         : solver.cleanBasicPatterns(1, 2);
     QVERIFY(changed);
     QVERIFY(solver.solverBoard[2][1] == LibreMinesSolver::SolverCellState::Mine);
     QVERIFY(solver.solverBoard[0][3] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[0][4] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[1][4] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[2][4] == LibreMinesSolver::SolverCellState::Safe);
 }
 
 void TestLibreMinesSolver::runBasic13X(PatternTestRoute route)
 {
-    // The 3 and 1 clues leave two unique mine candidates for the 3:
-    // ? = = 0
-    // ? 3 1 0
-    // 1 = = 0
+    // The 3 and 1 clues leave two unique mine candidates for the 3.
+    // M = = S
+    // M 3 1 S
+    // 1 = = S
     setBoard(4, 3, 3, QString::fromLatin1(
         R"(* * 1 0
            * 3 1 0
@@ -632,10 +636,7 @@ void TestLibreMinesSolver::runBasic13X(PatternTestRoute route)
     solver.solverBoard[1][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[2][1] = LibreMinesSolver::SolverCellState::Safe;
     solver.solverBoard[0][2] = LibreMinesSolver::SolverCellState::Safe;
-    for (uchar y = 0; y < solver.rows; ++y)
-    {
-        solver.solverBoard[3][y] = LibreMinesSolver::SolverCellState::Safe;
-    }
+
 
     const bool changed = route == PatternTestRoute::DirectApply
         ? solver.applyMNXPatternLogic(1, 1, 2, 1, 1, 3)
@@ -644,14 +645,17 @@ void TestLibreMinesSolver::runBasic13X(PatternTestRoute route)
     QVERIFY(solver.solverBoard[0][0] == LibreMinesSolver::SolverCellState::Mine);
     QVERIFY(solver.solverBoard[0][1] == LibreMinesSolver::SolverCellState::Mine);
     QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Unknown);
+    QVERIFY(solver.solverBoard[3][0] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[3][1] == LibreMinesSolver::SolverCellState::Safe);
+    QVERIFY(solver.solverBoard[3][2] == LibreMinesSolver::SolverCellState::Safe);
 }
 
 void TestLibreMinesSolver::runBasic14X(PatternTestRoute route)
 {
     // The 4 and 1 clues leave three unique mine candidates for the 4:
-    // ? = = 0
-    // ? 4 1 0
-    // ? = = 0
+    // M = = 0
+    // M 4 1 0
+    // M = = 0
     setBoard(4, 3, 4, QString::fromLatin1(
         R"(* * 1 0
            * 4 1 0
@@ -678,11 +682,11 @@ void TestLibreMinesSolver::runBasic14X(PatternTestRoute route)
 void TestLibreMinesSolver::runAdvanced23X(PatternTestRoute route)
 {
     // The 2 and 3 clues share candidates; (0, 2) is a unique mine candidate:
-    // = 2 = ?
+    // = 2 = =
     // = 3 1 1
-    // ? 2 0 0
-    // ? 2 0 @
-    // ? ? ? ?
+    // M 2 0 0
+    // = 2 0 0
+    // = = = =
     setBoard(4, 5, 4, QString::fromLatin1(
         R"(* 2 * 1
            2 3 1 1
@@ -716,7 +720,7 @@ void TestLibreMinesSolver::runAdvanced23X(PatternTestRoute route)
 void TestLibreMinesSolver::runAdvanced222Corner(PatternTestRoute route)
 {
     // Clearing the middle zero reveals a 2-ring with a 2-2-2 corner:
-    // ? = = M = =
+    // S = = M = =
     // = 2 2 2 2 =
     // = 2 0 0 2 =
     // M 2 0 0 2 =
@@ -754,10 +758,10 @@ void TestLibreMinesSolver::runAdvanced131Corner(PatternTestRoute route)
 {
     // The 3 and two perpendicular 1 clues leave (0, 0) as the unique middle
     // mine and one unique safe cell for each 1:
-    // ? = = ? =
+    // M = = S =
     // = 3 1 1 =
     // = 1 0 1 =
-    // ? 1 1 1 =
+    // S 1 1 1 =
     // = = = = =
     setBoard(5, 5, 6, QString::fromLatin1(
         R"(* * 1 1 1
@@ -781,11 +785,11 @@ void TestLibreMinesSolver::runAdvanced131Corner(PatternTestRoute route)
 void TestLibreMinesSolver::runAdvanced1X1(PatternTestRoute route)
 {
     // The 1 clues share unknown candidates; unique cells of the first become safe:
-    // ? ? * *
-    // ? ? = 3
-    // ? 1 = 1
-    // ? 2 2 2
-    // ? 1 = 1
+    // = = * *
+    // S = = 3
+    // S 1 = 1
+    // S 2 2 2
+    // S 1 = 1
     setBoard(4, 5, 4, QString::fromLatin1(
         R"(0 1 * *
            0 2 3 3
@@ -827,9 +831,9 @@ void TestLibreMinesSolver::runAdvanced1X1(PatternTestRoute route)
 void TestLibreMinesSolver::basicPattern11XRejectsNonSubsetViaDirectApply()
 {
     // Reopening (3, 0) breaks the subset relation; unique cells stay unknown:
-    // ? = = ?
-    // ? 1 1 1
-    // ? = = 0
+    // = = = =
+    // = 1 1 1
+    // = = = 0
     setBoard(4, 3, 1, QString::fromLatin1(
         R"(0 1 * 1
            0 1 1 1
@@ -854,8 +858,8 @@ void TestLibreMinesSolver::basicPattern11XRejectsNonSubsetViaDirectApply()
 void TestLibreMinesSolver::basicPattern12XRejectsWrongUniqueNeighborCountViaDirectApply()
 {
     // The unknown unique candidate count does not match the 1-2-X deduction:
-    // ? = = 0
-    // ? 2 1 0
+    // = = = 0
+    // = 2 1 0
     // 1 = = 0
     setBoard(4, 3, 2, QString::fromLatin1(
         R"(2 * 1 0
@@ -893,11 +897,11 @@ void TestLibreMinesSolver::runBasic12XTwoSidedCandidates(PatternTestRoute route)
 {
     // The two 2 clues share the 1; each pair has one unique candidate on both sides.
     // Known mines reduce the 3 and 5 clues to 2 remaining mines each:
-    // 2 M M ? 1
-    // 2 M 5 ? 2
-    // 1 1 2 ? 1
-    // 1 1 3 ? 2
-    // 1 M 2 ? 1
+    // 2 * * M 1
+    // 2 * 5 S 2
+    // 1 1 2 = 1
+    // 1 1 3 S 2
+    // 1 * 2 M 1
     // 1 1 2 1 1
     setBoard(5, 6, 7, QString::fromLatin1(
         R"(2***1

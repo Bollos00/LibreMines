@@ -64,6 +64,11 @@ public:
         int nCells = 0;                    ///< Number of cells (variables) in the problem
         std::vector<std::vector<int>> clueCells;   ///< For each clue: the cells it covers (indices 0..nCells-1)
         QVector<int> clueMines;            ///< For each clue: how many of its cells are mines
+
+        /// Optional cap on the number of mines in a layout; layouts with more mines are not
+        /// enumerated (-1 = no cap). Only use it when such layouts are known to be impossible
+        /// anyway, e.g. because the board's mine counter does not allow them.
+        int maxMines = -1;
     };
 
     /**
@@ -82,6 +87,20 @@ public:
         QVector<bool> canBeMine;       ///< canBeMine[i]: at least one valid layout has cell i as a mine
         QVector<bool> canBeSafe;       ///< canBeSafe[i]: at least one valid layout has cell i as safe
 
+        // --- Only filled when run() is called with recordMineCounts = true ---------------
+        // They describe the layouts grouped by how many mines each one has, which is what
+        // the global mine counter needs (see LibreMinesSolver::cleanMineCounting()).
+        int nCells = 0;                    ///< Number of cells of the problem (row length of the tables below)
+        QVector<bool> mineTotalPossible;   ///< mineTotalPossible[t]: some valid layout has exactly t mines
+        QVector<bool> mineAtTotal;         ///< flat table [t * nCells + i]: cell i is a mine in some t-mine layout
+        QVector<bool> safeAtTotal;         ///< flat table [t * nCells + i]: cell i is safe in some t-mine layout
+
+        /** @return true if some valid layout with exactly `total` mines has cell i as a mine */
+        bool canBeMineWithTotal(int total, int i) const { return mineAtTotal[total * nCells + i]; }
+
+        /** @return true if some valid layout with exactly `total` mines has cell i as safe */
+        bool canBeSafeWithTotal(int total, int i) const { return safeAtTotal[total * nCells + i]; }
+
         /** @return true if cell i is a mine in every valid layout */
         bool isMineInAllSolutions(int i) const { return canBeMine[i] && !canBeSafe[i]; }
 
@@ -94,9 +113,12 @@ public:
      *
      * @param input       Cells and clues to solve
      * @param nodeBudget  Maximum number of search nodes; protects against rare, very large problems
+     * @param recordMineCounts  Also record, for every possible number of mines, what the layouts
+     *                    with that many mines say about each cell. This needs every layout, so the
+     *                    early stop (see Result::saturated) is disabled.
      * @return Per-cell mine/safe possibilities (see Result for when they can be trusted)
      */
-    Result run(const Input& input, quint64 nodeBudget)
+    Result run(const Input& input, quint64 nodeBudget, bool recordMineCounts = false)
     {
         m_input = &input;
         m_nodeBudget = nodeBudget;
@@ -106,6 +128,17 @@ public:
         m_result = Result();
         m_result.canBeMine.fill(false, input.nCells);
         m_result.canBeSafe.fill(false, input.nCells);
+
+        m_recordMineCounts = recordMineCounts;
+        m_minesPlaced = 0;
+        m_result.nCells = input.nCells;
+        if (recordMineCounts)
+        {
+            // One row per possible number of mines (0..nCells)
+            m_result.mineTotalPossible.fill(false, input.nCells + 1);
+            m_result.mineAtTotal.fill(false, (input.nCells + 1) * input.nCells);
+            m_result.safeAtTotal.fill(false, (input.nCells + 1) * input.nCells);
+        }
 
         const int nClues = input.clueCells.size();
 
@@ -134,7 +167,9 @@ public:
         buildSearchOrder();
         search(0);
 
-        m_result.saturated = (m_undetermined == 0);
+        // Saturation means "stopped early because nothing more can be learned"; when recording
+        // mine counts every layout is visited, so it never applies.
+        m_result.saturated = (m_undetermined == 0) && !m_recordMineCounts;
         return m_result;
     }
 
@@ -143,6 +178,8 @@ private:
     quint64 m_nodeBudget = 0;           ///< Search node limit
     bool m_stop = false;                ///< Set to abort the whole search (budget hit or nothing left to learn)
     int m_undetermined = 0;             ///< Cells not yet seen as both mine and safe
+    bool m_recordMineCounts = false;    ///< Also record the mine total of every layout (disables the early stop)
+    int m_minesPlaced = 0;              ///< Mines among the cells assigned so far
     Result m_result;                    ///< Result being built
 
     std::vector<std::vector<int>> m_cluesOfCell;   ///< For each cell: clues that contain it
@@ -277,23 +314,39 @@ private:
         const int cell = m_searchOrder[index];
         for (int value = 0; value <= 1 && !m_stop; ++value)   // try "safe", then "mine"
         {
+            // Mine cap: placing one more mine would exceed the allowed number of mines
+            if (value == 1 && m_input->maxMines >= 0 && m_minesPlaced >= m_input->maxMines)
+            {
+                continue;
+            }
+
+            m_minesPlaced += value;
             if (place(cell, value))
             {
                 search(index + 1);
             }
             unplace(cell, value);
+            m_minesPlaced -= value;
         }
     }
 
     /**
      * @brief Remember what the current (valid) layout says about each cell
      *
-     * This is also the place to extend when mine counting is added: the number
-     * of mines in the layout (sum of m_assignment) is the value to record.
+     * When mine counts are recorded, the layout is also filed under its number of
+     * mines (m_minesPlaced), so the caller can later keep only the layouts whose
+     * total is compatible with the board's mine counter.
      */
     void recordSolution()
     {
         ++m_result.solutions;
+
+        // Row of the per-total tables that this layout belongs to
+        const int tableRow = m_minesPlaced * m_input->nCells;
+        if (m_recordMineCounts)
+        {
+            m_result.mineTotalPossible[m_minesPlaced] = true;
+        }
 
         for (int cell = 0; cell < m_input->nCells; ++cell)
         {
@@ -308,6 +361,18 @@ private:
                 m_result.canBeSafe[cell] = true;
             }
 
+            if (m_recordMineCounts)
+            {
+                if (m_assignment[cell] == 1)
+                {
+                    m_result.mineAtTotal[tableRow + cell] = true;
+                }
+                else
+                {
+                    m_result.safeAtTotal[tableRow + cell] = true;
+                }
+            }
+
             if (!alreadySeenBoth && m_result.canBeMine[cell] && m_result.canBeSafe[cell])
             {
                 --m_undetermined;
@@ -315,8 +380,9 @@ private:
         }
 
         // If every cell has been seen both ways, more layouts cannot add any
-        // deduction, so stop searching.
-        if (m_undetermined == 0)
+        // deduction, so stop searching (unless the mine totals are being recorded:
+        // a layout with a different total could still matter to the mine counter).
+        if (m_undetermined == 0 && !m_recordMineCounts)
         {
             m_stop = true;
         }
