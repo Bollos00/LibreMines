@@ -1337,7 +1337,7 @@ void TestGameEngine::testEndGameScoreWithCustomTime()
     
     // Start game and let some time pass, then generate score using public slot
     engine->SLOT_cleanCell(0, 0);  // Start timer
-    QTest::qWait(100);  // Let some time pass
+    QTest::qWait(1100);  // Let some time pass
     
     // Use the public slot to regenerate score
     engine->SLOT_generateEndGameScoreAgain();

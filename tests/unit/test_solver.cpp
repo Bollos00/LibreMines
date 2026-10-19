@@ -98,10 +98,13 @@ private slots:
     void generalPairRuleMarksUniqueCellsAsMinesViaCleanGeneralPairRule();
     void generalPairRuleMarksOnlyBUniqueCellsViaDirectApply();
     void generalPairRuleMarksOnlyBUniqueCellsViaCleanGeneralPairRule();
+    void generalPairRuleDiagonal11XMarksUniqueCellsSafeViaDirectApply();
+    void generalPairRuleDiagonal11XMarksUniqueCellsSafeViaCleanGeneralPairRule();
 
     // Enumeration
     void enumerationResolvesCellsAcrossConnectedClues();
     void enumerationRespectsMaxEnumerationCluesWindows();
+    void enumerationResolvesThreeConnectedCluesWithoutPairRule();
 
     // Mine Counting
     void mineCountingMarksAllUnknownCellsSafeWhenNoMinesLeft();
@@ -109,6 +112,7 @@ private slots:
     void mineCountingMarksFreeCellsSafeWhenGroupsUseAllMines();
     void mineCountingRejectsInconsistentMineCount();
     void mineCountingDoesNothingWhenStrategyDisabled();
+    void mineCountingResolvesAmbiguousFiftyFiftyWithLastMine();
 
     // Rejection paths
     void basicPattern11XRejectsNonSubsetViaDirectApply();
@@ -142,6 +146,7 @@ private:
     void runGeneralPairRuleOnlyASafe(PatternTestRoute route);
     void runGeneralPairRuleOnlyAMine(PatternTestRoute route);
     void runGeneralPairRuleOnlyBMine(PatternTestRoute route);
+    void runGeneralPairRuleDiagonal11X(PatternTestRoute route);
 
     LibreMinesGameEngine gameEngine;
     LibreMinesSolver solver;
@@ -1098,6 +1103,16 @@ void TestLibreMinesSolver::generalPairRuleMarksOnlyBUniqueCellsViaCleanGeneralPa
     runGeneralPairRuleOnlyBMine(PatternTestRoute::Cleaner);
 }
 
+void TestLibreMinesSolver::generalPairRuleDiagonal11XMarksUniqueCellsSafeViaDirectApply()
+{
+    runGeneralPairRuleDiagonal11X(PatternTestRoute::DirectApply);
+}
+
+void TestLibreMinesSolver::generalPairRuleDiagonal11XMarksUniqueCellsSafeViaCleanGeneralPairRule()
+{
+    runGeneralPairRuleDiagonal11X(PatternTestRoute::Cleaner);
+}
+
 void TestLibreMinesSolver::runGeneralPairRuleOnlyASafe(PatternTestRoute route)
 {
     // Both 2 clues need two more mines. Every unknown neighbor of the second clue is
@@ -1185,6 +1200,46 @@ void TestLibreMinesSolver::runGeneralPairRuleOnlyBMine(PatternTestRoute route)
     QVERIFY(solver.solverBoard[0][2] == LibreMinesSolver::SolverCellState::Safe);
 }
 
+void TestLibreMinesSolver::runGeneralPairRuleDiagonal11X(PatternTestRoute route)
+{
+    // The two 1 clues are placed diagonally at (0, 0) and (1, 1).
+    // Clue (0, 0) has unknown candidates {(1, 0), (0, 1)}, which are a subset of
+    // clue (1, 1)'s unknown candidates.
+    // A second mine at (3, 1) ensures all cells have value 1 so no zero-expansion occurs.
+    // Neither basic nor advanced patterns check diagonal pairs, but the pair rule
+    // resolves the candidates unique to (1, 1) as safe:
+    // 1 = S =
+    // = 1 S =
+    // S S S =
+    setBoard(4, 3, 2, QString::fromLatin1(
+        R"(1 1 1 1
+           * 1 1 *
+           1 1 1 1)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::PairRule);
+
+    solver.updateCellState({0, 0}, LibreMinesSolver::SolverCellState::Safe);
+    solver.updateCellState({1, 1}, LibreMinesSolver::SolverCellState::Safe);
+
+    // Basic and advanced pattern cleaners do not detect diagonal 1-1 pairs
+    QVERIFY(!solver.cleanBasicPatterns(1, 1));
+    QVERIFY(!solver.cleanAdvancedPatterns(1, 1));
+
+    const bool changed = route == PatternTestRoute::DirectApply
+        ? solver.applyPairRule(1, 1, 0, 0)
+        : solver.cleanGeneralPairRule(1, 1);
+    QVERIFY(changed);
+    const QPair<uchar, uchar> safeCells[] = {
+        {2, 0}, {2, 1}, {0, 2}, {1, 2}, {2, 2}
+    };
+    for (const QPair<uchar, uchar>& cell : safeCells)
+    {
+        QCOMPARE(solver.solverBoard[cell.first][cell.second],
+                 LibreMinesSolver::SolverCellState::Safe);
+    }
+    QCOMPARE(solver.solverBoard[1][0], LibreMinesSolver::SolverCellState::Unknown);
+    QCOMPARE(solver.solverBoard[0][1], LibreMinesSolver::SolverCellState::Unknown);
+}
+
 void TestLibreMinesSolver::enumerationResolvesCellsAcrossConnectedClues()
 {
     // The connected 1-2-1 clues leave (1, 0) and (1, 2) safe in every valid layout:
@@ -1240,6 +1295,52 @@ void TestLibreMinesSolver::enumerationRespectsMaxEnumerationCluesWindows()
     QVERIFY(solver.cleanEnumeration());
     QVERIFY(solver.solverBoard[1][0] == LibreMinesSolver::SolverCellState::Safe);
     QVERIFY(solver.solverBoard[1][2] == LibreMinesSolver::SolverCellState::Safe);
+}
+
+void TestLibreMinesSolver::enumerationResolvesThreeConnectedCluesWithoutPairRule()
+{
+    // Three connected clues (1-2-1) share 6 unknown candidates.
+    // Mines at (0, 0) and (6, 0) are already flagged so outer candidates (0, 1) and (6, 1)
+    // have non-zero clue values and do not trigger cascading zero-clearing.
+    // Clue A at (1, 1) touches { (0, 1), (2, 0), (2, 1) } (needs 1 mine)
+    // Clue B at (3, 1) touches { (2, 0), (2, 1), (4, 0), (4, 1) } (needs 2 mines)
+    // Clue C at (5, 1) touches { (4, 0), (4, 1), (6, 1) } (needs 1 mine)
+    // No pair of clues collapses via pair-rule or patterns, but enumerating all 3
+    // forces (0, 1) and (6, 1) to be safe:
+    // * 2 = 2 = 2 *
+    // S 2 = 2 = 2 S
+    setBoard(7, 2, 4, QString::fromLatin1(
+        R"(* 2 * 2 * 2 *
+           1 2 1 2 1 2 1)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::Enumeration);
+
+    solver.updateCellState({0, 0}, LibreMinesSolver::SolverCellState::Mine);
+    solver.updateCellState({6, 0}, LibreMinesSolver::SolverCellState::Mine);
+
+    const QPair<uchar, uchar> safeCells[] = {
+        {1, 0}, {3, 0}, {5, 0},
+        {1, 1}, {3, 1}, {5, 1}
+    };
+    for (const QPair<uchar, uchar>& cell : safeCells)
+    {
+        solver.updateCellState(cell, LibreMinesSolver::SolverCellState::Safe);
+    }
+
+    // Verify simpler strategies cannot make progress on these clues
+    for (uchar x : {1, 3, 5})
+    {
+        QVERIFY(!solver.cleanBasicPatterns(x, 1));
+        QVERIFY(!solver.cleanAdvancedPatterns(x, 1));
+        QVERIFY(!solver.cleanGeneralPairRule(x, 1));
+    }
+
+    QVERIFY(solver.cleanEnumeration());
+    QCOMPARE(solver.solverBoard[0][1], LibreMinesSolver::SolverCellState::Safe);
+    QCOMPARE(solver.solverBoard[6][1], LibreMinesSolver::SolverCellState::Safe);
+    QCOMPARE(solver.solverBoard[2][0], LibreMinesSolver::SolverCellState::Unknown);
+    QCOMPARE(solver.solverBoard[2][1], LibreMinesSolver::SolverCellState::Unknown);
+    QCOMPARE(solver.solverBoard[4][0], LibreMinesSolver::SolverCellState::Unknown);
+    QCOMPARE(solver.solverBoard[4][1], LibreMinesSolver::SolverCellState::Unknown);
 }
 
 void TestLibreMinesSolver::mineCountingMarksAllUnknownCellsSafeWhenNoMinesLeft()
@@ -1371,6 +1472,52 @@ void TestLibreMinesSolver::mineCountingDoesNothingWhenStrategyDisabled()
     QVERIFY(!solver.cleanMineCounting());
     QCOMPARE(solver.nCellsMarkedSafe, quint32(0));
     QCOMPARE(solver.nCellsMarkedMine, quint32(1));
+}
+
+void TestLibreMinesSolver::mineCountingResolvesAmbiguousFiftyFiftyWithLastMine()
+{
+    // End-of-game scenario with 1 remaining mine:
+    // Clues (0, 1) and (2, 1) touch unknown candidates (0, 0), (1, 0), (2, 0).
+    // Locally this admits two layouts:
+    //   - Layout 1: (1, 0) is mine, (0, 0) and (2, 0) are safe (1 mine)
+    //   - Layout 2: (0, 0) and (2, 0) are mines, (1, 0) is safe (2 mines)
+    // Neither patterns, pair-rule, nor enumeration alone can resolve the 50-50 choice.
+    // Mine counting discards Layout 2 because only 1 mine remains, fixing the last mine:
+    // S M S
+    // 2 * 2
+    // 1 1 1
+    setBoard(3, 3, 2, QString::fromLatin1(
+        R"(2 * 2
+           2 * 2
+           1 1 1)"));
+    solver.setStrategies(LibreMinesSolver::SolverStrategy::MineCounting);
+    solver.nMines = 2;
+
+    solver.updateCellState({1, 1}, LibreMinesSolver::SolverCellState::Mine);
+    const QPair<uchar, uchar> safeCells[] = {
+        {0, 1}, {2, 1},
+        {0, 2}, {1, 2}, {2, 2}
+    };
+    for (const QPair<uchar, uchar>& cell : safeCells)
+    {
+        solver.updateCellState(cell, LibreMinesSolver::SolverCellState::Safe);
+    }
+
+    // Verify simpler strategies and enumeration alone cannot resolve this ambiguity
+    QVERIFY(!solver.cleanBasicPatterns(0, 1));
+    QVERIFY(!solver.cleanBasicPatterns(2, 1));
+    QVERIFY(!solver.cleanAdvancedPatterns(0, 1));
+    QVERIFY(!solver.cleanAdvancedPatterns(2, 1));
+    QVERIFY(!solver.cleanGeneralPairRule(0, 1));
+    QVERIFY(!solver.cleanGeneralPairRule(2, 1));
+    QVERIFY(!solver.cleanEnumeration());
+
+    QVERIFY(solver.cleanMineCounting());
+    QCOMPARE(solver.solverBoard[1][0], LibreMinesSolver::SolverCellState::Mine);
+    QCOMPARE(solver.solverBoard[0][0], LibreMinesSolver::SolverCellState::Safe);
+    QCOMPARE(solver.solverBoard[2][0], LibreMinesSolver::SolverCellState::Safe);
+    QCOMPARE(solver.nCellsMarkedMine, quint32(2));
+    QCOMPARE(solver.nCellsMarkedSafe, quint32(7));
 }
 
 void TestLibreMinesSolver::basicPattern11XRejectsNonSubsetViaDirectApply()
