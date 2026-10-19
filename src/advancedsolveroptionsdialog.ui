@@ -35,9 +35,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern12X">
-        <property name="toolTip">
-         <string>1-2-X pattern</string>
-        </property>
         <property name="text">
          <string>1-2-X</string>
         </property>
@@ -45,9 +42,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern11X">
-        <property name="toolTip">
-         <string>1-1-X pattern</string>
-        </property>
         <property name="text">
          <string>1-1-X</string>
         </property>
@@ -55,9 +49,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern13X">
-        <property name="toolTip">
-         <string>1-3-X pattern</string>
-        </property>
         <property name="text">
          <string>1-3-X</string>
         </property>
@@ -65,9 +56,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern14X">
-        <property name="toolTip">
-         <string>1-4-X pattern</string>
-        </property>
         <property name="text">
          <string>1-4-X</string>
         </property>
@@ -97,9 +85,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern23X">
-        <property name="toolTip">
-         <string>2-3-X pattern</string>
-        </property>
         <property name="text">
          <string>2-3-X</string>
         </property>
@@ -107,9 +92,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern24X">
-        <property name="toolTip">
-         <string>2-4-X pattern</string>
-        </property>
         <property name="text">
          <string>2-4-X</string>
         </property>
@@ -117,9 +99,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern34X">
-        <property name="toolTip">
-         <string>3-4-X pattern</string>
-        </property>
         <property name="text">
          <string>3-4-X</string>
         </property>
@@ -127,9 +106,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern22X">
-        <property name="toolTip">
-         <string>2-2-X pattern</string>
-        </property>
         <property name="text">
          <string>2-2-X</string>
         </property>
@@ -137,9 +113,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern33X">
-        <property name="toolTip">
-         <string>3-3-X pattern</string>
-        </property>
         <property name="text">
          <string>3-3-X</string>
         </property>
@@ -147,9 +120,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern1X1">
-        <property name="toolTip">
-         <string>1-X-1 pattern</string>
-        </property>
         <property name="text">
          <string>1-X-1</string>
         </property>
@@ -157,9 +127,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern2X2">
-        <property name="toolTip">
-         <string>2-X-2 pattern</string>
-        </property>
         <property name="text">
          <string>2-X-2</string>
         </property>
@@ -167,9 +134,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern222Corner">
-        <property name="toolTip">
-         <string>2-2-2 corner pattern</string>
-        </property>
         <property name="text">
          <string>2-2-2 corner</string>
         </property>
@@ -177,9 +141,6 @@
       </item>
       <item>
        <widget class="QCheckBox" name="cbPattern131Corner">
-        <property name="toolTip">
-         <string>1-3-1 corner pattern</string>
-        </property>
         <property name="text">
          <string>1-3-1 corner</string>
         </property>
@@ -217,7 +178,7 @@
       <item>
        <widget class="QCheckBox" name="cbMineCounting">
         <property name="toolTip">
-         <string>Combine the enumerated layouts with the global mine counter</string>
+         <string>Combine the constraint enumeration with the global mine counter</string>
         </property>
         <property name="text">
          <string>Mine counting</string>
@@ -236,7 +197,7 @@
       <item>
        <widget class="QLabel" name="labelMaxEnumerationClues">
         <property name="toolTip">
-         <string>A smaller limit is faster but may miss deductions that need many clues at once. Use 0 for no limit.</string>
+         <string>A smaller limit is faster but may miss deductions that need many clues at once. 8 is the optimal value. Use 0 for no limit.</string>
         </property>
         <property name="text">
          <string>Max enumeration clues:</string>
@@ -245,9 +206,6 @@
       </item>
       <item>
        <widget class="QSpinBox" name="sbMaxEnumerationClues">
-        <property name="toolTip">
-         <string>Maximum number of clues considered by one enumeration. 0 means no limit.</string>
-        </property>
         <property name="specialValueText">
          <string>No limit</string>
         </property>
@@ -283,9 +241,6 @@
       </item>
       <item>
        <widget class="QSpinBox" name="sbSolversCount">
-        <property name="toolTip">
-         <string>Number of parallel solver threads. Auto derives the value from the board mine density, capped by the number of CPU cores.</string>
-        </property>
         <property name="specialValueText">
          <string>Auto</string>
         </property>
