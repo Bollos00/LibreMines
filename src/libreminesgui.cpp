@@ -341,6 +341,12 @@ void LibreMinesGui::vNewGame(const uchar _X,
             this, &LibreMinesGui::SLOT_gameLost);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_remakeGame,
             this, &LibreMinesGui::SLOT_remakeGame);
+    // Play the "denied" sound when a chord is rejected.
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_cleanNeighborCellsRejected,
+            this, [this](const uchar, const uchar, const int, const int)
+    {
+        Q_EMIT SIGNAL_playSoundEffect(SoundEffects::DENIED);
+    });
 
     // Communication (GUI -> GameEngine)
     connect(this, &LibreMinesGui::SIGNAL_cleanCell,

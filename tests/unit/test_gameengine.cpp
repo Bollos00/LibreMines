@@ -88,6 +88,7 @@ private slots:
     // Chord/Auto-clear operations tests (High Priority)
     void testChordOperation();
     void testChordWithIncorrectFlagCount();
+    void testChordWithIncorrectFlagsCorrectCount();
     void testChordSafetyChecks();
     void testChordRecursiveClearingEdgeCases();
     
@@ -758,182 +759,170 @@ void TestGameEngine::testConfigurationPersistence()
 // Chord/Auto-clear operations tests (High Priority)
 void TestGameEngine::testChordOperation()
 {
-    // Create a small game to test chord operation
-    engine->vNewGame(5, 5, 3);
-    engine->SLOT_startTimer();
-    
+    // Deterministic board:
+    // 1 1 1
+    // 1 * 1
+    // 1 1 1
+    engine->setFirstCellClean(false);
+    engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
+R"(111
+1*1
+111)"));
+
     QSignalSpy showCellSpy(engine, &LibreMinesGameEngine::SIGNAL_showCell);
-    
-    // Find a numbered cell (not zero, not mine)
-    const auto& matrix = engine->getPrincipalMatrix();
-    int targetX = -1, targetY = -1;
-    
-    for (int x = 1; x < 4; ++x) {
-        for (int y = 1; y < 4; ++y) {
-            if (matrix[x][y].value != CellValue::MINE && 
-                matrix[x][y].value != CellValue::ZERO) {
-                targetX = x;
-                targetY = y;
-                break;
-            }
-        }
-        if (targetX != -1) break;
-    }
-    
-    if (targetX != -1 && targetY != -1) {
-        // First reveal the target cell
-        engine->SLOT_cleanCell(targetX, targetY);
-        
-        // Count mines around this cell
-        int minesAround = static_cast<int>(matrix[targetX][targetY].value);
-        
-        // Flag exactly the right number of neighboring cells (if possible)
-        int flaggedCount = 0;
-        for (int dx = -1; dx <= 1 && flaggedCount < minesAround; ++dx) {
-            for (int dy = -1; dy <= 1 && flaggedCount < minesAround; ++dy) {
-                if (dx == 0 && dy == 0) continue;
-                
-                int nx = targetX + dx;
-                int ny = targetY + dy;
-                
-                if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5) {
-                    if (matrix[nx][ny].isHidden) {
-                        engine->SLOT_changeFlagState(nx, ny);
-                        flaggedCount++;
-                    }
-                }
-            }
-        }
-        
-        // Now attempt chord operation
-        int initialShowCount = showCellSpy.count();
-        engine->SLOT_cleanNeighborCells(targetX, targetY);
-        
-        // Should have attempted to clear neighboring cells
-        // (exact behavior depends on whether flags were placed correctly)
-        QVERIFY(showCellSpy.count() >= initialShowCount);
-    } else {
-        // If no suitable cell found, just test that the method doesn't crash
-        engine->SLOT_cleanNeighborCells(2, 2);
-        QVERIFY(true); // Test passes if no crash
-    }
+    QSignalSpy gameLostSpy(engine, &LibreMinesGameEngine::SIGNAL_gameLost);
+    QSignalSpy rejectedSpy(engine, &LibreMinesGameEngine::SIGNAL_cleanNeighborCellsRejected);
+
+    // Reveal the top-left corner (value 1)
+    engine->SLOT_cleanCell(0, 0);
+    QCOMPARE(engine->getPrincipalMatrix()[0][0].value, CellValue::ONE);
+
+    // Flag the actual mine so the flag count matches the cell value
+    engine->SLOT_changeFlagState(1, 1);
+
+    const int showBefore = showCellSpy.count();
+    engine->SLOT_cleanNeighborCells(0, 0);
+
+    // The two unflagged hidden neighbors must be revealed and the game not lost
+    QCOMPARE(showCellSpy.count(), showBefore + 2);
+    QCOMPARE(rejectedSpy.count(), 0);
+    QCOMPARE(gameLostSpy.count(), 0);
+    QVERIFY(!engine->getPrincipalMatrix()[0][1].isHidden);
+    QVERIFY(!engine->getPrincipalMatrix()[1][0].isHidden);
 }
 
 void TestGameEngine::testChordWithIncorrectFlagCount()
 {
-    engine->vNewGame(5, 5, 2);
-    engine->SLOT_startTimer();
-    
+    // Deterministic board:
+    // 1 1 1
+    // 1 * 1
+    // 1 1 1
+    engine->setFirstCellClean(false);
+    engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
+R"(111
+1*1
+111)"));
+
     QSignalSpy showCellSpy(engine, &LibreMinesGameEngine::SIGNAL_showCell);
-    
-    // Find a numbered cell
-    const auto& matrix = engine->getPrincipalMatrix();
-    int targetX = -1, targetY = -1;
-    
-    for (int x = 1; x < 4; ++x) {
-        for (int y = 1; y < 4; ++y) {
-            if (matrix[x][y].value != CellValue::MINE && 
-                matrix[x][y].value != CellValue::ZERO) {
-                targetX = x;
-                targetY = y;
-                break;
-            }
-        }
-        if (targetX != -1) break;
-    }
-    
-    if (targetX != -1 && targetY != -1) {
-        // Reveal the target cell
-        engine->SLOT_cleanCell(targetX, targetY);
-        
-        // Flag wrong number of cells (either too few or too many)
-        engine->SLOT_changeFlagState(targetX + 1, targetY); // Flag one cell
-        
-        int initialShowCount = showCellSpy.count();
-        
-        // Chord operation should not clear cells when flag count is wrong
-        engine->SLOT_cleanNeighborCells(targetX, targetY);
-        
-        // Should not have cleared additional cells due to incorrect flag count
-        // (behavior may vary based on implementation)
-    }
-    
-    // Test passes if no crash occurs
-    QVERIFY(true);
+    QSignalSpy rejectedSpy(engine, &LibreMinesGameEngine::SIGNAL_cleanNeighborCellsRejected);
+
+    // Reveal the top-left corner (value 1)
+    engine->SLOT_cleanCell(0, 0);
+    const int showBefore = showCellSpy.count();
+
+    // Too few flags (0 instead of 1): the chord must be rejected
+    engine->SLOT_cleanNeighborCells(0, 0);
+    QCOMPARE(showCellSpy.count(), showBefore);
+    QCOMPARE(rejectedSpy.count(), 1);
+    QCOMPARE(rejectedSpy.at(0).at(2).toInt(), 0); // iFlagCount
+    QCOMPARE(rejectedSpy.at(0).at(3).toInt(), 1); // iCellValue
+
+    // Too many flags (2 instead of 1): rejected again, still nothing revealed
+    engine->SLOT_changeFlagState(0, 1);
+    engine->SLOT_changeFlagState(1, 0);
+    engine->SLOT_cleanNeighborCells(0, 0);
+    QCOMPARE(showCellSpy.count(), showBefore);
+    QCOMPARE(rejectedSpy.count(), 2);
+    QCOMPARE(rejectedSpy.at(1).at(2).toInt(), 2); // iFlagCount
+    QCOMPARE(rejectedSpy.at(1).at(3).toInt(), 1); // iCellValue
+}
+
+void TestGameEngine::testChordWithIncorrectFlagsCorrectCount()
+{
+    // Matching flag count is enough: the flags do not need to mark actual mines
+    //
+    // 1 1 1
+    // 1 * 1
+    // 1 1 1
+    engine->setFirstCellClean(false);
+    engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
+R"(111
+1*1
+111)"));
+
+    QSignalSpy gameLostSpy(engine, &LibreMinesGameEngine::SIGNAL_gameLost);
+    QSignalSpy rejectedSpy(engine, &LibreMinesGameEngine::SIGNAL_cleanNeighborCellsRejected);
+
+    // Reveal the top-left corner (value 1)
+    engine->SLOT_cleanCell(0, 0);
+
+    // Flag a safe neighbor: the count matches (1) but the flag is wrong
+    engine->SLOT_changeFlagState(0, 1);
+    engine->SLOT_cleanNeighborCells(0, 0);
+
+    // The chord must be accepted and reveal the unflagged mine neighbor
+    QCOMPARE(rejectedSpy.count(), 0);
+    QVERIFY(gameLostSpy.count() >= 1);
 }
 
 void TestGameEngine::testChordSafetyChecks()
 {
-    engine->vNewGame(5, 5, 3);
-    engine->SLOT_startTimer();
-    
-    // Test chord on unrevealed cell (should not work)
+    // Deterministic board:
+    // 1 1 1
+    // 1 * 1
+    // 1 1 1
+    engine->setFirstCellClean(false);
+    engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
+R"(111
+1*1
+111)"));
+
     QSignalSpy showCellSpy(engine, &LibreMinesGameEngine::SIGNAL_showCell);
-    
-    int initialCount = showCellSpy.count();
-    engine->SLOT_cleanNeighborCells(2, 2); // Cell is still hidden
-    
-    // Should not have cleared neighboring cells on hidden cell
-    // (exact behavior depends on implementation)
-    
-    // Test chord on edge cells
-    engine->SLOT_cleanNeighborCells(0, 0); // Corner cell
-    engine->SLOT_cleanNeighborCells(4, 2); // Edge cell
-    
-    // Test passes if no crash or invalid behavior
-    QVERIFY(true);
+    QSignalSpy rejectedSpy(engine, &LibreMinesGameEngine::SIGNAL_cleanNeighborCellsRejected);
+
+    // Chording on hidden cells does nothing and is not reported as a rejection
+    engine->SLOT_cleanNeighborCells(0, 0);
+    engine->SLOT_cleanNeighborCells(1, 1); // Hidden mine
+    QCOMPARE(showCellSpy.count(), 0);
+    QCOMPARE(rejectedSpy.count(), 0);
+    QVERIFY(engine->isGameActive());
+
+    // After revealing a corner, chording with the wrong flag count is rejected
+    engine->SLOT_cleanCell(0, 0);
+    const int showBefore = showCellSpy.count();
+    engine->SLOT_cleanNeighborCells(0, 0);
+    QCOMPARE(showCellSpy.count(), showBefore);
+    QCOMPARE(rejectedSpy.count(), 1);
+
+    // Out-of-bounds coordinates are ignored safely
+    engine->SLOT_cleanNeighborCells(200, 200);
+    QCOMPARE(rejectedSpy.count(), 1);
+    QVERIFY(engine->isGameActive());
 }
 
 void TestGameEngine::testChordRecursiveClearingEdgeCases()
 {
-    // Test chord operation that might trigger recursive clearing
-    engine->vNewGame(7, 7, 5);
-    engine->SLOT_startTimer();
-    
+    // Deterministic board:
+    // * 1 0 0
+    // 1 1 0 0
+    // 0 0 0 0
+    // 0 0 0 0
+    //
+    // Chording (1,0) clears a zero neighbor and triggers a cascade that
+    // reveals every non-mine cell, winning the game.
+    engine->setFirstCellClean(false);
+    engine->vNewGameForTest(4, 4, 1, QString::fromLatin1(
+R"(*100
+1100
+0000
+0000)"));
+
     QSignalSpy showCellSpy(engine, &LibreMinesGameEngine::SIGNAL_showCell);
-    
-    // Find a cell with low mine count that might trigger cascade
-    const auto& matrix = engine->getPrincipalMatrix();
-    
-    for (int x = 2; x < 5; ++x) {
-        for (int y = 2; y < 5; ++y) {
-            if (matrix[x][y].value == CellValue::ONE || matrix[x][y].value == CellValue::TWO) {
-                // Reveal this cell first
-                engine->SLOT_cleanCell(x, y);
-                
-                // Flag the mines around it correctly (simplified for test)
-                int mineCount = static_cast<int>(matrix[x][y].value);
-                int flagged = 0;
-                
-                for (int dx = -1; dx <= 1 && flagged < mineCount; ++dx) {
-                    for (int dy = -1; dy <= 1 && flagged < mineCount; ++dy) {
-                        if (dx == 0 && dy == 0) continue;
-                        
-                        int nx = x + dx;
-                        int ny = y + dy;
-                        
-                        if (nx >= 0 && nx < 7 && ny >= 0 && ny < 7 && 
-                            matrix[nx][ny].isHidden && matrix[nx][ny].value == CellValue::MINE) {
-                            engine->SLOT_changeFlagState(nx, ny);
-                            flagged++;
-                        }
-                    }
-                }
-                
-                // Now chord - this might trigger recursive clearing
-                int beforeChord = showCellSpy.count();
-                engine->SLOT_cleanNeighborCells(x, y);
-                
-                // Should have shown additional cells if chord was successful
-                QVERIFY(showCellSpy.count() >= beforeChord);
-                return; // Test one successful chord
-            }
-        }
-    }
-    
-    // If no suitable cell found, just verify method doesn't crash
-    engine->SLOT_cleanNeighborCells(3, 3);
-    QVERIFY(true);
+    QSignalSpy gameWonSpy(engine, &LibreMinesGameEngine::SIGNAL_gameWon);
+    QSignalSpy gameLostSpy(engine, &LibreMinesGameEngine::SIGNAL_gameLost);
+
+    // Reveal (1,0) (value 1) and flag the mine so the count matches
+    engine->SLOT_cleanCell(1, 0);
+    engine->SLOT_changeFlagState(0, 0);
+
+    const int showBefore = showCellSpy.count();
+    engine->SLOT_cleanNeighborCells(1, 0);
+
+    // The cascade must reveal more than the immediate neighbors
+    QVERIFY(showCellSpy.count() > showBefore + 1);
+    QCOMPARE(gameLostSpy.count(), 0);
+    QCOMPARE(gameWonSpy.count(), 1);
+    QCOMPARE(engine->hiddenCells(), 0);
 }
 
 // Actual game flow tests (High Priority)
@@ -1476,6 +1465,10 @@ R"(111
 
     QSignalSpy gameWonSpy(engine, &LibreMinesGameEngine::SIGNAL_gameWon);
     QSignalSpy gameLostSpy(engine, &LibreMinesGameEngine::SIGNAL_gameLost);
+
+    // Place a wrongly placed but count-matching flag so the chord is accepted
+    // (the cell (2,0) has value 1 and only the safe cell (1,0) is flagged)
+    engine->SLOT_changeFlagState(1, 0);
 
     engine->SLOT_cleanNeighborCells(2, 0);
 

@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>sound_effects/clock_tick.wav</file>
+        <file>sound_effects/denied.wav</file>
         <file>sound_effects/flag_cell.wav</file>
         <file>sound_effects/game_lost.wav</file>
         <file>sound_effects/game_won.wav</file>

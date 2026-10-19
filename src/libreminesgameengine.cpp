@@ -561,6 +561,47 @@ void LibreMinesGameEngine::SLOT_startTimer()
 
 void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _Y)
 {
+    if(!bGameActive || _X >= iX || _Y >= iY)
+        return;
+
+    const CellGameEngine& centerCell = principalMatrix[_X][_Y];
+
+    // Chording is only valid on a revealed number cell. Revealed zero cells
+    // are already fully expanded and mines are only revealed after a loss.
+    if(centerCell.isHidden || centerCell.value == CellValue::MINE ||
+       centerCell.value == CellValue::ZERO)
+    {
+        return;
+    }
+
+    // Count the neighboring cells marked with a real flag. Question marks do
+    // not count towards the required number of flags.
+    int iFlagsAround = 0;
+    for(short i=_X-1; i<=_X+1; i++)
+    {
+        if(i<0 || i>=iX)
+            continue;
+
+        for(short j=_Y-1; j<=_Y+1; j++)
+        {
+            if(j<0 || j>=iY)
+                continue;
+
+            if(i == _X && j == _Y)
+                continue;
+
+            if(principalMatrix[i][j].flagState == FlagState::HasFlag)
+                iFlagsAround++;
+        }
+    }
+
+    // Only clear the neighbors when the number of flags matches the cell value
+    if(iFlagsAround != static_cast<int>(centerCell.value))
+    {
+        Q_EMIT SIGNAL_cleanNeighborCellsRejected(_X, _Y, iFlagsAround,
+                                                 static_cast<int>(centerCell.value));
+        return;
+    }
 
     bool recursive = false;
     // Clean all hided and unflaged neighbor flags

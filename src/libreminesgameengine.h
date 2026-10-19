@@ -396,7 +396,26 @@ Q_SIGNALS:
      * @param recursive true if this cell is being shown as part of auto-clearing
      */
     void SIGNAL_showCell(const uchar _X, const uchar _Y, const bool recursive);
-    
+
+    /**
+     * @brief Signal emitted when a neighbor-clearing request is rejected
+     *
+     * Emitted when the player tries to clear the neighbors of a revealed
+     * number cell but the number of placed flags around it does not match
+     * the cell value. No cell is revealed in this case. The signal carries
+     * enough information for the GUI to inform the player about the
+     * mismatch (for example, through a visual or audio cue).
+     *
+     * @param _X X coordinate of the clicked center cell
+     * @param _Y Y coordinate of the clicked center cell
+     * @param iFlagCount Number of neighbors currently marked with a real flag
+     * @param iCellValue Value (1-8) of the clicked center cell
+     *
+     * @see SLOT_cleanNeighborCells
+     */
+    void SIGNAL_cleanNeighborCellsRejected(const uchar _X, const uchar _Y,
+                                           const int iFlagCount, const int iCellValue);
+
     /**
      * @brief Signal emitted when the game ends with complete statistics
      * 
@@ -521,13 +540,23 @@ public Q_SLOTS:
     
     /**
      * @brief Slot to handle neighbor cell clearing requests
-     * 
+     *
      * Attempts to clear all neighboring cells around the specified coordinates.
      * This is typically used for the "chord" action when clicking on a
      * revealed number cell that has the correct number of flags around it.
-     * 
+     *
+     * The request is only honored when the clicked cell is a revealed number
+     * cell (value 1-8) and the number of neighbors marked with a real flag
+     * (question marks are ignored) exactly matches the cell value. Otherwise
+     * nothing is revealed and SIGNAL_cleanNeighborCellsRejected is emitted.
+     * When the count matches, the flags do not need to be placed on actual
+     * mines: an unflagged mine neighbor is revealed and the game is lost as
+     * usual.
+     *
      * @param _X X coordinate of the center cell
      * @param _Y Y coordinate of the center cell
+     *
+     * @see SIGNAL_cleanNeighborCellsRejected
      */
     void SLOT_cleanNeighborCells(const uchar _X, const uchar _Y);
     

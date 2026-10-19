@@ -72,7 +72,7 @@ public:
      * gameplay and user interaction.
      */
     enum SoundType {
-        GAME_BEGIN,                    ///< Sound played when a new game starts
+        DENIED,                        ///< Sound played when an action is rejected (e.g. a chord with a mismatched flag count)
         GAME_WON,                      ///< Sound played when the player wins
         GAME_LOST,                     ///< Sound played when the player loses (hits a mine)
         KEYBOARD_CONTROLLER_MOVE,      ///< Sound played when navigating with keyboard
@@ -110,7 +110,7 @@ public Q_SLOTS:
     void SLOT_setVolume(const int vol, const bool playPreview);
 
 private:
-    QSharedPointer<QSoundEffect> soundGameBegin;         ///< Sound effect for game start
+    QSharedPointer<QSoundEffect> soundDenied;            ///< Sound effect for rejected actions
     QSharedPointer<QSoundEffect> soundGameWon;           ///< Sound effect for game victory
     QSharedPointer<QSoundEffect> soundGameLost;          ///< Sound effect for game loss
 

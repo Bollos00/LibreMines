@@ -1,6 +1,6 @@
 # Credits
 
-* Clock tick: https://freesound.org/people/andersmmg/sounds/511492/
+* Denied: https://freesound.org/people/andersmmg/sounds/511492/
 
 * Flag cell: https://freesound.org/people/ironcross32/sounds/582695/
 
