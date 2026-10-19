@@ -36,7 +36,7 @@ void SoundEffects::SLOT_initializeSounds()
         return; // Already initialized
     }
 
-    soundGameBegin.reset(new QSoundEffect(this));
+    soundDenied.reset(new QSoundEffect(this));
     soundGameWon.reset(new QSoundEffect(this));
     soundGameLost.reset(new QSoundEffect(this));
 
@@ -44,7 +44,7 @@ void SoundEffects::SLOT_initializeSounds()
     soundReleaseCell.reset(new QSoundEffect(this));
     soundFlagCell.reset(new QSoundEffect(this));
 
-    soundGameBegin->setSource(QUrl("qrc:/sound_effects/clock_tick.wav"));
+    soundDenied->setSource(QUrl("qrc:/sound_effects/denied.wav"));
     soundGameWon->setSource(QUrl("qrc:/sound_effects/game_won.wav"));
     soundGameLost->setSource(QUrl("qrc:/sound_effects/game_lost.wav"));
 
@@ -52,7 +52,7 @@ void SoundEffects::SLOT_initializeSounds()
     soundReleaseCell->setSource(QUrl("qrc:/sound_effects/release_cell.wav"));
     soundFlagCell->setSource(QUrl("qrc:/sound_effects/flag_cell.wav"));
     
-    soundEffects.append(soundGameBegin);
+    soundEffects.append(soundDenied);
     soundEffects.append(soundGameWon);
     soundEffects.append(soundKeyboardControlMove);
     soundEffects.append(soundGameLost);
@@ -90,12 +90,12 @@ void SoundEffects::SLOT_playSound(const SoundType type)
     }
     switch(type)
     {
-        case SoundEffects::GAME_BEGIN:
+        case SoundEffects::DENIED:
         {
-            if(!soundGameBegin->isMuted())
+            if(!soundDenied->isMuted())
             {
-                // soundGameBegin->stop();
-                soundGameBegin->play();
+                // soundDenied->stop();
+                soundDenied->play();
             }
         }break;
         case SoundEffects::GAME_WON:

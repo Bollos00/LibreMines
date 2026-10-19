@@ -204,6 +204,35 @@ void LibreMinesPreferencesSaver::vLastSessionLoadConfigurationFile(
 
                 preferences.setOptionUseQuestionMark(terms.at(1));
             }
+            else if(terms.at(0).compare("NoGuessMode", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionNoGuessMode(terms.at(1));
+            }
+            else if(terms.at(0).compare("SolverStrategies", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionSolverStrategies(
+                    static_cast<LibreMinesSolver::SolverStrategy>(terms.at(1).toULongLong()));
+            }
+            else if(terms.at(0).compare("MaxEnumerationClues", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionMaxEnumerationClues(terms.at(1).toInt());
+            }
+            else if(terms.at(0).compare("SolversCount", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionSolversCount(terms.at(1).toInt());
+            }
         }
     }
 
@@ -262,7 +291,15 @@ void LibreMinesPreferencesSaver::vLastSessionSaveConfigurationFile(
                << (uchar)preferences.optionAskToSaveMatchScoreBehaviour() << '\n'
                << "SoundVolume" << ' ' << preferences.optionSoundVolume() << '\n'
                << "QuestionMark" << ' '
-               << (preferences.optionUseQuestionMark() ? "On" : "Off") << '\n';
+               << (preferences.optionUseQuestionMark() ? "On" : "Off") << '\n'
+               << "NoGuessMode" << ' '
+               << (preferences.optionNoGuessMode() ? "On" : "Off") << '\n'
+               << "SolverStrategies" << ' '
+               << static_cast<qulonglong>(preferences.optionSolverStrategies()) << '\n'
+               << "MaxEnumerationClues" << ' '
+               << preferences.optionMaxEnumerationClues() << '\n'
+               << "SolversCount" << ' '
+               << preferences.optionSolversCount() << '\n';
     }
 
     QScopedPointer<QFile> fileLanguage

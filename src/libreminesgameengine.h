@@ -118,6 +118,34 @@ public:
                   const uchar i_Y_Clean = 255);
 
     /**
+     * @brief Start a deterministic game from a textual minefield description
+     *
+     * The minefield string contains one row per line. Use '*' for a mine and
+     * '0' through '8' for the adjacent mine count of a safe cell. For example:
+     * Leading and trailing whitespace on each row is ignored, so rows may be
+     * indented for readability.
+     * @code
+     * 111
+     * 1*1
+     * 111
+     * @endcode
+     * The dimensions, mine count, valid characters, and clue values are
+     * validated before the current game state is changed.
+     *
+     * @param _X Board width (number of columns)
+     * @param _Y Board height (number of rows)
+     * @param i_nMines_ Number of mines the description must contain
+     * @param minefieldString Textual board description
+     * @throws std::invalid_argument if the description does not match the
+     *         supplied dimensions, mine count, or Minesweeper rules
+     * @since v3.0.0
+     */
+    void vNewGameForTest(const uchar _X,
+                         const uchar _Y,
+                         short i_nMines_,
+                         const QString& minefieldString);
+
+    /**
      * @brief Get read-only access to the game matrix
      * 
      * Provides const access to the internal game matrix for querying
@@ -195,6 +223,74 @@ public:
      */
     void setUseQuestionMark(const bool x);
 
+    /**
+     * @brief Set whether no-guess mode is enabled
+     * 
+     * When enabled, no-guess mode ensures that the generated minesweeper
+     * puzzle can always be solved through logical deduction without requiring
+     * guessing. This mode may adjust mine placement algorithms to guarantee
+     * that every move can be determined through analysis of revealed numbers
+     * and their relationships to neighboring cells.
+     * 
+     * @param x true to enable no-guess mode, false to allow traditional puzzles
+     * @since v3.0.0
+     */
+    void setNoGuessMode(const bool x);
+
+    /**
+     * @brief Set the deduction strategies offered to the No Guess solver
+     *
+     * The value is a bit mask of LibreMinesSolver::SolverStrategy flags. It is
+     * passed to every solver instance created for the next generated puzzle.
+     * The parameter is a plain integer to avoid a circular include between the
+     * game engine and the solver.
+     *
+     * @param strategies Bit mask of LibreMinesSolver::SolverStrategy values
+     * @see LibreMinesSolver::SolverStrategy
+     * @since v3.0.0
+     */
+    void setSolverStrategies(const quint64 strategies);
+
+    /**
+     * @brief Set the maximum number of clues considered by one enumeration
+     *
+     * Passed to every solver instance created for the next generated puzzle.
+     * 0 disables the limit, negative values are treated as 0.
+     *
+     * @param clues Clue limit of one enumeration window
+     * @see LibreMinesSolver::setMaxEnumerationClues()
+     * @since v3.0.0
+     */
+    void setMaxEnumerationClues(const int clues);
+
+    /**
+     * @brief Value of setSolversCount() that selects automatic solver sizing
+     *
+     * When this value is configured, the engine derives the number of parallel
+     * solvers from the board mine density, capped by the number of CPU cores.
+     *
+     * @see setSolversCount()
+     * @see resolveSolversCount()
+     * @since v3.0.0
+     */
+    static constexpr int AutoSolversCount = 0;
+
+    /**
+     * @brief Select how many parallel solver threads generate a No Guess board
+     *
+     * Several independent solvers may race to find a solvable board; the first
+     * one to finish provides the matrix and the others are interrupted. Pass
+     * AutoSolversCount to let the engine derive the count from the board mine
+     * density (denser boards produce solvable layouts more rarely, so they are
+     * worth more parallel attempts), capped by the number of CPU cores.
+     *
+     * @param n Number of solver threads, or AutoSolversCount for automatic sizing
+     * @see AutoSolversCount
+     * @see resolveSolversCount()
+     * @since v3.0.0
+     */
+    void setSolversCount(const int n);
+
 private:
     /**
      * @brief Reset the game matrix to initial state
@@ -249,6 +345,20 @@ private:
      */
     void vGenerateEndGameScore(qint64 iTimeInNs = -1, bool ignorePreferences=false);
 
+    /**
+     * @brief Resolve the number of solver threads to start
+     *
+     * Returns the count configured through setSolversCount(). When
+     * AutoSolversCount is configured, the value is derived from the current
+     * board mine density and the number of CPU cores: dense boards yield
+     * solvable boards more rarely, so more parallel solvers are started.
+     *
+     * @return Number of solver threads to start (always at least 1)
+     * @see setSolversCount()
+     * @since v3.0.0
+     */
+    int resolveSolversCount() const;
+
     std::vector< std::vector<CellGameEngine> > principalMatrix; ///< 2D grid containing all game cells
 
     uchar iX;               ///< Current game board width (number of columns)
@@ -266,6 +376,11 @@ private:
     bool bFirstCellClean;   ///< Whether first clicked cell should be guaranteed safe
 
     bool bUseQuestionMark;  ///< Whether question mark flags are enabled
+    bool bNoGuessMode;      ///< Whether no-guess mode is enabled for logical-only puzzles
+
+    quint64 solverStrategies;   ///< Bit mask of LibreMinesSolver::SolverStrategy flags used in No Guess mode
+    int maxEnumerationClues;    ///< Clue limit of one enumeration window (0 = unlimited)
+    int iSolversCount;          ///< Number of parallel solvers (AutoSolversCount = derive from board density)
 
     bool bGameActive;       ///< Whether the game is currently in progress
 
@@ -281,7 +396,26 @@ Q_SIGNALS:
      * @param recursive true if this cell is being shown as part of auto-clearing
      */
     void SIGNAL_showCell(const uchar _X, const uchar _Y, const bool recursive);
-    
+
+    /**
+     * @brief Signal emitted when a neighbor-clearing request is rejected
+     *
+     * Emitted when the player tries to clear the neighbors of a revealed
+     * number cell but the number of placed flags around it does not match
+     * the cell value. No cell is revealed in this case. The signal carries
+     * enough information for the GUI to inform the player about the
+     * mismatch (for example, through a visual or audio cue).
+     *
+     * @param _X X coordinate of the clicked center cell
+     * @param _Y Y coordinate of the clicked center cell
+     * @param iFlagCount Number of neighbors currently marked with a real flag
+     * @param iCellValue Value (1-8) of the clicked center cell
+     *
+     * @see SLOT_cleanNeighborCells
+     */
+    void SIGNAL_cleanNeighborCellsRejected(const uchar _X, const uchar _Y,
+                                           const int iFlagCount, const int iCellValue);
+
     /**
      * @brief Signal emitted when the game ends with complete statistics
      * 
@@ -406,13 +540,23 @@ public Q_SLOTS:
     
     /**
      * @brief Slot to handle neighbor cell clearing requests
-     * 
+     *
      * Attempts to clear all neighboring cells around the specified coordinates.
      * This is typically used for the "chord" action when clicking on a
      * revealed number cell that has the correct number of flags around it.
-     * 
+     *
+     * The request is only honored when the clicked cell is a revealed number
+     * cell (value 1-8) and the number of neighbors marked with a real flag
+     * (question marks are ignored) exactly matches the cell value. Otherwise
+     * nothing is revealed and SIGNAL_cleanNeighborCellsRejected is emitted.
+     * When the count matches, the flags do not need to be placed on actual
+     * mines: an unflagged mine neighbor is revealed and the game is lost as
+     * usual.
+     *
      * @param _X X coordinate of the center cell
      * @param _Y Y coordinate of the center cell
+     *
+     * @see SIGNAL_cleanNeighborCellsRejected
      */
     void SLOT_cleanNeighborCells(const uchar _X, const uchar _Y);
     

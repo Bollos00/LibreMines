@@ -32,4 +32,7 @@
 // Sound effects threading configuration
 #cmakedefine USE_THREADED_SOUND_EFFECTS
 
+// Solver debug output configuration
+#cmakedefine01 LIBREMINES_SOLVER_DEBUG
+
 #endif // LIBREMINESCONFIG_H

@@ -34,7 +34,7 @@ endif()
 message(STATUS "Setting macOS deployment target to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 
 project(libremines
-    VERSION "2.3.0"
+    VERSION "3.0.0"
     DESCRIPTION " A Free/Libre and Open Source Software Qt based Minesweeper game available for GNU/Linux, FreeBSD, macOS and Windows systems. "
     HOMEPAGE_URL "https://github.com/Bollos00/LibreMines"
     LANGUAGES "CXX"
@@ -45,6 +45,7 @@ option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
 option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra themes for the minefield" TRUE)
 option(INSTALL_EXTRA_FACESREACTION_THEMES "Install extra themes for the faces reaction" TRUE)
 option(USE_THREADED_SOUND_EFFECTS "Use sound effects on a separate thread (default: OFF)" OFF)
+option(LIBREMINES_SOLVER_DEBUG "Enable debug output for the solver (default: OFF)" OFF)
 
 # Add the Qt dependencies according to the option `USE_QT6`
 if(USE_QT6)
@@ -171,15 +172,18 @@ set(SOURCE_FILES
     src/extrathemes.cpp src/extrathemes.h
     src/main.cpp
     src/facesreaction.h src/facesreaction.cpp
+    src/gameboardrandomgenerator.h src/gameboardrandomgenerator.cpp
     src/facesreactionpreview.h src/facesreactionpreview.cpp src/facesreactionpreview.ui
     src/keyboardcontroller.h src/keyboardcontroller.cpp
     src/libreminesapptheme.cpp src/libreminesapptheme.h
+    src/libreminesconstraintenumerator.hpp
     src/libreminesgameengine.cpp src/libreminesgameengine.h
     src/libreminesgui.cpp src/libreminesgui.h
     src/libreminespreferencesdialog.cpp src/libreminespreferencesdialog.h src/libreminespreferencesdialog.ui
     src/libreminespreferencessaver.cpp src/libreminespreferencessaver.h
     src/libreminesscore.cpp src/libreminesscore.h
     src/libreminesscoresdialog.cpp src/libreminesscoresdialog.h
+    src/libreminessolver.h src/libreminessolver.cpp
     src/libreminesviewscoresdialog.cpp src/libreminesviewscoresdialog.h
     src/minefieldtheme.cpp src/minefieldtheme.h
     src/qkeyinput.cpp src/qkeyinput.h
@@ -203,6 +207,7 @@ else()
 endif()
 
 add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${SOURCE_FILES}
+    src/advancedsolveroptionsdialog.h src/advancedsolveroptionsdialog.cpp src/advancedsolveroptionsdialog.ui
     src/gameplaythemechooser.h src/gameplaythemechooser.cpp src/gameplaythemechooser.ui
     src/minefieldthemepreview.h src/minefieldthemepreview.cpp src/minefieldthemepreview.ui)
 
@@ -310,6 +315,16 @@ endif()
 
 # Add tests (optional - can be disabled)
 option(BUILD_TESTS "Build the test suite" OFF)
+
+# Optional solver statistics / benchmark tools. They are only built when this
+# option is explicitly enabled; since they depend on the test core library, they
+# also force the test suite on. Normal builds and CI (which only pass
+# -DBUILD_TESTS=ON) stay unaffected.
+option(BUILD_SOLVER_STATISTICS "Build the optional solver statistics and strategy benchmark tools" OFF)
+if(BUILD_SOLVER_STATISTICS)
+    set(BUILD_TESTS ON)
+endif()
+
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)

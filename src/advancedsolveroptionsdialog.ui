@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AdvancedSolverOptionsDialog</class>
+ <widget class="QDialog" name="AdvancedSolverOptionsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>520</width>
+    <height>875</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Advanced Solver Options</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="gbBasicPatterns">
+     <property name="title">
+      <string>Basic Patterns</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutBasic">
+      <item>
+       <widget class="QCheckBox" name="cbAllBasicPatterns">
+        <property name="toolTip">
+         <string>Enable or disable every basic pattern at once</string>
+        </property>
+        <property name="text">
+         <string>All basic patterns</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern12X">
+        <property name="text">
+         <string>1-2-X</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern11X">
+        <property name="text">
+         <string>1-1-X</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern13X">
+        <property name="text">
+         <string>1-3-X</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern14X">
+        <property name="text">
+         <string>1-4-X</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbAdvancedPatterns">
+     <property name="title">
+      <string>Advanced Patterns</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutAdvanced">
+      <item>
+       <widget class="QCheckBox" name="cbAllAdvancedPatterns">
+        <property name="toolTip">
+         <string>Enable or disable every advanced pattern at once</string>
+        </property>
+        <property name="text">
+         <string>All advanced patterns</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern23X">
+        <property name="text">
+         <string>2-3-X</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern24X">
+        <property name="text">
+         <string>2-4-X</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern34X">
+        <property name="text">
+         <string>3-4-X</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern22X">
+        <property name="text">
+         <string>2-2-X</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern33X">
+        <property name="text">
+         <string>3-3-X</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern1X1">
+        <property name="text">
+         <string>1-X-1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern2X2">
+        <property name="text">
+         <string>2-X-2</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern222Corner">
+        <property name="text">
+         <string>2-2-2 corner</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbPattern131Corner">
+        <property name="text">
+         <string>1-3-1 corner</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbGeneralStrategies">
+     <property name="title">
+      <string>General Strategies</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutGeneral">
+      <item>
+       <widget class="QCheckBox" name="cbPairRule">
+        <property name="toolTip">
+         <string>General pair rule</string>
+        </property>
+        <property name="text">
+         <string>Pair rule</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbEnumeration">
+        <property name="toolTip">
+         <string>Exhaustive enumeration of the clues on the frontier</string>
+        </property>
+        <property name="text">
+         <string>Constraint enumeration</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbMineCounting">
+        <property name="toolTip">
+         <string>Combine the constraint enumeration with the global mine counter</string>
+        </property>
+        <property name="text">
+         <string>Mine counting</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbEnumerationSettings">
+     <property name="title">
+      <string>Enumeration Settings</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayoutEnumeration">
+      <item>
+       <widget class="QLabel" name="labelMaxEnumerationClues">
+        <property name="toolTip">
+         <string>A smaller limit is faster but may miss deductions that need many clues at once. 8 is the optimal value. Use 0 for no limit.</string>
+        </property>
+        <property name="text">
+         <string>Max enumeration clues:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sbMaxEnumerationClues">
+        <property name="specialValueText">
+         <string>No limit</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>64</number>
+        </property>
+        <property name="value">
+         <number>8</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbParallelSolvers">
+     <property name="title">
+      <string>Parallel Solvers</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayoutSolvers">
+      <item>
+       <widget class="QLabel" name="labelSolversCount">
+        <property name="toolTip">
+         <string>Number of solver threads racing to find a solvable No Guess board. Dense boards produce solvable layouts more rarely, so more solvers run in parallel for them. The maximum is the number of CPU cores.</string>
+        </property>
+        <property name="text">
+         <string>Solvers:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sbSolversCount">
+        <property name="specialValueText">
+         <string>Auto</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>64</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutButtons">
+     <item>
+      <widget class="QPushButton" name="pbResetDefaults">
+       <property name="text">
+        <string>Reset to Defaults</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::StandardButton::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

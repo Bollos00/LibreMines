@@ -22,6 +22,9 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QCheckBox" name="cbFirstCellClean">
+        <property name="toolTip">
+         <string>The first cell you open and its neighbors are always safe and never contain a mine.</string>
+        </property>
         <property name="text">
          <string>First cell clean</string>
         </property>
@@ -31,7 +34,34 @@
        </widget>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QCheckBox" name="cbNoGuessMode">
+          <property name="toolTip">
+           <string>Generate boards that can always be solved by logic alone, without guessing.</string>
+          </property>
+          <property name="text">
+           <string>No Guess Mode</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbAdvancedSolverOptions">
+          <property name="text">
+           <string>Advanced Solver Options...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QCheckBox" name="cbCleanNeighborCellsWhenClickedOnShowedCell">
+        <property name="toolTip">
+         <string>Clicking a revealed number clears its neighboring cells when the adjacent flag count matches.</string>
+        </property>
         <property name="text">
          <string>Clean neighbor cells when
 clicked on showed cell</string>
@@ -43,6 +73,9 @@ clicked on showed cell</string>
       </item>
       <item>
        <widget class="QCheckBox" name="cbProgressBarInGame">
+        <property name="toolTip">
+         <string>Show a progress bar indicating how many cells have been cleared.</string>
+        </property>
         <property name="text">
          <string>Show progress bar</string>
         </property>
@@ -53,6 +86,9 @@ clicked on showed cell</string>
       </item>
       <item>
        <widget class="QCheckBox" name="cbUseQuestionMark">
+        <property name="toolTip">
+         <string>Add a question mark state when cycling through cell marks (flag, question mark, clear).</string>
+        </property>
         <property name="text">
          <string>Use Question Mark</string>
         </property>
@@ -62,6 +98,9 @@ clicked on showed cell</string>
        <layout class="QHBoxLayout" name="horizontalLayout_12">
         <item>
          <widget class="QLabel" name="labelMinimumCellLength">
+          <property name="toolTip">
+           <string>Smallest allowed cell size in pixels.</string>
+          </property>
           <property name="text">
            <string>Minimum cell length</string>
           </property>
@@ -69,6 +108,9 @@ clicked on showed cell</string>
         </item>
         <item>
          <widget class="QSpinBox" name="sbMinimumCellLength">
+          <property name="suffix">
+           <string>px</string>
+          </property>
           <property name="minimum">
            <number>10</number>
           </property>
@@ -83,6 +125,9 @@ clicked on showed cell</string>
        <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
          <widget class="QLabel" name="labelMaximumCellLength">
+          <property name="toolTip">
+           <string>Largest allowed cell size in pixels.</string>
+          </property>
           <property name="text">
            <string>Maximum cell length</string>
           </property>
@@ -90,6 +135,9 @@ clicked on showed cell</string>
         </item>
         <item>
          <widget class="QSpinBox" name="sbMaximumCellLength">
+          <property name="suffix">
+           <string>px</string>
+          </property>
           <property name="minimum">
            <number>10</number>
           </property>
@@ -110,6 +158,9 @@ clicked on showed cell</string>
        <layout class="QHBoxLayout" name="horizontalLayout_16">
         <item>
          <widget class="QLabel" name="labelMinefieldGenerationAnimation">
+          <property name="toolTip">
+           <string>Control the animation shown while a new minefield is generated.</string>
+          </property>
           <property name="text">
            <string>Minefield Generation
 Animation</string>
@@ -134,6 +185,9 @@ Animation</string>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="labelApplicationStyle">
+          <property name="toolTip">
+           <string>Select the Qt widget style used by the application.</string>
+          </property>
           <property name="text">
            <string>Application style:</string>
           </property>
@@ -148,6 +202,9 @@ Animation</string>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
          <widget class="QLabel" name="labelGameplayCustomization">
+          <property name="toolTip">
+           <string>Choose the minefield theme and the faces reaction theme.</string>
+          </property>
           <property name="text">
            <string>Gameplay customization:</string>
           </property>
@@ -175,6 +232,9 @@ Animation</string>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="labelUsername">
+          <property name="toolTip">
+           <string>Name used to identify you in saved scores.</string>
+          </property>
           <property name="text">
            <string>Username</string>
           </property>
@@ -205,7 +265,7 @@ Animation</string>
            <x>0</x>
            <y>0</y>
            <width>569</width>
-           <height>306</height>
+           <height>268</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -577,6 +637,9 @@ Animation</string>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
          <widget class="QLabel" name="label_7">
+          <property name="toolTip">
+           <string>Choose what happens when a movement key is pressed while Ctrl is held.</string>
+          </property>
           <property name="text">
            <string>When CTRL is pressed</string>
           </property>

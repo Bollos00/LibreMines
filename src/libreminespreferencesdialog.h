@@ -33,6 +33,7 @@
 #define LIBREMINESPREFERENCESDIALOG_H
 
 #include "gameplaythemechooser.h"
+#include "advancedsolveroptionsdialog.h"
 
 #include <QDialog>
 #include <QtCore>
@@ -140,6 +141,42 @@ public:
     int optionSoundVolume()const;
     bool optionUseQuestionMark()const;
 
+    /**
+     * @brief Check whether No Guess mode is enabled
+     *
+     * @return true when generated boards must be solvable without guessing
+     * @since v3.0.0
+     */
+    bool optionNoGuessMode()const;
+
+    /**
+     * @brief Get the deduction strategies enabled for the No Guess solver
+     *
+     * @return Bit mask of LibreMinesSolver::SolverStrategy values
+     * @see AdvancedSolverOptionsDialog::optionSolverStrategies()
+     * @since v3.0.0
+     */
+    LibreMinesSolver::SolverStrategy optionSolverStrategies()const;
+
+    /**
+     * @brief Get the clue limit used by the solver enumeration tier
+     *
+     * @return Maximum number of clues considered by one enumeration; 0 means no limit
+     * @see AdvancedSolverOptionsDialog::optionMaxEnumerationClues()
+     * @since v3.0.0
+     */
+    int optionMaxEnumerationClues()const;
+
+    /**
+     * @brief Get the number of parallel solver threads
+     *
+     * @return Solver count, or LibreMinesGameEngine::AutoSolversCount for
+     *         automatic sizing based on the board mine density
+     * @see AdvancedSolverOptionsDialog::optionSolversCount()
+     * @since v3.0.0
+     */
+    int optionSolversCount()const;
+
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
     void setOptionProgressBar(const QString& option);
@@ -157,6 +194,42 @@ public:
     void setOptionSoundVolume(const int option);
     void setOptionUseQuestionMark(const QString& option);
 
+    /**
+     * @brief Enable or disable No Guess mode
+     *
+     * @param option "On" to enable No Guess mode, any other value disables it
+     * @since v3.0.0
+     */
+    void setOptionNoGuessMode(const QString& option);
+
+    /**
+     * @brief Set the deduction strategies used by the No Guess solver
+     *
+     * @param strategies Bit mask of LibreMinesSolver::SolverStrategy values
+     * @see AdvancedSolverOptionsDialog::setOptionSolverStrategies()
+     * @since v3.0.0
+     */
+    void setOptionSolverStrategies(const LibreMinesSolver::SolverStrategy strategies);
+
+    /**
+     * @brief Set the clue limit used by the solver enumeration tier
+     *
+     * @param clues Clue limit; 0 disables the limit and negative values are treated as 0
+     * @see AdvancedSolverOptionsDialog::setOptionMaxEnumerationClues()
+     * @since v3.0.0
+     */
+    void setOptionMaxEnumerationClues(const int clues);
+
+    /**
+     * @brief Set the number of parallel solver threads
+     *
+     * @param n Solver count, or LibreMinesGameEngine::AutoSolversCount (0) for
+     *          automatic sizing based on the board mine density
+     * @see AdvancedSolverOptionsDialog::setOptionSolversCount()
+     * @since v3.0.0
+     */
+    void setOptionSolversCount(const int n);
+
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;
     void setOptionKeyboardControllerKeys(const QList<int>& keys);
@@ -172,6 +245,8 @@ private:
 
     GameplayThemeChooser* gameplayThemeChooser;
 
+    AdvancedSolverOptionsDialog* advancedSolverOptions;  ///< Dialog holding the No Guess solver strategy options
+
 private Q_SLOTS:
     void SLOT_updateCellLengthParameters();
     void SLOT_updateLanguage();
@@ -183,6 +258,14 @@ private Q_SLOTS:
     void on_sliderSoundVolume_sliderReleased();
 
     void on_pbGameplayCustomization_clicked();
+
+    /**
+     * @brief Open the advanced No Guess solver options dialog
+     *
+     * @see AdvancedSolverOptionsDialog
+     * @since v3.0.0
+     */
+    void on_pbAdvancedSolverOptions_clicked();
 
 Q_SIGNALS:
     void SIGNAL_optionChanged(const QString& name, const QString& value);
