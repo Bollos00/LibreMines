@@ -967,6 +967,8 @@ void TestGameEngine::testActualGameWinByRevealingAllCells()
 
 void TestGameEngine::testActualGameLossbyHittingMine()
 {
+    engine->setFirstCellClean(false); // Disable first cell clean to allow hitting a mine
+    engine->setNoGuessMode(false); // Disable no-guess mode to allow hitting a mine
     engine->vNewGame(5, 5, 5);
     engine->SLOT_startTimer();
     

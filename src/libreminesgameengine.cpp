@@ -23,9 +23,11 @@
 #include "libreminessolver.h"
 
 #include <QRandomGenerator>
+#include <QThread>
 #include <QTimer>
 
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 #include <utility>
 
@@ -39,7 +41,8 @@ LibreMinesGameEngine::CellGameEngine::CellGameEngine():
 
 LibreMinesGameEngine::LibreMinesGameEngine():
     solverStrategies(static_cast<quint64>(LibreMinesSolver::SolverStrategy::AllStrategies)),
-    maxEnumerationClues(LibreMinesSolver::DefaultMaxEnumerationClues)
+    maxEnumerationClues(LibreMinesSolver::DefaultMaxEnumerationClues),
+    iSolversCount(AutoSolversCount)
 {
 
 }
@@ -69,7 +72,7 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
     
     if (bRemakingGame && bNoGuessMode)
     {
-        QVector<QSharedPointer<LibreMinesSolver>> solvers(SOLVERS_COUNT);
+        QVector<QSharedPointer<LibreMinesSolver>> solvers(resolveSolversCount());
 
         // Start the solvers
         for (QSharedPointer<LibreMinesSolver>& solver : solvers)
@@ -422,6 +425,44 @@ void LibreMinesGameEngine::setSolverStrategies(const quint64 strategies)
 void LibreMinesGameEngine::setMaxEnumerationClues(const int clues)
 {
     maxEnumerationClues = qMax(0, clues);
+}
+
+void LibreMinesGameEngine::setSolversCount(const int n)
+{
+    iSolversCount = (n > 0) ? n : AutoSolversCount;
+}
+
+int LibreMinesGameEngine::resolveSolversCount() const
+{
+    const int iMachineLimit = qMax(1, QThread::idealThreadCount());
+
+    if (iSolversCount != AutoSolversCount)
+    {
+        return qBound(1, iSolversCount, iMachineLimit);
+    }
+
+    const int iCells = static_cast<int>(iX) * static_cast<int>(iY);
+    if (iCells <= 0)
+    {
+        return 1;
+    }
+
+    // Mine density drives how rare a solvable board is: denser boards are far
+    // less likely to be solvable without guessing, so they are worth more
+    // parallel attempts. The constants are calibrated with the data produced
+    // by tests/statistics/solver_solvability_statistics using the default
+    // "all strategies" solver configuration:
+    //   density 0.156 -> solvable probability ~0.71 (about 1.4 attempts)
+    //   density 0.206 -> solvable probability ~0.15 (about 6.6 attempts)
+    const double dDensity = static_cast<double>(nMines) / static_cast<double>(iCells);
+    const double dSolvableProbability =
+        qBound(0.005, 0.71 * std::exp(-31.0 * (dDensity - 0.156)), 0.90);
+
+    // Use roughly one solver per expected attempt, capped by the CPU count.
+    const int iExpectedAttempts =
+        static_cast<int>(std::lround(1.0 / dSolvableProbability));
+
+    return qBound(1, iExpectedAttempts, iMachineLimit);
 }
 
 

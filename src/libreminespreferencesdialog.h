@@ -167,6 +167,16 @@ public:
      */
     int optionMaxEnumerationClues()const;
 
+    /**
+     * @brief Get the number of parallel solver threads
+     *
+     * @return Solver count, or LibreMinesGameEngine::AutoSolversCount for
+     *         automatic sizing based on the board mine density
+     * @see AdvancedSolverOptionsDialog::optionSolversCount()
+     * @since v3.0.0
+     */
+    int optionSolversCount()const;
+
     void setOptionFirstCellClean(const QString& option);
     void setOptionCleanNeighborCellsWhenClickedOnShowedCell(const QString& option);
     void setOptionProgressBar(const QString& option);
@@ -209,6 +219,16 @@ public:
      * @since v3.0.0
      */
     void setOptionMaxEnumerationClues(const int clues);
+
+    /**
+     * @brief Set the number of parallel solver threads
+     *
+     * @param n Solver count, or LibreMinesGameEngine::AutoSolversCount (0) for
+     *          automatic sizing based on the board mine density
+     * @see AdvancedSolverOptionsDialog::setOptionSolversCount()
+     * @since v3.0.0
+     */
+    void setOptionSolversCount(const int n);
 
     QList<int> optionKeyboardControllerKeys()const;
     QString optionKeyboardControllerKeysString()const;

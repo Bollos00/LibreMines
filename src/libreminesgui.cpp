@@ -237,6 +237,7 @@ void LibreMinesGui::vNewGame(const uchar _X,
     gameEngine->setNoGuessMode(preferences->optionNoGuessMode());
     gameEngine->setSolverStrategies(static_cast<quint64>(preferences->optionSolverStrategies()));
     gameEngine->setMaxEnumerationClues(preferences->optionMaxEnumerationClues());
+    gameEngine->setSolversCount(preferences->optionSolversCount());
     gameEngine->vNewGame(_X, _Y, i_nMines_);
 
     // Set the length of each cell

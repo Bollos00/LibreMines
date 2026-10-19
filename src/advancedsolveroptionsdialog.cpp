@@ -24,6 +24,7 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QThread>
 
 AdvancedSolverOptionsDialog::AdvancedSolverOptionsDialog(QWidget *parent)
     : QDialog(parent)
@@ -39,9 +40,13 @@ AdvancedSolverOptionsDialog::AdvancedSolverOptionsDialog(QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::rejected,
             this, &AdvancedSolverOptionsDialog::close);
 
+    // The solver count can never exceed the number of CPU cores
+    ui->sbSolversCount->setMaximum(qMax(1, QThread::idealThreadCount()));
+
     // Initialize the controls with the solver defaults
     setOptionSolverStrategies(LibreMinesSolver::SolverStrategy::AllStrategies);
     setOptionMaxEnumerationClues(LibreMinesSolver::DefaultMaxEnumerationClues);
+    setOptionSolversCount(LibreMinesGameEngine::AutoSolversCount);
 }
 
 AdvancedSolverOptionsDialog::~AdvancedSolverOptionsDialog()
@@ -86,6 +91,22 @@ int AdvancedSolverOptionsDialog::optionMaxEnumerationClues() const
 void AdvancedSolverOptionsDialog::setOptionMaxEnumerationClues(const int clues)
 {
     ui->sbMaxEnumerationClues->setValue(qMax(0, clues));
+}
+
+int AdvancedSolverOptionsDialog::optionSolversCount() const
+{
+    return ui->sbSolversCount->value();
+}
+
+void AdvancedSolverOptionsDialog::setOptionSolversCount(const int n)
+{
+    if (n <= LibreMinesGameEngine::AutoSolversCount)
+    {
+        ui->sbSolversCount->setValue(LibreMinesGameEngine::AutoSolversCount);
+        return;
+    }
+
+    ui->sbSolversCount->setValue(qMin(n, ui->sbSolversCount->maximum()));
 }
 
 void AdvancedSolverOptionsDialog::closeEvent(QCloseEvent* e)
@@ -242,4 +263,5 @@ void AdvancedSolverOptionsDialog::vResetToDefaults()
 {
     setOptionSolverStrategies(LibreMinesSolver::SolverStrategy::AllStrategies);
     setOptionMaxEnumerationClues(LibreMinesSolver::DefaultMaxEnumerationClues);
+    setOptionSolversCount(LibreMinesGameEngine::AutoSolversCount);
 }

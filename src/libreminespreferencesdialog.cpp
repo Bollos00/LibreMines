@@ -264,6 +264,11 @@ int LibreMinesPreferencesDialog::optionMaxEnumerationClues() const
     return advancedSolverOptions->optionMaxEnumerationClues();
 }
 
+int LibreMinesPreferencesDialog::optionSolversCount() const
+{
+    return advancedSolverOptions->optionSolversCount();
+}
+
 void LibreMinesPreferencesDialog::setOptionFirstCellClean(const QString &option)
 {
     ui->cbFirstCellClean->setChecked(option.compare("On", Qt::CaseInsensitive) == 0);
@@ -390,6 +395,11 @@ void LibreMinesPreferencesDialog::setOptionSolverStrategies(const LibreMinesSolv
 void LibreMinesPreferencesDialog::setOptionMaxEnumerationClues(const int clues)
 {
     advancedSolverOptions->setOptionMaxEnumerationClues(clues);
+}
+
+void LibreMinesPreferencesDialog::setOptionSolversCount(const int n)
+{
+    advancedSolverOptions->setOptionSolversCount(n);
 }
 
 QList<int> LibreMinesPreferencesDialog::optionKeyboardControllerKeys() const

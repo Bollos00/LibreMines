@@ -39,14 +39,6 @@
 #include "libreminesscore.h"
 
 /**
- * @brief Number of solver threads started for one No Guess board generation
- *
- * Several independent solvers race to find a solvable board; the first one to
- * finish provides the matrix and the others are interrupted.
- */
-#define SOLVERS_COUNT 1
-
-/**
  * @brief Core minesweeper game engine
  * 
  * LibreMinesGameEngine manages all aspects of minesweeper game logic including:
@@ -271,6 +263,34 @@ public:
      */
     void setMaxEnumerationClues(const int clues);
 
+    /**
+     * @brief Value of setSolversCount() that selects automatic solver sizing
+     *
+     * When this value is configured, the engine derives the number of parallel
+     * solvers from the board mine density, capped by the number of CPU cores.
+     *
+     * @see setSolversCount()
+     * @see resolveSolversCount()
+     * @since v3.0.0
+     */
+    static constexpr int AutoSolversCount = 0;
+
+    /**
+     * @brief Select how many parallel solver threads generate a No Guess board
+     *
+     * Several independent solvers may race to find a solvable board; the first
+     * one to finish provides the matrix and the others are interrupted. Pass
+     * AutoSolversCount to let the engine derive the count from the board mine
+     * density (denser boards produce solvable layouts more rarely, so they are
+     * worth more parallel attempts), capped by the number of CPU cores.
+     *
+     * @param n Number of solver threads, or AutoSolversCount for automatic sizing
+     * @see AutoSolversCount
+     * @see resolveSolversCount()
+     * @since v3.0.0
+     */
+    void setSolversCount(const int n);
+
 private:
     /**
      * @brief Reset the game matrix to initial state
@@ -325,6 +345,20 @@ private:
      */
     void vGenerateEndGameScore(qint64 iTimeInNs = -1, bool ignorePreferences=false);
 
+    /**
+     * @brief Resolve the number of solver threads to start
+     *
+     * Returns the count configured through setSolversCount(). When
+     * AutoSolversCount is configured, the value is derived from the current
+     * board mine density and the number of CPU cores: dense boards yield
+     * solvable boards more rarely, so more parallel solvers are started.
+     *
+     * @return Number of solver threads to start (always at least 1)
+     * @see setSolversCount()
+     * @since v3.0.0
+     */
+    int resolveSolversCount() const;
+
     std::vector< std::vector<CellGameEngine> > principalMatrix; ///< 2D grid containing all game cells
 
     uchar iX;               ///< Current game board width (number of columns)
@@ -346,6 +380,7 @@ private:
 
     quint64 solverStrategies;   ///< Bit mask of LibreMinesSolver::SolverStrategy flags used in No Guess mode
     int maxEnumerationClues;    ///< Clue limit of one enumeration window (0 = unlimited)
+    int iSolversCount;          ///< Number of parallel solvers (AutoSolversCount = derive from board density)
 
     bool bGameActive;       ///< Whether the game is currently in progress
 

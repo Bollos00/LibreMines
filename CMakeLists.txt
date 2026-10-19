@@ -315,6 +315,16 @@ endif()
 
 # Add tests (optional - can be disabled)
 option(BUILD_TESTS "Build the test suite" OFF)
+
+# Optional solver statistics / benchmark tools. They are only built when this
+# option is explicitly enabled; since they depend on the test core library, they
+# also force the test suite on. Normal builds and CI (which only pass
+# -DBUILD_TESTS=ON) stay unaffected.
+option(BUILD_SOLVER_STATISTICS "Build the optional solver statistics and strategy benchmark tools" OFF)
+if(BUILD_SOLVER_STATISTICS)
+    set(BUILD_TESTS ON)
+endif()
+
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)

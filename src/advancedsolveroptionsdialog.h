@@ -117,6 +117,22 @@ public:
      */
     void setOptionMaxEnumerationClues(const int clues);
 
+    /**
+     * @brief Get the number of parallel solver threads
+     *
+     * @return Solver count, or LibreMinesGameEngine::AutoSolversCount for
+     *         automatic sizing based on the board mine density
+     */
+    int optionSolversCount() const;
+
+    /**
+     * @brief Set the number of parallel solver threads
+     *
+     * @param n Solver count, or LibreMinesGameEngine::AutoSolversCount (0) for
+     *          automatic sizing; values above the CPU core count are clamped
+     */
+    void setOptionSolversCount(const int n);
+
 protected:
     /**
      * @brief Handle dialog close event

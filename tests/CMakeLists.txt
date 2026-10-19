@@ -121,3 +121,10 @@ endfunction()
 
 # Add unit tests
 add_subdirectory(unit)
+
+# Optional solver statistics / benchmark tools (built only with
+# -DBUILD_SOLVER_STATISTICS=ON). They are executables meant to be run manually
+# and are intentionally not registered with CTest.
+if(BUILD_SOLVER_STATISTICS)
+    add_subdirectory(statistics)
+endif()

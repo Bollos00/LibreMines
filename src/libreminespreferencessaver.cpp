@@ -226,6 +226,13 @@ void LibreMinesPreferencesSaver::vLastSessionLoadConfigurationFile(
 
                 preferences.setOptionMaxEnumerationClues(terms.at(1).toInt());
             }
+            else if(terms.at(0).compare("SolversCount", Qt::CaseInsensitive) == 0)
+            {
+                if(terms.size() != 2)
+                    continue;
+
+                preferences.setOptionSolversCount(terms.at(1).toInt());
+            }
         }
     }
 
@@ -290,7 +297,9 @@ void LibreMinesPreferencesSaver::vLastSessionSaveConfigurationFile(
                << "SolverStrategies" << ' '
                << static_cast<qulonglong>(preferences.optionSolverStrategies()) << '\n'
                << "MaxEnumerationClues" << ' '
-               << preferences.optionMaxEnumerationClues() << '\n';
+               << preferences.optionMaxEnumerationClues() << '\n'
+               << "SolversCount" << ' '
+               << preferences.optionSolversCount() << '\n';
     }
 
     QScopedPointer<QFile> fileLanguage
