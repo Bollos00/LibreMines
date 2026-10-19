@@ -14,10 +14,6 @@ on:
 #   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
 #   BUILD_TYPE: Release
 
-permissions:
-  checks: write
-  pull-requests: write
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
