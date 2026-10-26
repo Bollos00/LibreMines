@@ -246,6 +246,21 @@ else()
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Multimedia)
 endif()
 
+# Fix for issue #106 (crash on boards larger than 40x40 on Windows).
+#  Each board cell is drawn with two QLabel widgets under the same parent. Qt paints
+#  siblings recursively (QWidgetPrivate::paintSiblingsRecursive), so a large board
+#  (e.g. 41x41 = ~3362 siblings) exhausts the default 1 MB main-thread stack with
+#  STATUS_STACK_OVERFLOW (0xC00000FD). Raising the reserved stack to 8 MB lets the
+#  board paint up to 100x100. This is a mitigation; the durable fix is to reduce
+#  the number of widgets per cell.
+if(WIN32)
+    if(MSVC)
+        target_link_options(${PROJECT_NAME} PRIVATE /STACK:8388608)
+    else()
+        target_link_options(${PROJECT_NAME} PRIVATE -Wl,--stack,8388608)
+    endif()
+endif()
+
 # Set the install settings for Unix environments
 if(UNIX)
     # create install target
