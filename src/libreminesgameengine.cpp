@@ -53,6 +53,8 @@ void LibreMinesGameEngine::vNewGame(const uchar _X,
                                     const uchar i_X_Clean,
                                     const uchar i_Y_Clean)
 {
+    resetTimerState();
+
     // Update the instance parameters
     iX = _X;
     iY = _Y;
@@ -233,6 +235,7 @@ void LibreMinesGameEngine::vNewGameForTest(const uchar _X,
 
     // Match the initial state established by vNewGame, but use the validated
     // deterministic board instead of invoking a board generator.
+    resetTimerState();
     iX = _X;
     iY = _Y;
     nMines = i_nMines_;
@@ -304,20 +307,24 @@ bool LibreMinesGameEngine::bCleanCell(const uchar _X, const uchar _Y, const bool
 
 void LibreMinesGameEngine::vGameLost(const uchar _X, const uchar _Y)
 {
-    qint64 timeInNs = elapsedPreciseTimeInGame.nsecsElapsed();
+    const qint64 timeInNs = elapsedTimeInNs();
     bGameActive = false;
 
     timerTimeInGame.reset();
+    elapsedPreciseTimeInGame.invalidate();
+    bGamePaused = false;
     Q_EMIT SIGNAL_gameLost(_X, _Y);
     vGenerateEndGameScore(timeInNs);
 }
 
 void LibreMinesGameEngine::vGameWon()
 {
-    qint64 timeInNs = elapsedPreciseTimeInGame.nsecsElapsed();
+    const qint64 timeInNs = elapsedTimeInNs();
     bGameActive = false;
 
     timerTimeInGame.reset();
+    elapsedPreciseTimeInGame.invalidate();
+    bGamePaused = false;
     Q_EMIT SIGNAL_gameWon();
     vGenerateEndGameScore(timeInNs);
 }
@@ -402,6 +409,11 @@ bool LibreMinesGameEngine::isGameActive() const
     return bGameActive;
 }
 
+bool LibreMinesGameEngine::isGamePaused() const
+{
+    return bGamePaused;
+}
+
 void LibreMinesGameEngine::setFirstCellClean(const bool x)
 {
     bFirstCellClean = x;
@@ -468,6 +480,9 @@ int LibreMinesGameEngine::resolveSolversCount() const
 
 void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 {
+    if(bGamePaused)
+        return;
+
     // Remake the game if it's the first click and the user asked for a clean first cell
     // On No Guess mode, always remake the game on first click
     if(bFirst && bFirstCellClean && (principalMatrix[_X][_Y].value != CellValue::ZERO || bNoGuessMode))
@@ -506,6 +521,9 @@ void LibreMinesGameEngine::SLOT_cleanCell(const uchar _X, const uchar _Y)
 
 void LibreMinesGameEngine::SLOT_changeFlagState(const uchar _X, const uchar _Y)
 {
+    if(bGamePaused)
+        return;
+
     if(!principalMatrix[_X][_Y].isHidden)
         return;
 
@@ -540,15 +558,34 @@ void LibreMinesGameEngine::SLOT_changeFlagState(const uchar _X, const uchar _Y)
     Q_EMIT SIGNAL_minesLeft(iMinesLeft);
 }
 
-void LibreMinesGameEngine::SLOT_stop()
+qint64 LibreMinesGameEngine::elapsedTimeInNs() const
+{
+    qint64 elapsedTimeInNs = elapsedTimeBeforeCurrentRunInNs;
+    if(elapsedPreciseTimeInGame.isValid())
+        elapsedTimeInNs += qMax<qint64>(1, elapsedPreciseTimeInGame.nsecsElapsed());
+
+    return elapsedTimeInNs;
+}
+
+void LibreMinesGameEngine::resetTimerState()
 {
     timerTimeInGame.reset();
+    elapsedPreciseTimeInGame.invalidate();
+    elapsedTimeBeforeCurrentRunInNs = 0;
+    bGamePaused = false;
+}
+
+void LibreMinesGameEngine::SLOT_stop()
+{
+    resetTimerState();
     bGameActive = false;
     vResetPrincipalMatrix();
 }
 
 void LibreMinesGameEngine::SLOT_startTimer()
 {
+    elapsedTimeBeforeCurrentRunInNs = 0;
+    bGamePaused = false;
     timerTimeInGame.reset(new QTimer());
     QObject::connect(timerTimeInGame.get(), &QTimer::timeout,
                      this, &LibreMinesGameEngine::SLOT_UpdateTime);
@@ -557,11 +594,36 @@ void LibreMinesGameEngine::SLOT_startTimer()
     // This fixes issue #83 where the display timer was one second ahead of real time
     timerTimeInGame->start(100);
     elapsedPreciseTimeInGame.start();
+    Q_EMIT SIGNAL_gameTimerStarted();
+}
+
+void LibreMinesGameEngine::SLOT_pauseTimer()
+{
+    if(!bGameActive || bGamePaused || !timerTimeInGame ||
+       !timerTimeInGame->isActive() || !elapsedPreciseTimeInGame.isValid())
+    {
+        return;
+    }
+
+    elapsedTimeBeforeCurrentRunInNs = elapsedTimeInNs();
+    elapsedPreciseTimeInGame.invalidate();
+    timerTimeInGame->stop();
+    bGamePaused = true;
+}
+
+void LibreMinesGameEngine::SLOT_resumeTimer()
+{
+    if(!bGameActive || !bGamePaused || !timerTimeInGame)
+        return;
+
+    bGamePaused = false;
+    elapsedPreciseTimeInGame.start();
+    timerTimeInGame->start(100);
 }
 
 void LibreMinesGameEngine::SLOT_cleanNeighborCells(const uchar _X, const uchar _Y)
 {
-    if(!bGameActive || _X >= iX || _Y >= iY)
+    if(!bGameActive || bGamePaused || _X >= iX || _Y >= iY)
         return;
 
     const CellGameEngine& centerCell = principalMatrix[_X][_Y];
@@ -642,6 +704,5 @@ void LibreMinesGameEngine::SLOT_generateEndGameScoreAgain()
 
 void LibreMinesGameEngine::SLOT_UpdateTime()
 {
-    Q_EMIT SIGNAL_currentTime(elapsedPreciseTimeInGame.elapsed()/1000);
+    Q_EMIT SIGNAL_currentTime(static_cast<ushort>(elapsedTimeInNs()/1000000000));
 }
-

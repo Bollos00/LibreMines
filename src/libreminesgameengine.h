@@ -204,6 +204,12 @@ public:
     bool isGameActive()const;
 
     /**
+     * @brief Check whether the active game is paused
+     * @return true if gameplay is paused, false otherwise
+     */
+    bool isGamePaused() const;
+
+    /**
      * @brief Set whether the first cell clicked should be guaranteed safe
      * 
      * When enabled, the first cell clicked will automatically be kept
@@ -444,6 +450,11 @@ Q_SIGNALS:
      * @param time Current game time in seconds
      */
     void SIGNAL_currentTime(const ushort);
+
+    /**
+     * @brief Signal emitted when the first move starts the game timer
+     */
+    void SIGNAL_gameTimerStarted();
     
     /**
      * @brief Signal emitted when the mine count display should be updated
@@ -526,7 +537,8 @@ public Q_SLOTS:
      * @brief Slot to stop the current game
      * 
      * Stops the game timer and sets the game to inactive state.
-     * Used when pausing or ending a game.
+     * Used when restarting or abandoning a game; use SLOT_pauseTimer()
+     * to pause without ending the active game.
      */
     void SLOT_stop();
     
@@ -537,6 +549,16 @@ public Q_SLOTS:
      * cell is clicked.
      */
     void SLOT_startTimer();
+
+    /**
+     * @brief Pause the active game timer and block gameplay actions
+     */
+    void SLOT_pauseTimer();
+
+    /**
+     * @brief Resume a paused game timer
+     */
+    void SLOT_resumeTimer();
     
     /**
      * @brief Slot to handle neighbor cell clearing requests
@@ -577,6 +599,12 @@ private Q_SLOTS:
      */
     void SLOT_UpdateTime();
 
+private:
+    qint64 elapsedTimeInNs() const;
+    void resetTimerState();
+
+    qint64 elapsedTimeBeforeCurrentRunInNs = 0;
+    bool bGamePaused = false;
 };
 
 #endif // LIBREMINESGAMEENGINE_H

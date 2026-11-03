@@ -230,6 +230,11 @@ private Q_SLOTS:
     void SLOT_RestartGame();
 
     /**
+     * @brief Toggle between the paused and resumed gameplay states
+     */
+    void SLOT_pauseResumeGame();
+
+    /**
      * @brief
      *
      * @param e
@@ -317,6 +322,7 @@ private:
     QProgressBar* progressBarGameCompleteInGame;
     QPushButton *buttonRestartInGame; /**< TODO: describe */
     QPushButton *buttonQuitInGame; /**< TODO: describe */
+    QPushButton* buttonPauseInGame;
     QPushButton* buttonSaveMinefieldAsImage;
     QPushButton* buttonSaveScore;
 
