@@ -129,7 +129,6 @@ jobs:
           Copy-Item ../share/faces_reaction/SecularSteve_custom ./Release/facesreaction_extra_themes -Recurse
 
       - name: Create Windows installer
-        if: inputs.upload_to_release
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.9
         with:
           path: etc/installers/windows/libremines.iss
@@ -157,6 +156,7 @@ jobs:
           New-Item -ItemType Directory -Name "artifact-temp" -Force
           New-Item -ItemType Directory -Name "artifact-temp/libremines" -Force
           Copy-Item ./Release/* ./artifact-temp/libremines -Recurse
+          Copy-Item ./*-setup.exe ./artifact-temp
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
