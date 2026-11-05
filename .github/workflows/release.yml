@@ -19,7 +19,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
+      - name: Validate release version and AppStream metadata
+        run: python3 .github/scripts/validate_release.py "$GITHUB_REF_NAME"
+
       - name: Get version from tag
         id: version
         run: |

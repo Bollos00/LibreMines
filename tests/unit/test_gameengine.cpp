@@ -109,6 +109,9 @@ private slots:
     void testTimerBehaviorWithFirstCellCleanEnabled();
     void testTimerAccuracyForScoring();
     void testTimerStateAfterGameEnd();
+    void testTimerPausesAndResumes();
+    void testPausedTimeIsExcludedFromScore();
+    void testCannotPauseBeforeFirstMove();
     
     // Score generation tests (High Priority)
     void testEndGameScoreCalculation();
@@ -765,9 +768,9 @@ void TestGameEngine::testChordOperation()
     // 1 1 1
     engine->setFirstCellClean(false);
     engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
-R"(111
-1*1
-111)"));
+        R"(1 1 1
+           1 * 1
+           1 1 1)"));
 
     QSignalSpy showCellSpy(engine, &LibreMinesGameEngine::SIGNAL_showCell);
     QSignalSpy gameLostSpy(engine, &LibreMinesGameEngine::SIGNAL_gameLost);
@@ -799,9 +802,9 @@ void TestGameEngine::testChordWithIncorrectFlagCount()
     // 1 1 1
     engine->setFirstCellClean(false);
     engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
-R"(111
-1*1
-111)"));
+        R"(1 1 1
+           1 * 1
+           1 1 1)"));
 
     QSignalSpy showCellSpy(engine, &LibreMinesGameEngine::SIGNAL_showCell);
     QSignalSpy rejectedSpy(engine, &LibreMinesGameEngine::SIGNAL_cleanNeighborCellsRejected);
@@ -836,9 +839,9 @@ void TestGameEngine::testChordWithIncorrectFlagsCorrectCount()
     // 1 1 1
     engine->setFirstCellClean(false);
     engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
-R"(111
-1*1
-111)"));
+        R"(1 1 1
+           1 * 1
+           1 1 1)"));
 
     QSignalSpy gameLostSpy(engine, &LibreMinesGameEngine::SIGNAL_gameLost);
     QSignalSpy rejectedSpy(engine, &LibreMinesGameEngine::SIGNAL_cleanNeighborCellsRejected);
@@ -863,9 +866,9 @@ void TestGameEngine::testChordSafetyChecks()
     // 1 1 1
     engine->setFirstCellClean(false);
     engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
-R"(111
-1*1
-111)"));
+        R"(1 1 1
+           1 * 1
+           1 1 1)"));
 
     QSignalSpy showCellSpy(engine, &LibreMinesGameEngine::SIGNAL_showCell);
     QSignalSpy rejectedSpy(engine, &LibreMinesGameEngine::SIGNAL_cleanNeighborCellsRejected);
@@ -902,10 +905,10 @@ void TestGameEngine::testChordRecursiveClearingEdgeCases()
     // reveals every non-mine cell, winning the game.
     engine->setFirstCellClean(false);
     engine->vNewGameForTest(4, 4, 1, QString::fromLatin1(
-R"(*100
-1100
-0000
-0000)"));
+        R"(* 1 0 0
+           1 1 0 0
+           0 0 0 0
+           0 0 0 0)"));
 
     QSignalSpy showCellSpy(engine, &LibreMinesGameEngine::SIGNAL_showCell);
     QSignalSpy gameWonSpy(engine, &LibreMinesGameEngine::SIGNAL_gameWon);
@@ -1278,6 +1281,80 @@ void TestGameEngine::testTimerStateAfterGameEnd()
     QVERIFY(currentTimeSpy.count() <= timerSignalsBeforeEnd + 1);
 }
 
+void TestGameEngine::testTimerPausesAndResumes()
+{
+    engine->setFirstCellClean(false);
+    engine->vNewGameForTest(2, 2, 1, QString::fromLatin1(
+        R"(1 *
+           1 1)"));
+
+    QSignalSpy currentTimeSpy(engine, &LibreMinesGameEngine::SIGNAL_currentTime);
+    engine->SLOT_cleanCell(0, 0);
+    QTest::qWait(250);
+    QVERIFY(currentTimeSpy.count() > 0);
+
+    engine->SLOT_pauseTimer();
+    QVERIFY(engine->isGamePaused());
+    const int pausedSignalCount = currentTimeSpy.count();
+
+    engine->SLOT_cleanCell(1, 0);
+    engine->SLOT_changeFlagState(0, 1);
+    QVERIFY(engine->isGameActive());
+    QVERIFY(engine->getPrincipalMatrix()[1][0].isHidden);
+    QCOMPARE(engine->getPrincipalMatrix()[0][1].flagState, FlagState::NoFlag);
+
+    QTest::qWait(250);
+    QCOMPARE(currentTimeSpy.count(), pausedSignalCount);
+
+    engine->SLOT_resumeTimer();
+    QVERIFY(!engine->isGamePaused());
+    QTest::qWait(250);
+    QVERIFY(currentTimeSpy.count() > pausedSignalCount);
+
+    engine->SLOT_pauseTimer();
+    engine->SLOT_stop();
+    QVERIFY(!engine->isGamePaused());
+    engine->vNewGame(2, 2, 1);
+    QVERIFY(!engine->isGamePaused());
+}
+
+void TestGameEngine::testPausedTimeIsExcludedFromScore()
+{
+    engine->setFirstCellClean(false);
+    engine->vNewGameForTest(2, 2, 1, QString::fromLatin1(
+        R"(1 *
+           1 1)"));
+
+    QSignalSpy endGameSpy(engine, &LibreMinesGameEngine::SIGNAL_endGameScore);
+    QElapsedTimer wallClock;
+    wallClock.start();
+
+    engine->SLOT_cleanCell(0, 0);
+    QTest::qWait(200);
+    engine->SLOT_pauseTimer();
+    QTest::qWait(1200);
+    engine->SLOT_resumeTimer();
+    QTest::qWait(200);
+    engine->SLOT_cleanCell(1, 0);
+
+    QCOMPARE(endGameSpy.count(), 1);
+    const LibreMinesScore score =
+        qvariant_cast<LibreMinesScore>(endGameSpy.at(0).at(0));
+    QVERIFY(score.iTimeInNs < wallClock.nsecsElapsed() - 600000000);
+}
+
+void TestGameEngine::testCannotPauseBeforeFirstMove()
+{
+    engine->vNewGameForTest(2, 2, 1, QString::fromLatin1(
+        R"(1 *
+           1 1)"));
+
+    engine->SLOT_pauseTimer();
+    QVERIFY(!engine->isGamePaused());
+    engine->SLOT_resumeTimer();
+    QVERIFY(!engine->isGamePaused());
+}
+
 // Score generation tests (High Priority)
 void TestGameEngine::testEndGameScoreCalculation()
 {
@@ -1322,24 +1399,33 @@ void TestGameEngine::testEndGameScoreCalculation()
 
 void TestGameEngine::testEndGameScoreWithCustomTime()
 {
-    engine->vNewGame(3, 3, 1);
+    engine->setFirstCellClean(false);
+    engine->vNewGameForTest(2, 2, 1, QString::fromLatin1(
+        R"(1 *
+           1 1)"));
     
     QSignalSpy endGameSpy(engine, &LibreMinesGameEngine::SIGNAL_endGameScore);
     
-    // Start game and let some time pass, then generate score using public slot
-    engine->SLOT_cleanCell(0, 0);  // Start timer
-    QTest::qWait(1100);  // Let some time pass
-    
-    // Use the public slot to regenerate score
+    // Start the game, let time pass, then finish it before checking its duration.
+    engine->SLOT_cleanCell(0, 0);
+    QTest::qWait(1100);
+    engine->SLOT_cleanCell(0, 1);
+    engine->SLOT_cleanCell(1, 1);
+
+    QVERIFY(!engine->isGameActive());
+    QCOMPARE(endGameSpy.count(), 1);
+
+    const LibreMinesScore completedScore =
+        qvariant_cast<LibreMinesScore>(endGameSpy.at(0).at(0));
+    QVERIFY(completedScore.iTimeInNs > 0);
+
+    // Regenerating a completed score should retain its finalized duration.
     engine->SLOT_generateEndGameScoreAgain();
-    
-    QVERIFY(endGameSpy.count() >= 1);
-    
-    auto args = endGameSpy.takeLast();
-    LibreMinesScore score = qvariant_cast<LibreMinesScore>(args.at(0));
-    
-    // Score should have some time recorded
-    QVERIFY(score.iTimeInNs > 0);
+    QCOMPARE(endGameSpy.count(), 2);
+
+    const LibreMinesScore regeneratedScore =
+        qvariant_cast<LibreMinesScore>(endGameSpy.at(1).at(0));
+    QCOMPARE(regeneratedScore.iTimeInNs, completedScore.iTimeInNs);
 }
 
 void TestGameEngine::testEndGameScoreStatisticsAccuracy()
@@ -1454,9 +1540,9 @@ void TestGameEngine::testNoWinAfterLossFromCleaningLastNeighbors()
 
     engine->setFirstCellClean(false);
     engine->vNewGameForTest(3, 3, 1, QString::fromLatin1(
-R"(111
-   1*1
-   111)"));
+        R"(1 1 1
+           1 * 1
+           1 1 1)"));
 
     for (QPair<uchar, uchar> cell : QList<QPair<uchar, uchar>>{ {0,0}, {0, 1}, {0,2}, {1,2}, {2,0}, {2, 1}, {2,2} })
     {

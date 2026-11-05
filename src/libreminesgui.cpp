@@ -165,7 +165,7 @@ bool LibreMinesGui::eventFilter(QObject* object, QEvent* event)
         return false;
 
     // If the game is not running, do not deal with the event
-    if(!gameEngine || !gameEngine->isGameActive())
+    if(!gameEngine || !gameEngine->isGameActive() || gameEngine->isGamePaused())
         return false;
 
     // If the GUI is not ready
@@ -199,6 +199,9 @@ void LibreMinesGui::vNewGame(const uchar _X,
                              short i_nMines_)
 {
     bMinefieldBeingCreated = true;
+    buttonPauseInGame->setText(tr("Pause"));
+    buttonPauseInGame->hide();
+    buttonPauseInGame->setEnabled(false);
     
     vAdjustInterfaceInGame();
     vShowInterfaceInGame();
@@ -327,6 +330,15 @@ void LibreMinesGui::vNewGame(const uchar _X,
             this, &LibreMinesGui::SLOT_endGameScore);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_currentTime,
             this, &LibreMinesGui::SLOT_currentTime);
+    connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_gameTimerStarted,
+            this, [this]()
+    {
+        if(gameEngine->isGameActive())
+        {
+            buttonPauseInGame->setEnabled(true);
+            buttonPauseInGame->show();
+        }
+    });
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_minesLeft,
             this, &LibreMinesGui::SLOT_minesLeft);
     connect(gameEngine.get(), &LibreMinesGameEngine::SIGNAL_flagCell,
@@ -476,6 +488,7 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     progressBarGameCompleteInGame = new QProgressBar(centralWidget());
     buttonRestartInGame = new QPushButton(centralWidget());
     buttonQuitInGame = new QPushButton(centralWidget());
+    buttonPauseInGame = new QPushButton(centralWidget());
     buttonSaveMinefieldAsImage = new QPushButton(centralWidget());
     buttonSaveScore = new QPushButton(centralWidget());
 
@@ -515,6 +528,8 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
     buttonRestartInGame->setMinimumSize(0, 35);
     buttonQuitInGame->setText(tr("Quit"));
     buttonQuitInGame->setMinimumSize(0, 35);
+    buttonPauseInGame->setText(tr("Pause"));
+    buttonPauseInGame->setMinimumSize(0, 35);
     buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
     buttonSaveMinefieldAsImage->setMinimumSize(0, 35);
     buttonSaveScore->setText(tr("Save Score"));
@@ -605,6 +620,9 @@ void LibreMinesGui::vCreateGUI(const int width, const int height)
 
     connect(buttonQuitInGame, &QPushButton::released,
             this, &LibreMinesGui::SLOT_QuitGame);
+
+    connect(buttonPauseInGame, &QPushButton::released,
+            this, &LibreMinesGui::SLOT_pauseResumeGame);
 
     connect(buttonSaveMinefieldAsImage, &QPushButton::released,
             this, &LibreMinesGui::SLOT_saveMinefieldAsImage);
@@ -910,12 +928,17 @@ void LibreMinesGui::vAdjustInterfaceInGame()
         buttonRestartInGame->x() + buttonRestartInGame->width() + h/200, buttonRestartInGame->y(),
         buttonRestartInGame->width(), buttonRestartInGame->height()
         );
+    buttonPauseInGame->setGeometry(
+        progressBarGameCompleteInGame->x(),
+        buttonRestartInGame->y() + buttonRestartInGame->height() + h/200,
+        progressBarGameCompleteInGame->width(), buttonRestartInGame->height()
+        );
 
     if(progressBarGameCompleteInGame->width() > 200)
     {
         buttonSaveMinefieldAsImage->setGeometry(
             buttonRestartInGame->x(),
-            buttonRestartInGame->y() + buttonRestartInGame->height() + h/200,
+            buttonPauseInGame->y() + buttonPauseInGame->height() + h/200,
             progressBarGameCompleteInGame->width(), progressBarGameCompleteInGame->height()
             );
         buttonSaveMinefieldAsImage->setText(tr("Save Minefield as Image"));
@@ -924,7 +947,7 @@ void LibreMinesGui::vAdjustInterfaceInGame()
     {
         buttonSaveMinefieldAsImage->setGeometry(
             buttonRestartInGame->x(),
-            buttonRestartInGame->y() + buttonRestartInGame->height() + h/200,
+            buttonPauseInGame->y() + buttonPauseInGame->height() + h/200,
             progressBarGameCompleteInGame->width(), 2*progressBarGameCompleteInGame->height()
             );
         buttonSaveMinefieldAsImage->setText(tr("Save Minefield\nas Image"));
@@ -1008,6 +1031,7 @@ void LibreMinesGui::vHideInterfaceInGame()
     progressBarGameCompleteInGame->hide();
     buttonRestartInGame->hide();
     buttonQuitInGame->hide();
+    buttonPauseInGame->hide();
     buttonSaveMinefieldAsImage->hide();
     buttonSaveScore->hide();
     labelYouWonYouLost->hide();
@@ -1043,6 +1067,31 @@ void LibreMinesGui::vSetApplicationTheme(const QString& theme)
         // Create a message if a restart is needed
         QMessageBox::information(this, "LibreMines",
                                  "Please reset the application to apply this change");
+    }
+}
+
+void LibreMinesGui::SLOT_pauseResumeGame()
+{
+    if(!gameEngine || !gameEngine->isGameActive() || !buttonPauseInGame->isEnabled())
+        return;
+
+    if(gameEngine->isGamePaused())
+    {
+        gameEngine->SLOT_resumeTimer();
+        if(gameEngine->isGamePaused())
+            return;
+
+        scrollAreaBoard->show();
+        buttonPauseInGame->setText(tr("Pause"));
+    }
+    else
+    {
+        gameEngine->SLOT_pauseTimer();
+        if(!gameEngine->isGamePaused())
+            return;
+
+        scrollAreaBoard->hide();
+        buttonPauseInGame->setText(tr("Resume"));
     }
 }
 
@@ -1245,6 +1294,9 @@ void LibreMinesGui::SLOT_endGameScore(LibreMinesScore score,
             + '\n'
             + tr("Game Complete: %1 %").arg(QString::number(score.dPercentageGameCompleted, 'f', 2));
 
+    buttonPauseInGame->setEnabled(false);
+    buttonPauseInGame->setText(tr("Pause"));
+    buttonPauseInGame->hide();
     labelStatsLastMatch->setText(QS_Statics);
 
 
