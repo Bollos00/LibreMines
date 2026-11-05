@@ -39,7 +39,7 @@ jobs:
         qt-version: [5, 6]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: "Install Qt 5 via Homebrew"
         if: matrix.qt-version == 5
@@ -91,7 +91,7 @@ jobs:
           fail_on_failure: true
 
       - name: "Upload test results (XML)"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: (success() || failure()) && inputs.upload_to_release != true
         with:
           name: test-results-macos-${{ matrix.os }}-qt-${{ matrix.qt-version }}
@@ -163,13 +163,13 @@ jobs:
           cp *.dmg artifact-temp/ 2>/dev/null || true
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: libremines-build-macos-${{ matrix.os }}-qt-${{ matrix.qt-version }}
           path: build/artifact-temp/
           
       - name: Upload to Release
         if: inputs.upload_to_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: build/*.dmg

@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: "Apt update"
         run: "sudo apt-get update"
@@ -51,7 +51,7 @@ jobs:
           fail_on_failure: true
 
       - name: "Upload test results (XML)"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
           name: test-results-${{ matrix.os }}
@@ -64,7 +64,7 @@ jobs:
           cp ../LICENSE ../README.md ./install/usr/share/libremines
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: libremines-build-${{ matrix.os }}
           path: build/install

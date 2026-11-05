@@ -40,6 +40,14 @@ project(libremines
     LANGUAGES "CXX"
     )
 
+if(WIN32)
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/etc/installers/windows/libremines-version.iss.in
+        ${PROJECT_BINARY_DIR}/libremines-version.iss
+        @ONLY
+        )
+endif()
+
 option(USE_QT6 "Whether to use Qt5 or Qt6 libraries" TRUE)
 option(UPDATE_TRANSLATIONS "Generate de QM translation files" FALSE)
 option(INSTALL_EXTRA_MINEFIELD_THEMES "Install extra themes for the minefield" TRUE)
