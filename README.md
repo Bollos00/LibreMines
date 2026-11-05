@@ -10,44 +10,6 @@ The game supports dark and light themes, extensive customization, customizable f
 
 The source code is licensed under the [GNU General Public License at version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) (or any later version), this includes all files inside the `src` directory. The artworks are licensed under the [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/), this includes all files on the `share` directory.
 
-## Installing from Package Manager
-
-### Arch User Repository
-
-[LibreMines is available in Arch User Repository](https://aur.archlinux.org/packages/libremines/). It can be installed with an AUR helper:
-
-To install using `yay`:
-```sh
-yay -Sy libremines
-```
-
-To install using `paru`:
-```sh
-paru -Sy libremines
-```
-
-To install manually using `git` **without** an AUR helper:
-```sh
-git clone https://aur.archlinux.org/libremines.git && cd libremines
-makepkg -si
-```
-
-### FreeBSD
-
-[LibreMines is available in FreeBSD ports tree](https://www.freshports.org/games/LibreMines). It can be installed with `pkg`:
-
-```sh
-pkg install libremines
-```
-
-### Flatpak
-
-[LibreMines is available in FlatHub](https://flathub.org/apps/details/io.github.Bollos00.LibreMines). It can be installed with `flatpak`:
-
-```sh
-flatpak install flathub io.github.Bollos00.LibreMines
-```
-
 ## Downloads & Releases
 
 Pre-built binaries are available for multiple platforms. Download the latest release from the [Releases page](https://github.com/Bollos00/LibreMines/releases).
@@ -58,7 +20,33 @@ Pre-built binaries are available for multiple platforms. Download the latest rel
 |-------------|--------------|------------|-----------------|--------------------------------------------------------------------------|
 | **Linux**   | AppImage     | Qt5/Qt6    | x86_64          | Make executable with `chmod +x LibreMines*.AppImage` and run directly    |
 | **macOS**   | .dmg package | Qt5/Qt6    | Intel & ARM64   | Open the .dmg file, drag libremines to Applications folder. If you are unable to launch the application,  [follow instructions here](https://support.apple.com/en-gb/guide/mac-help/mh40616/26/mac/26) |
-| **Windows** | ZIP Archive  | Qt5/Qt6    | x64             | Extract the ZIP archive to any folder and run `libremines.exe`           |
+| **Windows** | Inno Setup installer or ZIP archive | Qt5/Qt6 | x64 | Run the installer for a standard setup, or extract the ZIP and run `libremines.exe` |
+
+## Installing from Package Manager
+
+### Flatpak
+
+[LibreMines is available in FlatHub](https://flathub.org/apps/details/io.github.Bollos00.LibreMines). It can be installed with `flatpak`:
+
+```sh
+flatpak install flathub io.github.Bollos00.LibreMines
+```
+
+### Arch User Repository
+
+[LibreMines is available in the AUR](https://aur.archlinux.org/packages/libremines/). It can be installed with your preferred AUR helper, such as `yay` or `paru`.
+
+```sh
+yay -Sy libremines # alternative: paru -Sy libremines
+```
+
+### FreeBSD
+
+[LibreMines is available in FreeBSD ports tree](https://www.freshports.org/games/LibreMines). It can be installed with `pkg`:
+
+```sh
+pkg install libremines
+```
 
 ## Compiling from the source code
 

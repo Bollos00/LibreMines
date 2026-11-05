@@ -23,7 +23,7 @@ jobs:
       image: archlinux:latest
       options: --privileged
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: "Install dependencies"
         run: "pacman -Syu --noconfirm base-devel qt6-base qt6-svg qt6-multimedia cmake"
@@ -47,7 +47,7 @@ jobs:
           fail_on_failure: true
 
       - name: "Upload test results (XML)"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
           name: test-results-archlinux-latest
@@ -60,7 +60,7 @@ jobs:
           cp ../LICENSE ../README.md ./install/usr/share/libremines
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: libremines-build-archlinux-latest
           path: build/install

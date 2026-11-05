@@ -28,11 +28,11 @@ jobs:
         qt-version: [ '5.15.2', '6.8.3' ]
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: "Install Qt 5.15.2"
         if: matrix.qt-version == '5.15.2'
-        uses: jurplel/install-qt-action@v4.3.0
+        uses: jurplel/install-qt-action@v4.5.0
         with:
           version: '5.15.2'
           host: 'linux'
@@ -41,7 +41,7 @@ jobs:
 
       - name: "Install Qt 6.8.3"
         if: matrix.qt-version == '6.8.3'
-        uses: jurplel/install-qt-action@v4.3.0
+        uses: jurplel/install-qt-action@v4.5.0
         with:
           version: '6.8.3'
           host: 'linux'
@@ -89,7 +89,7 @@ jobs:
           fail_on_failure: true
 
       - name: "Upload test results (XML)"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: (success() || failure()) && inputs.upload_to_release != true
         with:
           name: test-results-appimage-qt-${{ matrix.qt-version }}
@@ -144,13 +144,13 @@ jobs:
           fi
       
       - name: Upload AppImage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: LibreMines-AppImage-qt-${{ matrix.qt-version }}-x86_64
           path: build/*.AppImage
           
       - name: Upload to Release
         if: inputs.upload_to_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: build/*.AppImage
